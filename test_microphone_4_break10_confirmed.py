@@ -1209,7 +1209,7 @@ t1=0
 def send_photo_request(photo_base64):
     global flag_error, audio_file_stack_length, paizhao_voice_command,\
         generate_photo_base64,nihao_detected,xiaoqi_detected,result_detected,\
-        hello_detected,file_counter,message_id,no_match_but_valid,resp_code_id,conversation_id,ws2,flag_think2
+        hello_detected,file_counter,message_id,no_match_but_valid,resp_code_id,conversation_id,ws2,flag_think2,no_match_but_valid
     # WebSocket 地址
 
     # 构建 JSON 请求
@@ -1246,7 +1246,21 @@ def send_photo_request(photo_base64):
         # while not flag_done:
         while True:
             time.sleep(0.01)
-            if audio_file_stack_length > 1:
+            if no_match_but_valid == True or nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
+                print("***************************")
+                print("***************************")
+                print("no_match_but_valid:", no_match_but_valid)
+                print("nihao_detected:", nihao_detected)
+                print("xiaoqi_detected:", xiaoqi_detected)
+                print("audio_file_stack_length > 1:", audio_file_stack_length > 1)
+                print("***************************")
+                print("***************************")
+                output_audio_stack.clear()
+                print("Clear output_file_stack @@SReceive_break_send_audio")
+                no_match_but_valid = False
+                break_send_audio = False
+                nihao_detected = False
+                xiaoqi_detected = False
                 break
 
             # if nihao_detected:
@@ -1279,7 +1293,10 @@ def send_photo_request(photo_base64):
                     print("!resp_message_id:", resp_message_id)
                     resp_fomat = response_data["data"]["audio_format"]
                     print("resp_fomat:", resp_fomat)
-
+                    if resp_message_id != message_id and int(resp_code_id) == 0:
+                        no_match_but_valid = True
+                        print("resp_conversation_id not match !!!!!!!!!!!!!!!!!!!!!???????????????????")
+                        break
                     audio_base64 = response_data["data"]["audio_data"]
                     audio_bytes = base64.b64decode(audio_base64)
                     seq_li = response_data["data"]["stream_seq"]
@@ -1330,6 +1347,8 @@ def send_photo_request(photo_base64):
                         #     ["aplay", "-D", "hw:0,0", "-f", "S16_LE", "-r", "16000", "-c", "1", output_file_name])
                     else:
                         audio_buffer = io.BytesIO(audio_bytes)
+                        if nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
+                            continue
                         output_audio_stack.append(audio_buffer)
                         output_audio_stack_length = len(output_audio_stack)
                         print("播放栈len:", output_audio_stack_length)
