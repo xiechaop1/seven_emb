@@ -74,7 +74,7 @@ nihao_detected=False
 hello_detected=False
 result_detected=False
 xiaoqi_detected_count=0
-message_id=0
+
 file_counter = 0
 no_match_but_valid=False
 resp_code_id=0
@@ -268,14 +268,14 @@ def speed_control(speed,speed2,step):
 
         pulse_width += current_step  # 根据速度增加或减少脉冲宽度
         pulse_width2 += current_step2  # 根据速度增加或减少脉冲宽度
-        if pulse_width>1600:
-            pulse_width =1600
-        elif pulse_width<1000:
-            pulse_width=1000
-        if pulse_width2 > 1600:
-            pulse_width2 = 1600
-        elif pulse_width2 < 1000:
-            pulse_width2 = 1000
+        if pulse_width>1800:
+            pulse_width =1800
+        elif pulse_width<800:
+            pulse_width=800
+        if pulse_width2 > 1500:
+            pulse_width2 = 1500
+        elif pulse_width2 < 700:
+            pulse_width2 = 700
 
             # 控制时间间隔，以达到指定的速度
         time.sleep(0.007)  # 控制循环速度，值可以调整以匹配实际硬件响应
@@ -300,7 +300,7 @@ def speed_control(speed,speed2,step):
             last_pulse_width2 = pulse_width2
             last_time = current_time
 start_angel1=1300
-start_angel0=1300
+start_angel0=1000
 def init():
     global switch_flag, old_switch_flag, stop_event, thread3
 
@@ -308,7 +308,7 @@ def init():
     pwm.setServoPulse(0, start_angel0)  # jaw
 
     for i in range(1):
-        time.sleep(5)
+        time.sleep(1)
         print("##################start################")
 
 def map_value(value, from_min, from_max, to_min, to_max):
@@ -489,7 +489,7 @@ def face_detection_run1():
     while running2 and face_detection_switch:
         thread_control_event.wait()
 
-        time.sleep(0.02)
+        time.sleep(0.005)
         count += 1
         t0 = time.time()
         flag_break = False
@@ -504,12 +504,15 @@ def face_detection_run1():
             if retval:
                 # 将字节流转换为Base64字符串
                 photo_base64 = base64.b64encode(buffer).decode('utf-8')
-                time.sleep(0.02)
+                time.sleep(0.2)
                 generate_photo_base64=True
                 print("send_generate_photo_base64:",generate_photo_base64)
                 # send_photo_request(photo_base64)
                 send_photo_thread = threading.Thread(target=send_photo_request,args=(photo_base64,))
                 send_photo_thread.start()
+                with threading.Lock():
+                    subprocess.run(
+                        ["aplay", "-D", "plughw:4,0", "-f", "S16_LE", "-r", "16000", "-c", "1", take_photo_file])
                 # send_photo_thread.join()
 
         paizhao_voice_command=False
@@ -606,45 +609,45 @@ def face_detection_run1():
             # 左边 & 垂直中心
             print("Left-Center")
             flag_break2 = True
-            speed_control(1.2 * abs(int(speed_h)), 0, 20)
+            speed_control(1.4 * abs(int(speed_h)), 0, 20)
 
         elif x > center_x_max and center_y_min <= y <= center_y_max:
             # 右边 & 垂直中心
             print("Right-Center")
             flag_break2 = True
-            speed_control(-1.2 * abs(int(speed_h)), 0, 20)
+            speed_control(-1.4 * abs(int(speed_h)), 0, 20)
 
         elif center_x_min <= x <= center_x_max and y < center_y_min:
             # 水平中心 & 上
             print("Center-Up")
             flag_break = True
-            speed_control(0, -abs(int(speed_v * 1.0)), 20)
+            speed_control(0, -abs(int(speed_v * 1.2)), 20)
 
         elif center_x_min <= x <= center_x_max and y > center_y_max:
             # 水平中心 & 下
             print("Center-Down")
             flag_break = True
-            speed_control(0, abs(int(speed_v * 1.0)), 20)
+            speed_control(0, abs(int(speed_v * 1.2)), 20)
         #
         elif x < center_x_min and y < center_y_min:
             # 左边 & 上
             print("Left-Up")
-            speed_control(1.2 * abs(int(speed_h)), -abs(int(speed_v * 1.0)), 20)
+            speed_control(1.4 * abs(int(speed_h)), -abs(int(speed_v * 1.2)), 20)
 
         elif x < center_x_min and y > center_y_max:
             # 左边 & 下
             print("Left-Down")
-            speed_control(1.2 * abs(int(speed_h)), abs(int(speed_v * 1.0)), 20)
+            speed_control(1.4 * abs(int(speed_h)), abs(int(speed_v * 1.2)), 20)
 
         elif x > center_x_max and y < center_y_min:
             # 右边 & 上
             print("Right-Up")
-            speed_control(-1.2 * abs(int(speed_h)), -abs(int(speed_v * 1.0)), 20)
+            speed_control(-1.4 * abs(int(speed_h)), -abs(int(speed_v * 1.2)), 20)
 
         elif x > center_x_max and y > center_y_max:
             # 右边 & 下
             print("Right-Down")
-            speed_control(-1.2 * abs(int(speed_h)), abs(int(speed_v * 1.0)), 20)
+            speed_control(-1.4 * abs(int(speed_h)), abs(int(speed_v * 1.2)), 20)
         else:
             print("Something else")
         t2 = time.time()
@@ -773,18 +776,18 @@ def create_connection_with_retries(url, max_retries=100, retry_interval=0.1):
     retries = 0
     while retries < max_retries:
         try:
-            print(f"尝试连接到 {url} (尝试 {retries + 1} / {max_retries})")
+            print(f"try connetc {url} (try {retries + 1} / {max_retries})")
             ws = websocket.create_connection(url)
-            print("连接成功!")
+            print("connect successed!")
             return ws
         except websocket.WebSocketException as e:
-            print(f"连接失败: {e}")
+            print(f"Connection Fail: {e}")
             retries += 1
             if retries < max_retries:
-                print(f"等待 {retry_interval} 秒后重试...")
+                print(f"wait for {retry_interval} s retry...")
                 time.sleep(retry_interval)
             else:
-                print("达到最大重试次数，无法连接 WebSocket。")
+                print("max try rearched ，can't connect to WebSocket。")
                 raise e
     return None
 
@@ -1124,7 +1127,7 @@ BUFFER_DURATION = 300  # mss
 SAMPLE_RATE = 16000  # 采样率
 CHANNELS = 1  # 单声道
 
-SILENCE_THRESHOLD = 700  # 静音阈值
+SILENCE_THRESHOLD = 500  # 静音阈值
 SILENCE_FRAMES = 10  # 静音帧数量阈值
 PRE_RECORD_FRAMES = 1  # 预录制帧数
 # 定义队列和缓冲区
@@ -1232,9 +1235,9 @@ t1=0
 def send_photo_request(photo_base64):
     global flag_error, audio_file_stack_length, paizhao_voice_command,\
         generate_photo_base64,nihao_detected,xiaoqi_detected,result_detected,\
-        hello_detected,file_counter,message_id,resp_code_id,conversation_id,ws2,flag_think2,old_message_id
+        hello_detected,file_counter,message_id,resp_code_id,conversation_id,ws,shield_after_send,flag_think2,old_message_id
     # WebSocket 地址
-
+    print("$$$$$$$$$$$$$$$$message_id_send:",message_id)
     # 构建 JSON 请求
     request2 = {
         "version": "1.0",
@@ -1257,167 +1260,172 @@ def send_photo_request(photo_base64):
         print("****************************")
         print("****************************")
         print("****************************")
-        websocket_url = "ws://114.55.90.104:9001/ws"
-        ws2 = websocket.create_connection(websocket_url)
-        ws2.send(json.dumps(request2))
+        # websocket_url = "ws://114.55.90.104:9001/ws"
+        # ws2 = websocket.create_connection(websocket_url)
+        ws.send(json.dumps(request2))
+
+        shield_after_send = True
         print("Photo data sent.")
-
-        file_counter = 1
-
-        # flag_done = False
-        # while not flag_done:
-        while True:
-            time.sleep(0.01)
-            if  nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
-                print("***************************")
-                print("***************************")
-                print("nihao_detected:", nihao_detected)
-                print("xiaoqi_detected:", xiaoqi_detected)
-                print("audio_file_stack_length > 1:", audio_file_stack_length > 1)
-                print("***************************")
-                print("***************************")
-                output_audio_stack.clear()
-                print("Clear output_file_stack @@SReceive_break_send_audio")
-
-                break_send_audio = False
-                nihao_detected = False
-                xiaoqi_detected = False
-                break
-
-            # if nihao_detected:
-            #     nihao_detected = False
-            #     break
-
-            # if t1 - last_t1 > 3:
-            #     # await websocket.send(json.dumps(request_heartbeat))
-            #     ws.send(json.dumps(request_heartbeat))
-            #     print("Heartbeat sent.")
-
-            # 等待响应
-            # response = await websocket.recv()
-            try:
-                response = ws2.recv()
-                response_data = json.loads(response)
-                # print("response_data:",response_data)
-            except json.JSONDecodeError as e:
-                print(f"JSON 解码错误:{e}")
-                # print(f"响应内容:{response}")
-                continue
-            # 检查响应的状态
-            if response_data['method'] == 'voice-chat':
-                if response_data.get("code") == 0:
-                    # 提取并解码音频数据
-                    # print("response_data recieived:", response_data["data"])
-                    resp_message_id = response_data["message_id"]
-                    print("********")
-                    print("********")
-                    print("!resp_message_id:", resp_message_id)
-                    resp_fomat = response_data["data"]["audio_format"]
-                    print("resp_fomat:", resp_fomat)
-                    # if resp_message_id != old_message_id and int(resp_code_id) == 0:
-                    #     no_match_but_valid = True
-                    #     print("resp_conversation_id not match !!!!!!!!!!!!!!!!!!!!!???????????????????")
-                    #     break
-                    audio_base64 = response_data["data"]["audio_data"]
-                    audio_bytes = base64.b64decode(audio_base64)
-                    seq_li = response_data["data"]["stream_seq"]
-                    print("seq_li:", seq_li)
-                    response_action = response_data["data"]["action"]
-                    print("response_action:", response_action)
-                    if response_action == "take_photo":
-                        print("web ask to take photo.")
-                        paizhao_voice_command = True
-
-                    response_text = response_data["data"]["text"]
-                    print("response_text:", response_text)
-
-                    # 将音频数据写入 .pcm 文件
-                    # play_audio_data(audio_bytes)
-
-                    file_counter += 1  # 递增文件计数器
-                    flag_think2 = False
-                    if str(resp_fomat) == 'mp3':
-                        output_file_name = f"2input{file_counter}.mp3"
-                        with open(output_file_name, "wb") as pcm_file:
-                            pcm_file.write(audio_bytes)
-                        print("Saved:", output_file_name)
-                        output_wav = f"music0.wav"
-                        if os.path.exists(output_wav):
-                            # os.remove(output_wav)
-                            print(f"Deleted {output_wav}.")
-                        subprocess.run(
-                            ["ffmpeg", "-i", output_file_name, output_wav]
-                        )
-                        player = subprocess.Popen(["aplay", "-D", "plughw:5,0", output_wav])
-                        while player.poll() is None:  # 检查播放器是否仍在运行
-                            if nihao_detected or xiaoqi_detected or xiaoqi_event.is_set() or audio_file_stack_length > 1:  # or hello_detected: #or result_detected:  # 检查是否需要停止
-                                print("#################")
-                                print("nihao_detected:", nihao_detected)
-                                print("xiaoqi_detected:", xiaoqi_detected)
-                                print("audio_file_stack_length:", audio_file_stack_length)
-                                print("#################")
-                                print("Stopping audio playback...")
-                                player.terminate()  # 停止播放
-                                nihao_detected = False
-                                xiaoqi_detected = False
-                                xiaoqi_event.clear()
-                                # hello_detected=False
-                                # result_detected=False
-                                break
-                            # break
-                            time.sleep(0.01)  # 频繁检查是否停止播放
-
-                        # subprocess.run(
-                        #     ["aplay", "-D", "hw:0,0", "-f", "S16_LE", "-r", "16000", "-c", "1", output_file_name])
-                    else:
-                        audio_buffer = io.BytesIO(audio_bytes)
-                        if nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
-                            continue
-                        output_audio_stack.append(audio_buffer)
-                        output_audio_stack_length = len(output_audio_stack)
-                        print("播放栈len:", output_audio_stack_length)
-                        # while len(output_file_stack)>0:
-
-                        # output_file_name = output_file_stack.pop(0)
-                        # player2 = subprocess.Popen(
-                        #     ["aplay", "-D", "hw:0,0", "-f", "S16_LE", "-r", "16000", "-c", "1", output_file_name])
-                        # while player2.poll() is None:  # 检查播放器是否仍在运行
-                        #     if nihao_detected or xiaoqi_detected:  # or hello_detected: #or result_detected:  # 检查是否需要停止
-                        #         print("nihao_detected:", nihao_detected)
-                        #         print("Stopping audio playback...")
-                        #         player2.terminate()  # 停止播放
-                        #         nihao_detected = False
-                        #         xiaoqi_detected = False
-                        #         # hello_detected=False
-                        #         # result_detected=False
-                        #         break
-                        #     # break
-                        #     time.sleep(0.01)  # 频繁检查是否停止播放
-                    # break  # 退出循环????????????????????
-                    # if nihao_detected or xiaoqi_detected:
-                    #     print("Stopping audio playback due to detection...")
-                    #     break
-                    if int(seq_li) == -1:
-                        break
-                else:
-                    # print("Error in response:", response_data.get("message"))
-                    flag_done = True
-                    break
-        generate_photo_base64 = False
     finally:
-        # ws2.close()
-        print("ws2 closed2!")
+        print("we closed!")
+        pass
+        # file_counter = 1
+
+    #     # flag_done = False
+    #     # while not flag_done:
+    #     while True:
+    #         time.sleep(0.01)
+    #         if  nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
+    #             print("***************************")
+    #             print("***************************")
+    #             print("nihao_detected:", nihao_detected)
+    #             print("xiaoqi_detected:", xiaoqi_detected)
+    #             print("audio_file_stack_length > 1:", audio_file_stack_length > 1)
+    #             print("***************************")
+    #             print("***************************")
+    #             output_audio_stack.clear()
+    #             print("Clear output_file_stack @@SReceive_break_send_audio")
+    #
+    #             break_send_audio = False
+    #             nihao_detected = False
+    #             xiaoqi_detected = False
+    #             break
+    #
+    #         # if nihao_detected:
+    #         #     nihao_detected = False
+    #         #     break
+    #
+    #         # if t1 - last_t1 > 3:
+    #         #     # await websocket.send(json.dumps(request_heartbeat))
+    #         #     ws.send(json.dumps(request_heartbeat))
+    #         #     print("Heartbeat sent.")
+    #
+    #         # 等待响应
+    #         # response = await websocket.recv()
+    #         try:
+    #             response = ws.recv()
+    #             response_data = json.loads(response)
+    #             # print("response_data:",response_data)
+    #         except json.JSONDecodeError as e:
+    #             print(f"JSON 解码错误:{e}")
+    #             # print(f"响应内容:{response}")
+    #             continue
+    #         # 检查响应的状态
+    #         if response_data['method'] == 'voice-chat':
+    #             if response_data.get("code") == 0:
+    #                 # 提取并解码音频数据
+    #                 # print("response_data recieived:", response_data["data"])
+    #                 resp_message_id = response_data["message_id"]
+    #                 print("********")
+    #                 print("********")
+    #                 print("!resp_message_id:", resp_message_id)
+    #                 resp_fomat = response_data["data"]["audio_format"]
+    #                 print("resp_fomat:", resp_fomat)
+    #                 # if resp_message_id != old_message_id and int(resp_code_id) == 0:
+    #                 #     no_match_but_valid = True
+    #                 #     print("resp_conversation_id not match !!!!!!!!!!!!!!!!!!!!!???????????????????")
+    #                 #     break
+    #                 audio_base64 = response_data["data"]["audio_data"]
+    #                 audio_bytes = base64.b64decode(audio_base64)
+    #                 seq_li = response_data["data"]["stream_seq"]
+    #                 print("seq_li:", seq_li)
+    #                 response_action = response_data["data"]["action"]
+    #                 print("response_action:", response_action)
+    #                 if response_action == "take_photo":
+    #                     print("web ask to take photo.")
+    #                     paizhao_voice_command = True
+    #
+    #                 response_text = response_data["data"]["text"]
+    #                 print("response_text:", response_text)
+    #
+    #                 # 将音频数据写入 .pcm 文件
+    #                 # play_audio_data(audio_bytes)
+    #
+    #                 file_counter += 1  # 递增文件计数器
+    #                 flag_think2 = False
+    #                 if str(resp_fomat) == 'mp3':
+    #                     output_file_name = f"2input{file_counter}.mp3"
+    #                     with open(output_file_name, "wb") as pcm_file:
+    #                         pcm_file.write(audio_bytes)
+    #                     print("Saved:", output_file_name)
+    #                     output_wav = f"music0.wav"
+    #                     if os.path.exists(output_wav):
+    #                         # os.remove(output_wav)
+    #                         print(f"Deleted {output_wav}.")
+    #                     subprocess.run(
+    #                         ["ffmpeg", "-i", output_file_name, output_wav]
+    #                     )
+    #                     player = subprocess.Popen(["aplay", "-D", "plughw:5,0", output_wav])
+    #                     while player.poll() is None:  # 检查播放器是否仍在运行
+    #                         if nihao_detected or xiaoqi_detected or xiaoqi_event.is_set() or audio_file_stack_length > 1:  # or hello_detected: #or result_detected:  # 检查是否需要停止
+    #                             print("#################")
+    #                             print("nihao_detected:", nihao_detected)
+    #                             print("xiaoqi_detected:", xiaoqi_detected)
+    #                             print("audio_file_stack_length:", audio_file_stack_length)
+    #                             print("#################")
+    #                             print("Stopping audio playback...")
+    #                             player.terminate()  # 停止播放
+    #                             nihao_detected = False
+    #                             xiaoqi_detected = False
+    #                             xiaoqi_event.clear()
+    #                             # hello_detected=False
+    #                             # result_detected=False
+    #                             break
+    #                         # break
+    #                         time.sleep(0.01)  # 频繁检查是否停止播放
+    #
+    #                     # subprocess.run(
+    #                     #     ["aplay", "-D", "hw:0,0", "-f", "S16_LE", "-r", "16000", "-c", "1", output_file_name])
+    #                 else:
+    #                     audio_buffer = io.BytesIO(audio_bytes)
+    #                     if nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
+    #                         continue
+    #                     output_audio_stack.append(audio_buffer)
+    #                     output_audio_stack_length = len(output_audio_stack)
+    #                     print("播放栈len:", output_audio_stack_length)
+    #                     # while len(output_file_stack)>0:
+    #
+    #                     # output_file_name = output_file_stack.pop(0)
+    #                     # player2 = subprocess.Popen(
+    #                     #     ["aplay", "-D", "hw:0,0", "-f", "S16_LE", "-r", "16000", "-c", "1", output_file_name])
+    #                     # while player2.poll() is None:  # 检查播放器是否仍在运行
+    #                     #     if nihao_detected or xiaoqi_detected:  # or hello_detected: #or result_detected:  # 检查是否需要停止
+    #                     #         print("nihao_detected:", nihao_detected)
+    #                     #         print("Stopping audio playback...")
+    #                     #         player2.terminate()  # 停止播放
+    #                     #         nihao_detected = False
+    #                     #         xiaoqi_detected = False
+    #                     #         # hello_detected=False
+    #                     #         # result_detected=False
+    #                     #         break
+    #                     #     # break
+    #                     #     time.sleep(0.01)  # 频繁检查是否停止播放
+    #                 # break  # 退出循环????????????????????
+    #                 # if nihao_detected or xiaoqi_detected:
+    #                 #     print("Stopping audio playback due to detection...")
+    #                 #     break
+    #                 if int(seq_li) == -1:
+    #                     break
+    #             else:
+    #                 # print("Error in response:", response_data.get("message"))
+    #                 flag_done = True
+    #                 break
+    #     generate_photo_base64 = False
+    # finally:
+    #     # ws2.close()
+    #     print("ws2 closed2!")
 ###local_output_file_name
 is_playing = False
 player2 = None  # 初始化播放器变量
 import random
 haode_file=f"/home/orangepi/vosk-api/python/example/haode.pcm"
+take_photo_file=f"/home/orangepi/vosk-api/python/example/take_photo.pcm"
 pcm_files = [
     "/home/orangepi/vosk-api/python/example/zhegema.pcm",
     "/home/orangepi/vosk-api/python/example/zheyangya.pcm",
     "/home/orangepi/vosk-api/python/example/qibaozaine.pcm",
     "/home/orangepi/vosk-api/python/example/qibaozaiting.pcm",
-    "/home/orangepi/vosk-api/python/example/haode.pcm"
+    # "/home/orangepi/vosk-api/python/example/haode.pcm"
 ]
 play_haode_event = threading.Event()  # 事件对象
 def play_haode_function():
@@ -1429,10 +1437,10 @@ def play_haode_function():
         if play_haode == True and not nihao_detected and not xiaoqi_detected:
             start_time = time.time()  # 记录播放开始时间
             random_number = random.randint(0, 10000)
-            index = random_number % 5
+            index = random_number % 4
             with threading.Lock():
                 subprocess.run(
-                ["aplay", "-D", "plughw:5,0", "-f", "S16_LE", "-r", "16000", "-c", "1", pcm_files[index]])
+                ["aplay", "-D", "plughw:4,0", "-f", "S16_LE", "-r", "16000", "-c", "1", pcm_files[index]])
 
             play_haode = False
             # time.sleep(1)
@@ -1465,10 +1473,11 @@ def playback_thread():
             play_start_time = time.time()
             print("!!!!!!!!!Play_start_time:", play_start_time)
             print("!!!!!!!!!!!Play_message_id:", message_id)
-            shield_after_send=False
+
             # flag_think=False
-            if shield_after_send==False and (nihao_detected or xiaoqi_detected or audio_file_stack_length > 1):
+            if recording_event.is_set() or nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
                 print("file_name and message_id not match???????????????????????????????????????")
+                recording_event.clear()
                 continue
             if resp_message_id != message_id:
                 print("playback_thread resp_message_id!= message_id break!!!!!!!!!!!!!!")
@@ -1480,7 +1489,7 @@ def playback_thread():
             # )
             with threading.Lock():
                 player2 = subprocess.Popen(
-                ["aplay", "-D", "plughw:5,0", "-f", "S16_LE", "-r", str(sample_rate), "-c", str(channels)],
+                ["aplay", "-D", "plughw:4,0", "-f", "S16_LE", "-r", str(sample_rate), "-c", str(channels)],
                 stdin=subprocess.PIPE
             )
             try:
@@ -1493,9 +1502,10 @@ def playback_thread():
                     player2.stdin.write(chunk)
 
                     # 检查中断信号
-                    if shield_after_send==False and (recording_event.is_set() or xiaoqi_event.is_set() or nihao_detected or xiaoqi_detected or audio_file_stack_length > 1):
+                    if  recording_event.is_set() or xiaoqi_event.is_set() or nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
                         print("$$$$$$$$$$$$$$$$$")
                         print("xiaoqi_event.is_set():",xiaoqi_event.is_set())
+                        print("recording_event.is_set():",recording_event.is_set())
                         print("nihao_detected:",nihao_detected)
                         print("xiaoqi_detected:",xiaoqi_detected)
 
@@ -1546,6 +1556,7 @@ def send_audio_request(audio_file_path):
         audio_data = base64.b64encode(audio_file.read()).decode('utf-8')
         # audio_data = resample_audio1(audio_data, SAMPLERATE_ORIG, SAMPLERATE_TARGET)
     # 构建 JSON 请求
+    print("$$$$$$$$$$$$$$$$message_id_send:",message_id)
     request = {
         "version": "1.0",
         "method": "voice-chat",
@@ -1653,7 +1664,8 @@ def deal_received_audio_request():
     global last_t1, t1, last_t2, t2, flag_error, audio_file_stack_length, paizhao_voice_command, \
         photo_base64, generate_photo_base64, nihao_detected, xiaoqi_detected, result_detected, \
         hello_detected, file_counter, message_id, resp_code_id, \
-        conversation_id, output_audio_stack, recording, ws, shield_after_send, flag_think, flag_think2, old_message_id,resp_message_id,xiaoqi_event
+        conversation_id, output_audio_stack, recording, ws, shield_after_send, flag_think, flag_think2, \
+        old_message_id,resp_message_id,xiaoqi_event,recording_event
     while True:
         time.sleep(0.005)
         print("audio_data_queue:",audio_data_queue)
@@ -1683,115 +1695,117 @@ def deal_received_audio_request():
                 resp_fomat = response_data["data"]["audio_format"]
                 print("resp_fomat:", resp_fomat)
                 audio_base64 = response_data["data"]["audio_data"]
-                audio_bytes = base64.b64decode(audio_base64)
-                seq_li = response_data["data"]["stream_seq"]
-                print("seq_li:", seq_li)
-                response_action = response_data["data"]["action"]
-                print("response_action:", response_action)
-                if response_action == "take_photo":
-                    print("web ask to take photo.")
-                    paizhao_voice_command = True
-                response_text = response_data["data"]["text"]
-                print("response_text:", response_text)
-                # if audio_file_stack_length>1:
-                #     print("audio_file_stack_length>1 break!!!!!!!!!!!!!!")
-                #     output_audio_stack.clear()
-                #     break
-                # if resp_message_id != message_id:
-                #     no_match_but_valid = True
-                #     print("resp_message_id != message_id break!!!!!!!!!!!!!!")
-                #     no_match_but_valid = False
-                #     output_audio_stack.clear()
-                #     break
-                # if nihao_detected :
-                #     # if recording==True or break_send_audio==True or nihao_detected or xiaoqi_detected or audio_file_stack_length>1:
-                #
-                #     output_audio_stack.clear()
-                #     print("nihao_detected or xiaoqi_detected break!!!!!!.")
+                if audio_base64!=None:
+                    audio_bytes = base64.b64decode(audio_base64)
 
-                # nihao_detected = False
-                # xiaoqi_detected = False
-                # break
-                file_counter += 1  # 递增文件计数器
-                flag_think2 = False
-                if str(resp_fomat) == 'mp3':
-                    output_file_name = f"/home/orangepi/vosk-api/python/example/send_pcm_folder/2input{file_counter}.mp3"
-                    with open(output_file_name, "wb") as pcm_file:
-                        pcm_file.write(audio_bytes)
-                    print("Saved:", output_file_name)
-                    # output_mp3 = f"/home/orangepi/vosk-api/python/example/send_pcm_folder/music0.mp3"
-                    # if os.path.exists(output_mp3):
-                    #     os.remove(output_mp3)
-                    #     print(f"Deleted {output_mp3}.")
-                    # output_wav = f"music0.wav"
-                    # if os.path.exists(output_wav):
-                    #     os.remove(output_wav)
-                    #     print(f"Deleted {output_wav}.")
-                    # subprocess.run(
-                    #     ["ffmpeg", "-i", output_file_name, output_wav]
-                    # )
-                    # print("output_wav1:", output_wav)
-                    # player = subprocess.Popen(["aplay", "-D", "plughw:5,0", output_wav])
-                    player = subprocess.Popen(["mpg123", "-o", "alsa:plughw:5,0", output_file_name])
-                    # player = subprocess.Popen(["aplay", "-D", "hw:0,0", output_wav])
-                    while player.poll() is None:  # 检查播放器是否仍在运行
-                        if nihao_detected or xiaoqi_detected or  xiaoqi_event.is_set() or audio_file_stack_length > 1:  # or hello_detected: #or result_detected:  # 检查是否需要停止
-                            print("#################")
-                            print("nihao_detected:", nihao_detected)
-                            print("xiaoqi_detected:", xiaoqi_detected)
-                            print("audio_file_stack_length:", audio_file_stack_length)
-                            print("#################")
-                            print("Stopping audio playback...")
-                            player.terminate()  # 停止播放
-                            nihao_detected = False
-                            xiaoqi_detected = False
-                            xiaoqi_event.clear()
-                            # hello_detected=False
-                            # result_detected=False
-                            break
-                        # break
-                        time.sleep(0.01)  # 频繁检查是否停止播放
-                    # subprocess.run(
-                    #     ["aplay", "-D", "hw:0,0", "-f", "S16_LE", "-r", "16000", "-c", "1", output_file_name])
-                else:
-                    # output_file_name = f"/home/orangepi/vosk-api/python/example/send_pcm_folder/2input{resp_message_id}#{file_counter}.pcm"
+                    seq_li = response_data["data"]["stream_seq"]
+                    print("seq_li:", seq_li)
+                    response_action = response_data["data"]["action"]
+                    print("response_action:", response_action)
+                    if response_action == "take_photo":
+                        print("web ask to take photo.")
+                        paizhao_voice_command = True
+                    response_text = response_data["data"]["text"]
+                    print("response_text:", response_text)
+                    # if audio_file_stack_length>1:
+                    #     print("audio_file_stack_length>1 break!!!!!!!!!!!!!!")
+                    #     output_audio_stack.clear()
+                    #     break
+                    # if resp_message_id != message_id:
+                    #     no_match_but_valid = True
+                    #     print("resp_message_id != message_id break!!!!!!!!!!!!!!")
+                    #     no_match_but_valid = False
+                    #     output_audio_stack.clear()
+                    #     break
+                    # if nihao_detected :
+                    #     # if recording==True or break_send_audio==True or nihao_detected or xiaoqi_detected or audio_file_stack_length>1:
                     #
-                    # print("!!!!!!!!!!!!!!!Pcm_genarate_time:",time.time())
-                    # print("!!!!!!!!!!!!Resp_message_id:",resp_message_id)
-                    #
-                    # with open(output_file_name, "wb") as pcm_file:
-                    #     pcm_file.write(audio_bytes)
-                    # print("***********Saved:", output_file_name)
-                    audio_buffer = io.BytesIO(audio_bytes)
-                    if resp_message_id != message_id: #and resp_message_id != old_message_id:
-                        print("resp_message_id!= message_id break!!!!!!!!!!!!!!")
+                    #     output_audio_stack.clear()
+                    #     print("nihao_detected or xiaoqi_detected break!!!!!!.")
 
+                    # nihao_detected = False
+                    # xiaoqi_detected = False
+                    # break
+                    file_counter += 1  # 递增文件计数器
+                    flag_think2 = False
+                    if str(resp_fomat) == 'mp3':
+                        output_file_name = f"/home/orangepi/vosk-api/python/example/send_pcm_folder/2input{file_counter}.mp3"
+                        with open(output_file_name, "wb") as pcm_file:
+                            pcm_file.write(audio_bytes)
+                        print("Saved:", output_file_name)
+                        # output_mp3 = f"/home/orangepi/vosk-api/python/example/send_pcm_folder/music0.mp3"
+                        # if os.path.exists(output_mp3):
+                        #     os.remove(output_mp3)
+                        #     print(f"Deleted {output_mp3}.")
+                        # output_wav = f"music0.wav"
+                        # if os.path.exists(output_wav):
+                        #     os.remove(output_wav)
+                        #     print(f"Deleted {output_wav}.")
+                        # subprocess.run(
+                        #     ["ffmpeg", "-i", output_file_name, output_wav]
+                        # )
+                        # print("output_wav1:", output_wav)
+                        # player = subprocess.Popen(["aplay", "-D", "plughw:5,0", output_wav])
+                        player = subprocess.Popen(["mpg123", "-o", "alsa:plughw:4,0", output_file_name])
+                        # player = subprocess.Popen(["aplay", "-D", "hw:0,0", output_wav])
+                        while player.poll() is None:  # 检查播放器是否仍在运行
+                            if nihao_detected or xiaoqi_detected or  xiaoqi_event.is_set() or audio_file_stack_length > 1:  # or hello_detected: #or result_detected:  # 检查是否需要停止
+                                print("#################")
+                                print("nihao_detected:", nihao_detected)
+                                print("xiaoqi_detected:", xiaoqi_detected)
+                                print("audio_file_stack_length:", audio_file_stack_length)
+                                print("#################")
+                                print("Stopping audio playback...")
+                                player.terminate()  # 停止播放
+                                nihao_detected = False
+                                xiaoqi_detected = False
+                                xiaoqi_event.clear()
+                                # hello_detected=False
+                                # result_detected=False
+                                break
+                            # break
+                            time.sleep(0.01)  # 频繁检查是否停止播放
+                        # subprocess.run(
+                        #     ["aplay", "-D", "hw:0,0", "-f", "S16_LE", "-r", "16000", "-c", "1", output_file_name])
+                    else:
+                        # output_file_name = f"/home/orangepi/vosk-api/python/example/send_pcm_folder/2input{resp_message_id}#{file_counter}.pcm"
+                        #
+                        # print("!!!!!!!!!!!!!!!Pcm_genarate_time:",time.time())
+                        # print("!!!!!!!!!!!!Resp_message_id:",resp_message_id)
+                        #
+                        # with open(output_file_name, "wb") as pcm_file:
+                        #     pcm_file.write(audio_bytes)
+                        # print("***********Saved:", output_file_name)
+                        audio_buffer = io.BytesIO(audio_bytes)
+                        if resp_message_id != message_id or recording_event.is_set(): #and resp_message_id != old_message_id:
+                            print("resp_message_id!= message_id break!!!!!!!!!!!!!!")
 
-                        continue
+                            recording_event.clear()
+                            continue
 
-                    if  nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
-                        continue
-                    output_audio_stack.append(audio_buffer)
-                    output_audio_stack_length = len(output_audio_stack)
-                    print("播放栈len:", output_audio_stack_length)
-                    # player2=subprocess.Popen(
-                    #     ["aplay", "-D", "hw:0,0", "-f", "S16_LE", "-r", "16000", "-c", "1", output_file_name])
-                    # while player2.poll() is None:  # 检查播放器是否仍在运行
-                    #     if nihao_detected or xiaoqi_detected: #or hello_detected: #or result_detected:  # 检查是否需要停止
-                    #         print("nihao_detected:", nihao_detected)
-                    #         print("Stopping audio playback...")
-                    #         player2.terminate()  # 停止播放
-                    #         nihao_detected = False
-                    #         xiaoqi_detected=False
-                    #         # hello_detected=False
-                    #         # result_detected=False
-                    #         break
-                    #     # break
-                    #     time.sleep(0.01)  # 频繁检查是否停止播放
+                        if  nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
+                            continue
+                        output_audio_stack.append(audio_buffer)
+                        output_audio_stack_length = len(output_audio_stack)
+                        print("播放栈len:", output_audio_stack_length)
+                        # player2=subprocess.Popen(
+                        #     ["aplay", "-D", "hw:0,0", "-f", "S16_LE", "-r", "16000", "-c", "1", output_file_name])
+                        # while player2.poll() is None:  # 检查播放器是否仍在运行
+                        #     if nihao_detected or xiaoqi_detected: #or hello_detected: #or result_detected:  # 检查是否需要停止
+                        #         print("nihao_detected:", nihao_detected)
+                        #         print("Stopping audio playback...")
+                        #         player2.terminate()  # 停止播放
+                        #         nihao_detected = False
+                        #         xiaoqi_detected=False
+                        #         # hello_detected=False
+                        #         # result_detected=False
+                        #         break
+                        #     # break
+                        #     time.sleep(0.01)  # 频繁检查是否停止播放
 
-                # break  # 退出循环????????????????????
-                # if int(seq_li) == -1:
-                #     break
+                    # break  # 退出循环????????????????????
+                    # if int(seq_li) == -1:
+                    #     break
 
 
 
@@ -1957,13 +1971,14 @@ def callback(indata, frames, time1, status):
             output_pcm_file.write(indata.tobytes())
 
             # 如果录音时间超过4秒，立即停止录音
-            if current_time - start_record_time > 4:
+            if current_time - start_record_time > 6:
                 print("@@@@@@@@@@@@录音时间超过4秒，停止录音")
                 recording = False
                 output_pcm_file.close()
                 # process_audio(output_file_name, denoise_output_file_name)
 
                 if pop_swtich and output_file_name is not None:
+                    play_haode = True
                     audio_file_stack.append(output_file_name)
 
                     # flag_think = False
@@ -2593,6 +2608,7 @@ if __name__ == "__main__":
     freq = cv2.getTickFrequency()  # 系统频率
     # face_detection_run1()
     init()
+    message_id = get_message_id()
     # time.sleep(10)
     try:
         if args.samplerate is None:
