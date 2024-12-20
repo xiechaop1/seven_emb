@@ -795,6 +795,7 @@ import pypinyin
 ###########drawing code
 websocket_url = "ws://114.55.90.104:9001/ws"
 ws=None
+ws2=None
 # ws = websocket.create_connection(websocket_url)
 def create_connection_with_retries(url, max_retries=100, retry_interval=0.05):
     global ws
@@ -816,9 +817,28 @@ def create_connection_with_retries(url, max_retries=100, retry_interval=0.05):
                 print("Max retry attempts reached. Unable to connect to WebSocket.")
                 raise e
     return None
+def create_connection_with_retries2(url, max_retries=100, retry_interval=0.05):
+    global ws2
+    """尝试建立 WebSocket 连接，如果断开则重试"""
+    retries = 0
+    while retries < max_retries:
+        try:
+            print(f"Trying to connect to {url} (Attempt {retries + 1} / {max_retries})")
+            ws2 = websocket.create_connection(url)
+            print("Connection successful!")
+            return ws2
+        except (websocket.WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
+            print(f"Connection failed: {e}")
+            retries += 1
+            if retries < max_retries:
+                print(f"Waiting for {retry_interval} seconds before retrying...")
+                time.sleep(retry_interval)
+            else:
+                print("Max retry attempts reached. Unable to connect to WebSocket.")
+                raise e
+    return None
 
-
-ws2 = websocket.create_connection(websocket_url)
+# ws2 = websocket.create_connection(websocket_url)
 # 初始化 pygame
 pygame.init()
 
@@ -1636,6 +1656,56 @@ def send_audio_request(audio_data):
         print("we closed!")
         pass
 
+
+def send_audio_request2(audio_data):
+    global last_t1,t1,last_t2,t2,flag_error,audio_file_stack_length,paizhao_voice_command,\
+        photo_base64,generate_photo_base64,nihao_detected,xiaoqi_detected,result_detected,\
+        hello_detected,file_counter,message_id,resp_code_id,\
+        conversation_id,output_audio_stack,recording,ws2,shield_after_send,flag_think,flag_think2,old_message_id
+    # WebSocket 地址
+
+
+    # 加载音频文件并编码为 base64
+    # with open(audio_file_path, "rb") as audio_file:
+    #     audio_data = base64.b64encode(audio_file.read()).decode('utf-8')
+    audio_data = base64.b64encode(audio_data).decode('utf-8')
+        # audio_data = resample_audio1(audio_data, SAMPLERATE_ORIG, SAMPLERATE_TARGET)
+    # 构建 JSON 请求
+    print("$$$$$$$$$$$$$$$$message_id_send:",message_id)
+    request = {
+        "version": "1.0",
+        "method": "voice-chat",
+        "conversation_id": conversation_id,
+        "message_id": message_id,
+        "token": datetime.utcnow().strftime("%Y%m%d-%H%M%S-") + str(uuid.uuid4()),
+        # "timestamp": datetime.utcnow().isoformat() + "Z",
+        "timestamp":get_rfc3339_with_timezone(),
+        "data": {
+            "content_type": "audio",
+            "content": audio_data
+        }
+    }
+    print("message_id_send_request:",message_id)
+    try:
+        ws2.send(json.dumps(request))
+        print("Audio data sent.")
+        print("send_audio_request time:", time.time())
+        last_t1 = t1
+        shield_after_send=True
+        # flag_think=True
+        # flag_done = False
+        # while not flag_done:
+
+
+
+        # generate_photo_base64 = False
+            # last_t2 = t2
+    finally:
+        print("we closed!")
+        pass
+
+
+
 audio_data_queue = queue.Queue()
 
 def receive_audio_request():
@@ -1716,7 +1786,84 @@ def receive_audio_request():
 
 
         last_t1 = t1  # 重置最后发送心跳请求的时间
+def receive_audio_request2():
+    global last_t1, t1, last_t2, t2, flag_error, audio_file_stack_length, paizhao_voice_command, \
+        photo_base64, generate_photo_base64, nihao_detected, xiaoqi_detected, result_detected, \
+        hello_detected, file_counter, message_id, resp_code_id, \
+        conversation_id, output_audio_stack, recording, ws2, shield_after_send, flag_think, flag_think2, old_message_id
 
+    while True:
+        print("print receive_audio_request2")
+
+
+        # nihao_detected = False
+        # xiaoqi_detected = False
+        time.sleep(0.005)
+        # if nihao_detected or xiaoqi_detected:
+        #     print("Stopping audio playback due to detection...")
+        #     nihao_detected=False
+        #     xiaoqi_detected=False
+        #     break
+        # nihao_detected = False
+        # rewaken_flag=False
+        # if nihao_detected:
+        #     nihao_detected = False
+        #     break
+        t1 = time.time()
+        # print("@@@@@@SReceive_break_send_audio:", break_send_audio)
+        if  nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
+            print("***************************")
+            print("***************************")
+
+            print("nihao_detected2:", nihao_detected)
+            print("xiaoqi_detected2:", xiaoqi_detected)
+            print("audio_file_stack_length2 > 1:", audio_file_stack_length > 1)
+            print("***************************")
+            print("***************************")
+            output_audio_stack.clear()
+            print("Clear output_file_stack @@SReceive_break_send_audio")
+
+            break_send_audio = False
+            nihao_detected = False
+            xiaoqi_detected = False
+            break
+
+
+
+
+        print("Time_cycle:", t1 - last_t1)
+        # 等待响应
+        # response = await websocket.recv()
+        try:
+            response = ws2.recv()
+            if response is not None:
+                print("receive_audio_request2.....")
+                print("response_audio_request2 time:", time.time())
+            response_data = json.loads(response)
+            if response_data['method'] == 'voice-chat':
+                if response_data.get("code") == 0:
+                    # 提取并解码音频数据
+                    print("response_data recieived2:......")
+                    print("response_data time2:", time.time())
+                    resp_message_id = response_data["message_id"]
+                    if resp_message_id != message_id or recording_event.is_set():  # and resp_message_id != old_message_id:
+                        print("resp_message_id!= message_id break!!!!!!!!!!!!!!")
+
+                        recording_event.clear()
+                        continue
+
+
+
+            # print("response_data:",response_data)
+            audio_data_queue.put(response_data)
+        except json.JSONDecodeError as e:
+            print(f"JSON 解码错误:{e}")
+            # print(f"响应内容:{response}")
+            continue
+        #######检查响应的状态
+
+
+        last_t1 = t1  # 重置最后发送心跳请求的时间
 resp_message_id=0
 def deal_received_audio_request():
     global last_t1, t1, last_t2, t2, flag_error, audio_file_stack_length, paizhao_voice_command, \
@@ -2234,21 +2381,23 @@ def audio_run():
     global flag_append, audio_file_stack, flag_len, running2, data_id_no_send, generate_photo_base64, shield_after_send, flag_think, flag_think2
     print("audio_run")
     audio_file_stack.clear()
-    time.sleep(0.01)  # 保证事件循环可以调度其他任务
+    time.sleep(0.005)  # 保证事件循环可以调度其他任务
     if running2:
         audio_thread_control_event.wait()
         thread_control_event.wait()
         # audio_file_stack.append("/home/orangepi/vosk-api/python/example/output_li.pcm")
         # time.sleep(0.01)
     # time.sleep(0.1)
+    con_num=0
     while running2:
+        con_num+=1
         # print("flag_think:",flag_think)
         # print("network audio_run!!!")
         audio_thread_control_event.wait()
         thread_control_event.wait()
         flag_len = len(audio_file_stack)
         # print("!!!!!!!!!!!!!!!len(audio_file_stack):",len(audio_file_stack))
-        time.sleep(0.01)  # 确保事件循环可以调度其他任务
+        time.sleep(0.005)  # 确保事件循环可以调度其他任务
         # print("Entering while循环")
         # print("发送栈length:", flag_len)
         # if conversion_success==True:
@@ -2274,8 +2423,12 @@ def audio_run():
             #         continue
             # audio_file_path = os.path.join("/home/orangepi/vosk-api/python/example", audio_file_path)
             # print(f"audio file_full: {audio_file_path}")
-
-            send_audio_request(audio_data)
+            if con_num%2==0:
+                print("send_audio_request")
+                send_audio_request(audio_data)
+            elif con_num%2==1:
+                print("send_audio_request2")
+                send_audio_request2(audio_data)
             # run_async(send_audio_request, audio_file_path)
             # success =send_audio_request(audio_file_path)
             # print(f"Send status: {success}")
@@ -2374,6 +2527,8 @@ def start_threads():
         # logic_thread = threading.Thread(target=animation_logic)
         receive_audio_request_thread=threading.Thread(target=receive_audio_request)
         receive_audio_request_thread.start()
+        receive_audio_request2_thread=threading.Thread(target=receive_audio_request2)
+        receive_audio_request2_thread.start()
         deal_received_audio_request_thread=threading.Thread(target=deal_received_audio_request)
         deal_received_audio_request_thread.start()
         playback_thread_instance = threading.Thread(target=playback_thread, daemon=True)
