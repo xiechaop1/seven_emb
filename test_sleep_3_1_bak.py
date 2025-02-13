@@ -6,7 +6,6 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 import serial
 import time
 import numpy as np
@@ -42,65 +41,85 @@ from collections import deque
 from threading import Event
 from websocket import WebSocketException, WebSocketConnectionClosedException
 from datetime import datetime
-last_tt1=0
-tt1=0
-cycle_time=0
-Face_locations = []  # 定义为空列表
-cur_t=0
-last_t=0
-last_pos_0=0
-position=[0,0]
-current_pulse_width=0
-flag_break=False
-flag_break2=False
 
-current_pulse_width=0
-current_pulse_width2=0
+last_tt1 = 0
+tt1 = 0
+cycle_time = 0
+Face_locations = []  # 定义为空列表
+cur_t = 0
+last_t = 0
+last_pos_0 = 0
+position = [0, 0]
+current_pulse_width = 0
+flag_break = False
+flag_break2 = False
+
+current_pulse_width = 0
+current_pulse_width2 = 0
 W = 1280  # 摄像头的宽度分辨率
 H = 960  # 摄像头的高度分辨率
 theta_h = 1500  # 水平舵机的初始角度
 theta_v = 900  # 竖直舵机的初始角度
-audio_file_stack_length=0
-silent_start_time=0
-silent_end_time=0
-count2=0
-face_detection_switch=False
-paizhao_voice_command=False
-conversion_success=False
+audio_file_stack_length = 0
+silent_start_time = 0
+silent_end_time = 0
+count2 = 0
+face_detection_switch = False
+paizhao_voice_command = False
+conversion_success = False
 
-message_id_get=None
-data_id_no_send=None
-photo_base64=None
-generate_photo_base64=False
-nihao_detected=False
-hello_detected=False
-result_detected=False
-xiaoqi_detected_count=0
+message_id_get = None
+data_id_no_send = None
+photo_base64 = None
+generate_photo_base64 = False
+nihao_detected = False
+hello_detected = False
+result_detected = False
+xiaoqi_detected_count = 0
 
 file_counter = 0
 # no_match_but_valid=False
-resp_code_id=0
-sleep_detected=False
+resp_code_id = 0
+sleep_detected = False
 output_audio_stack = deque()
-play_haode=False
-play_qibaozaina=False
-is_silent_flag=False
-old_message_id=0
-last_message_id=0
-continue_shot_and_record=False
+play_haode = False
+play_qibaozaina = False
+is_silent_flag = False
+old_message_id = 0
+last_message_id = 0
+continue_shot_and_record = False
 
-sleep_voice_list=[["PREPARE_0e4469908950edf80d00d50388e22b72.mp3","PREPARE_fb554feefb09a53a8bb55c6320e7cdb1.mp3","PREPARE_b28c329834ff637ff3a73c5e01bd7d52.mp3","PREPARE_2e60034d42489d4b7b411366b9295356.mp3"],
-                  ["POSTURE_b929bab873c406f9fcecc3abdd324ec1.mp3","POSTURE_c08908db7c842e01fbd8f965dfa85d89.mp3","POSTURE_06d311023745d1a866490c0d0ce42f44.mp3","POSTURE_080ed47b54f21a0b6709de6484d1dc1e.mp3","POSTURE_e444af1a781082ba399ff9eaebb507eb.mp3"],
-                  ["BREATHING_a291d037d81ddc94e0fc33bcf729dea9.mp3","BREATHING_4dc3129193b03d217cddf651ba366fe6.mp3","BREATHING_a7c0c188a373ea0a69c1f46f17eaeb31.mp3","BREATHING_36c798c145115acc2b01ca8339fa4981.mp3","BREATHING_9685385b968f6512da7ee169fe861b9c.mp3","BREATHING_7663c2e11fd2cc1179d6850a99db75aa.mp3","BREATHING_d460b7c6cb07b406dcdbde371afca1bc.mp3","BREATHING_bb6957ab273cbdf11a4aae3244e3f5cc.mp3","BREATHING_7941fd6f49d176f0dd2ee7bb0a93afcd.mp3","BREATHING_bd7ce9ce5e10201cdfe0b9bd4f634a5e.mp3","BREATHING_b361ddc8c2ca77b5493c7469c6e9b3d6.mp3",
-                   "BREATHING_9dce53484234ed669c45bcd4edb04d22.mp3","BREATHING_5049ad4ccc4a737f2361b13a47090613.mp3","BREATHING_6e8fe98a2b2102f12ced5ea46aea85af.mp3","BREATHING_e55fb3e213cba1408e0ef40c547ae640.mp3","BREATHING_4cb6818bd595b5516cc6e7b4757809cd.mp3","BREATHING_b270ed55b5b4dc2123ec0797ef450cb5.mp3","BREATHING_91003bd2e4ec5844b6c9f5d1c5da573f.mp3","BREATHING_7585a88baebd17e29d5c36a74a2f2bd8.mp3"],
-                  ["RELAX_1_f493e41a829211386884d7e1ae27abdf.mp3","RELAX_1_1c8f90b4f914a54f9e8b0ce67fc0952b.mp3","RELAX_1_274cce17599bfbe6d9a887aa46cbe2b8.mp3","RELAX_1_c49ec684c3c07d6a15f0f234bb0b0251.mp3","RELAX_1_225bebee5a4a2dfa4ed8cb756f13f99e.mp3","RELAX_1_55e1498701aa227d2fd8d5ac46ef5d2d.mp3","RELAX_1_ad1e671152487bb40daede8cc38eaf9a.mp3","RELAX_1_11e6a3fa3caa2c265564202c09a2164f.mp3","RELAX_1_0e56b97ebb717c43c9edbbd4a876742e.mp3","RELAX_1_3b2a13dc2c6f2ecbf02a52b8adaf1908.mp3","RELAX_1_1230b134033f975c74a4c63d45ea6d12.mp3"],
-                  ["RELAX_2_06728bad68a989b8f735dac2b86102c0.mp3","RELAX_2_02971319602ea73cb3309270c2ca5be3.mp3"],
-                  ["SLEEP_READY_af5dbd5a079133dd483b998db2ea2c73.mp3","SLEEP_READY_88a2a7c12cb7637af4df21ff704ee849.mp3"],
-                  ]
+sleep_voice_list = [["PREPARE_0e4469908950edf80d00d50388e22b72.mp3", "PREPARE_fb554feefb09a53a8bb55c6320e7cdb1.mp3",
+                     "PREPARE_b28c329834ff637ff3a73c5e01bd7d52.mp3", "PREPARE_2e60034d42489d4b7b411366b9295356.mp3"],
+                    ["POSTURE_b929bab873c406f9fcecc3abdd324ec1.mp3", "POSTURE_c08908db7c842e01fbd8f965dfa85d89.mp3",
+                     "POSTURE_06d311023745d1a866490c0d0ce42f44.mp3", "POSTURE_080ed47b54f21a0b6709de6484d1dc1e.mp3",
+                     "POSTURE_e444af1a781082ba399ff9eaebb507eb.mp3"],
+                    ["BREATHING_a291d037d81ddc94e0fc33bcf729dea9.mp3", "BREATHING_4dc3129193b03d217cddf651ba366fe6.mp3",
+                     "BREATHING_a7c0c188a373ea0a69c1f46f17eaeb31.mp3", "BREATHING_36c798c145115acc2b01ca8339fa4981.mp3",
+                     "BREATHING_9685385b968f6512da7ee169fe861b9c.mp3", "BREATHING_7663c2e11fd2cc1179d6850a99db75aa.mp3",
+                     "BREATHING_d460b7c6cb07b406dcdbde371afca1bc.mp3", "BREATHING_bb6957ab273cbdf11a4aae3244e3f5cc.mp3",
+                     "BREATHING_7941fd6f49d176f0dd2ee7bb0a93afcd.mp3", "BREATHING_bd7ce9ce5e10201cdfe0b9bd4f634a5e.mp3",
+                     "BREATHING_b361ddc8c2ca77b5493c7469c6e9b3d6.mp3",
+                     "BREATHING_9dce53484234ed669c45bcd4edb04d22.mp3", "BREATHING_5049ad4ccc4a737f2361b13a47090613.mp3",
+                     "BREATHING_6e8fe98a2b2102f12ced5ea46aea85af.mp3", "BREATHING_e55fb3e213cba1408e0ef40c547ae640.mp3",
+                     "BREATHING_4cb6818bd595b5516cc6e7b4757809cd.mp3", "BREATHING_b270ed55b5b4dc2123ec0797ef450cb5.mp3",
+                     "BREATHING_91003bd2e4ec5844b6c9f5d1c5da573f.mp3",
+                     "BREATHING_7585a88baebd17e29d5c36a74a2f2bd8.mp3"],
+                    ["RELAX_1_f493e41a829211386884d7e1ae27abdf.mp3", "RELAX_1_1c8f90b4f914a54f9e8b0ce67fc0952b.mp3",
+                     "RELAX_1_274cce17599bfbe6d9a887aa46cbe2b8.mp3", "RELAX_1_c49ec684c3c07d6a15f0f234bb0b0251.mp3",
+                     "RELAX_1_225bebee5a4a2dfa4ed8cb756f13f99e.mp3", "RELAX_1_55e1498701aa227d2fd8d5ac46ef5d2d.mp3",
+                     "RELAX_1_ad1e671152487bb40daede8cc38eaf9a.mp3", "RELAX_1_11e6a3fa3caa2c265564202c09a2164f.mp3",
+                     "RELAX_1_0e56b97ebb717c43c9edbbd4a876742e.mp3", "RELAX_1_3b2a13dc2c6f2ecbf02a52b8adaf1908.mp3",
+                     "RELAX_1_1230b134033f975c74a4c63d45ea6d12.mp3"],
+                    ["RELAX_2_06728bad68a989b8f735dac2b86102c0.mp3", "RELAX_2_02971319602ea73cb3309270c2ca5be3.mp3"],
+                    ["SLEEP_READY_af5dbd5a079133dd483b998db2ea2c73.mp3",
+                     "SLEEP_READY_88a2a7c12cb7637af4df21ff704ee849.mp3"],
+                    ]
+
 
 # PID 控制器类
 class PIDController:
-    def __init__(self, Kp, Ki, Kd,integral_limit=None):
+    def __init__(self, Kp, Ki, Kd, integral_limit=None):
         self.Kp = Kp  # 比例增益
         self.Ki = Ki  # 积分增益
         self.Kd = Kd  # 微分增益
@@ -206,25 +225,24 @@ class PCA9685:
         self.setPWM(channel, 0, int(pulse))
 
 
-
-def speed_control(speed,speed2,step):
-    global flag_break,flag_break2,current_pulse_width,current_pulse_width2
+def speed_control(speed, speed2, step):
+    global flag_break, flag_break2, current_pulse_width, current_pulse_width2
     min_pulse = 500
     max_pulse = 2500
     center_pulse = start_angel1  # 中心位置的脉冲宽度
-    center_pulse2=start_angel0
+    center_pulse2 = start_angel0
     # 设定目标速度（单位：脉冲宽度/秒）
     target_speed = speed  # 你可以根据需要设定这个值，比如50表示每秒脉冲宽度变化50单位
     target_speed2 = speed2
     # 初始化变量
     if current_pulse_width == 0:
-        pulse_width = center_pulse     # 从中间位置开始
+        pulse_width = center_pulse  # 从中间位置开始
     else:
-        pulse_width = current_pulse_width   #从当前位置开始
+        pulse_width = current_pulse_width  # 从当前位置开始
     if current_pulse_width2 == 0:
-        pulse_width2 = center_pulse2     # 从中间位置开始
+        pulse_width2 = center_pulse2  # 从中间位置开始
     else:
-        pulse_width2 = current_pulse_width2  #从当前位置开始
+        pulse_width2 = current_pulse_width2  # 从当前位置开始
     last_pulse_width = pulse_width
     last_pulse_width2 = pulse_width2
     last_time = time.time()
@@ -233,7 +251,7 @@ def speed_control(speed,speed2,step):
     current_step = target_speed / 60  # 控制步长与速度成比例
     current_step2 = target_speed2 / 50  # 控制步长与速度成比例
 
-    for i in range(int(step*3)):
+    for i in range(int(step * 3)):
         # 计算脉冲宽度
         if flag_break and flag_break2:
             print("Both break flags set, breaking loop!")
@@ -255,10 +273,10 @@ def speed_control(speed,speed2,step):
 
         pulse_width += current_step  # 根据速度增加或减少脉冲宽度
         pulse_width2 += current_step2  # 根据速度增加或减少脉冲宽度
-        if pulse_width>1800:
-            pulse_width =1800
-        elif pulse_width<800:
-            pulse_width=800
+        if pulse_width > 1800:
+            pulse_width = 1800
+        elif pulse_width < 800:
+            pulse_width = 800
         if pulse_width2 > 1300:
             pulse_width2 = 1300
         elif pulse_width2 < 900:
@@ -286,8 +304,12 @@ def speed_control(speed,speed2,step):
             last_pulse_width = pulse_width
             last_pulse_width2 = pulse_width2
             last_time = current_time
-start_angel1=1300
-start_angel0=1100
+
+
+start_angel1 = 1300
+start_angel0 = 1100
+
+
 def init():
     global switch_flag, old_switch_flag, stop_event, thread3
 
@@ -298,20 +320,23 @@ def init():
         time.sleep(0.2)
         print("##################start################")
 
+
 def map_value(value, from_min, from_max, to_min, to_max):
     # 使用线性映射公式
     return int(to_min + (value - from_min) * (to_max - to_min) / (from_max - from_min))
 
 
-last_x=0
-last_y=0
-under_score_count=0
+last_x = 0
+last_y = 0
+under_score_count = 0
 photo_base64_list = []
-reconnect_flag=False
-old_cant_connect_flag=False
+reconnect_flag = False
+old_cant_connect_flag = False
+
+
 def face_detection_run1():
-    global under_score_count,running2,face_detection_switch,paizhao_voice_command,photo_base64,generate_photo_base64,last_x,last_y,\
-        continue_shot_and_record,photo_base64_list,cant_connect_flag,reconnect_flag,old_cant_connect_flag,li_wait_time
+    global under_score_count, running2, face_detection_switch, paizhao_voice_command, photo_base64, generate_photo_base64, last_x, last_y, \
+        continue_shot_and_record, photo_base64_list, cant_connect_flag, reconnect_flag, old_cant_connect_flag, li_wait_time
     video_capture = cv2.VideoCapture(0)
     photo_counter = 0  # Counter for saved images
     count_face = 0
@@ -335,10 +360,10 @@ def face_detection_run1():
     top = 0.0
     right = 0.0
     down = 0.0
-    print("face_detection_switch:",face_detection_switch)
+    print("face_detection_switch:", face_detection_switch)
     # under_score_count=0
     # local_image_path="/home/li/vosk-api/python/example/guan1.jpg"
-    max_photo=0
+    max_photo = 0
     while running2 and face_detection_switch:
         thread_control_event.wait()
         tt2 = time.time()
@@ -349,9 +374,9 @@ def face_detection_run1():
         flag_break2 = False
         # Grab a single frame of video
         success, img = video_capture.read()
-        orin_img=img
-        print("!!!continue_shot_and_record:",continue_shot_and_record)
-        print("!!!count:",count)
+        orin_img = img
+        print("!!!continue_shot_and_record:", continue_shot_and_record)
+        print("!!!count:", count)
 
         if paizhao_voice_command:
             photo_filename = f"/home/li/vosk-api/python/example/shot_and_recording/captured_image_{int(tt2)}.jpg"
@@ -378,9 +403,9 @@ def face_detection_run1():
 
         # if continue_shot_and_record and count%2==1:
         if continue_shot_and_record:
-            if count==1:
-                max_photo=1
-            elif count>1:
+            if count == 1:
+                max_photo = 1
+            elif count > 1:
                 max_photo = 2
             print("shot!")
             photo_filename = f"/home/li/vosk-api/python/example/shot_and_recording/continued_image_{int(tt2)}.jpg"
@@ -392,13 +417,12 @@ def face_detection_run1():
                 photo_base64 = base64.b64encode(buffer).decode('utf-8')
                 photo_base64_list.append(photo_base64)
                 time.sleep(0.01)
-                generate_photo_base64=True
-                if len(photo_base64_list)>10:
+                generate_photo_base64 = True
+                if len(photo_base64_list) > 10:
                     print("len(photo_base64_list)>10!!!")
-                    cant_connect_flag =True
+                    cant_connect_flag = True
 
-
-                    print("cant_connect_flag:",cant_connect_flag)
+                    print("cant_connect_flag:", cant_connect_flag)
                     file_path = "/home/li/vosk-api/python/example/sleep_config.json"
                     with open(file_path, 'r', encoding='utf-8') as file:
                         try:
@@ -412,35 +436,34 @@ def face_detection_run1():
                     if result:
                         p, q = result
                         print(f"File '{li_filename}' found at p={p}, q={q}")
-                        if p==0:
-                            li_wait_time=1.5
+                        if p == 0:
+                            li_wait_time = 1.5
                         if p == 1:
                             li_wait_time = 2
-                        if p == 2 and (0<=q<=6 or 9<=q<=12):
+                        if p == 2 and (0 <= q <= 6 or 9 <= q <= 12):
                             li_wait_time = 3
-                        if p == 2 and (7 <= q <= 8 ):
+                        if p == 2 and (7 <= q <= 8):
                             li_wait_time = 8
                         if p == 2 and (13 <= q):
                             li_wait_time = 6
-                        if p==3 and (0<= q<=2 or q==5 or q>9):
+                        if p == 3 and (0 <= q <= 2 or q == 5 or q > 9):
                             li_wait_time = 8
-                        if p == 3 and (3 <= q <= 4 or 6<=q<=8):
+                        if p == 3 and (3 <= q <= 4 or 6 <= q <= 8):
                             li_wait_time = 4
-                        if p == 4 or 5 :
+                        if p == 4 or 5:
                             li_wait_time = 8
-
 
                         add_files_to_stack(sleep_voice_list, p, q)
                         with open("li_scene_seq.txt", "w") as file_scene:
-                            file_scene.write(str(p+1))
-                elif len(photo_base64_list)<=max_photo:
+                            file_scene.write(str(p + 1))
+                elif len(photo_base64_list) <= max_photo:
                     print("len(photo_base64_list)<=3>!!!")
                     cant_connect_flag = False
-                    if old_cant_connect_flag==True:
+                    if old_cant_connect_flag == True:
                         reconnect_flag = True
 
                 print(f"Captured {len(photo_base64_list)} photo(s)")
-                print("send_generate_photo_base64:",generate_photo_base64)
+                print("send_generate_photo_base64:", generate_photo_base64)
                 old_cant_connect_flag = cant_connect_flag
 
                 # with threading.Lock():
@@ -463,7 +486,7 @@ def face_detection_run1():
         img = cv2.resize(img, (0, 0), fx=0.25, fy=0.25)
         if not success:
             break
-        photo_filename_contiune=f"/home/li/vosk-api/python/example/continue_image_{int(count)}.jpg"
+        photo_filename_contiune = f"/home/li/vosk-api/python/example/continue_image_{int(count)}.jpg"
         blob = cv2.dnn.blobFromImage(img, 1.0, (150, 150), [104, 117, 123], False, False)
         H, W = img.shape[:2]
 
@@ -485,16 +508,16 @@ def face_detection_run1():
             # print("@@@@@@score:", score)
             if score < threshold:
 
-                if count%10==1:
-                    under_score_count+=1
+                if count % 10 == 1:
+                    under_score_count += 1
                     # print("under_score_count:", under_score_count)
-                    left=244
-                    right=244
-                    top=62
-                    down=62
+                    left = 244
+                    right = 244
+                    top = 62
+                    down = 62
                     position = [(left + right) // 2, (top + down) // 2]
                     error_x = (position[0] - 244)
-                    error_y = (position[1] - 122 -35)
+                    error_y = (position[1] - 122 - 35)
                     under_score = True
                     # print("error_x,error_y:", error_x, error_y)
 
@@ -502,8 +525,8 @@ def face_detection_run1():
                     continue
 
             ### 获取位置
-            if score>=threshold:
-                under_score_count=0
+            if score >= threshold:
+                under_score_count = 0
                 left = int(detections[0, 0, i, 3] * W)
                 top = int(detections[0, 0, i, 4] * H)
                 right = int(detections[0, 0, i, 5] * W)
@@ -514,8 +537,6 @@ def face_detection_run1():
             # print("left,top,right,down:", left, top, right, down)
             ######画框
             # cv2.rectangle(img, (left, top), (right, down), (0, 255, 0), 3)
-
-
 
             ########写分数
             # cv2.putText(img, '%.4f' % (score), (left, top + 12), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 0, 255))
@@ -540,17 +561,17 @@ def face_detection_run1():
         x = position[0]
         y = position[1]
         # print("!!!x,y:", x, y)
-        if count>300 and (abs(x - last_x) > 50 or abs(y - last_y) > 50):
+        if count > 300 and (abs(x - last_x) > 50 or abs(y - last_y) > 50):
             print("!!!!!Moved too much, ignore this frame.!!!")
             continue
         # error_x = (position[0] - 165)
         # error_y = (position[0] - 110)
         error_x = (position[0] - 244)
-        error_y = (position[1] - 122-35)
-        print("under_score_count2:",under_score_count)
-        if under_score_count>5:
-            error_x=0
-            error_y=0
+        error_y = (position[1] - 122 - 35)
+        print("under_score_count2:", under_score_count)
+        if under_score_count > 5:
+            error_x = 0
+            error_y = 0
         # print("!!!error_x,err_y:", error_x, error_y)
         speed_h = pid_h.update(error_x)
         speed_v = pid_v.update(error_y)
@@ -562,8 +583,8 @@ def face_detection_run1():
         # center_y_max = 120
         center_x_min = 234 - 2
         center_x_max = 254 + 2
-        center_y_min = 112 - 2-35
-        center_y_max = 132 + 2-35
+        center_y_min = 112 - 2 - 35
+        center_y_max = 132 + 2 - 35
         # center_x_min = 604
         # center_x_max = 644
         # center_y_min = 415
@@ -622,8 +643,8 @@ def face_detection_run1():
         t2 = time.time()
         d_t2 = t2 - t1
         d_t1 = t1 - t0
-        last_x=x
-        last_y=y
+        last_x = x
+        last_y = y
         print("!!!last_x,last_y:", last_x, last_y)
         # print("d_t1:", d_t1)
         # print("d_t2:", d_t2)
@@ -638,20 +659,15 @@ def face_detection_run1():
     cv2.destroyAllWindows()
 
 
-
 # 录音的全局变量
 recording2 = False
 start_record_time2 = time.time()
 audio_memory2 = io.BytesIO()
 message_id2 = 0
-pre_buffer2 =  deque(maxlen=1)
+pre_buffer2 = deque(maxlen=1)
 
 # 假设的音频数据队列
 audio_data_queue2 = []
-
-
-
-
 
 ###########################################################
 ############################################################
@@ -681,7 +697,6 @@ import wave
 from collections import deque  # 引入环形缓冲区
 import asyncio
 from scipy import signal
-
 
 import asyncio
 import websockets
@@ -732,6 +747,7 @@ import webrtcvad
 import collections
 import argparse
 import os
+
 os.environ["SDL_VIDEODRIVER"] = "dummy"
 import subprocess
 import websocket
@@ -748,6 +764,7 @@ import cv2
 from screeninfo import get_monitors
 import subprocess
 import pypinyin
+
 ###########drawing code
 
 print("AAA")
@@ -755,6 +772,8 @@ print("AAA")
 websocket_url = "ws://114.55.90.104:9001/ws"
 # ws=None
 ws = websocket.create_connection(websocket_url)
+
+
 def create_connection_with_retries(url, max_retries=10000, retry_interval=0.3):
     global ws
     """尝试建立 WebSocket 连接，如果断开则重试"""
@@ -766,7 +785,6 @@ def create_connection_with_retries(url, max_retries=10000, retry_interval=0.3):
 
             # remote_host, remote_port = ws.sock.getpeername()
             # print(f"Connected to host: {remote_host}, port: {remote_port}")
-
 
             print("Connection successful!")
             return ws
@@ -780,7 +798,6 @@ def create_connection_with_retries(url, max_retries=10000, retry_interval=0.3):
                 print("Max retry attempts reached. Unable to connect to WebSocket.")
                 raise e
     return None
-
 
 
 # 初始化 pygame
@@ -830,14 +847,13 @@ current_eye_width = eye_initial_width
 eye_glasses_width = 220  # 椭圆形的最终宽度
 # 创建队列用于线程之间传递用户输入
 # phase_queue = queue.Queue()
-running=True
-running2=True
+running = True
+running2 = True
 # 动画绘制初始化
 ###############
-silent_start_time=0
-pop_swtich=True
-draw_switch=False
-
+silent_start_time = 0
+pop_swtich = True
+draw_switch = False
 
 # 使用 Event 控制线程的开启和关闭
 thread_control_event = threading.Event()
@@ -848,15 +864,16 @@ start_threads_control = threading.Event()  # 用于控制 start_threads 线程�
 print("CCC")
 
 print("DDD")
-xiaoqi_event=Event()
-recording_event=Event()
-output_file_stack=[]
+xiaoqi_event = Event()
+recording_event = Event()
+output_file_stack = []
+
 
 # nihao_event = Event()
 # 动画逻辑线程
 def animation_logic():
-    global phase, current_eye_height, current_eye_radius, hold_start_time, current_eye_width, running,draw_switch
-    print("running:",running)
+    global phase, current_eye_height, current_eye_radius, hold_start_time, current_eye_width, running, draw_switch
+    print("running:", running)
     print("draw_switch:", draw_switch)
     while running and draw_switch:
         thread_control_event.wait()
@@ -874,7 +891,6 @@ def animation_logic():
                                          current_eye_height)
             pygame.draw.rect(screen, GREEN, right_eye_rect, border_radius=current_eye_radius)
             pygame.display.flip()  # 更新屏幕显示
-
 
         if phase == 1:
             if current_eye_height < eye_target_height:
@@ -917,20 +933,24 @@ def animation_logic():
                 current_eye_width = eye_initial_width
                 hold_start_time = None
         time.sleep(0.02)
-video_playing=False
+
+
+video_playing = False
 executed_once = False
 video_event = threading.Event()
 video_path = '/home/li/blink2.mp4'
 video_path2 = '/home/li/think.mp4'
 video_path3 = '/home/li/loading.mp4'
 pygame.display.set_caption('Eye Animation')
+
+
 def draw_main():
-    global running,executed_once,start_video_playback_flag
+    global running, executed_once, start_video_playback_flag
     # logic_thread = threading.Thread(target=animation_logic)
     # logic_thread.start()
-    st1=time.time()
+    st1 = time.time()
 
-    while running :
+    while running:
         # print("draw_main is running")
         time.sleep(0.02)  # 控制循环频率
         for event in pygame.event.get():
@@ -957,7 +977,7 @@ def draw_main():
         # print("executed_once:",executed_once)
         # print("video_playing:",video_playing)
         if st2 - st1 > 0 and not executed_once and not video_playing:
-            start_video_playback_flag=True
+            start_video_playback_flag = True
             # threading.Thread(target=start_video_playback).start()
             executed_once = True
             # break
@@ -984,7 +1004,7 @@ def draw_main():
 
 def start_video_playback():
     """ 在后台线程中播放视频 """
-    global video_playing,flag_think,video_path,video_path2,flag_think2,video_path3
+    global video_playing, flag_think, video_path, video_path2, flag_think2, video_path3
     if video_playing:
         print("Video is already playing.")
         return
@@ -1040,8 +1060,6 @@ def start_video_playback():
                 current_video_path = video_path  # 切换到 video_path
                 cap = cv2.VideoCapture(current_video_path)  # 打开新的视频
 
-
-
             ret, frame = cap.read()  # 读取一帧
             if not ret:  # 如果没有读取到帧，视频结束
                 print("End of video.")
@@ -1092,6 +1110,7 @@ def start_video_playback():
     print("Video playback finished.")
     cap.release()
 
+
 def remove_window_decor(window_name):
     """ 使用 wmctrl 去除窗口的装饰（无边框） """
     try:
@@ -1100,17 +1119,15 @@ def remove_window_decor(window_name):
         print(f"Error: Failed to remove window decorations for {window_name}")
 
 
-
-
-no_content_flag=False
+no_content_flag = False
 xiaoqi_detected = False
 first_xiaoqi_detected = False
 # xiaoqi_word = ['查询天气', '天气', '小鸡', '小七', '小区', '小气', '消气', '小琴', '小青', '小憩', '效期', '校区',
 #                '小觑', '小曲', '小心']
-xiaoqi_word=['细胞','七宝','鸡毛','稀薄','七','旗袍','确保','祈祷','去','气']
+xiaoqi_word = ['细胞', '七宝', '鸡毛', '稀薄', '七', '旗袍', '确保', '祈祷', '去', '气']
 stop_word = ['停', '停止']
 paizhao_word = ['拍', '拍照']
-hello_word=['hello','hi','你好','早上好','上午好','好']
+hello_word = ['hello', 'hi', '你好', '早上好', '上午好', '好']
 
 vad = webrtcvad.Vad(1)  # 0-3, 3最灵敏
 # 定义帧大小
@@ -1130,28 +1147,31 @@ PRE_RECORD_FRAMES = 1  # 预录制帧数
 # 定义队列和缓冲区
 
 
-xiaoqi_detected=False
+xiaoqi_detected = False
 threads_started = False
-video_threads_started=False
+video_threads_started = False
 first_xiaoqi_detected = False
 frames = collections.deque(maxlen=int(BUFFER_DURATION / FRAME_DURATION))
 
 q = queue.Queue()
 pre_buffer = deque(maxlen=PRE_RECORD_FRAMES)  # 环形缓冲区，用于保存开头静音
 recording = False  # 标志位：是否在录音
-recording2=False
+recording2 = False
 silence_counter = 0  # 静音计数器
 output_pcm_file = None  # 当前的 .pcm 文件对象
 output_wav_file = None  # 当前的 .wav 文件对象
 import jieba
-noise_break_flag=False #
+
+noise_break_flag = False  #
 audio_file_stack = []
 flag_append = False
 output_file_name = None
-audio_file_stack_length=0
-data_id1=0
+audio_file_stack_length = 0
+data_id1 = 0
 
 print("EEE")
+
+
 def callback10(indata, frames, time1, status):
     global message_id
     audio_data_dic = (bytes(indata), message_id)
@@ -1168,16 +1188,21 @@ class VCMethod(str, Enum):
     TEXT_CHAT = "text-chat"
     PING = "ping"
 
+
 class ContentType(str, Enum):
     AUDIO = "audio"
     IMAGE = "image"
+
+
 # class VCReqData(BaseModel):
 #     audio_data: Optional[str] = ""
 class VCReqData(BaseModel):
     content_type: Optional[str] = ContentType.AUDIO.value  # audio or image
-    content: Optional[str] = "" # base64 encoded data
+    content: Optional[str] = ""  # base64 encoded data
+
 
 DataT = TypeVar("DataT")
+
 
 class Req(BaseModel, Generic[DataT]):
     version: str = "1.0"
@@ -1187,6 +1212,7 @@ class Req(BaseModel, Generic[DataT]):
     token: Optional[str] = ""
     timestamp: Optional[str] = ""
     data: Optional[DataT] = None
+
 
 class VCRespData(BaseModel):
     action: Optional[str] = None
@@ -1210,15 +1236,16 @@ class Resp(BaseModel, Generic[DataT]):
     data: Optional[DataT] = None
 
 
-
 ###id生成
 
 def get_id() -> str:
     timestamp = datetime.now().strftime('%Y%m%d-%H%M%S-%f')[:-3]
     return f"{timestamp}-{uuid.uuid4().hex}"
 
+
 def get_conversation_id() -> str:
     return uuid.uuid4().hex
+
 
 def get_message_id() -> str:
     return get_id()
@@ -1229,14 +1256,17 @@ def get_rfc3339_with_timezone():
     tz = pytz.timezone('Asia/Shanghai')
     return datetime.now(tz).isoformat()
 
-last_t1=0
-t1=0
+
+last_t1 = 0
+t1 = 0
+
+
 def send_photo_request(photo_base64_list):
-    global flag_error, audio_file_stack_length, paizhao_voice_command,\
-        generate_photo_base64,nihao_detected,xiaoqi_detected,result_detected,\
-        hello_detected,file_counter,message_id,resp_code_id,conversation_id,ws,shield_after_send,flag_think2,old_message_id
+    global flag_error, audio_file_stack_length, paizhao_voice_command, \
+        generate_photo_base64, nihao_detected, xiaoqi_detected, result_detected, \
+        hello_detected, file_counter, message_id, resp_code_id, conversation_id, ws, shield_after_send, flag_think2, old_message_id
     # WebSocket 地址
-    print("$$$$$$$$$$$$$$$$message_id_send:",message_id)
+    print("$$$$$$$$$$$$$$$$message_id_send:", message_id)
     # print("sned2_photo_base64_list:",photo_base64_list)
     # 构建 JSON 请求
     request2 = {
@@ -1284,22 +1314,23 @@ def send_photo_request(photo_base64_list):
             print(f"Retrying2 in {retry_interval} seconds...")
             time.sleep(retry_interval)
 
+
 def continue_send_photo():
     global flag_error, audio_file_stack_length, paizhao_voice_command, \
         generate_photo_base64, nihao_detected, xiaoqi_detected, result_detected, \
         hello_detected, file_counter, message_id, resp_code_id, conversation_id, ws, \
-        shield_after_send, flag_think2, old_message_id, photo_base64_list,message_id2
+        shield_after_send, flag_think2, old_message_id, photo_base64_list, message_id2
     # WebSocket 地址
     retries = 0
     max_retries = 10000
     retry_interval = 0.3
-    c_count=0
+    c_count = 0
     while True:
-        c_count+=1
+        c_count += 1
         time.sleep(0.01)
-        if c_count==1:
-            max_photo=1
-        elif c_count>1:
+        if c_count == 1:
+            max_photo = 1
+        elif c_count > 1:
             max_photo = 2
         if len(photo_base64_list) >= max_photo:
             with open("li_scene_seq.txt", "r") as file_scene:
@@ -1310,8 +1341,6 @@ def continue_send_photo():
                 else:  # 如果文件内容不是空的
                     li_scene_seq2 = int(content)  # 转换为整数
                     print("li_scene_seq2:", li_scene_seq2)  # 打印读取的值
-
-
 
                 # 读取play_status.txt中的字符串
             with open("play_status.txt", "r") as file_status:
@@ -1328,8 +1357,8 @@ def continue_send_photo():
             message_id_orin2 = get_message_id()
             message_id2 = message_id_orin2
             print("Sending 3 photos...")
-            print("message_id2:",message_id2)
-            print("continue_send_photo conversation_id:",conversation_id)
+            print("message_id2:", message_id2)
+            print("continue_send_photo conversation_id:", conversation_id)
             request2 = {
                 "version": "1.0",
                 "method": "report-state",  # 始终使用 "report-state"
@@ -1350,7 +1379,7 @@ def continue_send_photo():
 
             }
             # print("request2:",request2)
-            print("li_scene_seq2:",li_scene_seq2)
+            print("li_scene_seq2:", li_scene_seq2)
             print("play_status2:", play_status2)
             while True:  # 无限重连直到成功
                 try:
@@ -1385,12 +1414,15 @@ def continue_send_photo():
 is_playing = False
 player2 = None  # 初始化播放器变量
 import random
-qibaozaine_file=f"/home/li/vosk-api/python/example/qibaozaine.pcm"
-take_photo_file=f"/home/li/vosk-api/python/example/take_photo.pcm"
+
+qibaozaine_file = f"/home/li/vosk-api/python/example/qibaozaine.pcm"
+take_photo_file = f"/home/li/vosk-api/python/example/take_photo.pcm"
 play_haode_event = threading.Event()
-play_qibaozaina_event= threading.Event()
+play_qibaozaina_event = threading.Event()
+
+
 def play_haode_function():
-    global play_haode,xiaoqi_detected
+    global play_haode, xiaoqi_detected
     while 1:
         time.sleep(0.01)  # 500ms 后执行
         # print("enter play_haode!")
@@ -1410,11 +1442,12 @@ def play_haode_function():
             index = random_number % 4
             with threading.Lock():
                 subprocess.run(
-                ["aplay", "-D", "plughw:1,0", "-f", "S16_LE", "-r", "16000", "-c", "1", pcm_files[index]])
+                    ["aplay", "-D", "plughw:1,0", "-f", "S16_LE", "-r", "16000", "-c", "1", pcm_files[index]])
 
             play_haode = False
             # time.sleep(1)
             play_haode_event.set()  # 触发事件信号，通知“好”的播放已完成
+
 
 def play_qibaozaine_function():
     global play_qibaozaina, xiaoqi_detected
@@ -1433,29 +1466,31 @@ def play_qibaozaine_function():
             # time.sleep(1)
             play_qibaozaina_event.set()  # 触发事件信号，通知“好”的播放已完成
 
+
 play_queue = queue.Queue()
-local_output_file_name_list=[]
+local_output_file_name_list = []
 # local_output_file_name='/home/li/vosk-api/python/example/A13_4.wav'
-bmg_file_name='/home/li/vosk-api/python/example/sleep2.mp3'
+bmg_file_name = '/home/li/vosk-api/python/example/sleep2.mp3'
 bmg_file_name_list = [
     "/home/li/vosk-api/python/example/sleep1.mp3",
     "/home/li/vosk-api/python/example/sleep2.mp3",
     "/home/li/vosk-api/python/example/sleep3.mp3"
 ]
 
-li_scene_seq=None
-play_status=None
+li_scene_seq = None
+play_status = None
 # status_queue=queue.Queue()
-interrupt_flag=False
+interrupt_flag = False
 
 garbage_content_event = threading.Event()
 add_once_list_flag_with_sleep = False
 
-def mix_play():
-    global recording_event,nihao_detected,xiaoqi_detected,local_output_file_name_list,standup_flag,\
-        li_voices_list_len,play_status,interrupt_flag,li_wait_time,is_garbage_content,garbage_flag,resp_message_id,message_id
 
-    global qibao_sentence_complete,add_once_list_flag_with_sleep
+def mix_play():
+    global recording_event, nihao_detected, xiaoqi_detected, local_output_file_name_list, standup_flag, \
+        li_voices_list_len, play_status, interrupt_flag, li_wait_time, is_garbage_content, garbage_flag, resp_message_id, message_id
+
+    global qibao_sentence_complete, add_once_list_flag_with_sleep
 
     while True:
         try:
@@ -1467,12 +1502,12 @@ def mix_play():
                 time.sleep(0.1)
                 continue
 
-            command2,j2,local_output_file_name = play_queue.get()
-            old_command2=command2
-            old_j2=j2
-            old_local_output_file_name=local_output_file_name
+            command2, j2, local_output_file_name = play_queue.get()
+            old_command2 = command2
+            old_j2 = j2
+            old_local_output_file_name = local_output_file_name
             print(f"get from queue: {local_output_file_name}")
-            print("command2,j2,local_output_file_name:",command2,j2,local_output_file_name)
+            print("command2,j2,local_output_file_name:", command2, j2, local_output_file_name)
             # if command2=="voice-chat":
             #     print("li_voices_list_len:",li_voices_list_len)
             #     if j2<li_voices_list_len-1:
@@ -1485,12 +1520,12 @@ def mix_play():
             #     with open("play_status.txt", "w") as file_status:
             #         file_status.write(str(play_status))  # 将play_status写入文件，确保是字符串格式（"IN_PROGRESS" 或 "COMPLETED"）
             # play_status = "IN_PROGRESS"
-            if command2=="execute-command":
-                if j2<li_voices_list_len-1:
-                    play_status="IN_PROGRESS"
-                elif j2==li_voices_list_len-1:
+            if command2 == "execute-command":
+                if j2 < li_voices_list_len - 1:
+                    play_status = "IN_PROGRESS"
+                elif j2 == li_voices_list_len - 1:
                     play_status = "COMPLETED"
-                print("play_status:",play_status)
+                print("play_status:", play_status)
 
                 with open("play_status.txt", "w") as file_status:
                     file_status.write(str(play_status))  # 将play_status写入文件，确保是字符串格式（"IN_PROGRESS" 或 "COMPLETED"）
@@ -1509,7 +1544,7 @@ def mix_play():
                     print("standup_flag detected, stopping voice playback")
                     voice_channel.stop()
                     time.sleep(0.1)
-                    standup_flag=False
+                    standup_flag = False
                     break
 
                 print("garbage_flag2:", garbage_flag)
@@ -1533,37 +1568,36 @@ def mix_play():
                     garbage_flag = 0
                     # break
                 # elif garbage_flag == 0:
-                    # interrupt_flag = True
-                    # print("not garbage content")
-                    # play_queue.queue.clear()
-                    # output_file_stack.clear()
-                    # print("2 clear play_queue")
-                    # print("2 clear output_file_stack")
-                    # with open("play_status.txt", "w") as file_status:
-                    #     file_status.write(str(play_status))  # 更新文件
-                    # break
-
+                # interrupt_flag = True
+                # print("not garbage content")
+                # play_queue.queue.clear()
+                # output_file_stack.clear()
+                # print("2 clear play_queue")
+                # print("2 clear output_file_stack")
+                # with open("play_status.txt", "w") as file_status:
+                #     file_status.write(str(play_status))  # 更新文件
+                # break
 
                 voice_channel.play(voice)
 
                 temp_voice = voice
 
                 print("################")
-                print("command and j2",command2,j2)
+                print("command and j2", command2, j2)
                 print("####################")
                 if command2 == "voice-chat":
                     if j2 == -1:
                         qibao_sentence_complete = True
                         interrupt_flag = False
                         add_once_list_flag_with_sleep = True
-                if command2 == "execute-command" and (local_output_file_name == "/home/li/vosk-api/python/example/enter_sleep_mode.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/lahuisixu2.mp3"):
+                if command2 == "execute-command" and (
+                        local_output_file_name == "/home/li/vosk-api/python/example/enter_sleep_mode.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/lahuisixu2.mp3"):
                     qibao_sentence_complete = True
                     interrupt_flag = False
                     add_once_list_flag_with_sleep = True
 
-
                 if li_wait_time is None:
-                    li_wait_time=1
+                    li_wait_time = 1
                 print("li_wait_time2:", li_wait_time)
                 print("wait start!!!")
                 # time.sleep(li_wait_time*2)
@@ -1576,12 +1610,12 @@ def mix_play():
                 interrupted_position = 0
 
                 print("wait end!!!")
-                while voice_channel.get_busy() :
+                while voice_channel.get_busy():
                     if command2 == "execute-command":
                         time.sleep(li_wait_time)
                         # (pygame.time.get_ticks() - start_time < li_wait_time * 1000)
-                    #current_position = (pygame.time.get_ticks() - start_time) / 1000.0
-                    #print("current position:", current_position)
+                    # current_position = (pygame.time.get_ticks() - start_time) / 1000.0
+                    # print("current position:", current_position)
                     # if resp_message_id != message_id:
                     #     print("!resp_message_id != message_id break!")
                     #     voice_channel.stop()  # 停止语音播放
@@ -1595,17 +1629,17 @@ def mix_play():
                     #         file_status.write(str(play_status))  # 更新文件
                     #
                     #     break
-                    print("resp_message_id:",resp_message_id)
-                    print("message_id:",message_id)
-                    if resp_message_id != message_id :
+                    print("resp_message_id:", resp_message_id)
+                    print("message_id:", message_id)
+                    if resp_message_id != message_id:
                         print("!resp_message_id != message_id break!")
                         voice_channel.stop()  # 停止语音播放
                         interrupt_flag = True
-                        garbage_flag=0
+                        garbage_flag = 0
                         # print('voice garbage', garbage_flag)
                         time.sleep(0.1)
-                        #interrupted_position = current_position
-                        #print("interrupted_position:",interrupted_position)
+                        # interrupted_position = current_position
+                        # print("interrupted_position:",interrupted_position)
                         play_status = "IN_PROGRESS"  # 播放状态更改为IN_PROGRESS
 
                         # if current_position >= total_duration:
@@ -1651,7 +1685,7 @@ def mix_play():
                             file_status.write(str(play_status))  # 更新文件
                         standup_flag = False
                         break
-                    if recording_event.is_set() or nihao_detected or xiaoqi_detected :
+                    if recording_event.is_set() or nihao_detected or xiaoqi_detected:
                         print("!xiaoqi_detected break!")
                         voice_channel.stop()  # 停止语音播放
                         time.sleep(0.1)
@@ -1672,9 +1706,13 @@ def mix_play():
                 print(f"播放失败: {e}")
         else:
             print(f"语音文件未找到: {local_output_file_name}")
-last_bgm_num=0
+
+
+last_bgm_num = 0
+
+
 def combine_bgm_sound():
-    global bmg_file_name_list,bmg_file_name,bgm_num,last_bgm_num,standup_flag
+    global bmg_file_name_list, bmg_file_name, bgm_num, last_bgm_num, standup_flag
     os.environ["SDL_AUDIODRIVER"] = "alsa"
     os.environ["AUDIODEV"] = "hw:1,0"
     while 1:
@@ -1702,9 +1740,9 @@ def combine_bgm_sound():
                 if standup_flag:
                     print("standup_flag detected, stopping bgm and voice")
                     pygame.mixer.music.stop()  # 停止背景音乐
-                    standup_flag=False
+                    standup_flag = False
                     break  # 跳出while循环，重新初始化和播放新的背景音乐
-                if bgm_num==last_bgm_num:
+                if bgm_num == last_bgm_num:
                     continue
                 if bgm_num == 1:
                     bmg_file_name = bmg_file_name_list[2]
@@ -1721,17 +1759,17 @@ def combine_bgm_sound():
                     pygame.mixer.music.load(bmg_file_name)
                     pygame.mixer.music.play(-1)
                     print(f"swtich to bgm {bmg_file_name}")
-                last_bgm_num=bgm_num
+                last_bgm_num = bgm_num
 
         except pygame.error as e:
             print(f"pygame 初始化失败: {e}")
 
 
 def playback_thread():
-    global nihao_detected, xiaoqi_detected, player2,message_id, output_file_stack, nihao_event, running2,recording,\
-        play_haode,audio_file_stack_length,xiaoqi_event,play_haode_event,play_qibaozaina_event,recording_event,\
-        shield_after_send,flag_think,resp_message_id,local_output_file_name_list,li_wait_time,standup_flag
-  # 清除事件信号
+    global nihao_detected, xiaoqi_detected, player2, message_id, output_file_stack, nihao_event, running2, recording, \
+        play_haode, audio_file_stack_length, xiaoqi_event, play_haode_event, play_qibaozaina_event, recording_event, \
+        shield_after_send, flag_think, resp_message_id, local_output_file_name_list, li_wait_time, standup_flag
+    # 清除事件信号
     while running2:
         time.sleep(0.01)
         # if (player2 is not None and player2.poll() is None) or play_haode==True:
@@ -1740,26 +1778,25 @@ def playback_thread():
         # play_haode_event.clear()  # 清除事件信号，准备下一次等待
         # play_haode_event.wait()  # 阻塞直到“好”的播放完成
 
-        if len(output_file_stack) > 0 :
+        if len(output_file_stack) > 0:
             # 从栈中取出文件
-            command1,j1,local_output_file_name = output_file_stack.pop(0)
-            print(" command1,j1,local_output_file_name:", command1,j1,local_output_file_name)
+            command1, j1, local_output_file_name = output_file_stack.pop(0)
+            print(" command1,j1,local_output_file_name:", command1, j1, local_output_file_name)
             # print(f"***Playing***: {local_output_file_name}")
 
-
             # flag_think=False
-            print("li_resp_message_id:",resp_message_id)
+            print("li_resp_message_id:", resp_message_id)
             print("li_message_id:", message_id)
             if standup_flag:
-                print("playback_thread standup_flag:",standup_flag)
+                print("playback_thread standup_flag:", standup_flag)
                 continue
-            if  recording_event.is_set() or nihao_detected or xiaoqi_detected or  audio_file_stack_length > 1:
+            if recording_event.is_set() or nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
                 print("file_name and message_id not match???????????????????????????????????????")
                 recording_event.clear()
                 continue
-            #if resp_message_id != message_id:
-                #print("playback_thread resp_message_id!= message_id break!!!!!!!!!!!!!!")
-                # continue
+            # if resp_message_id != message_id:
+            # print("playback_thread resp_message_id!= message_id break!!!!!!!!!!!!!!")
+            # continue
 
             # player2 = subprocess.Popen(
             #     ["aplay", "-D", "hw:0,0", "-f", "S16_LE", "-r", str(sample_rate), "-c", str(channels)],
@@ -1770,36 +1807,39 @@ def playback_thread():
             # )
             # player2 = subprocess.Popen(["mpg123", "-o", "alsa:plughw:3,0", local_output_file_name])
 
-            play_queue.put((command1,j1,local_output_file_name))
+            play_queue.put((command1, j1, local_output_file_name))
         else:
 
             # 如果栈为空，稍微休眠一段时间
             time.sleep(0.005)
 
     # play_haode_event.clear()
-flag_think=False
-flag_think2=False
-shield_after_send=False
-retries=0
+
+
+flag_think = False
+flag_think2 = False
+shield_after_send = False
+retries = 0
 retry_interval = 0.3
-max_retries=10000
+max_retries = 10000
+
+
 def send_audio_request(audio_data):
-    global last_t1,t1,last_t2,t2,flag_error,audio_file_stack_length,paizhao_voice_command,\
-        photo_base64,generate_photo_base64,nihao_detected,xiaoqi_detected,result_detected,\
-        hello_detected,file_counter,message_id,resp_code_id,\
-        conversation_id,output_audio_stack,recording,ws,shield_after_send,flag_think,flag_think2,old_message_id,retries ,max_retries
+    global last_t1, t1, last_t2, t2, flag_error, audio_file_stack_length, paizhao_voice_command, \
+        photo_base64, generate_photo_base64, nihao_detected, xiaoqi_detected, result_detected, \
+        hello_detected, file_counter, message_id, resp_code_id, \
+        conversation_id, output_audio_stack, recording, ws, shield_after_send, flag_think, flag_think2, old_message_id, retries, max_retries
 
     global garbage_flag
     # WebSocket 地址
-
 
     # 加载音频文件并编码为 base64
     # with open(audio_file_path, "rb") as audio_file:
     #     audio_data = base64.b64encode(audio_file.read()).decode('utf-8')
     audio_data = base64.b64encode(audio_data).decode('utf-8')
-        # audio_data = resample_audio1(audio_data, SAMPLERATE_ORIG, SAMPLERATE_TARGET)
+    # audio_data = resample_audio1(audio_data, SAMPLERATE_ORIG, SAMPLERATE_TARGET)
     # 构建 JSON 请求
-    print("$$$$$$$$$$$$$$$$message_id_send:",message_id)
+    print("$$$$$$$$$$$$$$$$message_id_send:", message_id)
     request = {
         "version": "1.0",
         "method": "voice-chat",
@@ -1807,13 +1847,13 @@ def send_audio_request(audio_data):
         "message_id": message_id,
         "token": datetime.utcnow().strftime("%Y%m%d-%H%M%S-") + str(uuid.uuid4()),
         # "timestamp": datetime.utcnow().isoformat() + "Z",
-        "timestamp":get_rfc3339_with_timezone(),
+        "timestamp": get_rfc3339_with_timezone(),
         "data": {
             "content_type": "audio",
             "content": audio_data
         }
     }
-    print("message_id_send_request:",message_id)
+    print("message_id_send_request:", message_id)
     retries = 0
     max_retries = 10000
     retry_interval = 0.3
@@ -1851,34 +1891,31 @@ def send_audio_request(audio_data):
         # flag_done = False
         # while not flag_done:
 
-
-
         # generate_photo_base64 = False
-            # last_t2 = t2
+        # last_t2 = t2
         finally:
             print("we closed!")
             pass
 
 
-
-
-
 audio_data_queue = queue.Queue()
 
-is_garbage_content=False
+is_garbage_content = False
 old_msg_id = None
-cant_connect_flag=False
-sleep_mode=False
+cant_connect_flag = False
+sleep_mode = False
+
+
 def receive_audio_request():
     global last_t1, t1, last_t2, t2, flag_error, audio_file_stack_length, paizhao_voice_command, \
         photo_base64, generate_photo_base64, nihao_detected, xiaoqi_detected, result_detected, \
         hello_detected, file_counter, message_id, resp_code_id, \
-        conversation_id, output_audio_stack, recording, ws, shield_after_send, flag_think, flag_think2,\
-        old_message_id,retries,max_retries,old_msg_id,cant_connect_flag,reconnect_flag,sleep_mode,is_garbage_content
+        conversation_id, output_audio_stack, recording, ws, shield_after_send, flag_think, flag_think2, \
+        old_message_id, retries, max_retries, old_msg_id, cant_connect_flag, reconnect_flag, sleep_mode, is_garbage_content
 
     retry_interval = 0.3
-    mes2_id=None
-    count_j=0
+    mes2_id = None
+    count_j = 0
     while True:
         print("receive_audio_request!")
         current_time_loop = datetime.now()
@@ -1889,7 +1926,7 @@ def receive_audio_request():
 
         t1 = time.time()
         # print("@@@@@@SReceive_break_send_audio:", break_send_audio)
-        if  nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
+        if nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
             print("***************************")
             print("***************************")
 
@@ -1910,21 +1947,21 @@ def receive_audio_request():
         # response = await websocket.recv()
         try:
             try:
-                print("reconnect_flag!!:",reconnect_flag)
-                if reconnect_flag==True:
+                print("reconnect_flag!!:", reconnect_flag)
+                if reconnect_flag == True:
                     print("write COMPLETED to play_status.txt")
                     play_queue.queue.clear()
                     output_file_stack.clear()
                     with open("play_status.txt", "w") as file_status:
                         file_status.write(str("COMPLETED"))
-                    reconnect_flag=False
-                t1=time.time()
+                    reconnect_flag = False
+                t1 = time.time()
                 response = ws.recv()
-                t2=time.time()
+                t2 = time.time()
                 print("Time_diff2:", t2 - t1)
                 # remote_host, remote_port = ws.sock.getpeername()
                 # print(f"Connected to host: {remote_host}, port: {remote_port}")
-                #print("recv_message_id2:",message_id)
+                # print("recv_message_id2:",message_id)
             except (websocket.WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
                 print(f"Connection failed: {e}")
                 retries += 1
@@ -1935,7 +1972,7 @@ def receive_audio_request():
                     try:
                         ws = websocket.create_connection(websocket_url)  # 尝试重新连接
                         print("Reconnected to WebSocket.")
-                        cant_connect_flag=False
+                        cant_connect_flag = False
                         print("cant_connect_flag1:", cant_connect_flag)
                         # remote_host, remote_port = ws.sock.getpeername()
                         # print(f"Connected to host: {remote_host}, port: {remote_port}")
@@ -1946,20 +1983,20 @@ def receive_audio_request():
                     raise e
 
             if response is not None:
-                cant_connect_flag =False
+                cant_connect_flag = False
                 print("receive_audio_request.....")
                 response_data = json.loads(response)
                 if response_data is not None:
-                    print("response_data.getcode:",response_data.get("code"))
-                    if response_data.get("code")==400:
-                        is_garbage_content=True
+                    print("response_data.getcode:", response_data.get("code"))
+                    if response_data.get("code") == 400:
+                        is_garbage_content = True
                         garbage_content_event.set()
-                        print("is_garbage_content:",is_garbage_content)
+                        print("is_garbage_content:", is_garbage_content)
 
                     else:
-                        
-                        is_garbage_content=False
-                #if response_data is not None:
+
+                        is_garbage_content = False
+                    # if response_data is not None:
                     if response_data['method'] == 'voice-chat':
                         resp_message_id = response_data["message_id"]
                         if response_data.get("code") == 0:
@@ -1974,72 +2011,74 @@ def receive_audio_request():
                                 recording_event.clear()
                                 continue
                             interrupt_flag = True
-                # print("response_data:",response_data)
-                #if response_data is not None:
+                    # print("response_data:",response_data)
+                    # if response_data is not None:
                     if response_data['method'] == 'execute-command':
                         if response_data["data"]["scene_seq"] is not None and response_data["data"]["scene_seq"] > 100:
                             audio_data_queue.queue.clear()
                             print("len(audio_data_queue.queue):", len(audio_data_queue.queue))
                         if response_data.get("code") == 0:
-                            sleep_mode=True
+                            sleep_mode = True
                             print("set sleep_mode True!")
-                            mes2_id=response_data["message_id"]
+                            mes2_id = response_data["message_id"]
                             print("mes2_id:", mes2_id)
-                            print("message_id:",message_id)
+                            print("message_id:", message_id)
                             print("old_msg_id:", old_msg_id)
                             if message_id == mes2_id:
                                 print("continue audio_data_queue")
-                                #continue
+                                # continue
 
                     audio_data_queue.put(response_data)
                     print("len(audio_data_queue.queue)2:", len(audio_data_queue.queue))
                     if mes2_id is not None:
                         print("put queue sucess:", mes2_id)
                     old_msg_id = message_id
-                    #response_data = None
+                    # response_data = None
         except json.JSONDecodeError as e:
             print(f"JSON 解码错误:{e}")
             # print(f"响应内容:{response}")
             continue
         #######检查响应的状态
 
-
         last_t1 = t1  # 重置最后发送心跳请求的时间
+
 
 from datetime import datetime
 
-resp_message_id=0
-fix_counter=0
+resp_message_id = 0
+fix_counter = 0
 
-li_wait_time=0
-scent_spray_flag=False
-last_scent_spray_flag=False
-bgm_num=0
-standup_string="站起"
-standup_flag=False
-seq_queue=queue.Queue()
-li_voices_list_len=0
-qibao_sentence_complete=True
-li_voice=None
-li_filename=None
-play_enter_sleep_mode=False
-has_added_sleep_mode_command=False
+li_wait_time = 0
+scent_spray_flag = False
+last_scent_spray_flag = False
+bgm_num = 0
+standup_string = "站起"
+standup_flag = False
+seq_queue = queue.Queue()
+li_voices_list_len = 0
+qibao_sentence_complete = True
+li_voice = None
+li_filename = None
+play_enter_sleep_mode = False
+has_added_sleep_mode_command = False
+
+
 def deal_received_audio_request():
     global last_t1, t1, last_t2, t2, flag_error, audio_file_stack_length, paizhao_voice_command, \
         photo_base64, generate_photo_base64, nihao_detected, xiaoqi_detected, result_detected, \
         hello_detected, file_counter, message_id, resp_code_id, \
         conversation_id, output_audio_stack, recording, ws, shield_after_send, flag_think, flag_think2, \
-        old_message_id,resp_message_id,xiaoqi_event,recording_event,continue_shot_and_record,output_file_stack,fix_counter\
-        ,li_wait_time,scent_spray_flag,bgm_num,standup_flag,li_voices_list_len,li_scene_seq,\
-        qibao_sentence_complete,li_voice,interrupt_flag,cant_connect_flag,li_filename,sleep_mode,play_enter_sleep_mode,has_added_sleep_mode_command
+        old_message_id, resp_message_id, xiaoqi_event, recording_event, continue_shot_and_record, output_file_stack, fix_counter \
+        , li_wait_time, scent_spray_flag, bgm_num, standup_flag, li_voices_list_len, li_scene_seq, \
+        qibao_sentence_complete, li_voice, interrupt_flag, cant_connect_flag, li_filename, sleep_mode, play_enter_sleep_mode, has_added_sleep_mode_command
 
     global add_once_list_flag_with_sleep
-    li_voices_list=[]
+    li_voices_list = []
 
     while True:
         print("deal_received_audio_request!")
         time.sleep(0.003)
-        print("audio_data_queue:",audio_data_queue)
+        print("audio_data_queue:", audio_data_queue)
         try:
             response_data = audio_data_queue.get()
             print("wait response_data")
@@ -2049,8 +2088,8 @@ def deal_received_audio_request():
         if response_data is not None:
             if response_data['method'] == 'execute-command':
                 # print("response_data_from_execute-command:", response_data)
-                print("response_data_conversation_id:",response_data['conversation_id'])
-                print("cant_connect_flag3:",cant_connect_flag)
+                print("response_data_conversation_id:", response_data['conversation_id'])
+                print("cant_connect_flag3:", cant_connect_flag)
                 if cant_connect_flag == True:
                     print("!!!!!!!!!!!!!!!!!")
                     print("local broadcast!!!!!!")
@@ -2060,9 +2099,9 @@ def deal_received_audio_request():
 
                 elif cant_connect_flag == False:
                     if response_data.get("code") == 0:
-                        print("mes_id:",response_data["message_id"])
+                        print("mes_id:", response_data["message_id"])
 
-                        li_action_feature=response_data["data"]["actions"]["action_feature"]
+                        li_action_feature = response_data["data"]["actions"]["action_feature"]
                         print("li_action_feature:", li_action_feature)
                         # if standup_string in li_action_feature:
                         #     print("standup_string:",standup_string)
@@ -2071,8 +2110,8 @@ def deal_received_audio_request():
                         li_bgm = response_data["data"]["actions"]["bgm"]
                         print("li_bgm:", li_bgm)
                         if li_bgm is not None:
-                            li_bgm_audio_data=li_bgm["audio_data"]
-                            print("li_bgm_audio_data:",li_bgm_audio_data)
+                            li_bgm_audio_data = li_bgm["audio_data"]
+                            print("li_bgm_audio_data:", li_bgm_audio_data)
                             li_bgm_audio_format = li_bgm["audio_format"]
                             print("li_bgm_audio_format:", li_bgm_audio_format)
                             li_bgm_filename = li_bgm["filename"]
@@ -2080,12 +2119,12 @@ def deal_received_audio_request():
                             if li_bgm_filename is not None:
                                 if "bo_1036" in li_bgm_filename:
                                     print("enter bgm_num 1")
-                                    bgm_num=1
+                                    bgm_num = 1
                                 if "bo_asmr" in li_bgm_filename:
                                     print("enter bgm_num 2")
                                     bgm_num = 2
 
-                        li_scene=response_data["data"]["scene"]
+                        li_scene = response_data["data"]["scene"]
                         print("li_scene:", li_scene)
                         li_scene_seq = response_data["data"]["scene_seq"]
                         print("***************************************")
@@ -2105,22 +2144,31 @@ def deal_received_audio_request():
                             else:  # 如果文件内容不是空的clea
                                 old_seq = int(content)  # 转换为整数
                                 print("old_seq:", old_seq)
-                        print("interrupt_flag:",interrupt_flag)
-                        print("li_scene_seq==old_seq:",li_scene_seq==old_seq)
-                        print("li_scene_seq > old_seq:",li_scene_seq > old_seq)
+                        print("interrupt_flag:", interrupt_flag)
+                        print("li_scene_seq==old_seq:", li_scene_seq == old_seq)
+                        print("li_scene_seq > old_seq:", li_scene_seq > old_seq)
                         print("qibao_sentence_complete_2:", qibao_sentence_complete)
                         if li_scene_seq is not None:
-                            print("old_seq<100 and (li_scene_seq > old_seq or (add_once_list_flag_with_sleep==True and li_scene_seq==old_seq)) and qibao_sentence_complete:",old_seq<100 and (li_scene_seq > old_seq or (add_once_list_flag_with_sleep==True and li_scene_seq==old_seq and qibao_sentence_complete)))
-                            print("(old_seq>100 and li_scene_seq!=old_seq) or (add_once_list_flag_with_sleep==True and li_scene_seq==old_seq and qibao_sentence_complete):",(old_seq>100 and li_scene_seq!=old_seq and qibao_sentence_complete) or (add_once_list_flag_with_sleep==True and li_scene_seq==old_seq and qibao_sentence_complete))
+                            print(
+                                "old_seq<100 and (li_scene_seq > old_seq or (add_once_list_flag_with_sleep==True and li_scene_seq==old_seq)) and qibao_sentence_complete:",
+                                old_seq < 100 and (li_scene_seq > old_seq or (
+                                            add_once_list_flag_with_sleep == True and li_scene_seq == old_seq and qibao_sentence_complete)))
+                            print(
+                                "(old_seq>100 and li_scene_seq!=old_seq) or (add_once_list_flag_with_sleep==True and li_scene_seq==old_seq and qibao_sentence_complete):",
+                                (old_seq > 100 and li_scene_seq != old_seq and qibao_sentence_complete) or (
+                                            add_once_list_flag_with_sleep == True and li_scene_seq == old_seq and qibao_sentence_complete))
 
-                            if (old_seq<100 and (li_scene_seq > old_seq or (add_once_list_flag_with_sleep==True and li_scene_seq==old_seq)) and qibao_sentence_complete) or ((old_seq>100 and li_scene_seq!=old_seq and qibao_sentence_complete) or (add_once_list_flag_with_sleep==True and li_scene_seq==old_seq and qibao_sentence_complete)):
+                            if (old_seq < 100 and (li_scene_seq > old_seq or (
+                                    add_once_list_flag_with_sleep == True and li_scene_seq == old_seq)) and qibao_sentence_complete) or (
+                                    (old_seq > 100 and li_scene_seq != old_seq and qibao_sentence_complete) or (
+                                    add_once_list_flag_with_sleep == True and li_scene_seq == old_seq and qibao_sentence_complete)):
                                 with open("li_scene_seq.txt", "w") as file_scene:
                                     file_scene.write(str(li_scene_seq))  # 将li_scene_seq写入文件，确保是数字序号的字符串格式
-                            # if 1 >= 0:
+                                # if 1 >= 0:
                                 print("yes")
                                 add_once_list_flag_with_sleep = False
 
-                                if li_scene_seq>100:
+                                if li_scene_seq > 100:
                                     print("queue.clear", li_scene_seq)
                                     play_queue.queue.clear()
                                     print("clear play_queue")
@@ -2130,9 +2178,9 @@ def deal_received_audio_request():
                                 if li_voice is not None:
                                     # print("li_voice:", li_voice)
 
-                                    li_voices_list=li_voice["voices"]
+                                    li_voices_list = li_voice["voices"]
                                     # print("li_voices_list:",li_voices_list)
-                                    print("len(li_voices_list):",len(li_voices_list))
+                                    print("len(li_voices_list):", len(li_voices_list))
                                     # if li_audio_base64 != None:
                                     #     audio_data_list = [voice["audio_data"] for voice in response_data["voices"]]
                                     #     audio_text_list = [voice["text"] for voice in response_data["voices"]]
@@ -2152,9 +2200,9 @@ def deal_received_audio_request():
                                     #             # time.sleep(1)
                                     #             output_file_stack.append(fixed_audio_file_name)
                                     #             fix_counter+=1
-                                    li_voices_list_len=len(li_voices_list)
-                                    print("li_voices_list_len:",li_voices_list_len)
-                                    for i in range (li_voices_list_len):
+                                    li_voices_list_len = len(li_voices_list)
+                                    print("li_voices_list_len:", li_voices_list_len)
+                                    for i in range(li_voices_list_len):
                                         print("i:", i)
                                         # li_audio_base64 = li_voices_list[i]["audio_data"]
                                         li_audio_fomat = li_voices_list[i]["audio_format"]
@@ -2176,16 +2224,16 @@ def deal_received_audio_request():
                                         #     with open(fixed_audio_file_name, "wb") as mp3_file:
                                         #         mp3_file.write(audio_bytes)
                                         #     print("Saved_fix:", fixed_audio_file_name)
-                                            # time.sleep(li_wait_time)
-                                            # time.sleep(5)
+                                        # time.sleep(li_wait_time)
+                                        # time.sleep(5)
                                         li_filename = li_voices_list[i]["filename"]
                                         print("li_filename:", li_filename, "appended!")
 
+                                        output_file_stack.append(("execute-command", i,
+                                                                  "/home/li/vosk-api/python/example/sound/" + str(
+                                                                      li_filename)))
 
-
-                                        output_file_stack.append(("execute-command",i,"/home/li/vosk-api/python/example/sound/"+str(li_filename)))
-
-                                        print("!!!output_file_stack:",output_file_stack)
+                                        print("!!!output_file_stack:", output_file_stack)
                                         output_file_stack_length = len(output_file_stack)
                                         print("播放栈len:", output_file_stack_length)
                                 interrupt_flag = False
@@ -2214,7 +2262,7 @@ def deal_received_audio_request():
                             if light_rgb is not None:
                                 r, g, b = map(int, light_rgb.split(','))
 
-                                print("r, g, b:",r,g,b)
+                                print("r, g, b:", r, g, b)
                             light_mode = light["mode"]
                             print("light_mode:", light_mode)
                             if light_mode is not None:
@@ -2227,7 +2275,8 @@ def deal_received_audio_request():
                                     turn_off()
                                     time.sleep(0.1)
                                     # theaterChaseRainbow(strip, wait_ms=50)
-                                    theaterChaseRainbow_thread=threading.Thread(target=theaterChaseRainbow,args=(strip,50))
+                                    theaterChaseRainbow_thread = threading.Thread(target=theaterChaseRainbow,
+                                                                                  args=(strip, 50))
                                     theaterChaseRainbow_thread.start()
                                     # time.sleep(1)
                                 if str(light_mode) == "Breathing":
@@ -2251,20 +2300,20 @@ def deal_received_audio_request():
                                     turn_off()
                                     time.sleep(0.1)
                                     # rainbow(strip, wait_ms=30)
-                                    rainbow_thread = threading.Thread(target=const_color,args=(r, g, b,))
+                                    rainbow_thread = threading.Thread(target=const_color, args=(r, g, b,))
                                     rainbow_thread.start()
                                     # time.sleep(1)
 
                         fragrance = response_data["data"]["actions"]["fragrance"]
-                        print("fragrance:",fragrance)
+                        print("fragrance:", fragrance)
                         if fragrance is not None:
                             fragrance_status = fragrance["status"]
                             fragrance_level = fragrance["level"]
                             fragrance_count = fragrance["count"]
                             print("fragrance_status:", fragrance_status)
                             if fragrance_status is not None:
-                                if fragrance_status=="on":
-                                    scent_spray_flag=True
+                                if fragrance_status == "on":
+                                    scent_spray_flag = True
                                 if fragrance_status == "off":
                                     scent_spray_flag = False
                             if fragrance_level is not None:
@@ -2273,8 +2322,9 @@ def deal_received_audio_request():
                                 print("fragrance_count:", fragrance_count)
 
             if response_data['method'] == 'voice-chat':
-                if is_garbage_content==False:
-                    if response_data['data']['text'] is not None and response_data["data"]["stream_seq"] is not None and response_data["data"]["stream_seq"] == 1 :
+                if is_garbage_content == False:
+                    if response_data['data']['text'] is not None and response_data["data"]["stream_seq"] is not None and \
+                            response_data["data"]["stream_seq"] == 1:
                         print("garbage")
                         response_text = response_data['message_id']
                         print("gar response_text:", response_text)
@@ -2282,17 +2332,17 @@ def deal_received_audio_request():
                         print("clear play_queue")
                         output_file_stack.clear()
                         print("clear output_file_stack")
-                        #interrupt_flag = False
+                        # interrupt_flag = False
                         qibao_sentence_complete = False
 
                 if response_data.get("code") == 0:
                     seq_li = response_data["data"]["stream_seq"]
                     print("seq_li:", seq_li)
                     if seq_li == -1:
-                        #qibao_sentence_complete = True
-                        #print("qibao_sentence_complete:", qibao_sentence_complete)
-                        print("sleep_mode:",sleep_mode)
-                        if sleep_mode==True:
+                        # qibao_sentence_complete = True
+                        # print("qibao_sentence_complete:", qibao_sentence_complete)
+                        print("sleep_mode:", sleep_mode)
+                        if sleep_mode == True:
                             time.sleep(10)
                             output_file_stack.append(
                                 ("execute-command", 1, f"/home/li/vosk-api/python/example/lahuisixu2.mp3"))
@@ -2314,11 +2364,11 @@ def deal_received_audio_request():
                         with open("play_status.txt", "w") as file_status:
                             file_status.write(str("IN_PROGRESS"))
                         # qibao_sentence_complete = False
-                    #else:
-                        #qibao_sentence_complete = False
+                    # else:
+                    # qibao_sentence_complete = False
                     # 提取并解码音频数据
                     print("response_data recieived:voice-chat")
-                    print("response_data time:",time.time())
+                    print("response_data time:", time.time())
                     resp_message_id = response_data["message_id"]
 
                     resp_code_id = response_data["code"]
@@ -2334,7 +2384,7 @@ def deal_received_audio_request():
                     # if resp_message_id != old_message_id and int(resp_code_id) == 0:
 
                     #     print("resp_conversation_id not match !!!!!!!!!!!!!!!!!!!!!???????????????????")
-                        # break
+                    # break
 
                     resp_fomat = response_data["data"]["audio_format"]
                     print("resp_fomat:", resp_fomat)
@@ -2355,11 +2405,11 @@ def deal_received_audio_request():
                         print("sleep_assistant clear play_queue")
                         output_file_stack.clear()
                         print("sleep_assistant clear output_file_stack")
-                        #interrupt_flag = False
+                        # interrupt_flag = False
 
                         print("web ask to sleep assistant.")
                         continue_shot_and_record = True
-                        play_enter_sleep_mode=True
+                        play_enter_sleep_mode = True
                         if play_enter_sleep_mode and not has_added_sleep_mode_command:
                             output_file_stack.append(
                                 ("execute-command", 1, f"/home/li/vosk-api/python/example/enter_sleep_mode.mp3"))
@@ -2381,7 +2431,6 @@ def deal_received_audio_request():
 
                         response_action = response_data["data"]["action"]
                         print("response_action:", response_action)
-
 
                         response_text = response_data["data"]["text"]
                         print("response_text:", response_text)
@@ -2416,13 +2465,11 @@ def deal_received_audio_request():
                             if nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
                                 continue
 
-
-
                             output_file_name = f"/home/li/vosk-api/python/example/send_pcm_folder/2input{file_counter}.mp3"
                             with open(output_file_name, "wb") as pcm_file:
                                 pcm_file.write(audio_bytes)
                             print("Saved:", output_file_name)
-                            output_file_stack.append(("voice-chat",seq_li,output_file_name))
+                            output_file_stack.append(("voice-chat", seq_li, output_file_name))
                             output_file_stack_length = len(output_file_stack)
                             print("播放栈len:", output_file_stack_length)
 
@@ -2434,15 +2481,13 @@ def deal_received_audio_request():
             interrupt_flag = False
 
 
-
-
-
 # 判断是否有语音活动
 import webrtcvad
 
 # 初始化 VAD 模块
 vad = webrtcvad.Vad()
 vad.set_mode(2)  # 设置灵敏度，0 为最低灵敏度，3 为最高灵敏度
+
 
 def is_speech(data, sample_rate=16000):
     """检测语音活动"""
@@ -2458,6 +2503,7 @@ def is_speech(data, sample_rate=16000):
     # 调用 WebRTC VAD 检测语音活动
     return vad.is_speech(data_bytes, sample_rate)
 
+
 def is_silent(data, threshold=150):
     """检测是否为静音段。"""
     # 将字节数据转换为 numpy 数组
@@ -2472,6 +2518,7 @@ def is_silent(data, threshold=150):
         # print("未检测到静音")
         return False
 
+
 def resample_audio1(audio_data, orig_rate, target_rate):
     """重采样音频数据"""
     # 计算重采样后的长度
@@ -2479,8 +2526,6 @@ def resample_audio1(audio_data, orig_rate, target_rate):
     # 执行重采样
     resampled = signal.resample(audio_data, new_length)
     return resampled.astype(np.int16)
-
-
 
 
 def write_variable(value):
@@ -2495,22 +2540,27 @@ def int_or_str(text):
         return int(text)
     except ValueError:
         return text
-start_record_time=0
 
+
+start_record_time = 0
 
 import numpy as np
 # from webrtc_audio_processing import AudioProcessingModule as AP
 import time
+
+
 # 加载 PCM 文件
 def load_pcm(file_path, dtype=np.int16):
     with open(file_path, 'rb') as f:
         data = np.frombuffer(f.read(), dtype=dtype)
     return data
 
+
 # 保存 PCM 文件
 def save_pcm(file_path, data, dtype=np.int16):
     with open(file_path, 'wb') as f:
         f.write(data.astype(dtype).tobytes())
+
 
 # 初始化 WebRTC AudioProcessing 模块并处理音频
 def process_audio(input_pcm_file, output_pcm_file, sample_rate=16000):
@@ -2529,7 +2579,7 @@ def process_audio(input_pcm_file, output_pcm_file, sample_rate=16000):
     frame_size = sample_rate // 100  # 每块 10ms
     processed_audio = []
     for i in range(0, len(audio_data), frame_size):
-        audio_chunk = audio_data[i:i+frame_size]
+        audio_chunk = audio_data[i:i + frame_size]
         if len(audio_chunk) < frame_size:
             # 如果最后一块不足 10ms，用 0 填充
             audio_chunk = np.pad(audio_chunk, (0, frame_size - len(audio_chunk)))
@@ -2544,16 +2594,18 @@ def process_audio(input_pcm_file, output_pcm_file, sample_rate=16000):
     # 保存处理后的 PCM 文件
     save_pcm(output_pcm_file, processed_audio)
     print(f"Processed audio saved to {output_pcm_file}")
-t_play_haode=time.time()
+
+
+t_play_haode = time.time()
 
 audio_memory = None
 
 
 def callback(indata, frames, time1, status):
     """每次接收音频数据时调用"""
-    global t_play_haode,output_file_name, recording, silence_counter, output_pcm_file, pre_buffer, audio_file_stack, \
-        noise_break_flag, silent_start_time, silent_end_time, pop_swtich, message_id, start_record_time,play_haode,\
-        is_silent_flag,recording_event,flag_think,old_message_id,last_message_id,not_send_flag,play_qibaozaina,audio_memory
+    global t_play_haode, output_file_name, recording, silence_counter, output_pcm_file, pre_buffer, audio_file_stack, \
+        noise_break_flag, silent_start_time, silent_end_time, pop_swtich, message_id, start_record_time, play_haode, \
+        is_silent_flag, recording_event, flag_think, old_message_id, last_message_id, not_send_flag, play_qibaozaina, audio_memory
     denoise_output_file_name = f"/home/li/vosk-api/python/example/send_pcm_folder/denoise_output{message_id}.pcm"
     if status:
         print(status, file=sys.stderr)
@@ -2564,9 +2616,9 @@ def callback(indata, frames, time1, status):
     current_time = time.time()
     # if current_time-t_play_haode>1:
     #     play_haode_event.set()
-    if is_silent_flag==False:
+    if is_silent_flag == False:
         if volume >= SILENCE_THRESHOLD:
-            flag_think=True
+            flag_think = True
             noise_break_flag = True
             silence_counter = 0  # 重置静音计数器
 
@@ -2583,7 +2635,7 @@ def callback(indata, frames, time1, status):
                 message_id = message_id_orin
                 print("message_id_born:", message_id)
                 print("last_message_id:", last_message_id)
-                old_message_id=last_message_id
+                old_message_id = last_message_id
                 print("old_message_id:", old_message_id)
                 # output_file_name = f"/home/orangepi/vosk-api/python/example/send_pcm_folder/output{message_id}.pcm"
                 #
@@ -2610,7 +2662,7 @@ def callback(indata, frames, time1, status):
 
                 if pop_swtich and audio_data is not None:
 
-                    if not_send_flag==False:
+                    if not_send_flag == False:
                         # play_qibaozaina=True
                         audio_file_stack.append(audio_data)
                     else:
@@ -2637,9 +2689,9 @@ def callback(indata, frames, time1, status):
                     audio_memory = None
                     # output_pcm_file.close()
                     # process_audio(output_file_name, denoise_output_file_name)
-                    if pop_swtich and audio_data  is not None:
-                        play_haode=True
-                        t_play_haode=time.time()
+                    if pop_swtich and audio_data is not None:
+                        play_haode = True
+                        t_play_haode = time.time()
                         # print("!!!!!!!!!!!!!!!Send_play_haode:", play_haode)
                         if not_send_flag == False:
                             # play_qibaozaina = True
@@ -2752,6 +2804,7 @@ def read_from_file1():
         # print(f"读取共享变量：{data}")
         return data
 
+
 def write_to_file(sentence):
     """当共享变量为 0 时写入句子到文件。"""
     while read_from_file1() != "0":
@@ -2780,10 +2833,12 @@ def write_to_file_custom(content):
 # device_name = "USB PnP Sound Device"  # 根据实际设备名称进行设置
 # device_name = "UM10"  # 根据实际设备名称进行设置
 # device_name="POROSVOC UAC Dongle"
-device_name="Yundea 1076"
+device_name = "Yundea 1076"
 # device_name = "SP002Ua"
 # device_name='JieLi BR21'
 device_index = None
+
+
 def find_device_index():
     global device_index
     # 遍历设备列表查找设备索引
@@ -2826,6 +2881,7 @@ def add_files_to_stack(sleep_voice_list, p, q):
                 output_file_stack.append(("execute-command", i, f"/home/li/vosk-api/python/example/sound/{file_name}"))
                 print(f"Added {file_name} to output_file_stack")
 
+
 # def input_stream():
 #     global audio_file_stack,device_index
 #     device_name = "USB PnP Sound Device"  # 根据实际设备名称进行设置
@@ -2841,7 +2897,7 @@ def add_files_to_stack(sleep_voice_list, p, q):
 #         print("#" * 80)
 #         while True:
 #             time.sleep(0.05)  # 防止占用过多 CPU
-    ######数据格式定义
+######数据格式定义
 def main_callback(indata, frames, time1, status):
     global file_counter
     # 调用网络传输的处理函数
@@ -2851,7 +2907,10 @@ def main_callback(indata, frames, time1, status):
     # 调用本地 Kaldi 处理的处理函数
     callback10(indata, frames, time1, status)
 
-garbage_flag=0
+
+garbage_flag = 0
+
+
 def process_interupt():
     global garbage_flag, is_garbage_content
     print("Waiting for garbage content event to be set...")
@@ -2861,12 +2920,15 @@ def process_interupt():
         garbage_content_event.wait()  # 等待事件被触发
         print("garbage_content receive")  # 事件触发后打印
         is_garbage_content = True
-        garbage_flag=1
+        garbage_flag = 1
+
 
 thread_process_interupt = threading.Thread(target=process_interupt)
 thread_process_interupt.start()
+
+
 def send_heartbeat():
-    global last_t1,t1,last_t2,t2,running2,ws,retries,max_retries
+    global last_t1, t1, last_t2, t2, running2, ws, retries, max_retries
     # try:
 
     retry_interval = 0.3
@@ -2909,6 +2971,7 @@ def send_heartbeat():
     # finally:
     #     ws.close()
 
+
 def audio_run():
     global flag_append, audio_file_stack, flag_len, running2, data_id_no_send, generate_photo_base64, shield_after_send, flag_think, flag_think2
     print("audio_run")
@@ -2920,9 +2983,9 @@ def audio_run():
         # audio_file_stack.append("/home/orangepi/vosk-api/python/example/output_li.pcm")
         # time.sleep(0.01)
     # time.sleep(0.1)
-    con_num=0
+    con_num = 0
     while running2:
-        con_num+=1
+        con_num += 1
         # print("flag_think:",flag_think)
         # print("network audio_run!!!")
         audio_thread_control_event.wait()
@@ -2969,16 +3032,21 @@ def audio_run():
         # else:
         #     print("No more audio files to send.")
         #     print("No more audio files to send.")
-            # break  # 如果栈空则退出
+        # break  # 如果栈空则退出
     print("break from audio_run!")
+
 
 def stop_threads():
     print("Threads stopped.")
 
     thread_control_event.clear()  # 停止子线程的执行
+
+
 log_file_path = "/home/li/vosk-api/python/example/servo_pulse_log.txt"
+
+
 def start_threads():
-    global threads_started,running,audio_file_stack,running2,start_threads_control,start_video_playback_flag,conversation_id
+    global threads_started, running, audio_file_stack, running2, start_threads_control, start_video_playback_flag, conversation_id
     # 确保线程只启动一次
     print("enter start_threads")
 
@@ -3025,25 +3093,25 @@ def start_threads():
         # thread_draw=threading.Thread(target=draw_main)
         # record_2s_thread=threading.Thread(target=record_2s)
         # record_2s_thread.start()
-        combine_bgm_sound_thread=threading.Thread(target=combine_bgm_sound)
+        combine_bgm_sound_thread = threading.Thread(target=combine_bgm_sound)
         combine_bgm_sound_thread.start()
         continue_send_photo_thread = threading.Thread(target=continue_send_photo)
         continue_send_photo_thread.daemon = True  # 设置为守护线程，这样程序退出时线程会自动退出
         continue_send_photo_thread.start()
 
-        LED_thread=threading.Thread(target=breath)
+        LED_thread = threading.Thread(target=breath)
         LED_thread.start()
-        scent_spray_thread=threading.Thread(target=scent_spray)
+        scent_spray_thread = threading.Thread(target=scent_spray)
         scent_spray_thread.start()
-        face_detection_run_thread=threading.Thread(target=face_detection_run1)
+        face_detection_run_thread = threading.Thread(target=face_detection_run1)
         heartbeat_thread = threading.Thread(target=send_heartbeat, daemon=True)
         audio_processing_thread = threading.Thread(target=audio_run)
         # logic_thread = threading.Thread(target=animation_logic)
-        receive_audio_request_thread=threading.Thread(target=receive_audio_request)
+        receive_audio_request_thread = threading.Thread(target=receive_audio_request)
         receive_audio_request_thread.start()
         # receive_audio_request2_thread=threading.Thread(target=receive_audio_request2)
         # receive_audio_request2_thread.start()
-        deal_received_audio_request_thread=threading.Thread(target=deal_received_audio_request)
+        deal_received_audio_request_thread = threading.Thread(target=deal_received_audio_request)
         deal_received_audio_request_thread.start()
 
         # playhaode_thread_instance = threading.Thread(target=play_haode_function, daemon=True)
@@ -3061,7 +3129,6 @@ def start_threads():
             threading.Thread(target=start_video_playback).start()
         start_threads_control.clear()
 
-
     # input_stream()
     # threads_started = True
     # audio_processing_thread.join()
@@ -3070,9 +3137,11 @@ def start_threads():
     # face_detection_run_thread.join()
     # threads_started = False
     # threads_started = True
+
+
 def timer_check():
-    global silent_start_time, xiaoqi_detected,recording,pop_swtich,draw_switch,\
-        face_detection_switch,xiaoqi_detected_count,sleep_detected,standup_flag
+    global silent_start_time, xiaoqi_detected, recording, pop_swtich, draw_switch, \
+        face_detection_switch, xiaoqi_detected_count, sleep_detected, standup_flag
     pulse_within_range = False
     while running:
         time.sleep(0.02)
@@ -3086,7 +3155,7 @@ def timer_check():
         # if standup_flag==True:
         if elapsed_time > 1800 and elapsed_time < 1000000 or sleep_detected:  # 超过25秒静音
             print("超过25秒静音，停止线程")
-            sleep_detected=False
+            sleep_detected = False
             pop_swtich = False
             draw_switch = False
             face_detection_switch = False
@@ -3098,14 +3167,14 @@ def timer_check():
 
 
 def kaldi_run2():
-    global xiaoqi_detected,silent_start_time,pop_swtich,draw_switch,face_detection_switch,xiaoqi_detected_count,not_send_flag,play_qibaozaina
+    global xiaoqi_detected, silent_start_time, pop_swtich, draw_switch, face_detection_switch, xiaoqi_detected_count, not_send_flag, play_qibaozaina
 
     while running2:
         time.sleep(0.01)
         if xiaoqi_detected:
-            pop_swtich=True
-            draw_switch=True
-            face_detection_switch=True
+            pop_swtich = True
+            draw_switch = True
+            face_detection_switch = True
             xiaoqi_detected_count += 1
             silent_start_time = time.time()  # 重置计时
             xiaoqi_detected = False
@@ -3124,10 +3193,11 @@ def kaldi_run2():
                 # start_threads_control.set()  # 启动 start_threads 线程
 
 
-
 def text_to_phonemes(text):
     phonemes = pypinyin.lazy_pinyin(text, style=pypinyin.Style.TONE3)  # 带音调拼音
     return phonemes
+
+
 # 将关键词转换为音素
 qibao_phonemes = {word: text_to_phonemes(word) for word in xiaoqi_word}
 print("qibao_phonemes:", qibao_phonemes)
@@ -3136,8 +3206,9 @@ print("stop_phonemes:", stop_phonemes)
 hello_phonemes = {word: text_to_phonemes(word) for word in hello_word}
 print("hello_phonemes:", hello_phonemes)
 
+target_keywords = ["播放音乐", "七七", "停止", "抬头", "拍照", "休息"]
 
-target_keywords = ["播放音乐", "七七", "停止", "抬头","拍照","休息"]
+
 def detect_keywords(transcription):
     """从转录文本中检测关键词"""
 
@@ -3145,7 +3216,8 @@ def detect_keywords(transcription):
         if word in transcription:
             print(f"Keyword detected: {word}")
 
-keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'##########关键词必须完全一样才行
+
+keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'  ##########关键词必须完全一样才行
 
 
 def cosine_dist(x, y):
@@ -3153,17 +3225,32 @@ def cosine_dist(x, y):
     ny = np.array(y)
     return 1 - np.dot(nx, ny) / np.linalg.norm(nx) / np.linalg.norm(ny)
 
+
 SPK_MODEL_PATH = "/home/li/vosk-api/python/example/vosk-model-spk-0.4"
 model_path = "/home/li/vosk-model-small-cn-0.22"
 # spk_li_1=[-0.297443, 0.138541, -0.480268, -0.20816, -0.181298, -0.639442, 0.21267, -0.555786, 1.005074, 0.011552, 1.985099, -0.568444, 0.520695, 0.221619, -0.442219, -0.352981, 1.291161, 0.58134, 1.671874, -1.298758, -0.395653, -0.401662, 2.137376, 0.174206, 0.570289, 0.01595, 1.390286, -0.475607, 1.212984, -0.195779, -0.038047, -0.18157, -0.598267, -0.97167, -0.560137, -0.021336, -1.152562, 0.948739, 0.765162, -0.550215, -1.161016, 1.401901, 0.383774, -0.220877, -0.638535, 1.118744, -0.51617, 0.952701, 0.540488, 0.459646, 0.337441, 1.287117, -1.81413, 0.807996, 0.418737, -1.263778, 0.068068, -1.384879, -1.70511, 1.647274, -0.842112, 0.111097, -0.736788, -2.329749, -2.008974, -1.564938, -0.335628, 0.184886, 0.943496, 0.770639, 1.692765, 0.082376, -1.156951, 0.097683, -1.031321, 1.875823, -1.600061, -1.14648, 0.628454, -0.386903, 1.692657, 0.846197, -0.966381, 1.106492, -0.734312, 0.077541, 0.689925, 0.817806, 0.971107, -0.693128, 0.986192, -0.015493, -1.595232, 0.250718, 0.381887, -0.662012, -0.158801, -0.679696, -0.487889, 2.454968, -1.054998, -1.543859, 0.815683, 1.125827, -0.15894, 1.941532, -0.684257, 0.595867, -0.239138, -1.711226, -0.669706, 1.655171, -1.010642, -0.764074, 1.118967, -1.066784, -1.645003, 0.38828, 0.085089, 0.470405, 0.969876, 0.572148, 0.61563, 0.815989, -0.234343, 2.112524, -0.769253, 0.585631]
-spk_li_1=[-0.626114, 0.430365, 0.564255, -0.182698, 0.537145, 0.044097, 0.564515, 0.666896, 1.085733, -0.523695, 2.178851, -0.545808, 0.492513, -0.214256, 0.380257, 0.561458, 1.432191, 0.576447, 1.347584, -1.410213, -0.201343, 1.299883, 0.16591, -0.301386, 1.030398, -0.155679, 1.668122, -0.47749, 1.583658, 1.031789, -0.610194, 0.207826, -2.028657, -0.778005, 0.608732, -1.103482, -0.249394, -0.145279, -0.252108, -0.744611, -0.178013, 0.821876, 1.348644, 0.958709, -1.489057, -0.069446, 0.55689, 0.382191, 1.793885, 0.12014, 1.096465, 1.948748, -0.288994, -0.427686, -0.25332, -0.74351, 1.289284, -0.442085, -1.594271, 0.238896, -0.14475, -1.243948, -0.811971, -1.167681, -1.934597, -2.094246, 0.203778, 0.2246, 0.769156, 3.129627, 1.638138, -0.414724, 0.363555, 1.058113, -0.658691, 0.345854, -1.559133, 0.087666, 0.984442, -0.469354, 1.667347, 0.916898, -2.170697, 0.292812, 0.051197, 1.222564, 1.065773, -0.065279, 0.214764, -0.407425, 0.992222, -0.993893, 0.693716, 0.121084, 1.31698, 1.255295, -0.941613, 0.015467, 0.500375, -1.479744, -0.943895, -0.405701, 1.795941, -0.66203, 1.224589, 0.963079, -0.872087, 0.392804, 1.412374, -0.279257, -0.462107, 0.674435, 0.137653, 0.93439, 2.394885, -0.571315, 0.374555, -0.233448, 0.757664, -0.375494, 0.666074, -0.123803, 1.518769, 0.873773, -0.218161, 1.566089, -0.488127, 0.386693]
+spk_li_1 = [-0.626114, 0.430365, 0.564255, -0.182698, 0.537145, 0.044097, 0.564515, 0.666896, 1.085733, -0.523695,
+            2.178851, -0.545808, 0.492513, -0.214256, 0.380257, 0.561458, 1.432191, 0.576447, 1.347584, -1.410213,
+            -0.201343, 1.299883, 0.16591, -0.301386, 1.030398, -0.155679, 1.668122, -0.47749, 1.583658, 1.031789,
+            -0.610194, 0.207826, -2.028657, -0.778005, 0.608732, -1.103482, -0.249394, -0.145279, -0.252108, -0.744611,
+            -0.178013, 0.821876, 1.348644, 0.958709, -1.489057, -0.069446, 0.55689, 0.382191, 1.793885, 0.12014,
+            1.096465, 1.948748, -0.288994, -0.427686, -0.25332, -0.74351, 1.289284, -0.442085, -1.594271, 0.238896,
+            -0.14475, -1.243948, -0.811971, -1.167681, -1.934597, -2.094246, 0.203778, 0.2246, 0.769156, 3.129627,
+            1.638138, -0.414724, 0.363555, 1.058113, -0.658691, 0.345854, -1.559133, 0.087666, 0.984442, -0.469354,
+            1.667347, 0.916898, -2.170697, 0.292812, 0.051197, 1.222564, 1.065773, -0.065279, 0.214764, -0.407425,
+            0.992222, -0.993893, 0.693716, 0.121084, 1.31698, 1.255295, -0.941613, 0.015467, 0.500375, -1.479744,
+            -0.943895, -0.405701, 1.795941, -0.66203, 1.224589, 0.963079, -0.872087, 0.392804, 1.412374, -0.279257,
+            -0.462107, 0.674435, 0.137653, 0.93439, 2.394885, -0.571315, 0.374555, -0.233448, 0.757664, -0.375494,
+            0.666074, -0.123803, 1.518769, 0.873773, -0.218161, 1.566089, -0.488127, 0.386693]
 model = Model(model_path)
 spk_model = SpkModel(SPK_MODEL_PATH)
-not_send_flag=False
+not_send_flag = False
+
+
 def kaldi_listener():
-    global count2, silent_start_time, silent_end_time, xiaoqi_detected, running2, running,paizhao_voice_command,\
-        message_id_get,data_id_no_send,nihao_detected,result_detected,hello_detected,keywords,sleep_detected,\
-        nihao_event,is_silent_flag,xiaoqi_event,continue_shot_and_record
+    global count2, silent_start_time, silent_end_time, xiaoqi_detected, running2, running, paizhao_voice_command, \
+        message_id_get, data_id_no_send, nihao_detected, result_detected, hello_detected, keywords, sleep_detected, \
+        nihao_event, is_silent_flag, xiaoqi_event, continue_shot_and_record
     args.samplerate = SAMPLERATE_ORIG
 
     rec = KaldiRecognizer(model, SAMPLERATE_ORIG, keywords)
@@ -3178,12 +3265,12 @@ def kaldi_listener():
         # print("args.samplerate:", args.samplerate)
         # start_threads()
         count2 = 0
-        xiaoqi_detected_count=0
+        xiaoqi_detected_count = 0
         xiaoqi_event_triggered = False  # 初始标志
         while True:
             time.sleep(0.01)
             count2 += 1
-            is_silent_flag=False
+            is_silent_flag = False
             # print("count2:",count2)
             # if count2 == 2:
             #     silent_start_time = time.time()
@@ -3201,7 +3288,7 @@ def kaldi_listener():
             xiaoqi_event_triggered = False
             if is_silent(data):
                 # print("检测到静音，跳过此段音频")
-                is_silent_flag=True
+                is_silent_flag = True
                 continue  # 跳过静音段，进入下一个循环
             # frames.append(data)
             # print("data_id_get:", data_id_get)
@@ -3216,7 +3303,7 @@ def kaldi_listener():
             #     print("LI_Result_dict:partial2", partial2)
             #     partial_text2 = partial2.get("partial2", "")
             #     print(f"Partial Transcription2: {partial_text2}")
-                # detect_keywords(partial_text2)
+            # detect_keywords(partial_text2)
             if rec.AcceptWaveform(data):
                 result = json.loads(rec.Result())
                 print("LI_Result_dict_keyword:", result)
@@ -3275,13 +3362,13 @@ def kaldi_listener():
                 #     data_id_no_send=int(data_id_get)
                 #     print("time_data_id_no_send:", time.time())
                 #     print("data_id_no_send:",data_id_no_send)
-                    # write_variable("1")
-                    # print("共享变量已改为 1")
+                # write_variable("1")
+                # print("共享变量已改为 1")
             else:
                 partial = json.loads(rec.PartialResult())
                 partial_text = partial.get("partial", "")
                 print(f"Partial Transcription: {partial_text}")
-                if target_keywords[1] in str(partial_text)and not xiaoqi_event_triggered:
+                if target_keywords[1] in str(partial_text) and not xiaoqi_event_triggered:
                     print(f"检测到qibao关键词: {target_keywords[1]}")
                     # print(f"检测到qibao关键词: {phonemes}")
                     xiaoqi_event.set()
@@ -3308,7 +3395,7 @@ def kaldi_listener():
 
             if dump_fn is not None:
                 dump_fn.write(data)
-        print("final:",rec.FinalResult())
+        print("final:", rec.FinalResult())
 
 
 ############################################################################
@@ -3317,26 +3404,28 @@ from rpi_ws281x import *
 import argparse
 
 # LED strip configuration:
-LED_COUNT      = 50      # Number of LED pixels.
-LED_PIN        = 18#18      # GPIO pin connected to the pixels (18 uses PWM!).
-#LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
-LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
-LED_DMA        = 10      # DMA channel to use for generating signal (try 10)
-LED_BRIGHTNESS =64     # Set to 0 for darkest and 255 for brightest
-LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
-LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
+LED_COUNT = 50  # Number of LED pixels.
+LED_PIN = 18  # 18      # GPIO pin connected to the pixels (18 uses PWM!).
+# LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
+LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
+LED_DMA = 10  # DMA channel to use for generating signal (try 10)
+LED_BRIGHTNESS = 64  # Set to 0 for darkest and 255 for brightest
+LED_INVERT = False  # True to invert the signal (when using NPN transistor level shift)
+LED_CHANNEL = 0  # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 
 def colorWipe2(strip, color, wait_ms=100):
     """Wipe color across display a pixel at a time."""
     # print("colorWipe2 act.")
     # for i in range(strip.numPixels()):
-        # strip.setPixelColor(i, color)
-        # strip.show()
+    # strip.setPixelColor(i, color)
+    # strip.show()
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, color)
         strip.show()
-        time.sleep(wait_ms/1000.0)
+        time.sleep(wait_ms / 1000.0)
+
+
 # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=40):
     """Wipe color across display a pixel at a time."""
@@ -3344,7 +3433,8 @@ def colorWipe(strip, color, wait_ms=40):
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, color)
     strip.show()
-        # time.sleep(wait_ms/1000.0)
+    # time.sleep(wait_ms/1000.0)
+
 
 def colorWipe_single(strip, color, wait_ms=40):
     """Wipe color across display a pixel at a time."""
@@ -3352,18 +3442,21 @@ def colorWipe_single(strip, color, wait_ms=40):
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, color)
         strip.show()
-        time.sleep(wait_ms/1000.0)
+        time.sleep(wait_ms / 1000.0)
+
+
 def theaterChase(strip, color, wait_ms=50, iterations=10):
     """Movie theater light style chaser animation."""
     # print("theaterChase act.")
     for j in range(iterations):
         for q in range(3):
             for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i+q, color)
+                strip.setPixelColor(i + q, color)
             strip.show()
-            time.sleep(wait_ms/1000.0)
+            time.sleep(wait_ms / 1000.0)
             for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i+q, 0)
+                strip.setPixelColor(i + q, 0)
+
 
 def wheel(pos):
     """Generate rainbow colors across 0-255 positions."""
@@ -3377,23 +3470,26 @@ def wheel(pos):
         pos -= 170
         return Color(0, pos * 3, 255 - pos * 3)
 
+
 def rainbow(strip, wait_ms=20, iterations=1):
     """Draw rainbow that fades across all pixels at once."""
     # print("rainbow act.")
-    for j in range(256*iterations):
+    for j in range(256 * iterations):
         for i in range(strip.numPixels()):
-            strip.setPixelColor(i, wheel((i+j) & 255))
+            strip.setPixelColor(i, wheel((i + j) & 255))
         strip.show()
-        time.sleep(wait_ms/1000.0)
+        time.sleep(wait_ms / 1000.0)
+
 
 def rainbowCycle(strip, wait_ms=20, iterations=5):
     """Draw rainbow that uniformly distributes itself across all pixels."""
     # print("rainbowCycle act.")
-    for j in range(256*iterations):
+    for j in range(256 * iterations):
         for i in range(strip.numPixels()):
             strip.setPixelColor(i, wheel((int(i * 256 / strip.numPixels()) + j) & 255))
         strip.show()
-        time.sleep(wait_ms/1000.0)
+        time.sleep(wait_ms / 1000.0)
+
 
 def theaterChaseRainbow(strip, wait_ms=50):
     """Rainbow movie theater light style chaser animation."""
@@ -3401,11 +3497,11 @@ def theaterChaseRainbow(strip, wait_ms=50):
     for j in range(256):
         for q in range(3):
             for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i+q, wheel((i+j) % 255))
+                strip.setPixelColor(i + q, wheel((i + j) % 255))
             strip.show()
-            time.sleep(wait_ms/1000.0)
+            time.sleep(wait_ms / 1000.0)
             for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i+q, 0)
+                strip.setPixelColor(i + q, 0)
 
 
 def breath():
@@ -3425,8 +3521,9 @@ def breath():
         time.sleep(0.01)
     time.sleep(2)
 
-def const_color(r,g,b):
-    print("r,g,b:",r,g,b)
+
+def const_color(r, g, b):
+    print("r,g,b:", r, g, b)
     for j in range(255):
         for i in range(strip.numPixels()):
             strip.setPixelColor(i, Color(r, g, b))
@@ -3434,6 +3531,7 @@ def const_color(r,g,b):
         strip.show()
         time.sleep(0.01)
     time.sleep(2)
+
 
 def turn_off():
     # print("turn_off act.")
@@ -3444,10 +3542,10 @@ def turn_off():
         time.sleep(0.01)
 
 
-
 import RPi.GPIO as GPIO
 import time
 import subprocess
+
 # 设置GPIO模式
 GPIO.setmode(GPIO.BCM)
 
@@ -3462,6 +3560,8 @@ DJ_PIN = 22  # 对应DJ引脚（模拟输出）
 GPIO.setup(KEYA_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(KEYB_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(DJ_PIN, GPIO.OUT)
+
+
 # 延时函数
 def delayms(ms):
     time.sleep(ms / 1000.0)  # 转换为秒
@@ -3502,6 +3602,7 @@ def check_keys():
                 jiaodu = 20  # 限制最大角度
             print(f"顺时针旋转: {jiaodu}")
 
+
 def adjust_volume():
     # 定时器模拟
     count = 0
@@ -3527,6 +3628,8 @@ def adjust_volume():
 
     finally:
         GPIO.cleanup()
+
+
 # 初始角度
 # jiaodu = 10
 # subprocess.Popen(['alsamixer'])
@@ -3564,14 +3667,14 @@ def adjust_volume():
 
 
 def scent_spray():
-    global scent_spray_flag,last_scent_spray_flag
+    global scent_spray_flag, last_scent_spray_flag
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(22, GPIO.OUT)
 
     while True:
-        if last_scent_spray_flag==scent_spray_flag:
+        if last_scent_spray_flag == scent_spray_flag:
             continue
-        if scent_spray_flag==True:
+        if scent_spray_flag == True:
             for j in range(30):
                 time.sleep(5)
                 for i in range(6):
@@ -3592,13 +3695,9 @@ def scent_spray():
     #
     #     print("scent_spray is ON")
     #     time.sleep(20)  # 延时 1 秒
-        # GPIO.output(22, GPIO.LOW)
-        # print("LED is OFF")
-        # time.sleep(1)  # 延时 1 秒
-
-
-
-
+    # GPIO.output(22, GPIO.LOW)
+    # print("LED is OFF")
+    # time.sleep(1)  # 延时 1 秒
 
 
 def listen_for_s_key():
@@ -3610,16 +3709,13 @@ def listen_for_s_key():
             print("Pressed 's' key!")
             standup_flag = True
 
-
             # 在这里可以执行你希望的操作，比如：
             # Do something when 's' is pressed
 
 
-
-
 if __name__ == "__main__":
     # shape_change2()
-    #turn_off scent
+    # turn_off scent
     print("ABC")
     with open("li_scene_seq.txt", "w") as file_scene:
         file_scene.write(str(0))  # 将li_scene_seq写入文件，确保是数字序号的字符串格式
@@ -3636,8 +3732,8 @@ if __name__ == "__main__":
     freq = cv2.getTickFrequency()  # 系统频率
     # face_detection_run1()
     init()
-    message_id = str(datetime.now().strftime('%Y%m%d-%H%M%S-%f')[:-8]+'start')
-    message_id2 = str(datetime.now().strftime('%Y%m%d-%H%M%S-%f')[:-8]+'start')
+    message_id = str(datetime.now().strftime('%Y%m%d-%H%M%S-%f')[:-8] + 'start')
+    message_id2 = str(datetime.now().strftime('%Y%m%d-%H%M%S-%f')[:-8] + 'start')
     # time.sleep(10)
 
     strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
@@ -3646,12 +3742,11 @@ if __name__ == "__main__":
 
     turn_off()
 
-
     try:
         if args.samplerate is None:
             print("1111")
             print(sd.query_devices())
-            print("args.device:",args.device)
+            print("args.device:", args.device)
             device_info = sd.query_devices(args.device, "input")
             print("1112")
             # soundfile expects an int, sounddevice provides a float:
@@ -3679,7 +3774,7 @@ if __name__ == "__main__":
         key_thread.daemon = True  # 将线程设为守护线程，这样程序退出时会自动结束线程
         key_thread.start()
 
-        connection_thread=threading.Thread(target=create_connection_with_retries,args=(websocket_url,))
+        connection_thread = threading.Thread(target=create_connection_with_retries, args=(websocket_url,))
         connection_thread.start()
 
         start_threads_thread = threading.Thread(target=start_threads)
@@ -3695,13 +3790,11 @@ if __name__ == "__main__":
         timer_thread.start()
         draw_main()
 
-
         # start_threads()
 
-
         # running2=True
-                # xiaoqi_detected = False
-            # print("break from while loop")
+        # xiaoqi_detected = False
+        # print("break from while loop")
         # time.sleep(1)
         # with 块结束，关闭当前流，重新启动一个带有 callback1 的 InputStream
         # print("Switching to callback1")
