@@ -2024,6 +2024,7 @@ li_voice=None
 li_filename=None
 play_enter_sleep_mode=False
 has_added_sleep_mode_command=False
+old_light_mode = ""
 def deal_received_audio_request():
     global last_t1, t1, last_t2, t2, flag_error, audio_file_stack_length, paizhao_voice_command, \
         photo_base64, generate_photo_base64, nihao_detected, xiaoqi_detected, result_detected, \
@@ -2218,42 +2219,44 @@ def deal_received_audio_request():
                             light_mode = light["mode"]
                             print("light_mode:", light_mode)
                             if light_mode is not None:
-                                if str(light_mode) == "Off":
-                                    print("Off!!!")
-                                    turn_off()
-                                    # time.sleep(2)
-                                if str(light_mode) == "Shadowing":
-                                    print("Shadowing!!!")
-                                    turn_off()
-                                    time.sleep(0.1)
-                                    # theaterChaseRainbow(strip, wait_ms=50)
-                                    theaterChaseRainbow_thread=threading.Thread(target=theaterChaseRainbow,args=(strip,50))
-                                    theaterChaseRainbow_thread.start()
-                                    # time.sleep(1)
-                                if str(light_mode) == "Breathing":
-                                    print("Breathing!!!")
-                                    turn_off()
-                                    time.sleep(0.1)
-                                    # wheel(100)
-                                    wheel_thread = threading.Thread(target=wheel, args=(100,))
-                                    wheel_thread.start()
-                                    # time.sleep(1)
-                                if str(light_mode) == "Gradient":
-                                    print("Gradient!!!")
-                                    turn_off()
-                                    time.sleep(0.1)
-                                    # colorWipe_single(strip,  color=Color(0, 255, 0),wait_ms=50)
-                                    colorWipe_single_thread = threading.Thread(target=breath)
-                                    colorWipe_single_thread.start()
-                                    # time.sleep(1)
-                                if str(light_mode) == "Static":
-                                    print("Static!!!")
-                                    turn_off()
-                                    time.sleep(0.1)
-                                    # rainbow(strip, wait_ms=30)
-                                    rainbow_thread = threading.Thread(target=const_color,args=(r, g, b,))
-                                    rainbow_thread.start()
-                                    # time.sleep(1)
+                                if old_light_mode != light_mode:
+                                    if str(light_mode) == "Off":
+                                        print("Off!!!")
+                                        turn_off()
+                                        # time.sleep(2)
+                                    if str(light_mode) == "Shadowing":
+                                        print("Shadowing!!!")
+                                        turn_off()
+                                        time.sleep(0.1)
+                                        # theaterChaseRainbow(strip, wait_ms=50)
+                                        theaterChaseRainbow_thread=threading.Thread(target=theaterChaseRainbow,args=(strip,50))
+                                        theaterChaseRainbow_thread.start()
+                                        # time.sleep(1)
+                                    if str(light_mode) == "Breathing":
+                                        print("Breathing!!!")
+                                        turn_off()
+                                        time.sleep(0.1)
+                                        # wheel(100)
+                                        wheel_thread = threading.Thread(target=wheel, args=(100,))
+                                        wheel_thread.start()
+                                        # time.sleep(1)
+                                    if str(light_mode) == "Gradient":
+                                        print("Gradient!!!")
+                                        turn_off()
+                                        time.sleep(0.1)
+                                        # colorWipe_single(strip,  color=Color(0, 255, 0),wait_ms=50)
+                                        colorWipe_single_thread = threading.Thread(target=breath, args(r, g, b))
+                                        colorWipe_single_thread.start()
+                                        # time.sleep(1)
+                                    if str(light_mode) == "Static":
+                                        print("Static!!!")
+                                        turn_off()
+                                        time.sleep(0.1)
+                                        # rainbow(strip, wait_ms=30)
+                                        rainbow_thread = threading.Thread(target=const_color,args=(r, g, b,))
+                                        rainbow_thread.start()
+                                        # time.sleep(1)
+                                    old_light_mode = light_mode
 
                         fragrance = response_data["data"]["actions"]["fragrance"]
                         print("fragrance:",fragrance)
@@ -3327,6 +3330,8 @@ LED_INVERT     = False   # True to invert the signal (when using NPN transistor 
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 
+light_mode = 'const_color'
+
 def colorWipe2(strip, color, wait_ms=100):
     """Wipe color across display a pixel at a time."""
     # print("colorWipe2 act.")
@@ -3408,32 +3413,67 @@ def theaterChaseRainbow(strip, wait_ms=50):
                 strip.setPixelColor(i+q, 0)
 
 
-def breath():
+def breath(r, g, b, waittime = 0.2):
     # print("breath act.")
-    for j in range(255, -1, -1):
-        for i in range(strip.numPixels()):
-            strip.setPixelColor(i, Color(j, 255 - j, 0))
-            # print("j:", j)
-        strip.show()
-        time.sleep(0.01)
-    time.sleep(2)
-    for j in range(255):
-        for i in range(strip.numPixels()):
-            strip.setPixelColor(i, Color(0, 255, j))
-            # print("j:", j)
-        strip.show()
-        time.sleep(0.01)
-    time.sleep(2)
+    # for j in range(255, -1, -1):
+    #     for i in range(strip.numPixels()):
+    #         strip.setPixelColor(i, Color(j, 255 - j, 0))
+    #         # print("j:", j)
+    #     strip.show()
+    #     time.sleep(0.01)
+    # time.sleep(2)
+    # for j in range(255):
+    #     for i in range(strip.numPixels()):
+    #         strip.setPixelColor(i, Color(0, 255, j))
+    #         # print("j:", j)
+    #     strip.show()
+    #     time.sleep(0.01)
+    # time.sleep(2)
+
+    print("breath 1")
+    # r = 25
+    # g = 12
+    # b = 12
+    m = max(r, g, b)
+    r1 = r
+    g1 = g
+    b1 = b
+    while(true):
+        if light_mode != 'breath':
+            break
+        for i in range(m):
+            if r1 > 0:
+                r1 = r1 - 1
+            if g1 > 0:
+                g1 = g1 - 1
+            if b1 > 0:
+                b1 = b1 - 1
+            for i in range(strip.numPixels()):
+                strip.setPixelColor(i, Color(r1, g1, b1))
+            strip.show()
+            time.sleep(waittime)
+
+        for i in range(m):
+            if r1 < r:
+                r1 = r1 + 1
+            if g1 > g:
+                g1 = g1 + 1
+            if b1 > b:
+                b1 = b1 + 1
+            for i in range(strip.numPixels()):
+                strip.setPixelColor(i, Color(r1, g1, b1))
+            strip.show()
+            time.sleep(waittime)
 
 def const_color(r,g,b):
     print("r,g,b:",r,g,b)
-    for j in range(255):
+    # for j in range(255):
         for i in range(strip.numPixels()):
             strip.setPixelColor(i, Color(r, g, b))
             # print("j:", j)
         strip.show()
-        time.sleep(0.01)
-    time.sleep(2)
+        # time.sleep(0.01)
+    # time.sleep(2)
 
 def turn_off():
     # print("turn_off act.")

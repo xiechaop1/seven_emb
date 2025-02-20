@@ -10,7 +10,7 @@ def on_message(ws, message):
     logging.info(f"Received message: {message}")
 
 def on_error(ws, error):
-    logging.info(f"Error: {error}")
+    logging.error(f"Error: {error}")
 
 def on_close(ws, close_status_code, close_msg):
     logging.info("Connection closed")
@@ -24,7 +24,7 @@ async def create_websocket_client(url):
     ws = None
     while retries < MAX_RETRIES:
         try:
-            logging.info(f"Attempting to connect... (Attempt {retries + 1})")
+            logging.warn(f"Attempting to connect... (Attempt {retries + 1})")
             ws = websocket.WebSocketApp(
                 url,
                 on_message=on_message,
@@ -40,8 +40,8 @@ async def create_websocket_client(url):
 
         except Exception as e:
             retries += 1
-            logging.info(f"Error connecting: {e}. Retrying in 0.5 seconds...")
+            logging.warn(f"Error connecting: {e}. Retrying in 0.5 seconds...")
             time.sleep(0.5)
 
-    logging.info("Max retries reached. Could not connect.")
+    logging.error("Max retries reached. Could not connect.")
     return None

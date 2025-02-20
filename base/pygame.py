@@ -12,17 +12,17 @@ class AudioPlayer:
         """将音频文件路径添加到列表"""
         if os.path.isfile(audio_file):
             self.audio_list.append(audio_file)
-            print(f"Added: {audio_file}")
+            logging.info(f"Added: {audio_file}")
         else:
-            print(f"Error: {audio_file} does not exist.")
+            logging.error(f"Error: {audio_file} does not exist.")
 
     def remove_audio(self, audio_file):
         """从列表中删除音频文件"""
         if audio_file in self.audio_list:
             self.audio_list.remove(audio_file)
-            print(f"Removed: {audio_file}")
+            logging.info(f"Removed: {audio_file}")
         else:
-            print(f"Error: {audio_file} not found in list.")
+            logging.error(f"Error: {audio_file} not found in list.")
 
     def play_audio(self, index):
         """从列表中播放指定索引的音频"""
@@ -33,23 +33,32 @@ class AudioPlayer:
             pygame.mixer.music.load(audio_file)  # 加载音频文件
             pygame.mixer.music.play()  # 播放音频
             self.current_track = audio_file
-            print(f"Now playing: {audio_file}")
+            logging.info(f"Now playing: {audio_file}")
         else:
-            print("Error: Invalid index.")
+            logging.error("Error: Invalid index.")
+
+    def play_audio_with_file(self, audio_file):
+        """从列表中播放指定索引的音频"""
+        # if self.current_track is not None and pygame.mixer.music.get_busy():
+        #     pygame.mixer.music.stop()  # 停止当前播放的音频
+        pygame.mixer.music.load(audio_file)  # 加载音频文件
+        pygame.mixer.music.play()  # 播放音频
+        self.current_track = audio_file
+        logging.info(f"Now playing: {audio_file}")
 
     def stop_audio(self):
         """停止当前播放的音频"""
         if pygame.mixer.music.get_busy():
             pygame.mixer.music.stop()
-            print("Playback stopped.")
+            logging.info("Playback stopped.")
             self.current_track = None
         else:
-            print("Error: No audio is currently playing.")
+            logging.error("Error: No audio is currently playing.")
 
     def clear_list(self):
         """清空音频列表"""
         self.audio_list.clear()
-        print("Audio list cleared.")
+        logging.info("Audio list cleared.")
 
     def get_audio_list(self):
         """返回当前音频列表"""
