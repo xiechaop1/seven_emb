@@ -24,7 +24,7 @@ class Microphone:
     PRE_RECORD_FRAMES = 1  # 预录制帧数
     # 定义队列和缓冲区
 
-    def __init__(self, threshold=800, timeout=4, sample_rate=16000, frame_duration=30):
+    def __init__(self, threshold=800, timeout=60, sample_rate=16000, frame_duration=30):
         """
         初始化麦克风参数
         :param threshold: 静音检测阈值（音频幅度超过该值视为非静音）
@@ -59,7 +59,7 @@ class Microphone:
             self.frames.append(data)
 
             # 静音检测（通过 VAD 检测）
-            if not self.is_speech(data):
+            if not self.is_speech(data) or self.is_silent(data):
                 logging.info("Silence detected.")
             
             # 超过 timeout 秒自动停止
@@ -77,7 +77,7 @@ class Microphone:
         self.is_recording = False
         logging.info("Recording stopped.")
     
-    def is_silent(data, threshold=150):
+    def is_silent(data):
         """检测是否为静音段。"""
         # 将字节数据转换为 numpy 数组
         audio_data = np.frombuffer(data, dtype=np.int16)
