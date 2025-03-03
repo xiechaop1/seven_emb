@@ -4,6 +4,9 @@ from common.threading_event import ThreadingEvent
 import logging
 import time
 from base.messageid import messageid
+from common.scence import Scence
+from common.code import Code
+
 
 class AudioPlayer:
 
@@ -14,28 +17,47 @@ class AudioPlayer:
         pygame.mixer.init()
         self.audio_list = []  # 用于存储音频文件路径
         self.current_track = None  # 当前正在播放的音频
+        self.current_bgm = None
         self.is_interrupted = False
         self.played_list = []
+        # self.playing_list = []
         self.spray = spray
         self.i = 0
         self.voice_channel = pygame.mixer.Channel(1)
+        self.continue_track = None
+        # self.replay_idx = 0
+
 
     def audio_play_event_daemon(self):
         self.i = 0
         while True:
+            # print(ThreadingEvent.audio_play_event)
             ThreadingEvent.audio_play_event.wait()
             plCount = len(self.audio_list)
-            logging.info(f"AudioPlayer audio_list length:{plCount}")
+            logging.info(f"AudioPlayer audio_list length:{self.i} {plCount}")
 
             while self.i < plCount:
-                if pygame.mixer.music.get_busy() == False:
-                    self.play_audio(self.i)
-                    self.i = self.i + 1
+                if self.voice_channel.get_busy() == False:
+                    print("play event:", ThreadingEvent.audio_play_event)
+                    if ThreadingEvent.audio_play_event.is_set():
+                        self.play_audio(self.i)
+                        self.i = self.i + 1
+                    else:
+                        break
                 time.sleep(0.5)
 
             if self.i >= len(self.audio_list):
                 # self.i = 0
                 ThreadingEvent.audio_play_event.clear()
+
+                # 如果已经进入了助眠场景，语音播放完，解开阻塞
+                if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+                    logging.info("Sleep assistance event pass!")
+                    ThreadingEvent.camera_start_event.set()
+                    ThreadingEvent.recv_execute_command_event.set()
+                    # if self.replay_idx > 0:
+                    #     self.i = self.i + self.replay_idx - 1
+
 
 
     def audio_stop_event_daemon(self):
@@ -88,16 +110,16 @@ class AudioPlayer:
             # type = audio_data["type"]
             # wait_time = audio_data["wait_time"]
             latest_msg_id = messageid.get_latest_message_id()
-            if latest_msg_id != msg_id:
-                logging.error(f"Error: {msg_id} != {latest_msg_id}")
+            # if latest_msg_id != msg_id:
+                # logging.error(f"Error: {msg_id} != {latest_msg_id}")
                 # return
-            if self.current_track is not None and pygame.mixer.music.get_busy():
-                pygame.mixer.music.stop()  # 停止当前播放的音频
+            if self.current_track is not None and self.voice_channel.get_busy():
+                self.voice_channel.stop()  # 停止当前播放的音频
 
             self.play(audio_data)
 
         else:
-            logging.error("Error: Invalid index.")
+            logging.error(f"Error: Invalid index. {index} {len(self.audio_list)}")
 
     def play_audio_with_data(self, audio_data, is_temp_save = True):
         """从列表中播放指定索引的音频"""
@@ -125,20 +147,29 @@ class AudioPlayer:
         else:
             bgm = ""
 
+        # if "continue" in audio_data:
+        #     if audio_data["continue"] == True:
+        #         self.continue_track = audio_data
+
         # if spray == "on":
         #     # ThreadingEvent.spray_start_event.set()
         #     self.spray.shoot()
 
-        if bgm:
-            bgm_file = bgm["filename"]
+        if bgm and bgm != self.current_bgm:
+            bgm_file = "resources/background_music/" + bgm["filename"]
+            print("bgm_file", bgm_file)
             if os.path.isfile(bgm_file):
                 pygame.mixer.music.load(bgm_file)  # 加载音频文件
                 pygame.mixer.music.play(-1)
-        else:
-            pygame.mixer.music.stop()
+                self.current_bgm = bgm
+        # else:
+        #     pygame.mixer.music.stop()
 
         self.current_track = audio_data
         voice = pygame.mixer.Sound(audio_file)
+
+        # self.playing_list.append(audio_data)
+
         self.voice_channel.play(voice)
 
         # pygame.mixer.music.load(audio_file)  # 加载音频文件
@@ -150,8 +181,10 @@ class AudioPlayer:
         if wait_time > 0 and self.is_interrupted == False:
             # 如果不是被打断的，就需要等待一点时间
             time.sleep(wait_time/10)
-        logging.info(f"Now playing: {audio_file}")
+        logging.info(f"Played: {audio_file}")
         self.played_list.append(audio_data)
+        self.current_track = None
+        # self.replay_idx = 0
 
     def replay(self):
         # audio_data = self.current_track
@@ -163,19 +196,37 @@ class AudioPlayer:
 
     def stop_audio(self):
         """停止当前播放的音频"""
+        playing_voice = self.get_current_track()
+        # if playing_voice is not None:
+        #     print(playing_voice)
+        #     if "continue" in playing_voice:
+        #         if playing_voice["continue"] == True:
+        #             self.replay_idx = self.i
+        #
+        # print("replay_idx", self.replay_idx)
+
         if self.voice_channel.get_busy():
             self.voice_channel.stop()
+            self.is_interrupted = True
             logging.info("Playback stopped.")
             self.current_track = None
-            ThreadingEvent.audio_play_event.clear()
+
         else:
-            logging.warn("Error: No audio is currently playing.")
+            logging.warn("No audio is currently playing.")
+        ThreadingEvent.audio_play_event.clear()
+
+    def stop_music(self):
+        pygame.mixer.music.stop()
+        ThreadingEvent.audio_play_event.clear()
 
     def clear_list(self):
         """清空音频列表"""
         self.audio_list.clear()
         self.i = 0
         logging.info("Audio list cleared.")
+
+    def set_play_index(self, idx):
+        self.i = idx
 
     def get_audio_list(self):
         """返回当前音频列表"""
@@ -187,8 +238,17 @@ class AudioPlayer:
     def get_current_track(self):
         return self.current_track
 
+    def get_latest_playing(self):
+        if len(self.played_list) == 0:
+            return self.played_list[-1]
+        else:
+            return None
+
     def get_latest_played(self):
         if len(self.played_list) > 0:
             return self.played_list[-1]
         else:
             return None
+
+    def is_playing(self):
+        return self.voice_channel.get_busy()

@@ -32,7 +32,7 @@ class Mic:
     SAMPLE_RATE = 16000  # 采样率
     CHANNELS = 1  # 单声道
 
-    SILENCE_THRESHOLD = 800  # 静音阈值
+    SILENCE_THRESHOLD = 1000  # 静音阈值
     SILENCE_FRAMES = 10  # 静音帧数量阈值
     PRE_RECORD_FRAMES = 1  # 预录制帧数
     # 定义队列和缓冲区
@@ -88,7 +88,7 @@ class Mic:
                 break
             data = self.stream.read(self.sample_rate * self.frame_duration // 1000)
             if self.is_speech(data) and not self.is_silent(data):
-                ThreadingEvent.audio_stop_event.set()
+                # ThreadingEvent.audio_stop_event.set()
                 if self.call_on == False:
                     audio_data = self.start_recording()
                     #self.callup(audio_data)
@@ -268,6 +268,9 @@ class Mic:
         # print("begin")
 
         self.audio_player.stop_audio()
+        ThreadingEvent.recv_execute_command_event.clear()
+        ThreadingEvent.camera_start_event.clear()
+        # ThreadingEvent.audio_play_event.clear()
 
         # volume = np.abs(indata).mean()
         # indata = resample_audio1(indata, SAMPLERATE_ORIG, SAMPLERATE_TARGET)

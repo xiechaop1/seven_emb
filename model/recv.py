@@ -6,6 +6,8 @@ import threading
 import websocket
 # from base.ws import WebSocketClient
 from common.threading_event import ThreadingEvent
+from common.scence import Scence
+from common.code import Code
 
 
 class Recv:
@@ -46,11 +48,12 @@ class Recv:
 			if resp is not None:
 				if resp["code"] == self.EMPTY_SOUND_CODE:
 					self.audio_player.replay()
+					ThreadingEvent.recv_execute_command_event.set()
 					continue
 				else:
 					if resp['method'] == self.REC_METHOD_VOICE_CHAT:
 						act = resp["data"]["action"]
-						if act == self.REC_ACTION_SLEEP_ASSISTANT:
+						if act == Code.REC_ACTION_SLEEP_ASSISTANT:
 							# 线程判断，如果已经启动线程，就不再启动
 							# 需要处理 by choice
 							tp_thread = threading.Thread(target=ec_handler.take_photo)
@@ -59,9 +62,17 @@ class Recv:
 								# print(tp_thread)
 								tp_thread.start()
 							ThreadingEvent.camera_start_event.set()
+							ThreadingEvent.recv_execute_command_event.set()
+
+							Scence.scence = Code.REC_ACTION_SLEEP_ASSISTANT
+						# ec_handler.latest_scene_seq = 0
+
 						vc_handler.deal(resp)
 						continue
-					elif resp['method'] == self.REC_METHOD_VOICE_EXEC:
-						ec_handler.deal(resp)
+					elif resp['method'] == Code.REC_METHOD_VOICE_EXEC:
+						print("recv event:",ThreadingEvent.recv_execute_command_event)
+						if ThreadingEvent.recv_execute_command_event.is_set():
+							print("recv event2:", ThreadingEvent.recv_execute_command_event)
+							ec_handler.deal(resp)
 						continue
 

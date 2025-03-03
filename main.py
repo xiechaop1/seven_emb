@@ -51,8 +51,8 @@ if __name__ == "__main__":
 
     # audio_event = threading.Event()
     audio_instance = AudioPlayer(spray_instance)
-    audio_stop_thread = threading.Thread(target=audio_instance.audio_stop_event_daemon)
-    audio_stop_thread.start()
+    # audio_stop_thread = threading.Thread(target=audio_instance.audio_stop_event_daemon)
+    # audio_stop_thread.start()
     audio_play_thread = threading.Thread(target=audio_instance.audio_play_event_daemon)
     audio_play_thread.start()
 

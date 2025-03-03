@@ -16,6 +16,7 @@ class VoiceChat:
 		msg_id = messageid.get_latest_message_id()
 
 		if resp_msg_id != msg_id:
+			print("resp_msg_id, msg_id", resp_msg_id, msg_id)
 			return
 
 		seq_li = resp["data"]["stream_seq"]

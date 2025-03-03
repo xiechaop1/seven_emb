@@ -10,6 +10,7 @@ from base.camera import Camera
 from base.messageid import messageid
 from common.threading_event import ThreadingEvent
 from common.common import Common
+from common.code import Code
 
 
 class ExecuteCommand:
@@ -25,7 +26,9 @@ class ExecuteCommand:
 
 	def take_photo(self):
 		while True:
+			# print("camera event: ", ThreadingEvent.camera_start_event)
 			ThreadingEvent.camera_start_event.wait()
+			# i = 0
 
 			photo_list = []
 			for i in range(self.take_photo_max_ct):
@@ -34,6 +37,8 @@ class ExecuteCommand:
 					photo_list.append(photo)
 				if self.take_photo_max_ct > 1:
 					time.sleep(1)
+
+			# print("camera event end: ", ThreadingEvent.camera_start_event, len(photo_list))
 
 			self.commit(photo_list)
 			time.sleep(0.5)
@@ -48,21 +53,22 @@ class ExecuteCommand:
 		status = ""
 		scene_seq = 0
 		if latest_played is not None:
-			seq_id = latest_played["seq_id"]
-			scene_seq = latest_played["scene_seq"]
-			voice_count = latest_played["voice_count"]
+			if latest_played["type"] == Code.REC_METHOD_VOICE_EXEC:
+				seq_id = latest_played["seq_id"]
+				scene_seq = latest_played["scene_seq"]
+				voice_count = latest_played["voice_count"]
 
-			if scene_seq < 100:
-				if self.max_seq < scene_seq:
-					if seq_id >= voice_count - 1:
-						status = "COMPLETED"
-						self.max_seq = scene_seq
+				if scene_seq < 100:
+					if self.max_seq < scene_seq:
+						if seq_id >= voice_count - 1:
+							status = "COMPLETED"
+							self.max_seq = scene_seq
+						else:
+							status = "IN_PROGRESS"
 					else:
-						status = "IN_PROGRESS"
-				else:
-					status = ""
+						status = ""
 
-			print(status, scene_seq, seq_id, voice_count)
+				print(status, scene_seq, seq_id, voice_count)
 
 		request = {
 			"version": "1.0",
@@ -84,7 +90,6 @@ class ExecuteCommand:
 
 		}
 
-
 		self.ws.send(json.dumps(request))
 
 		return
@@ -98,8 +103,29 @@ class ExecuteCommand:
 
 		msg_id = messageid.get_latest_message_id()
 
-		if self.latest_scene_seq == scene_seq:
-			return False
+		# if self.latest_scene_seq == scene_seq:
+		# 	return False
+
+		playing_data = self.audio_player.get_current_track()
+		if playing_data is not None:
+			if playing_data["type"] == Code.REC_METHOD_VOICE_EXEC:
+				latest_playing_scene_seq = playing_data["scene_seq"]
+				if latest_playing_scene_seq == scene_seq:
+					return False
+
+		latest_played = self.audio_player.get_latest_played()
+		# latest_scene_seq = 0
+		if latest_played is not None:
+			if latest_played["type"] == Code.REC_METHOD_VOICE_EXEC:
+				latest_scene_seq = latest_played["scene_seq"]
+				# print("latest_scene_seq:", latest_scene_seq, scene_seq)
+				if latest_scene_seq >= scene_seq:
+					return False
+			elif latest_played["type"] == Code.REC_METHOD_VOICE_CHAT and self.audio_player.is_playing():
+				return False
+		else:
+			if self.latest_scene_seq == scene_seq:
+				return False
 
 		if scene_seq > 100:
 			self.audio_player.clear_list()
@@ -127,6 +153,7 @@ class ExecuteCommand:
 
 		bgm = resp["data"]["actions"]["bgm"]
 
+		print(bgm)
 		if li_voice is not None:
 			# print("li_voice:", li_voice)
 
@@ -165,8 +192,11 @@ class ExecuteCommand:
 				audio_data["bgm"] = bgm
 				audio_data["msg_id"] = resp_msg_id
 				audio_data["conversation_id"] = resp_conv_id
-				audio_data["type"] = "execute-command"
+				audio_data["type"] = Code.REC_METHOD_VOICE_EXEC
 				audio_data["voice_count"] = li_voices_list_len
+				audio_data["wait_time"] = li_wait_time
+
+				audio_data["continue"] = True # 设置标志位，打断以后，可以继续播放
 
 				self.audio_player.add(audio_data)
 

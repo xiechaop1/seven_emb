@@ -8,3 +8,5 @@ class ThreadingEvent:
 	camera_start_event = threading.Event()
 
 	spray_start_event = threading.Event()
+
+	recv_execute_command_event = threading.Event()
