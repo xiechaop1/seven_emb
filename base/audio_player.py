@@ -18,7 +18,7 @@ class AudioPlayer:
         self.played_list = []
         self.spray = spray
         self.i = 0
-
+        self.voice_channel = pygame.mixer.Channel(1)
 
     def audio_play_event_daemon(self):
         self.i = 0
@@ -34,7 +34,7 @@ class AudioPlayer:
                 time.sleep(0.5)
 
             if self.i >= len(self.audio_list):
-                self.i = 0
+                # self.i = 0
                 ThreadingEvent.audio_play_event.clear()
 
 
@@ -89,7 +89,8 @@ class AudioPlayer:
             # wait_time = audio_data["wait_time"]
             latest_msg_id = messageid.get_latest_message_id()
             if latest_msg_id != msg_id:
-                return
+                logging.error(f"Error: {msg_id} != {latest_msg_id}")
+                # return
             if self.current_track is not None and pygame.mixer.music.get_busy():
                 pygame.mixer.music.stop()  # 停止当前播放的音频
 
@@ -138,33 +139,32 @@ class AudioPlayer:
 
         self.current_track = audio_data
         voice = pygame.mixer.Sound(audio_file)
-        voice_channel = pygame.mixer.Channel(1)
-        voice_channel.play(voice)
+        self.voice_channel.play(voice)
 
         # pygame.mixer.music.load(audio_file)  # 加载音频文件
         # ThreadingEvent.audio_play_event.set()
         # pygame.mixer.music.play()  # 播放音频
-        while voice_channel.get_busy():
+        while self.voice_channel.get_busy():
             pygame.time.wait(50)
         # ThreadingEvent.audio_play_event.clear()
         if wait_time > 0 and self.is_interrupted == False:
             # 如果不是被打断的，就需要等待一点时间
-            pygame.time.wait(wait_time)
+            time.sleep(wait_time/10)
         logging.info(f"Now playing: {audio_file}")
         self.played_list.append(audio_data)
 
     def replay(self):
-        audio_data = self.current_track
-        print("replay:", audio_data)
-        if audio_data is not None:
-            self.play_audio_with_data(audio_data, False)
+        # audio_data = self.current_track
+        # print("replay:", audio_data)
+        # if audio_data is not None:
+        #     self.play_audio_with_data(audio_data, False)
+        ThreadingEvent.audio_play_event.set()
         return
 
     def stop_audio(self):
         """停止当前播放的音频"""
-        voice_channel = pygame.mixer.Channel(1)
-        if voice_channel.get_busy():
-            voice_channel.stop()
+        if self.voice_channel.get_busy():
+            self.voice_channel.stop()
             logging.info("Playback stopped.")
             self.current_track = None
             ThreadingEvent.audio_play_event.clear()

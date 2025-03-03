@@ -54,9 +54,9 @@ class Recv:
 							# 线程判断，如果已经启动线程，就不再启动
 							# 需要处理 by choice
 							tp_thread = threading.Thread(target=ec_handler.take_photo)
-							print(tp_thread)
+							# print(tp_thread)
 							if not ThreadingEvent.camera_start_event.is_set() and not tp_thread.is_alive():
-								print(tp_thread)
+								# print(tp_thread)
 								tp_thread.start()
 							ThreadingEvent.camera_start_event.set()
 						vc_handler.deal(resp)

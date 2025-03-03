@@ -4,6 +4,7 @@ from datetime import datetime
 class messageid:
     
     message_id = 0
+    conversation_id = None
 
 
     def get_id() -> str:
@@ -11,7 +12,9 @@ class messageid:
         return f"{timestamp}-{uuid.uuid4().hex}"
 
     def get_conversation_id() -> str:
-        return uuid.uuid4().hex
+        if messageid.conversation_id is None:
+            messageid.conversation_id = uuid.uuid4().hex
+        return messageid.conversation_id
 
     def get_message_id() -> str:
         return messageid.get_id()

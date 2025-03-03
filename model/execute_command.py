@@ -21,6 +21,7 @@ class ExecuteCommand:
 		self.ws = ws
 		self.cv2 = cv2
 		self.camera = Camera(cv2)
+		self.max_seq = 0
 
 	def take_photo(self):
 		while True:
@@ -46,15 +47,22 @@ class ExecuteCommand:
 
 		status = ""
 		scene_seq = 0
-		if latest_played:
+		if latest_played is not None:
 			seq_id = latest_played["seq_id"]
 			scene_seq = latest_played["scene_seq"]
+			voice_count = latest_played["voice_count"]
 
 			if scene_seq < 100:
-				if seq_id == -1:
-					status = "COMPLETED"
+				if self.max_seq < scene_seq:
+					if seq_id >= voice_count - 1:
+						status = "COMPLETED"
+						self.max_seq = scene_seq
+					else:
+						status = "IN_PROGRESS"
 				else:
-					status = "IN_PROGRESS"
+					status = ""
+
+			print(status, scene_seq, seq_id, voice_count)
 
 		request = {
 			"version": "1.0",
@@ -75,6 +83,7 @@ class ExecuteCommand:
 			}
 
 		}
+
 
 		self.ws.send(json.dumps(request))
 
@@ -146,7 +155,7 @@ class ExecuteCommand:
 				print("li_audio_text:", li_audio_text)
 				li_filename = li_voices_list[i]["filename"]
 				print("li_filename:", li_filename, "appended!")
-				output_file_name = "/home/li/vosk-api/python/example/sound/" + str(li_filename)
+				output_file_name = "resources/sound/" + str(li_filename)
 				audio_data = li_voices_list[i]
 				audio_data["filename"] = output_file_name
 				audio_data["scene_seq"] = scene_seq
@@ -156,6 +165,8 @@ class ExecuteCommand:
 				audio_data["bgm"] = bgm
 				audio_data["msg_id"] = resp_msg_id
 				audio_data["conversation_id"] = resp_conv_id
+				audio_data["type"] = "execute-command"
+				audio_data["voice_count"] = li_voices_list_len
 
 				self.audio_player.add(audio_data)
 
