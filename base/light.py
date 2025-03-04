@@ -2,6 +2,7 @@ import time
 # from rpi_ws281x import *
 import argparse
 from common.code import Code
+import wheel
 
 class Light:
 
@@ -21,6 +22,7 @@ class Light:
         self.light_mode = ""
         self.strip = Adafruit_NeoPixel(self.LED_COUNT, self.LED_PIN, self.LED_FREQ_HZ, self.LED_DMA, self.LED_INVERT, self.LED_BRIGHTNESS, self.LED_CHANNEL)
         self.strip.begin()
+        self.current_color = None
 
     def set_mode(self, mode):
         self.light_mode = mode
@@ -40,10 +42,16 @@ class Light:
         else:
             b = 255
 
-        if self.light_mode == Code.LIGHT_MODE_STATIC:
+        light_code = ""
+        if self.light_mode in Code.lightModelMap:
+            light_code = Code.lightModelMap[self.light_mode]
+
+        if light_code == Code.LIGHT_MODE_STATIC:
             self.Static(r, g, b)
-        elif self.light_mode == Code.LIGHT_MODE_GRADIENT:
+        elif light_code == Code.LIGHT_MODE_GRADIENT:
             self.Gradient(r, g, b)
+        elif light_code == Code.LIGHT_MODE_BREATHING:
+            self.Breathing(r, g, b)
         else:
             self.turn_off()
 
@@ -84,6 +92,29 @@ class Light:
                 time.sleep(wait_ms/1000.0)
                 for i in range(0, self.strip.numPixels(), 3):
                     self.strip.setPixelColor(i+q, 0)
+
+
+    def Gradient(self, r, g, b):
+
+        old_color = self.get_color()
+
+        self.fade(old_color['r'], old_color['g'], old_color['b'], r, g, b)
+
+        return
+
+
+    def fade(self, r1, g1, b1, r2 = 0, g2 = 0, b2 = 255, steps = 100, wait_time = 0.2):
+        step_r = (r2 - r1) / steps
+        step_g = (g2 - g1) / steps
+        step_b = (b2 - b1) / steps
+
+        for i in range(steps + 1):
+            r = int(r1 + step_r * i)
+            g = int(g1 + step_g * i)
+            b = int(b1 + step_b * i)
+            self.show_color(r, g, b)
+
+        return
 
     def Gradient1(self, pos):
         """Generate rainbow colors across 0-255 positions."""
@@ -151,21 +182,21 @@ class Light:
             bt = b2 -b1
 
         m = max(rt, gt, bt)
-        inter = 1
+        step = 1
         while True:
             if self.light_mode != 'breath2Color':
                 break
             for i in range(m):
-                if (r1 > r2 and rt > r2 + inter) or (r1 < r2 and rt < r2 - inter):
-                    rt = rt + rtag * inter
+                if (r1 > r2 and rt > r2 + step) or (r1 < r2 and rt < r2 - step):
+                    rt = rt + rtag * step
                 else:
                     rt = r2
-                if (g1 > g2 and gt > g2 + inter) or (g1 < g2 and gt < g2 - inter):
-                    gt = gt + gtag * inter
+                if (g1 > g2 and gt > g2 + step) or (g1 < g2 and gt < g2 - step):
+                    gt = gt + gtag * step
                 else:
                     gt = g2
-                if (b1 > b2 and bt > b2 + inter) or (b1 < b2 and bt < b2 - inter):
-                    bt = bt + btag * inter
+                if (b1 > b2 and bt > b2 + step) or (b1 < b2 and bt < b2 - step):
+                    bt = bt + btag * step
                 else:
                     bt = b2
                 for i in range(self.strip.numPixels()):
@@ -176,16 +207,16 @@ class Light:
                 time.sleep(wait_time)
 
             for i in range(m):
-                if (r1 > r2 and rt < r1 - inter) or (r1 < r2 and rt > r1 + inter):
-                    rt = rt - rtag * inter
+                if (r1 > r2 and rt < r1 - step) or (r1 < r2 and rt > r1 + step):
+                    rt = rt - rtag * step
                 else:
                     rt = r1
-                if (g1 > g2 and gt < g1 - inter) or (g1 < g2 and gt > g1 + inter):
-                    gt = gt - gtag * inter
+                if (g1 > g2 and gt < g1 - step) or (g1 < g2 and gt > g1 + step):
+                    gt = gt - gtag * step
                 else:
                     gt = g1
-                if (b1 > b2 and bt < b1 - inter) or (b1 < b2 and bt > b1 + inter):
-                    bt = bt - btag * inter
+                if (b1 > b2 and bt < b1 - step) or (b1 < b2 and bt > b1 + step):
+                    bt = bt - btag * step
                 else:
                     bt = b1
                 for i in range(self.strip.numPixels()):
@@ -195,26 +226,66 @@ class Light:
                 self.strip.show()
                 time.sleep(wait_time)
 
-    def Gradient(self, r, g, b, wait_time = 0.2):
+    def Breathing(self, r, g, b, steps = 100, wait_ms = 200):
+        """ 计算两个颜色之间的渐变值 """
+        # step_r = (color2[0] - color1[0]) / steps
+        # step_g = (color2[1] - color1[1]) / steps
+        # step_b = (color2[2] - color1[2]) / steps
+
+        rt = r
+        gt = g
+        bt = b
+
+        while True:
+            if self.light_mode != Code.LIGHT_MODE_GRADIENT:
+                break
+            step_r = rt
+            step_g = gt
+            step_b = bt
+
+
+            # gradient = []
+            for i in range(steps + 1):
+                r1 = int(step_r * i)
+                g1 = int(step_g * i)
+                b1 = int(step_b * i)
+                # gradient.append((r1, g1, b1))
+
+                self.show_color(r1, g1, b1)
+
+            time.sleep(wait_ms/1000.0)
+
+            for i in range(steps + 1):
+                r1 = int(-1 * step_r * i)
+                g1 = int(-1 * step_g * i)
+                b1 = int(-1 * step_b * i)
+                self.show_color(r1, g1, b1)
+
+            time.sleep(wait_ms/1000.0)
+
+
+        # return gradient
+
+    def GradientOld(self, r, g, b, wait_time = 0.2):
         m = max(r, g, b)
         rt = r
         gt = g
         bt = b
-        inter = 1
+        step = 1
         while True:
             if self.light_mode != Code.LIGHT_MODE_GRADIENT:
                 break
             for i in range(m):
-                if rt > inter:
-                    rt = rt - inter
+                if rt > step:
+                    rt = rt - step
                 else:
                     rt = 0
-                if gt > inter:
-                    gt = gt - inter
+                if gt > step:
+                    gt = gt - step
                 else:
                     gt = 0
-                if bt > inter:
-                    bt = bt - inter
+                if bt > step:
+                    bt = bt - step
                 else:
                     bt = 0
                 for i in range(self.strip.numPixels()):
@@ -226,7 +297,7 @@ class Light:
 
             for i in range(m):
                 if rt < r:
-                    rt = rt + inter
+                    rt = rt + step
                 else:
                     rt = r
                 if gt > g:
@@ -244,13 +315,34 @@ class Light:
                 self.strip.show()
                 time.sleep(wait_time)
 
-    def Static(self, r,g,b):
-        print("r,g,b:",r,g,b)
+    def Static(self, r, g, b):
+        # print("r,g,b:",r,g,b)
+        # # for j in range(255):
+        # for i in range(self.strip.numPixels()):
+        #     self.strip.setPixelColor(i, Color(r, g, b))
+        #     # print("j:", j)
+        # self.strip.show()
+        # # time.sleep(0.01)
+        # # time.sleep(2)
+        self.show_color(r, g, b)
+
+
+
+    def get_color(self):
+        return self.current_color
+
+    def show_color(self, r, g, b):
+        print("r,g,b:", r, g, b)
         # for j in range(255):
         for i in range(self.strip.numPixels()):
             self.strip.setPixelColor(i, Color(r, g, b))
             # print("j:", j)
         self.strip.show()
+        self.current_color = {
+            "r": r,
+            "g": g,
+            "b": b
+        }
         # time.sleep(0.01)
         # time.sleep(2)
 
