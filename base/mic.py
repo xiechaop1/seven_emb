@@ -267,6 +267,7 @@ class Mic:
         logging.info("Recording started...")
         # print("begin")
 
+        self.audio_player.interrupt()
         self.audio_player.stop_audio()
         ThreadingEvent.recv_execute_command_event.clear()
         ThreadingEvent.camera_start_event.clear()
@@ -294,7 +295,8 @@ class Mic:
                 # self.stop_recording()
 
             # audio_memory.write(indata.tobytes())
-
+        self.audio_player.interrupt()
+        self.audio_player.stop_audio()
         # audio_memory = io.BytesIO()
         # for frame in pre_buffer:
             # audio_memory.write(frame.tobytes())
