@@ -3,6 +3,7 @@ import os
 from common.threading_event import ThreadingEvent
 import logging
 import time
+import random
 from base.messageid import messageid
 from common.scence import Scence
 from common.code import Code
@@ -31,32 +32,40 @@ class AudioPlayer:
     def audio_play_event_daemon(self):
         self.i = 0
         while True:
-            # print(ThreadingEvent.audio_play_event)
+            print("playing event:",ThreadingEvent.audio_play_event)
             ThreadingEvent.audio_play_event.wait()
-            plCount = len(self.audio_list)
-            logging.info(f"AudioPlayer audio_list length:{self.i} {plCount}")
+            # plCount = len(self.audio_list)
+            # logging.info(f"AudioPlayer audio_list length:{self.i} {plCount}")
 
-            while self.i < plCount:
-                if self.voice_channel.get_busy() == False:
-                    print("play event:", ThreadingEvent.audio_play_event)
-                    if ThreadingEvent.audio_play_event.is_set():
-                        self.play_audio(self.i)
-                        self.i = self.i + 1
-                    else:
-                        break
+            if self.voice_channel.get_busy():
                 time.sleep(0.5)
+                continue
 
-            if self.i >= len(self.audio_list):
-                # self.i = 0
-                ThreadingEvent.audio_play_event.clear()
+            ThreadingEvent.audio_play_event.clear()
+            self.play_audio(self.i)
 
-                # 如果已经进入了助眠场景，语音播放完，解开阻塞
-                if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
-                    logging.info("Sleep assistance event pass!")
-                    ThreadingEvent.camera_start_event.set()
-                    ThreadingEvent.recv_execute_command_event.set()
-                    # if self.replay_idx > 0:
-                    #     self.i = self.i + self.replay_idx - 1
+            # while self.i < plCount:
+            #     if self.voice_channel.get_busy() == False:
+            #         print("play event:", ThreadingEvent.audio_play_event)
+            #         if ThreadingEvent.audio_play_event.is_set():
+            #             self.play_audio(self.i)
+            #             self.i = self.i + 1
+            #         else:
+            #             break
+            #     time.sleep(0.5)
+            #
+            # if self.i >= len(self.audio_list):
+            #     # self.i = 0
+            #     ThreadingEvent.audio_play_event.clear()
+            #
+            #     # 如果已经进入了助眠场景，语音播放完，解开阻塞
+            #     if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+            #         logging.info("Sleep assistance event pass!")
+            #         ThreadingEvent.camera_start_event.set()
+            #         ThreadingEvent.recv_execute_command_event.set()
+            #         # if self.replay_idx > 0:
+            #         #     self.i = self.i + self.replay_idx - 1
+
 
 
 
@@ -79,7 +88,7 @@ class AudioPlayer:
         msg_id = audio_data["msg_id"]
         # type = audio_file["type"]
         # wait_time = audio_file["wait_time"]
-        if os.path.isfile(audio_file):
+        if os.path.isfile(audio_file) or audio_data["seq_id"] == -1:
             # audio_data = {
             #     "filename": audio_file,
             #     "msg_id": msg_id,
@@ -116,8 +125,50 @@ class AudioPlayer:
             if self.current_track is not None and self.voice_channel.get_busy():
                 self.voice_channel.stop()  # 停止当前播放的音频
 
+            # print("ad:",audio_data, self.audio_list)
             self.play(audio_data)
 
+
+            if audio_data["type"] == Code.REC_METHOD_VOICE_CHAT:
+                # 这里需要改一下，后端返回的需要是-1才能知道是结束
+                if audio_data["seq_id"] == -1:
+
+                    if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+                        time.sleep(5)
+                        resume_rand_idx = random.randint(1, 6)
+                        resume_audio_filename = f"resources/sound/flow_resume_0{resume_rand_idx}.mp3"
+                        # self.play_voice_with_file(resume_audio_filename)
+
+                        tmp_audio_data = {
+                            "filename": resume_audio_filename,
+                            "type": Code.EXECUTE_COMMAND_TIP_VOICE,
+                            "wait_time": 0,
+                            "msg_id": msg_id,
+                            "seq_id": -1
+                        }
+                        self.add(tmp_audio_data)
+
+                        logging.info("Sleep assistance event pass!")
+                        ThreadingEvent.camera_start_event.set()
+                        ThreadingEvent.recv_execute_command_event.set()
+                else:
+                    ThreadingEvent.audio_play_event.set()
+
+            elif audio_data["type"] == Code.REC_METHOD_VOICE_EXEC:
+                if audio_data["scene_seq"] < 100:
+                    if audio_data["scene_seq"] == audio_data["voice_count"] - 1:
+                        ThreadingEvent.camera_start_event.set()
+                        ThreadingEvent.recv_execute_command_event.set()
+                    else:
+                        ThreadingEvent.audio_play_event.set()
+                else:
+                    ThreadingEvent.camera_start_event.set()
+                    ThreadingEvent.recv_execute_command_event.set()
+            # elif audio_data["type"] == Code.EXECUTE_COMMAND_TIP_VOICE:
+            #     ThreadingEvent.camera_start_event.set()
+            #     ThreadingEvent.recv_execute_command_event.set()
+
+            self.i = self.i + 1
         else:
             logging.error(f"Error: Invalid index. {index} {len(self.audio_list)}")
 
@@ -134,6 +185,16 @@ class AudioPlayer:
         if is_temp_save == True:
             self.current_track = audio_data
         # logging.info(f"Now playing: {audio_file}")
+
+    def play_voice_with_file(self, filename):
+        if filename == "" or filename is None:
+            return
+        voice = pygame.mixer.Sound(filename)
+        self.voice_channel.play(voice)
+        while self.voice_channel.get_busy():
+            time.sleep(0.5)
+
+        return
 
     def play(self, audio_data):
         if audio_data["filename"] == "" or audio_data["filename"] is None:
@@ -178,13 +239,57 @@ class AudioPlayer:
         while self.voice_channel.get_busy():
             pygame.time.wait(50)
         # ThreadingEvent.audio_play_event.clear()
-        if wait_time > 0 and self.is_interrupted == False:
-            # 如果不是被打断的，就需要等待一点时间
-            time.sleep(wait_time/10)
-        logging.info(f"Played: {audio_file}")
-        self.played_list.append(audio_data)
-        self.current_track = None
-        # self.replay_idx = 0
+        if self.is_interrupted == False:
+            if wait_time > 0:
+                # 如果不是被打断的，就需要等待一点时间
+                time.sleep(wait_time/10)
+
+            logging.info(f"Played: {audio_file}")
+            self.played_list.append(audio_data)
+            self.current_track = None
+            self.continue_track = None
+            # self.replay_idx = 0
+
+            # if audio_data["type"] == Code.REC_METHOD_VOICE_CHAT:
+            #     # 这里需要改一下，后端返回的需要是-1才能知道是结束
+            #     if audio_data["seq_id"] == -1:
+            #         if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+            #             time.sleep(3)
+            #             resume_rand_idx = random.randint(1, 6)
+            #             resume_audio_filename = f"resources/sound/flow_resume_0{resume_rand_idx}.mp3"
+            #             # self.play_voice_with_file(resume_audio_filename)
+            #
+            #             tmp_audio_data = {
+            #                 "filename": resume_audio_filename,
+            #                 "type": Code.EXECUTE_COMMAND_TIP_VOICE,
+            #                 "wait_time": 0
+            #             }
+            #             self.add(tmp_audio_data)
+            #
+            #             logging.info("Sleep assistance event pass!")
+            #             ThreadingEvent.camera_start_event.set()
+            #             ThreadingEvent.recv_execute_command_event.set()
+            #     else:
+            #         ThreadingEvent.audio_play_event.set()
+            #
+            # elif audio_data["type"] == Code.REC_METHOD_VOICE_EXEC:
+            #     if audio_data["scene_seq"] < 100:
+            #         if audio_data["scene_seq"] == audio_data["voice_count"] - 1:
+            #             ThreadingEvent.camera_start_event.set()
+            #             ThreadingEvent.recv_execute_command_event.set()
+            #         else:
+            #             ThreadingEvent.audio_play_event.set()
+            #     else:
+            #         ThreadingEvent.camera_start_event.set()
+            #         ThreadingEvent.recv_execute_command_event.set()
+            # elif audio_data["type"] == Code.EXECUTE_COMMAND_TIP_VOICE:
+            #     ThreadingEvent.camera_start_event.set()
+            #     ThreadingEvent.recv_execute_command_event.set()
+
+            # self.i = self.i + 1
+            # ThreadingEvent.audio_play_event.set()
+                # if self.replay_idx > 0:
+                #     self.i = self.i + self.replay_idx - 1
 
     def replay(self):
         # audio_data = self.current_track
@@ -197,22 +302,35 @@ class AudioPlayer:
     def stop_audio(self):
         """停止当前播放的音频"""
         playing_voice = self.get_current_track()
-        # if playing_voice is not None:
+        if playing_voice is not None:
         #     print(playing_voice)
-        #     if "continue" in playing_voice:
-        #         if playing_voice["continue"] == True:
+            if "continue" in playing_voice:
+                if playing_voice["continue"] == True:
+                    self.continue_track = playing_voice
         #             self.replay_idx = self.i
         #
         # print("replay_idx", self.replay_idx)
 
         if self.voice_channel.get_busy():
             self.voice_channel.stop()
+            print(self.voice_channel.get_busy())
             self.is_interrupted = True
             logging.info("Playback stopped.")
             self.current_track = None
 
         else:
             logging.warn("No audio is currently playing.")
+        ThreadingEvent.audio_play_event.clear()
+
+    def interrupt(self):
+        playing_voice = self.get_current_track()
+        if playing_voice is not None:
+            #     print(playing_voice)
+            if "continue" in playing_voice:
+                if playing_voice["continue"] == True:
+                    self.continue_track = playing_voice
+
+        self.is_interrupted = True
         ThreadingEvent.audio_play_event.clear()
 
     def stop_music(self):

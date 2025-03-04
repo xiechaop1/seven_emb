@@ -35,17 +35,21 @@ class Camera:
         # mapped_value = map_value(value, from_min, from_max, to_min, to_max)
 
     def take_photo(self, file_tag = 1):
-        success, img = self.video_capture.read()
-        orin_img = img
-        path = self.PATH
-        photo_filename = f"{path}{file_tag}.jpg"
-        cv2.imwrite(photo_filename, img)
-        # 使用cv2.imencode将图像转换为JPEG格式的字节流
-        retval, buffer = cv2.imencode('.jpg', img)
+        try:
+            success, img = self.video_capture.read()
+            orin_img = img
+            path = self.PATH
+            photo_filename = f"{path}{file_tag}.jpg"
+            cv2.imwrite(photo_filename, img)
+            # 使用cv2.imencode将图像转换为JPEG格式的字节流
+            retval, buffer = cv2.imencode('.jpg', img)
 
-        if retval:
-            photo_base64 = base64.b64encode(buffer).decode('utf-8')
-            return photo_base64
+            if retval:
+                photo_base64 = base64.b64encode(buffer).decode('utf-8')
+                return photo_base64
+        except Exception as e:
+            print(e)
+            return
 
         return
 

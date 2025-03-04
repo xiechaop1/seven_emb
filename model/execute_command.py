@@ -26,7 +26,7 @@ class ExecuteCommand:
 
 	def take_photo(self):
 		while True:
-			# print("camera event: ", ThreadingEvent.camera_start_event)
+			print("camera event: ", ThreadingEvent.camera_start_event)
 			ThreadingEvent.camera_start_event.wait()
 			# i = 0
 
@@ -67,6 +67,8 @@ class ExecuteCommand:
 							status = "IN_PROGRESS"
 					else:
 						status = ""
+				else:
+					status = ""
 
 				print(status, scene_seq, seq_id, voice_count)
 
@@ -119,15 +121,20 @@ class ExecuteCommand:
 			if latest_played["type"] == Code.REC_METHOD_VOICE_EXEC:
 				latest_scene_seq = latest_played["scene_seq"]
 				# print("latest_scene_seq:", latest_scene_seq, scene_seq)
-				if latest_scene_seq >= scene_seq:
+				if latest_scene_seq < 100 and scene_seq < 100 and latest_scene_seq >= scene_seq:
+					return False
+				elif latest_scene_seq == scene_seq:
 					return False
 			elif latest_played["type"] == Code.REC_METHOD_VOICE_CHAT and self.audio_player.is_playing():
 				return False
+			# else:
+			# 	return False
 		else:
 			if self.latest_scene_seq == scene_seq:
 				return False
 
 		if scene_seq > 100:
+			self.audio_player.interrupt()
 			self.audio_player.clear_list()
 
 		li_voice = resp["data"]["actions"]["voice"]
@@ -163,7 +170,7 @@ class ExecuteCommand:
 			li_voices_list_len = len(li_voices_list)
 			print("li_voices_list_len:", li_voices_list_len)
 			for i in range(li_voices_list_len):
-				print("i:", i)
+				# print("i:", i)
 				if i == li_voices_list_len:
 					seq_id = -1
 				else:

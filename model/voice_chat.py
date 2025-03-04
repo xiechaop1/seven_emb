@@ -24,8 +24,12 @@ class VoiceChat:
 			# 第一条数据之前清除列表
 			self.audio_player.clear_list()
 
-		resp_fomat = resp["data"]["audio_format"]
+		resp_format = resp["data"]["audio_format"]
 		audio_base64 = resp["data"]["audio_data"]
+		# tmp_resp = resp
+		# del tmp_resp["data"]["audio_data"]
+		# print(tmp_resp)
+		audio_data = None
 		if audio_base64 != None:
 			audio_bytes = base64.b64decode(audio_base64)
 			response_text = resp["data"]["text"]
@@ -33,7 +37,7 @@ class VoiceChat:
 			# self.file_counter += 1  # 递增文件计数器
 			self.file_counter = seq_li
 			flag_think2 = False
-			if str(resp_fomat) == 'mp3':
+			if str(resp_format) == 'mp3':
 				msg_id = messageid.get_latest_message_id()
 				# output_file_name = f"/home/li/vosk-api/python/example/send_pcm_folder/{msg_id}_{file_counter}.mp3"
 				# with open(output_file_name, "wb") as pcm_file:
@@ -47,8 +51,21 @@ class VoiceChat:
 					"wait_time":0,
 					"seq_id":seq_li
 				}
-				print("audio_data:", audio_data)
-				self.audio_player.add(audio_data)
+				# print("audio_data:", audio_data)
+				# self.audio_player.add(audio_data)
+		elif seq_li == -1:
+			audio_data = {
+				"filename": "",
+				"msg_id": msg_id,
+				"conversion_id": resp_conv_id,
+				"type": resp["method"],
+				"wait_time": 0,
+				"seq_id": seq_li
+			}
+
+		if audio_data is not None:
+			print("audio_data:", audio_data)
+			self.audio_player.add(audio_data)
 
 		return
 

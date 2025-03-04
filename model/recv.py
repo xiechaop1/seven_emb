@@ -30,6 +30,8 @@ class Recv:
 		vc_handler = VoiceChat(self.audio_player)
 		ec_handler = ExecuteCommand(self.audio_player, self.ws, self.cv2)
 
+		last_resp = None
+		msg_id_2_type = {}
 		while True:
 			if self.recv_daemon == False:
 				break
@@ -51,9 +53,22 @@ class Recv:
 					ThreadingEvent.recv_execute_command_event.set()
 					continue
 				else:
-					if resp['method'] == self.REC_METHOD_VOICE_CHAT:
-						act = resp["data"]["action"]
+					if resp["method"] == self.REC_METHOD_VOICE_CHAT:
+						if resp["message_id"] in msg_id_2_type:
+							# method = msg_id_2_type[resp["message_id"]]["method"]
+							act = msg_id_2_type[resp["message_id"]]["action"]
+						else:
+							# method = resp["method"]
+							act = resp["data"]["action"]
+
+						msg_id_2_type[resp["message_id"]] = {
+							# "method": method,
+							"action": act
+						}
+						# act = resp["data"]["action"]
 						if act == Code.REC_ACTION_SLEEP_ASSISTANT:
+							if resp['data']['stream_seq'] == -1:
+								continue
 							# 线程判断，如果已经启动线程，就不再启动
 							# 需要处理 by choice
 							tp_thread = threading.Thread(target=ec_handler.take_photo)
@@ -65,14 +80,36 @@ class Recv:
 							ThreadingEvent.recv_execute_command_event.set()
 
 							Scence.scence = Code.REC_ACTION_SLEEP_ASSISTANT
-						# ec_handler.latest_scene_seq = 0
 
-						vc_handler.deal(resp)
+							# print("sleep assistant", resp)
+
+							if last_resp is not None:
+								last_resp = None
+								continue
+
+							msg_id = resp["message_id"]
+							resp_conv_id = resp["conversation_id"]
+							output_file_name = "resources/sound/enter_sleep_mode.mp3"
+							audio_data = {
+								"filename": output_file_name,
+								"msg_id": msg_id,
+								"conversion_id": resp_conv_id,
+								"type": Code.EXECUTE_COMMAND_TIP_VOICE,
+								"wait_time": 0,
+								"seq_id": -1
+							}
+							self.audio_player.clear_list()
+							self.audio_player.add(audio_data)
+							last_resp = resp
+
+						# ec_handler.latest_scene_seq = 0
+						else:
+							vc_handler.deal(resp)
 						continue
-					elif resp['method'] == Code.REC_METHOD_VOICE_EXEC:
+					elif resp["method"] == Code.REC_METHOD_VOICE_EXEC:
 						print("recv event:",ThreadingEvent.recv_execute_command_event)
 						if ThreadingEvent.recv_execute_command_event.is_set():
-							print("recv event2:", ThreadingEvent.recv_execute_command_event)
+							# print("recv event2:", ThreadingEvent.recv_execute_command_event)
 							ec_handler.deal(resp)
 						continue
 
