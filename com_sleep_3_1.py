@@ -1365,15 +1365,14 @@ def continue_send_photo():
                 # 读取play_status.txt中的字符串
             with open("play_status.txt", "r") as file_status:
                 content2 = file_status.read().strip()  # 读取并去除任何多余的空白字符
-
                 if content2 == 'None' or content2 == '':
                     print("content2 is empty or None")
                     play_status2 = ""  # 如果文件为空，可以设置默认值，或者根据需求处理
                 else:
                     play_status2 = content2
-                    # if play_status2!="COMPLETED":
-                    with open("play_status.txt", "w") as file_status:
-                        file_status.write(str("None"))  # 将play_status写入文件，确保是字符串格式（"IN_PROGRESS" 或 "COMPLETED"）
+
+            with open("play_status.txt", "w") as file_status:
+                file_status.write(str("None"))  # 将play_status写入文件，确保是字符串格式（"IN_PROGRESS" 或 "COMPLETED"）
             message_id_orin2 = get_message_id()
             message_id2 = message_id_orin2
             print(f"Sending {len(photo_base64_list)} photos...")
@@ -1483,7 +1482,7 @@ def play_haode_function():
             index = random_number % 4
             with threading.Lock():
                 subprocess.run(
-                ["aplay", "-D", "plughw:3,0", "-f", "S16_LE", "-r", "16000", "-c", "1", pcm_files[index]])
+                ["aplay", "-D", "plughw:1,0", "-f", "S16_LE", "-r", "16000", "-c", "1", pcm_files[index]])
 
             play_haode = False
             # time.sleep(1)
@@ -1500,7 +1499,7 @@ def play_qibaozaine_function():
 
             with threading.Lock():
                 subprocess.run(
-                    ["aplay", "-D", "plughw:3,0", "-f", "S16_LE", "-r", "16000", "-c", "1", qibaozaine_file])
+                    ["aplay", "-D", "plughw:1,0", "-f", "S16_LE", "-r", "16000", "-c", "1", qibaozaine_file])
 
             play_qibaozaina = False
             # time.sleep(1)
@@ -1638,7 +1637,7 @@ def mix_play():
                         qibao_sentence_complete = True
                         interrupt_flag = False
                         add_once_list_flag_with_sleep = True
-                if command2 == "execute-command" and (local_output_file_name == "/home/li/vosk-api/python/example/enter_sleep_mode.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/lahuisixu2.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/flow_resume_01.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/flow_resume_02.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/flow_resume_03.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/flow_resume_04.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/flow_resume_05.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/flow_resume_06.mp3"):
+                if command2 == "execute-command" and (local_output_file_name == "/home/li/vosk-api/python/example/enter_sleep_mode.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/lahuisixu2.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/flow_resume_01.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/flow_resume_02.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/flow_resume_03.mp3"):
                     qibao_sentence_complete = True
                     interrupt_flag = False
                     add_once_list_flag_with_sleep = True
@@ -1767,7 +1766,7 @@ last_bgm_num=0
 def combine_bgm_sound():
     global bmg_file_name_list,bmg_file_name,bgm_num,last_bgm_num,standup_flag
     os.environ["SDL_AUDIODRIVER"] = "alsa"
-    os.environ["AUDIODEV"] = "hw:3,0"
+    os.environ["AUDIODEV"] = "hw:1,0"
     while 1:
         thread_control_event.wait()
         try:
@@ -3829,7 +3828,7 @@ def scent_spray():
     GPIO.setup(22, GPIO.OUT)
 
     while True:
-        if last_scent_spray_flag==scent_spray_flag:
+        if last_scent_spray_flag==scent_spray_flag or 1 == 1:
             continue
         if scent_spray_flag==True:
             for j in range(30):
