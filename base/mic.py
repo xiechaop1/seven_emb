@@ -15,7 +15,7 @@ import base64
 from datetime import datetime
 import uuid
 import json
-# from vosk import Model, KaldiRecognizer
+from vosk import Model, KaldiRecognizer, SpkModel
 
 
 class Mic:
@@ -39,8 +39,10 @@ class Mic:
 
     MAX_RETRIES = 3
 
-    SPK_MODEL_PATH = "vosk-model-spk-0.4"
-    MODEL_PATH = "vosk-model-small-cn-0.22"
+    SPK_MODEL_PATH = "utils/vosk-model-spk-0.4"
+    MODEL_PATH = "utils/vosk-model-small-cn-0.22"
+    # SPK_MODEL_PATH = "/home/li/vosk-api/python/example/vosk-model-spk-0.4"
+    # model_path = "/home/li/vosk-model-small-cn-0.22"
 
     def __init__(self, ws, audio_player, threshold=800, timeout=30, sample_rate=16000, frame_duration=30):
         """
@@ -73,9 +75,10 @@ class Mic:
         self.audio_player = audio_player
 
         self.spk_li_1=[-0.626114, 0.430365, 0.564255, -0.182698, 0.537145, 0.044097, 0.564515, 0.666896, 1.085733, -0.523695, 2.178851, -0.545808, 0.492513, -0.214256, 0.380257, 0.561458, 1.432191, 0.576447, 1.347584, -1.410213, -0.201343, 1.299883, 0.16591, -0.301386, 1.030398, -0.155679, 1.668122, -0.47749, 1.583658, 1.031789, -0.610194, 0.207826, -2.028657, -0.778005, 0.608732, -1.103482, -0.249394, -0.145279, -0.252108, -0.744611, -0.178013, 0.821876, 1.348644, 0.958709, -1.489057, -0.069446, 0.55689, 0.382191, 1.793885, 0.12014, 1.096465, 1.948748, -0.288994, -0.427686, -0.25332, -0.74351, 1.289284, -0.442085, -1.594271, 0.238896, -0.14475, -1.243948, -0.811971, -1.167681, -1.934597, -2.094246, 0.203778, 0.2246, 0.769156, 3.129627, 1.638138, -0.414724, 0.363555, 1.058113, -0.658691, 0.345854, -1.559133, 0.087666, 0.984442, -0.469354, 1.667347, 0.916898, -2.170697, 0.292812, 0.051197, 1.222564, 1.065773, -0.065279, 0.214764, -0.407425, 0.992222, -0.993893, 0.693716, 0.121084, 1.31698, 1.255295, -0.941613, 0.015467, 0.500375, -1.479744, -0.943895, -0.405701, 1.795941, -0.66203, 1.224589, 0.963079, -0.872087, 0.392804, 1.412374, -0.279257, -0.462107, 0.674435, 0.137653, 0.93439, 2.394885, -0.571315, 0.374555, -0.233448, 0.757664, -0.375494, 0.666074, -0.123803, 1.518769, 0.873773, -0.218161, 1.566089, -0.488127, 0.386693]
+        self.keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
+        self.target_keywords = ["播放音乐", "七七", "停止", "抬头","拍照","休息"]
 
-        self.call_on = True
-    
+
     def daemon(self):
         self.stream = self.p.open(format=pyaudio.paInt16,
                                   channels=1,
@@ -86,31 +89,36 @@ class Mic:
         while True:
             if self.handler_interrupt == False:
                 break
-            data = self.stream.read(self.sample_rate * self.frame_duration // 1000)
+            data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow = False)
             if self.is_speech(data) and not self.is_silent(data):
                 # ThreadingEvent.audio_stop_event.set()
-                if self.call_on == False:
-                    audio_data = self.start_recording()
-                    #self.callup(audio_data)
-                else:
-                    self.is_recording = True
-                    audio_data = self.start_recording()
-                    try:
-                        self.send_request(self.ws, audio_data)
-                    except (WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
-                        print(f"WebSocket connection failed: {e}")
+                self.is_recording = True
+                audio_data = self.start_recording()
 
-                    except Exception as e:
-                        print(f"Unexpected error: {e}")
+                print("wakeup:", ThreadingEvent.wakeup_event)
+                if ThreadingEvent.wakeup_event.is_set() == False:
+                    if self.wakeup(audio_data):
+                        ThreadingEvent.wakeup_event.set()
+                    else:
+                        continue
+
+                ThreadingEvent.wakeup_event.wait()
+                try:
+                    self.send_request(self.ws, audio_data)
+                except (WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
+                    print(f"WebSocket connection failed: {e}")
+
+                except Exception as e:
+                    print(f"Unexpected error: {e}")
 
 
-    def callup(self, data):
+    def wakeup(self, data):
         
 
-        model = Model(MODEL_PATH)
-        spk_model = SpkModel(SPK_MODEL_PATH)
+        model = Model(self.MODEL_PATH)
+        spk_model = SpkModel(self.SPK_MODEL_PATH)
         not_send_flag=False
-        rec = KaldiRecognizer(model, SAMPLERATE_ORIG, keywords)
+        rec = KaldiRecognizer(model, self.SAMPLERATE_ORIG, self.keywords)
         rec.SetSpkModel(spk_model)
         # rec2 = KaldiRecognizer(model, 44100)
         # with sd.InputStream(samplerate=args.samplerate, blocksize=8000, device=find_device_index(),
@@ -161,7 +169,14 @@ class Mic:
                 #     partial_text2 = partial2.get("partial2", "")
                 #     print(f"Partial Transcription2: {partial_text2}")
                     # detect_keywords(partial_text2)
-        if rec.AcceptWaveform(data):
+        # data16 = np.frombuffer(data.getvalue(), dtype=np.int16)
+        with wave.open(data, 'rb') as wf:
+            raw_bytes = wf.readframes(wf.getnframes())  # 读取所有帧
+            data16 = np.frombuffer(raw_bytes, dtype=np.int16)
+        data.seek(0)
+
+        audio_data = data16.tobytes()
+        if rec.AcceptWaveform(audio_data):
             result = json.loads(rec.Result())
             print("LI_Result_dict_keyword:", result)
             transcription = result.get("text", "")
@@ -184,78 +199,28 @@ class Mic:
                     #         continue
                     #     # distance2 = cosine_dist(spk_li_2, spk_vector)
                     #     # print(f"Speaker distance2: {distance2}")
-            if target_keywords[1] in str(transcription):
+            if self.target_keywords[1] in str(transcription):
                 # and not xiaoqi_event_triggered:
-                print(f"检测到qibao关键词: {target_keywords[1]}")
-                # print(f"检测到qibao关键词: {phonemes}")
-                # xiaoqi_event.set()
-                # xiaoqi_detected = True
-                # xiaoqi_event_triggered = True
-                self.call_on = True
-                # continue
-            # else:
-                # print("未检测到qibao关键词，xiaoqi_event.clear")
-                # xiaoqi_event.clear()
+                print(f"检测到qibao关键词: {self.target_keywords[1]}")
 
-                        # continue
-                    # if target_keywords[5] in str(transcription):
-                    #     print(f"检测到sleep关键词: {target_keywords[5]}")
-                    #     continue_shot_and_record=True
-                    #     print("continue_shot_and_record0:",continue_shot_and_record)
-                    #     # print(f"检测到qibao关键词: {phonemes}")
-                    #     sleep_detected = True
-                    # if target_keywords[2] in str(transcription) :
-                    #     print(f"检测到stop_phonemes关键词: {target_keywords[2] }")
-                    #     # print(f"检测到stop_phonemes关键词: {phonemes}")
-                    #     nihao_detected=True
-                    #     nihao_event.set()
-                    #     continue
-                    # if target_keywords[3] in str(transcription):
-                    #     print(f"检测到stop_phonemes关键词: {target_keywords[3]}")
-                    #     # print(f"检测到stop_phonemes关键词: {phonemes}")
-                    #     nihao_detected = True
-                    # if target_keywords[4] in str(transcription):
-                    #     print(f"识别到paizhao_word: {target_keywords[4]}")
-                    #     paizhao_voice_command=True
-                    #     data_id_no_send=int(data_id_get)
-                    #     print("time_data_id_no_send:", time.time())
-                    #     print("data_id_no_send:",data_id_no_send)
-                        # write_variable("1")
-                        # print("共享变量已改为 1")
+                return True
+                # continue
         else:
             partial = json.loads(rec.PartialResult())
             partial_text = partial.get("partial", "")
             print(f"Partial Transcription: {partial_text}")
-            if target_keywords[1] in str(partial_text):
+            if self.target_keywords[1] in str(partial_text):
                 # and not xiaoqi_event_triggered:
-                print(f"检测到qibao关键词: {target_keywords[1]}")
-                # print(f"检测到qibao关键词: {phonemes}")
-                # xiaoqi_event.set()
-                # xiaoqi_detected = True
-                # xiaoqi_event_triggered = True
-                self.call_on = True
+                print(f"检测到qibao关键词: {self.target_keywords[1]}")
+                return True
 
                 # continue
             # else:
                 # xiaoqi_event.clear()
 
                 # print("partial未检测到qibao关键词，xiaoqi_event.clear")
-            # if target_keywords[5] in str(partial_text):
-            #     print(f"检测到sleep关键词: {target_keywords[5]}")
-            #     continue_shot_and_record = True
-            #     print("continue_shot_and_record1:", continue_shot_and_record)
-            #     # print(f"检测到qibao关键词: {phonemes}")
-            #     sleep_detected = True
-            # if target_keywords[2] in str(partial_text):
-            #     print(f"检测到stop_phonemes关键词: {target_keywords[2]}")
-            #     nihao_event.set()
-            #     # print(f"检测到stop_phonemes关键词: {phonemes}")
-            #     nihao_detected = True
-            #     continue
 
-        if dump_fn is not None:
-            dump_fn.write(data)
-        print("final:",rec.FinalResult())
+        return
 
     def stop_daemon(self):
         self.handler_interrupt = True
@@ -302,6 +267,7 @@ class Mic:
             # audio_memory.write(frame.tobytes())
         # pre_buffer.clear()
 
+        # audio_data = self.save_to_buffer_by_int16()
         audio_data = self.save_to_buffer()
         print("save to buffer")
         self.save_recording(self.filename)
@@ -361,7 +327,7 @@ class Mic:
         audio_data = np.frombuffer(data, dtype=np.int16)
         # print("li_audio_data:",audio_data)
         # 检查最大值是否低于阈值
-        print("max:",np.max(np.abs(audio_data)), self.threshold, self.silence_counter, self.slience_tag)
+        print("max, threshold, slic_counter, tag:",np.max(np.abs(audio_data)), self.threshold, self.silence_counter, self.slience_tag)
         if np.max(np.abs(audio_data)) < self.threshold:
             self.silence_counter = self.silence_counter - 1
             if self.slience_tag == False and self.silence_counter > -3:
@@ -372,7 +338,7 @@ class Mic:
             return True
         else:
             self.silence_counter = self.silence_counter + 1
-            if self.slience_tag == True and self.silence_counter < 3:
+            if self.slience_tag == True and self.silence_counter < 1:
                 return True
             # print("未检测到静音")
             self.silence_tag = False
@@ -397,8 +363,21 @@ class Mic:
         
         # 将文件指针重置为开头，以便读取
         memory_file.seek(0)
-        print(memory_file)
+        # print(memory_file)
         return memory_file
+
+    def save_to_buffer_by_int16(self):
+        if not self.frames:
+            logging.warning("No audio data recorded.")
+            return
+        memory_file = io.BytesIO()
+
+        audio_data = ""
+        with wave.open(memory_file, 'rb') as wf:
+            raw_bytes = wf.readframes(wf.getnframes())  # 读取所有帧
+            int16_array = np.frombuffer(raw_bytes, dtype=np.int16)
+
+        return int16_array
 
     def save_recording(self, filename="recording.wav"):
         """保存录音到文件"""

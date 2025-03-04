@@ -12,3 +12,5 @@ class ThreadingEvent:
 	spray_start_event = threading.Event()
 
 	recv_execute_command_event = threading.Event()
+
+	wakeup_event = threading.Event()
