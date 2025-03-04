@@ -5,6 +5,7 @@
 from base.ws import WebSocketClient
 from base.mic import Mic
 from base.audio_player import AudioPlayer
+from base.light import Light
 from threading import Event
 import threading
 from common.threading_event import ThreadingEvent
@@ -41,16 +42,24 @@ if __name__ == "__main__":
     # ws_cli = ws_instance.get_client()
 
     # 暂时去掉，等上板子再试
-    spray_instance = ""
+    # spray_instance = ""
     # spray_instance = Spray()
     # # spray_thread = threading.Thread(target=spray_instance.deal())
     # # spray_thread.start()
     #
+    # spray_instance.turn_off()
+    #
 
     cv2_instance = cv2.VideoCapture(0)
 
+    light_instance = Light()
+    light_instance.turn_off()
+
+    # Intialize the library (must be called once before other functions).
+    # strip.begin()
+
     # audio_event = threading.Event()
-    audio_instance = AudioPlayer(spray_instance)
+    audio_instance = AudioPlayer(spray_instance, light_instance)
     # audio_stop_thread = threading.Thread(target=audio_instance.audio_stop_event_daemon)
     # audio_stop_thread.start()
     audio_play_thread = threading.Thread(target=audio_instance.audio_play_event_daemon)

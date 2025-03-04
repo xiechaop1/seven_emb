@@ -13,16 +13,18 @@ class AudioPlayer:
 
     PATH = "/tmp/"
 
-    def __init__(self, spray):
+    def __init__(self, spray, light):
         # 初始化 Pygame mixer
         pygame.mixer.init()
         self.audio_list = []  # 用于存储音频文件路径
         self.current_track = None  # 当前正在播放的音频
         self.current_bgm = None
+        self.current_light = None
         self.is_interrupted = False
         self.played_list = []
         # self.playing_list = []
         self.spray = spray
+        self.light = light
         self.i = 0
         self.voice_channel = pygame.mixer.Channel(1)
         self.continue_track = None
@@ -211,6 +213,23 @@ class AudioPlayer:
             bgm = audio_data["bgm"]
         else:
             bgm = ""
+
+        if "light" in audio_data:
+            light = audio_data["light"]
+            light_rgb = light["rgb"]
+            r, g, b = map(int, light_rgb.split(','))
+            light_mode = light["mode"]
+            light_params = {
+                "r": r,
+                "g": g,
+                "b": b
+            }
+
+            if light_mode != self.current_light:
+                # if light_mode == Code.LIGHT_MODE_STATIC:
+                self.light.set_mode(light_mode)
+                self.light.start(light_params)
+                self.current_light = light_mode
 
         # if "continue" in audio_data:
         #     if audio_data["continue"] == True:

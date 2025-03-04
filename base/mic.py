@@ -80,6 +80,11 @@ class Mic:
 
 
     def daemon(self):
+        p = pyaudio.PyAudio()
+        for i in range(p.get_device_count()):
+            info = p.get_device_info_by_index(i)
+            print(f"设备索引: {i}, 名称: {info['name']}, 输入通道数: {info['maxInputChannels']}")
+        return
         self.stream = self.p.open(format=pyaudio.paInt16,
                                   channels=1,
                                   rate=self.sample_rate,

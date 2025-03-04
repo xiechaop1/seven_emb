@@ -36,6 +36,9 @@ class Spray:
     def delayms(ms):
         time.sleep(ms / 1000.0)  # 转换为秒
 
+    def turn_off(self):
+        self.gpio.output(22, GPIO.LOW)
+
     def shoot(self, times = 3, wait_time = 8):
         for i in range(times):
             GPIO.output(22, GPIO.HIGH)
