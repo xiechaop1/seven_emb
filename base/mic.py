@@ -9,7 +9,7 @@ import webrtcvad
 import logging
 import numpy as np
 import pyaudio
-import sounddevice as sd
+# import sounddevice as sd
 import collections
 from collections import deque
 import queue
