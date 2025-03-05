@@ -130,9 +130,9 @@ class Mic:
                     try:
                         # # 场景化策略（垫音）
                         # # 后面应该单独拆走
-                        if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
-                            output_file_name = "resources/sound/sa_wait_voice.mp3"
-                            self.audio_player.play_voice_with_file(output_file_name)
+                        # if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+                        #     output_file_name = "resources/sound/sa_wait_voice.mp3"
+                        #     self.audio_player.play_voice_with_file(output_file_name)
 
                         # 记录发送请求的时间
                         # self.req_send_time = time.time()
