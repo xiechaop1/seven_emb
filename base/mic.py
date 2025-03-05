@@ -94,55 +94,60 @@ class Mic:
         self.device_index = None
 
     def daemon(self):
-        self.stream = self.p.open(format=pyaudio.paInt16,
-                                  channels=1,
-                                  rate=self.sample_rate,
-                                  input=True,
-                                  frames_per_buffer=self.sample_rate * self.frame_duration // 1000)
-        
+
         while True:
             if self.handler_interrupt == False:
                 break
-            data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow = False)
-            if self.is_speech(data) and not self.is_silent(data):
-                # ThreadingEvent.audio_stop_event.set()
-                self.is_recording = True
-                # audio_data = self.start_recording()
 
-                print("wakeup:", ThreadingEvent.wakeup_event)
-                if ThreadingEvent.wakeup_event.is_set() == False:
-                    # if self.wakeup(audio_data):
-                    self.wakeup()
-                    # ThreadingEvent.wakeup_event.set()
-                    # 唤醒成功了点亮
-                    # self.light.set_mode(Code.LIGHT_MODE_BREATHING)
-                    # self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
-                    # logging.info("set light turned on")
-                    # else:
-                    #     continue
+            self.wakeup()
+            ThreadingEvent.wakeup_event.wait()
 
-                ThreadingEvent.wakeup_event.wait()
-                try:
-                    # # 场景化策略（垫音）
-                    # # 后面应该单独拆走
-                    if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
-                        output_file_name = "resources/sound/sa_wait_voice.mp3"
-                        self.audio_player.play_voice_with_file(output_file_name)
+            while True:
+                self.stream = self.p.open(format=pyaudio.paInt16,
+                                          channels=1,
+                                          rate=self.sample_rate,
+                                          input=True,
+                                          frames_per_buffer=self.sample_rate * self.frame_duration // 1000)
+                data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow = False)
+                if self.is_speech(data) and not self.is_silent(data):
+                    # ThreadingEvent.audio_stop_event.set()
+                    self.is_recording = True
+                    # audio_data = self.start_recording()
 
-                    # 记录发送请求的时间
-                    # self.req_send_time = time.time()
-                    self.send_request(self.ws, audio_data)
-                    # 场景化策略（垫音）
-                    # 后面应该单独拆走
-                    if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
-                        output_file_name = "resources/sound/sa_wait_voice.mp3"
-                        self.audio_player.play_voice_with_file(output_file_name)
+                    print("wakeup:", ThreadingEvent.wakeup_event)
+                    if ThreadingEvent.wakeup_event.is_set() == False:
+                        # if self.wakeup(audio_data):
+                        self.wakeup()
+                        # ThreadingEvent.wakeup_event.set()
+                        # 唤醒成功了点亮
+                        # self.light.set_mode(Code.LIGHT_MODE_BREATHING)
+                        # self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+                        # logging.info("set light turned on")
+                        # else:
+                        #     continue
 
-                except (WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
-                    print(f"WebSocket connection failed: {e}")
+                    ThreadingEvent.wakeup_event.wait()
+                    try:
+                        # # 场景化策略（垫音）
+                        # # 后面应该单独拆走
+                        if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+                            output_file_name = "resources/sound/sa_wait_voice.mp3"
+                            self.audio_player.play_voice_with_file(output_file_name)
 
-                except Exception as e:
-                    print(f"Unexpected error: {e}")
+                        # 记录发送请求的时间
+                        # self.req_send_time = time.time()
+                        self.send_request(self.ws, audio_data)
+                        # 场景化策略（垫音）
+                        # 后面应该单独拆走
+                        if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+                            output_file_name = "resources/sound/sa_wait_voice.mp3"
+                            self.audio_player.play_voice_with_file(output_file_name)
+
+                    except (WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
+                        print(f"WebSocket connection failed: {e}")
+
+                    except Exception as e:
+                        print(f"Unexpected error: {e}")
 
     # def get_req_send_time(self):
     #     return self.req_send_time
@@ -226,7 +231,7 @@ class Mic:
 
                 # print("partial未检测到qibao关键词，xiaoqi_event.clear")
 
-    def wakeup(self, data):
+    def wakeup(self):
         model = Model(self.MODEL_PATH)
         spk_model = SpkModel(self.SPK_MODEL_PATH)
         not_send_flag=False
