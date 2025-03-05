@@ -39,7 +39,7 @@ class Spray:
     def turn_off(self):
         GPIO.output(22, GPIO.LOW)
 
-    def shoot(self, times = 3, wait_time = 8):
+    def shoot(self, times = 3, wait_time = 30):
         for i in range(times):
             GPIO.output(22, GPIO.HIGH)
             time.sleep(0.3)
@@ -47,7 +47,7 @@ class Spray:
             print("GPIO.HIGH!")
             time.sleep(wait_time)
 
-    def deal(self, times = 3, wait_time = 8):
+    def deal(self, times = 3, wait_time = 30):
         while True:
             ThreadingEvent.spray_start_event.wait()
             self.shoot(times, wait_time)
