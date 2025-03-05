@@ -13,6 +13,7 @@ from threading import Event
 import threading
 from common.threading_event import ThreadingEvent
 from model.recv import Recv
+from common.code import Code
 import asyncio
 import cv2
 
@@ -57,8 +58,13 @@ if __name__ == "__main__":
     cv2_instance = cv2.VideoCapture(0)
 
     light_instance = Light()
+    light_thread = threading.Thread(target=light_instance.daemon)
+    light_thread.start()
+
     light_instance.turn_off()
-    logging.info("light initialized and turn off")
+    light_instance.start(Code.LIGHT_MODE_BREATHING, {"r":0, "g":0, "b":255})
+    logging.info("light initialized")
+    # light_instance.set_mode(Code.LIGHT_MODE_BREATHING)
 
     # Intialize the library (must be called once before other functions).
     # strip.begin()

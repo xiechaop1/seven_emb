@@ -217,18 +217,17 @@ class AudioPlayer:
         if "light" in audio_data:
             light = audio_data["light"]
             light_rgb = light["rgb"]
-            r, g, b = map(int, light_rgb.split(','))
+            # r, g, b = map(int, light_rgb.split(','))
             light_mode = light["mode"]
-            light_params = {
-                "r": r,
-                "g": g,
-                "b": b
-            }
+            # light_params = {
+            #     "r": r,
+            #     "g": g,
+            #     "b": b
+            # }
 
             if light_mode != self.current_light:
                 # if light_mode == Code.LIGHT_MODE_STATIC:
-                self.light.set_mode(light_mode)
-                self.light.start(light_params)
+                self.light.start_with_code(light_mode, light_rgb)
                 self.current_light = light_mode
 
         # if "continue" in audio_data:

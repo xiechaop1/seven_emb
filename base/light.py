@@ -4,6 +4,9 @@ import argparse
 from common.code import Code
 import wheel
 
+from seven_emb.common.threading_event import ThreadingEvent
+
+
 class Light:
 
     # LED strip configuration:
@@ -16,19 +19,49 @@ class Light:
     LED_INVERT = False  # True to invert the signal (when using NPN transistor level shift)
     LED_CHANNEL = 0  # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
-    light_mode = 'const_color'
-
     def __init__(self):
         self.light_mode = ""
         self.strip = Adafruit_NeoPixel(self.LED_COUNT, self.LED_PIN, self.LED_FREQ_HZ, self.LED_DMA, self.LED_INVERT, self.LED_BRIGHTNESS, self.LED_CHANNEL)
         self.strip.begin()
+        self.light_mode = None
+        self.last_light_mode = None
         self.current_color = None
+        self.target_color = None
+
+    def daemon(self):
+        while True:
+            ThreadingEvent.light_daemon_event.wait()
+
+            light_mode = self.light_mode
+            if light_mode == self.last_light_mode:
+                continue
+            self.last_light_mode = light_mode
+
+            r = self.target_color["r"]
+            g = self.target_color["g"]
+            b = self.target_color["b"]
+            if light_mode == Code.LIGHT_MODE_STATIC:
+                self.Static(r, g, b)
+            elif light_mode == Code.LIGHT_MODE_GRADIENT:
+                self.Gradient(r, g, b)
+            elif light_mode == Code.LIGHT_MODE_BREATHING:
+                self.Breathing(r, g, b)
+            else:
+                self.turn_off()
+
+
 
     def set_mode(self, mode):
         self.light_mode = mode
+        ThreadingEvent.light_daemon_event.set()
         return True
 
-    def start(self, params):
+    def set_target_color(self, rgb_color):
+        r, g, b = map(int, rgb_color.split(','))
+        self.target_color = {"r": r, "g": g, "b": b}
+        return True
+
+    def start(self, light_mode, params):
         if "r" in params:
             r = params["r"]
         else:
@@ -42,18 +75,24 @@ class Light:
         else:
             b = 255
 
-        light_code = ""
-        if self.light_mode in Code.lightModelMap:
-            light_code = Code.lightModelMap[self.light_mode]
+        self.set_target_color(f"{r},{g},{b}")
 
-        if light_code == Code.LIGHT_MODE_STATIC:
-            self.Static(r, g, b)
-        elif light_code == Code.LIGHT_MODE_GRADIENT:
-            self.Gradient(r, g, b)
-        elif light_code == Code.LIGHT_MODE_BREATHING:
-            self.Breathing(r, g, b)
-        else:
-            self.turn_off()
+        if light_mode is not None:
+            self.set_mode(light_mode)
+
+        return True
+
+    def start_with_code(self, light_code, light_rgb):
+        light_mode = None
+        if light_code in Code.lightModelMap:
+            light_mode = Code.lightModelMap[light_code]
+
+        self.set_target_color(light_rgb)
+        if light_mode is not None:
+            self.set_mode(light_mode)
+
+        return True
+
 
     def colorWipe2(self, strip, color, wait_ms=100):
         """Wipe color across display a pixel at a time."""
@@ -247,9 +286,9 @@ class Light:
 
             # gradient = []
             for i in range(steps + 1):
-                r1 = int(-1 * step_r * i)
-                g1 = int(-1 * step_g * i)
-                b1 = int(-1 * step_b * i)
+                r1 = int(step_r * i)
+                g1 = int(step_g * i)
+                b1 = int(step_b * i)
                 # gradient.append((r1, g1, b1))
 
                 self.show_color(r1, g1, b1)
@@ -257,10 +296,10 @@ class Light:
             time.sleep(wait_ms/1000.0)
 
             for j in range(steps + 1):
-                r1 = int(step_r * j)
-                g1 = int(step_g * j)
-                b1 = int(step_b * j)
-                self.show_color(r1, g1, b1)
+                r2 = r1 - int(step_r * j)
+                g2 = g1 - int(step_g * j)
+                b2 = b1 - int(step_b * j)
+                self.show_color(r2, g2, b2)
 
             time.sleep(wait_ms/1000.0)
 
@@ -350,6 +389,7 @@ class Light:
     def turn_off(self):
         # print("turn_off act.")
         # for j in range(255, -1, -1):
+        self.set_mode("")
         for i in range(self.strip.numPixels()):
             self.strip.setPixelColor(i, Color(0, 0, 0))
         self.strip.show()

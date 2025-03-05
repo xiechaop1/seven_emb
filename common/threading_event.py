@@ -14,3 +14,5 @@ class ThreadingEvent:
 	recv_execute_command_event = threading.Event()
 
 	wakeup_event = threading.Event()
+
+	light_daemon_event = threading.Event()
