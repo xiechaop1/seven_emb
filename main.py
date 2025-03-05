@@ -2,10 +2,13 @@
 #from fastapi.responses import FileResponse
 #from fastapi.staticfiles import StaticFiles
 #from config import settings, L
+import logging
+
 from base.ws import WebSocketClient
 from base.mic import Mic
 from base.audio_player import AudioPlayer
 from base.light import Light
+from base.spray import Spray
 from threading import Event
 import threading
 from common.threading_event import ThreadingEvent
@@ -43,17 +46,19 @@ if __name__ == "__main__":
 
     # 暂时去掉，等上板子再试
     # spray_instance = ""
-    # spray_instance = Spray()
-    # # spray_thread = threading.Thread(target=spray_instance.deal())
-    # # spray_thread.start()
-    #
-    # spray_instance.turn_off()
+    spray_instance = Spray()
+    # spray_thread = threading.Thread(target=spray_instance.deal())
+    # spray_thread.start()
+
+    spray_instance.turn_off()
+    logging.info("spray initialized and turn off")
     #
 
     cv2_instance = cv2.VideoCapture(0)
 
     light_instance = Light()
     light_instance.turn_off()
+    logging.info("light initialized and turn off")
 
     # Intialize the library (must be called once before other functions).
     # strip.begin()
@@ -64,16 +69,18 @@ if __name__ == "__main__":
     # audio_stop_thread.start()
     audio_play_thread = threading.Thread(target=audio_instance.audio_play_event_daemon)
     audio_play_thread.start()
+    logging.info("audio is ready")
 
     mic_instance = Mic(ws_cli, audio_instance)
     mic_thread = threading.Thread(target=mic_instance.daemon)
     mic_thread.start()
-    print("mic is ready")
+    logging.info("Mic is ready")
 
     #
     recv_instance = Recv(ws_cli, client, audio_instance, cv2_instance)
     recv_thread = threading.Thread(target=recv_instance.daemon)
     recv_thread.start()
+    # logging.info("Starting receive websocket data ...")
 
 
     # 通过实例调用 create_websocket_client 方法
