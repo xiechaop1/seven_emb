@@ -31,13 +31,13 @@ class Spray:
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(22, GPIO.OUT)
 
-        self.gpio = GPIO
+        # self.gpio = GPIO
 
     def delayms(ms):
         time.sleep(ms / 1000.0)  # 转换为秒
 
     def turn_off(self):
-        self.gpio.output(22, GPIO.LOW)
+        GPIO.output(22, GPIO.LOW)
 
     def shoot(self, times = 3, wait_time = 8):
         for i in range(times):
