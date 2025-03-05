@@ -10,20 +10,20 @@ class Spray:
 
     def __init__(self):
 
-        # 设置GPIO模式
-        GPIO.setmode(GPIO.BCM)
-
-        # 定义按键引脚
-        # KEY1_PIN = 17  # 对应按键1
-        KEYA_PIN = 17  # 对应按键A（已修改为GPIO17）
-        KEYB_PIN = 27  # 对应按键B（已修改为GPIO27）
-        DJ_PIN = 22  # 对应DJ引脚（模拟输出）
-
-        # 初始化GPIO引脚为输入和输出
-        # GPIO.setup(KEY1_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.setup(KEYA_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.setup(KEYB_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.setup(DJ_PIN, GPIO.OUT)
+        # # 设置GPIO模式
+        # GPIO.setmode(GPIO.BCM)
+        #
+        # # 定义按键引脚
+        # # KEY1_PIN = 17  # 对应按键1
+        # KEYA_PIN = 17  # 对应按键A（已修改为GPIO17）
+        # KEYB_PIN = 27  # 对应按键B（已修改为GPIO27）
+        # DJ_PIN = 22  # 对应DJ引脚（模拟输出）
+        #
+        # # 初始化GPIO引脚为输入和输出
+        # # GPIO.setup(KEY1_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        # GPIO.setup(KEYA_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        # GPIO.setup(KEYB_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        # GPIO.setup(DJ_PIN, GPIO.OUT)
 
         last_scent_spray_flag = ''
 
