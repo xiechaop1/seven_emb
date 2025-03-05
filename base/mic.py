@@ -1,3 +1,7 @@
+import os
+os.environ["SDL_AUDIODRIVER"] = "alsa"
+os.environ["AUDIODEV"] = "hw:0,0"
+
 import wave
 import time
 import webrtcvad
