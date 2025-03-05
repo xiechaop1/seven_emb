@@ -304,6 +304,7 @@ class Light:
 
                 time.sleep(wait_ms/1000.0)
 
+            time.sleep(wait_ms / 1000.0)
 
         # return gradient
 
