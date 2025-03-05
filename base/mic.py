@@ -99,8 +99,8 @@ class Mic:
             if self.handler_interrupt == False:
                 break
 
-            self.wakeup()
-            ThreadingEvent.wakeup_event.wait()
+            # self.wakeup()
+            # ThreadingEvent.wakeup_event.wait()
 
             while True:
                 self.stream = self.p.open(format=pyaudio.paInt16,
@@ -112,19 +112,19 @@ class Mic:
                 if self.is_speech(data) and not self.is_silent(data):
                     # ThreadingEvent.audio_stop_event.set()
                     self.is_recording = True
-                    # audio_data = self.start_recording()
+                    audio_data = self.start_recording()
 
                     print("wakeup:", ThreadingEvent.wakeup_event)
                     if ThreadingEvent.wakeup_event.is_set() == False:
-                        # if self.wakeup(audio_data):
-                        self.wakeup()
-                        # ThreadingEvent.wakeup_event.set()
-                        # 唤醒成功了点亮
-                        # self.light.set_mode(Code.LIGHT_MODE_BREATHING)
-                        # self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
-                        # logging.info("set light turned on")
-                        # else:
-                        #     continue
+                        if self.wakeup(audio_data):
+                            # self.wakeup()
+                            ThreadingEvent.wakeup_event.set()
+                            #唤醒成功了点亮
+                            self.light.set_mode(Code.LIGHT_MODE_BREATHING)
+                            self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+                            logging.info("set light turned on")
+                        else:
+                            continue
 
                     ThreadingEvent.wakeup_event.wait()
                     try:
@@ -166,11 +166,12 @@ class Mic:
         print(f"使用设备: {device_index} - {self.device_name}")
         return device_index
 
-    def wakeup_check(self, indata, frames, time, status):
+    def wakeup_check(self, indata):
         model = Model(self.MODEL_PATH)
         rec = KaldiRecognizer(model, self.SAMPLERATE_ORIG, self.keywords)
 
-        audio_data = bytes(indata)
+        audio_data = indata
+        # audio_data = bytes(indata)
         if rec.AcceptWaveform(audio_data):
             result = json.loads(rec.Result())
             print("LI_Result_dict_keyword:", result)
@@ -200,9 +201,9 @@ class Mic:
                     # and not xiaoqi_event_triggered:
                     print(f"检测到qibao关键词: {keyword}")
 
-                    ThreadingEvent.wakeup_event.set()
-                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
-                    logging.info("set light turned on")
+                    # ThreadingEvent.wakeup_event.set()
+                    # self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+                    # logging.info("set light turned on")
                     return True
                     # continue
         else:
@@ -215,9 +216,9 @@ class Mic:
                     # and not xiaoqi_event_triggered:
                     print(f"检测到qibao关键词: {keyword}")
 
-                    ThreadingEvent.wakeup_event.set()
-                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
-                    logging.info("set light turned on")
+                    # ThreadingEvent.wakeup_event.set()
+                    # self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+                    # logging.info("set light turned on")
                     return True
                     # continue
             # if self.target_keywords[1] in str(partial_text):
@@ -231,7 +232,7 @@ class Mic:
 
                 # print("partial未检测到qibao关键词，xiaoqi_event.clear")
 
-    def wakeup(self):
+    def wakeup(self, data):
         model = Model(self.MODEL_PATH)
         spk_model = SpkModel(self.SPK_MODEL_PATH)
         not_send_flag=False
@@ -239,18 +240,19 @@ class Mic:
         # rec.SetSpkModel(spk_model)
         # rec2 = KaldiRecognizer(model, 44100)
         samplerate = self.SAMPLERATE_ORIG
-        with sd.InputStream(samplerate=samplerate, blocksize=8000, device=self.find_device_index(),
-                            dtype="int16", channels=1, callback=self.wakeup_check):
-            while not ThreadingEvent.wakeup_event.is_set():
-                pass
-        return
-        # data16 = np.frombuffer(data.getvalue(), dtype=np.int16)
-        # with wave.open(data, 'rb') as wf:
-        #     raw_bytes = wf.readframes(wf.getnframes())  # 读取所有帧
-        #     data16 = np.frombuffer(raw_bytes, dtype=np.int16)
-        # data.seek(0)
+        # with sd.InputStream(samplerate=samplerate, blocksize=8000, device=self.find_device_index(),
+        #                     dtype="int16", channels=1, callback=self.wakeup_check):
+        #     while not ThreadingEvent.wakeup_event.is_set():
+        #         pass
+        # return
+        data16 = np.frombuffer(data.getvalue(), dtype=np.int16)
+        with wave.open(data, 'rb') as wf:
+            raw_bytes = wf.readframes(wf.getnframes())  # 读取所有帧
+            data16 = np.frombuffer(raw_bytes, dtype=np.int16)
+        data.seek(0)
         #
-        # audio_data = data16.tobytes()
+        audio_data = data16.tobytes()
+        return self.wakeup_check(audio_data)
         # if rec.AcceptWaveform(audio_data):
         #     result = json.loads(rec.Result())
         #     print("LI_Result_dict_keyword:", result)
