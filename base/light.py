@@ -28,11 +28,14 @@ class Light:
         self.current_color = None
         self.target_color = None
         self.target_params = None
+        self.ts = 0
+        self.run_ts = 0
 
     def daemon(self):
         while True:
             ThreadingEvent.light_daemon_event.wait()
 
+            self.run_ts = time.time()
             light_mode = self.light_mode
             # if light_mode == self.last_light_mode:
             #     continue
@@ -63,6 +66,7 @@ class Light:
 
     def set_mode(self, mode):
         self.light_mode = mode
+        self.ts = time.time()
         ThreadingEvent.light_daemon_event.set()
         return True
 
@@ -291,7 +295,7 @@ class Light:
         bt = b
 
         while True:
-            if self.light_mode != Code.LIGHT_MODE_BREATHING:
+            if self.light_mode != Code.LIGHT_MODE_BREATHING or self.ts > self.run_ts:
                 break
 
             step_r = rt / steps

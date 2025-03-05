@@ -61,6 +61,7 @@ if __name__ == "__main__":
     light_thread = threading.Thread(target=light_instance.daemon)
     light_thread.start()
 
+    ThreadingEvent.light_daemon_event.clear()
     light_instance.turn_off()
     light_instance.start(Code.LIGHT_MODE_BREATHING, {"r":0, "g":0, "b":255, "steps": 200})
     logging.info("light initialized")
