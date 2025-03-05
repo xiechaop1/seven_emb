@@ -228,11 +228,11 @@ class Mic:
                     #         continue
                     #     # distance2 = cosine_dist(spk_li_2, spk_vector)
                     #     # print(f"Speaker distance2: {distance2}")
-            for i in self.wakeup_keywords:
+            for keyword in self.wakeup_keywords:
             # if self.target_keywords[1] in str(transcription):
-                if self.wakeup_keywords[i] in transcription:
+                if keyword in transcription:
                     # and not xiaoqi_event_triggered:
-                    print(f"检测到qibao关键词: {self.wakeup_keywords[i]}")
+                    print(f"检测到qibao关键词: {keyword}")
 
                     return True
                     # continue
@@ -240,11 +240,11 @@ class Mic:
             partial = json.loads(rec.PartialResult())
             partial_text = partial.get("partial", "")
             print(f"Partial Transcription: {partial_text}")
-            for i in self.wakeup_keywords:
+            for keyword in self.wakeup_keywords:
             # if self.target_keywords[1] in str(transcription):
-                if self.wakeup_keywords[i] in str(partial_text):
+                if keyword in str(partial_text):
                     # and not xiaoqi_event_triggered:
-                    print(f"检测到qibao关键词: {self.wakeup_keywords[i]}")
+                    print(f"检测到qibao关键词: {keyword}")
 
                     return True
                     # continue
