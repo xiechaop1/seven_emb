@@ -15,8 +15,8 @@ class AudioPlayer:
 
     def __init__(self, spray, light):
         # 初始化 Pygame mixer
-        # pygame.mixer.init()
-        pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
+        pygame.mixer.init()
+        # pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
         pygame.mixer.music.set_volume(1.0)
         self.audio_list = []  # 用于存储音频文件路径
         self.current_track = None  # 当前正在播放的音频
@@ -391,11 +391,11 @@ class AudioPlayer:
     def get_current_track(self):
         return self.current_track
 
-    def get_latest_playing(self):
-        if len(self.played_list) == 0:
-            return self.played_list[-1]
-        else:
-            return None
+    # def get_latest_playing(self):
+    #     if len(self.played_list) == 0:
+    #         return self.played_list[-1]
+    #     else:
+    #         return None
 
     def get_latest_played(self):
         if len(self.played_list) > 0:
