@@ -388,9 +388,12 @@ class Mic:
             print("save to file")
             self.slience_tag = True
             self.silence_counter = 0
+
             self.is_recording = False
 
             return audio_data
+
+        self.silence_counter = 0
         return None
     
     def send_request(self, ws, audio_data):
