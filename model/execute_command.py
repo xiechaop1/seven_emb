@@ -159,6 +159,7 @@ class ExecuteCommand:
 				print("fragrance_count:", fragrance_count)
 
 		bgm = resp["data"]["actions"]["bgm"]
+		light = resp["data"]["actions"]["light"]
 
 		print(bgm)
 		if li_voice is not None:
@@ -202,6 +203,7 @@ class ExecuteCommand:
 				audio_data["type"] = Code.REC_METHOD_VOICE_EXEC
 				audio_data["voice_count"] = li_voices_list_len
 				audio_data["wait_time"] = li_wait_time
+				audio_data["light"] = light
 
 				audio_data["continue"] = True # 设置标志位，打断以后，可以继续播放
 
