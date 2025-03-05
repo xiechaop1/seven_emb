@@ -128,7 +128,7 @@ class Mic:
 
                             if Config.IS_DEBUG == False:
                                 #唤醒成功了点亮
-                                self.light.set_mode(Code.LIGHT_MODE_BREATHING)
+                                # self.light.set_mode(Code.LIGHT_MODE_BREATHING)
                                 self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
                                 logging.info("set light turned on")
                         else:
@@ -145,6 +145,8 @@ class Mic:
                         # 记录发送请求的时间
                         # self.req_send_time = time.time()
                         self.send_request(self.ws, audio_data)
+                        self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 254, "g": 211, "b": 76})
+                        logging.info("set light to loading mode")
                         # 场景化策略（垫音）
                         # 后面应该单独拆走
                         if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:

@@ -19,11 +19,12 @@ class Recv:
 
 	REC_ACTION_SLEEP_ASSISTANT = "sleep_assistant"
 
-	def __init__(self, ws, wsClient, audioPlayerIns, cv2Ins):
+	def __init__(self, ws, wsClient, audioPlayerIns, lightIns, cv2Ins):
 		self.ws = ws
 		self.wsClient = wsClient
 		self.recv_daemon = True
 		self.audio_player = audioPlayerIns
+		self.light = lightIns
 		self.cv2 = cv2Ins
 
 	def daemon(self):
@@ -54,6 +55,7 @@ class Recv:
 					continue
 				else:
 					if resp["method"] == self.REC_METHOD_VOICE_CHAT:
+						self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 0, "b": 255})
 						if resp["message_id"] in msg_id_2_type:
 							# method = msg_id_2_type[resp["message_id"]]["method"]
 							act = msg_id_2_type[resp["message_id"]]["action"]
@@ -107,6 +109,7 @@ class Recv:
 							vc_handler.deal(resp)
 						continue
 					elif resp["method"] == Code.REC_METHOD_VOICE_EXEC:
+						self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 0, "b": 128})
 						print("recv event:",ThreadingEvent.recv_execute_command_event.is_set())
 						if ThreadingEvent.recv_execute_command_event.is_set():
 							# print("recv event2:", ThreadingEvent.recv_execute_command_event)
