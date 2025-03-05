@@ -1,4 +1,4 @@
-from common.code import Code
+# from common.code import Code
 
 
 class Code:
@@ -14,7 +14,10 @@ class Code:
 	LIGHT_MODE_BREATHING = "Breathing"
 	LIGHT_MODE_STATIC = "Static"
 
-	lightModelMap = {
-		"Gradient": Code.LIGHT_MODE_BREATHING,
-		"Static": Code.LIGHT_MODE_GRADIENT,
-	}
+	@staticmethod
+	def __init__():
+		Code.lightModelMap = {
+			"Gradient": Code.LIGHT_MODE_BREATHING,
+			"Static": Code.LIGHT_MODE_GRADIENT,
+		}
+		
