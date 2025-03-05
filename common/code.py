@@ -15,8 +15,8 @@ class Code:
 	LIGHT_MODE_STATIC = "Static"
 
 	@staticmethod
-	def __init__():
-		Code.lightModelMap = {
+	def lightModelMap:
+		return {
 			"Gradient": Code.LIGHT_MODE_BREATHING,
 			"Static": Code.LIGHT_MODE_GRADIENT,
 		}
