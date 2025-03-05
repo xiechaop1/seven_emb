@@ -103,8 +103,9 @@ class Light:
 
     def start_with_code(self, light_code, light_rgb):
         light_mode = None
-        if light_code in Code.lightModelMap:
-            light_mode = Code.lightModelMap[light_code]
+        code_map = Code.lightModelMap()
+        if light_code in code_map:
+            light_mode = code_map[light_code]
 
         self.set_target_color(light_rgb)
         if light_mode is not None:
