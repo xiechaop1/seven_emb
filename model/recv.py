@@ -107,7 +107,7 @@ class Recv:
 							vc_handler.deal(resp)
 						continue
 					elif resp["method"] == Code.REC_METHOD_VOICE_EXEC:
-						print("recv event:",ThreadingEvent.recv_execute_command_event)
+						print("recv event:",ThreadingEvent.recv_execute_command_event.is_set())
 						if ThreadingEvent.recv_execute_command_event.is_set():
 							# print("recv event2:", ThreadingEvent.recv_execute_command_event)
 							ec_handler.deal(resp)

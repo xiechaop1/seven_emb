@@ -26,7 +26,7 @@ class ExecuteCommand:
 
 	def take_photo(self):
 		while True:
-			print("camera event: ", ThreadingEvent.camera_start_event)
+			print("camera event: ", ThreadingEvent.camera_start_event.is_set())
 			ThreadingEvent.camera_start_event.wait()
 			# i = 0
 

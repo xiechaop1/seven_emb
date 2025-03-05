@@ -34,7 +34,7 @@ class AudioPlayer:
     def audio_play_event_daemon(self):
         self.i = 0
         while True:
-            print("playing event:",ThreadingEvent.audio_play_event)
+            print("playing event:",ThreadingEvent.audio_play_event.is_set())
             ThreadingEvent.audio_play_event.wait()
             # plCount = len(self.audio_list)
             # logging.info(f"AudioPlayer audio_list length:{self.i} {plCount}")
@@ -216,19 +216,20 @@ class AudioPlayer:
 
         if "light" in audio_data:
             light = audio_data["light"]
-            light_rgb = light["rgb"]
-            # r, g, b = map(int, light_rgb.split(','))
-            light_mode = light["mode"]
-            # light_params = {
-            #     "r": r,
-            #     "g": g,
-            #     "b": b
-            # }
+            if "rgb" in light:
+                light_rgb = light["rgb"]
+                # r, g, b = map(int, light_rgb.split(','))
+                light_mode = light["mode"]
+                # light_params = {
+                #     "r": r,
+                #     "g": g,
+                #     "b": b
+                # }
 
-            if light_mode != self.current_light:
-                # if light_mode == Code.LIGHT_MODE_STATIC:
-                self.light.start_with_code(light_mode, light_rgb)
-                self.current_light = light_mode
+                if light_mode != self.current_light:
+                    # if light_mode == Code.LIGHT_MODE_STATIC:
+                    self.light.start_with_code(light_mode, light_rgb)
+                    self.current_light = light_mode
 
         # if "continue" in audio_data:
         #     if audio_data["continue"] == True:
