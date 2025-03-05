@@ -292,8 +292,9 @@ class Light:
                 # gradient.append((r1, g1, b1))
 
                 self.show_color(r1, g1, b1)
+                time.sleep(wait_ms / 1000.0)
 
-            time.sleep(wait_ms/1000.0)
+            # time.sleep(wait_ms/1000.0)
 
             for j in range(steps + 1):
                 r2 = r1 - int(step_r * j)
@@ -301,7 +302,7 @@ class Light:
                 b2 = b1 - int(step_b * j)
                 self.show_color(r2, g2, b2)
 
-            time.sleep(wait_ms/1000.0)
+                time.sleep(wait_ms/1000.0)
 
 
         # return gradient
