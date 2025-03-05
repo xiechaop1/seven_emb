@@ -71,7 +71,7 @@ if __name__ == "__main__":
     audio_play_thread.start()
     logging.info("audio is ready")
 
-    mic_instance = Mic(ws_cli, audio_instance)
+    mic_instance = Mic(ws_cli, audio_instance, light_instance)
     mic_thread = threading.Thread(target=mic_instance.daemon)
     mic_thread.start()
     logging.info("Mic is ready")
