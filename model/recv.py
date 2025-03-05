@@ -56,6 +56,9 @@ class Recv:
 				else:
 					if resp["method"] == self.REC_METHOD_VOICE_CHAT:
 						self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 0, "b": 255})
+
+						# 如果已经接到对应message_id的数据，同样的数据动作都是一致的
+						# 为sleep-assistant做的处理
 						if resp["message_id"] in msg_id_2_type:
 							# method = msg_id_2_type[resp["message_id"]]["method"]
 							act = msg_id_2_type[resp["message_id"]]["action"]
@@ -70,6 +73,7 @@ class Recv:
 						# act = resp["data"]["action"]
 						if act == Code.REC_ACTION_SLEEP_ASSISTANT:
 							if resp['data']['stream_seq'] == -1:
+								# 进入助眠唤醒命令，会有一条 -1的结束，这条pass
 								continue
 							# 线程判断，如果已经启动线程，就不再启动
 							# 需要处理 by choice
