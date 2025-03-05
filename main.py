@@ -53,8 +53,8 @@ if __name__ == "__main__":
         # 暂时去掉，等上板子再试
         # spray_instance = ""
         spray_instance = Spray()
-        spray_thread = threading.Thread(target=spray_instance.deal())
-        spray_thread.start()
+        # spray_thread = threading.Thread(target=spray_instance.deal())
+        # spray_thread.start()
 
         # spray_instance.turn_off()
         logging.info("spray initialized and turn off")
