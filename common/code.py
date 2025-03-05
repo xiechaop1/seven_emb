@@ -1,4 +1,4 @@
-from gevent._tblib import Code
+from base.code import Code
 
 
 class Code:
@@ -16,5 +16,5 @@ class Code:
 
 	lightModelMap = {
 		"Gradient": Code.LIGHT_MODE_BREATHING,
-		"Static": Code.LIGHT_MODE_STATIC,
+		"Static": Code.LIGHT_MODE_GRADIENT,
 	}
