@@ -173,7 +173,8 @@ class AudioPlayer:
             #     ThreadingEvent.camera_start_event.set()
             #     ThreadingEvent.recv_execute_command_event.set()
 
-            self.i = self.i + 1
+            if self.is_interrupted == False:
+                self.i = self.i + 1
         else:
             logging.error(f"Error: Invalid index. {index} {len(self.audio_list)}")
 
@@ -216,20 +217,21 @@ class AudioPlayer:
 
         if "light" in audio_data:
             light = audio_data["light"]
-            if "rgb" in light:
-                light_rgb = light["rgb"]
-                # r, g, b = map(int, light_rgb.split(','))
-                light_mode = light["mode"]
-                # light_params = {
-                #     "r": r,
-                #     "g": g,
-                #     "b": b
-                # }
+            if light is not None:
+                if "rgb" in light:
+                    light_rgb = light["rgb"]
+                    # r, g, b = map(int, light_rgb.split(','))
+                    light_mode = light["mode"]
+                    # light_params = {
+                    #     "r": r,
+                    #     "g": g,
+                    #     "b": b
+                    # }
 
-                if light_mode != self.current_light:
-                    # if light_mode == Code.LIGHT_MODE_STATIC:
-                    self.light.start_with_code(light_mode, light_rgb)
-                    self.current_light = light_mode
+                    if light_mode != self.current_light:
+                        # if light_mode == Code.LIGHT_MODE_STATIC:
+                        self.light.start_with_code(light_mode, light_rgb)
+                        self.current_light = light_mode
 
         # if "continue" in audio_data:
         #     if audio_data["continue"] == True:
