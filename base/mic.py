@@ -8,6 +8,7 @@ import webrtcvad
 import logging
 import numpy as np
 import pyaudio
+import sounddevice as sd
 import collections
 from collections import deque
 import queue
@@ -87,6 +88,10 @@ class Mic:
         self.target_keywords = ["播放音乐", "七七", "停止", "抬头","拍照","休息"]
         self.wakeup_keywords = ["七七", "七宝", "七夕", "休息"]
 
+        self.device_name = "Yundea 1076"
+        # device_name = "SP002Ua"
+        # device_name='JieLi BR21'
+        self.device_index = None
 
     def daemon(self):
         self.stream = self.p.open(format=pyaudio.paInt16,
@@ -102,18 +107,19 @@ class Mic:
             if self.is_speech(data) and not self.is_silent(data):
                 # ThreadingEvent.audio_stop_event.set()
                 self.is_recording = True
-                audio_data = self.start_recording()
+                # audio_data = self.start_recording()
 
                 print("wakeup:", ThreadingEvent.wakeup_event)
                 if ThreadingEvent.wakeup_event.is_set() == False:
-                    if self.wakeup(audio_data):
-                        ThreadingEvent.wakeup_event.set()
-                        # 唤醒成功了点亮
-                        # self.light.set_mode(Code.LIGHT_MODE_BREATHING)
-                        self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
-                        logging.info("set light turned on")
-                    else:
-                        continue
+                    # if self.wakeup(audio_data):
+                    self.wakeup()
+                    # ThreadingEvent.wakeup_event.set()
+                    # 唤醒成功了点亮
+                    # self.light.set_mode(Code.LIGHT_MODE_BREATHING)
+                    # self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+                    # logging.info("set light turned on")
+                    # else:
+                    #     continue
 
                 ThreadingEvent.wakeup_event.wait()
                 try:
@@ -141,70 +147,25 @@ class Mic:
     # def get_req_send_time(self):
     #     return self.req_send_time
 
-    def wakeup(self, data):
-        
 
+    def find_device_index(self):
+        global device_index
+        # 遍历设备列表查找设备索引
+        for i, device in enumerate(sd.query_devices()):
+            print(f"Device {i}: {device['name']}")
+            if self.device_name in device['name'] and device['max_input_channels'] > 0:
+                device_index = i
+                break
+        if device_index is None:
+            raise ValueError(f"找不到匹配的设备 '{self.device_name}'")
+        print(f"使用设备: {device_index} - {self.device_name}")
+        return device_index
+
+    def wakeup_check(self, indata, frames, time, status):
         model = Model(self.MODEL_PATH)
-        spk_model = SpkModel(self.SPK_MODEL_PATH)
-        not_send_flag=False
         rec = KaldiRecognizer(model, self.SAMPLERATE_ORIG, self.keywords)
-        rec.SetSpkModel(spk_model)
-        # rec2 = KaldiRecognizer(model, 44100)
-        # with sd.InputStream(samplerate=args.samplerate, blocksize=8000, device=find_device_index(),
-        #                     dtype="int16", channels=1, callback=main_callback):
-        #     print("#" * 80)
-        #     print("Press Ctrl+C to stop the recording1")
-        #     print("#" * 80)
-        #     # rec = KaldiRecognizer(model, args.samplerate,'["播放音乐","七宝", "停止", "停", "[unk]"]')
-        #     # print("args.samplerate:", args.samplerate)
-        #     # start_threads()
-        #     count2 = 0
-        #     xiaoqi_detected_count=0
-        #     xiaoqi_event_triggered = False  # 初始标志
-        #     while True:
-        #         time.sleep(0.01)
-        #         count2 += 1
-        #         is_silent_flag=False
-        #         # print("count2:",count2)
-        #         # if count2 == 2:
-        #         #     silent_start_time = time.time()
-        #         # silent_end_time = time.time()
-        #         # print("silent_end_time-slient_start_time:", silent_end_time - silent_start_time)
-        #         # if count2 > 2 and silent_end_time - silent_start_time > 30:
-        #         #     print("morre than 10s break!!!!!")
-        #         #     running2 = False
-        #         #     time.sleep(0.1)
-        #         # running2 = True
-        #         # print("running2:", running2)
-        #         # time.sleep(0.01)
-        #         audio_data_get = q.get()
-                # data, message_id_get = audio_data_get
-                # xiaoqi_event_triggered = False
-                # if is_silent(data):
-                    # print("检测到静音，跳过此段音频")
-                    # is_silent_flag=True
-                    # continue  # 跳过静音段，进入下一个循环
-                # frames.append(data)
-                # print("data_id_get:", data_id_get)
-                # if rec2.AcceptWaveform(data):
-                #     # print(rec.Result())
-                #     result2 = json.loads(rec2.Result())
-                #     print("LI_Result_dict_flow:2", result2)
-                #     if result2:
-                #         result_detected=True
-                # else:
-                #     partial2 = json.loads(rec2.PartialResult())
-                #     print("LI_Result_dict:partial2", partial2)
-                #     partial_text2 = partial2.get("partial2", "")
-                #     print(f"Partial Transcription2: {partial_text2}")
-                    # detect_keywords(partial_text2)
-        # data16 = np.frombuffer(data.getvalue(), dtype=np.int16)
-        with wave.open(data, 'rb') as wf:
-            raw_bytes = wf.readframes(wf.getnframes())  # 读取所有帧
-            data16 = np.frombuffer(raw_bytes, dtype=np.int16)
-        data.seek(0)
 
-        audio_data = data16.tobytes()
+        audio_data = bytes(indata)
         if rec.AcceptWaveform(audio_data):
             result = json.loads(rec.Result())
             print("LI_Result_dict_keyword:", result)
@@ -234,6 +195,9 @@ class Mic:
                     # and not xiaoqi_event_triggered:
                     print(f"检测到qibao关键词: {keyword}")
 
+                    ThreadingEvent.wakeup_event.set()
+                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+                    logging.info("set light turned on")
                     return True
                     # continue
         else:
@@ -246,6 +210,9 @@ class Mic:
                     # and not xiaoqi_event_triggered:
                     print(f"检测到qibao关键词: {keyword}")
 
+                    ThreadingEvent.wakeup_event.set()
+                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+                    logging.info("set light turned on")
                     return True
                     # continue
             # if self.target_keywords[1] in str(partial_text):
@@ -259,7 +226,81 @@ class Mic:
 
                 # print("partial未检测到qibao关键词，xiaoqi_event.clear")
 
+    def wakeup(self, data):
+        model = Model(self.MODEL_PATH)
+        spk_model = SpkModel(self.SPK_MODEL_PATH)
+        not_send_flag=False
+        rec = KaldiRecognizer(model, self.SAMPLERATE_ORIG, self.keywords)
+        # rec.SetSpkModel(spk_model)
+        # rec2 = KaldiRecognizer(model, 44100)
+        samplerate = self.SAMPLERATE_ORIG
+        with sd.InputStream(samplerate=samplerate, blocksize=8000, device=self.find_device_index(),
+                            dtype="int16", channels=1, callback=self.wakeup_check):
+            while not ThreadingEvent.wakeup_event.is_set():
+                pass
         return
+        # data16 = np.frombuffer(data.getvalue(), dtype=np.int16)
+        # with wave.open(data, 'rb') as wf:
+        #     raw_bytes = wf.readframes(wf.getnframes())  # 读取所有帧
+        #     data16 = np.frombuffer(raw_bytes, dtype=np.int16)
+        # data.seek(0)
+        #
+        # audio_data = data16.tobytes()
+        # if rec.AcceptWaveform(audio_data):
+        #     result = json.loads(rec.Result())
+        #     print("LI_Result_dict_keyword:", result)
+        #     transcription = result.get("text", "")
+        #     print(f"Transcription@@: {transcription}")
+        #             # detect_keywords(transcription)
+        #             # print("keywords[1]:",target_keywords[1])
+        #             # 检测关键词
+        #             # for word, phonemes in qibao_phonemes.items():
+        #             #     if any(phoneme in recognized_phonemes for phoneme in phonemes):
+        #             # if "spk" in result:
+        #             #     spk_vector = result["spk"]
+        #             #     print("spk_vector:", spk_vector)
+        #             #     print("len(spk_vector):", len(spk_vector))
+        #             #     # print("len(spk_sig):", len(spk_sig))
+        #             #
+        #             #     distance1 = cosine_dist(spk_li_1, spk_vector)
+        #             #     print(f"Speaker distance1: {distance1}")
+        #             #     if distance1>0.5:
+        #             #         print("speaker distance larger than 0.5!!!!!!!!")
+        #             #         continue
+        #             #     # distance2 = cosine_dist(spk_li_2, spk_vector)
+        #             #     # print(f"Speaker distance2: {distance2}")
+        #     for keyword in self.wakeup_keywords:
+        #     # if self.target_keywords[1] in str(transcription):
+        #         if keyword in transcription:
+        #             # and not xiaoqi_event_triggered:
+        #             print(f"检测到qibao关键词: {keyword}")
+        #
+        #             return True
+        #             # continue
+        # else:
+        #     partial = json.loads(rec.PartialResult())
+        #     partial_text = partial.get("partial", "")
+        #     print(f"Partial Transcription: {partial_text}")
+        #     for keyword in self.wakeup_keywords:
+        #     # if self.target_keywords[1] in str(transcription):
+        #         if keyword in str(partial_text):
+        #             # and not xiaoqi_event_triggered:
+        #             print(f"检测到qibao关键词: {keyword}")
+        #
+        #             return True
+        #             # continue
+        #     # if self.target_keywords[1] in str(partial_text):
+        #     #     # and not xiaoqi_event_triggered:
+        #     #     print(f"检测到qibao关键词: {self.target_keywords[1]}")
+        #     #     return True
+        #
+        #         # continue
+        #     # else:
+        #         # xiaoqi_event.clear()
+        #
+        #         # print("partial未检测到qibao关键词，xiaoqi_event.clear")
+        #
+        # return
 
     def stop_daemon(self):
         self.handler_interrupt = True
