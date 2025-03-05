@@ -4,7 +4,7 @@ import argparse
 from common.code import Code
 import wheel
 
-from seven_emb.common.threading_event import ThreadingEvent
+from common.threading_event import ThreadingEvent
 
 
 class Light:
