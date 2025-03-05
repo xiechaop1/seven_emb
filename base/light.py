@@ -27,6 +27,7 @@ class Light:
         self.last_light_mode = None
         self.current_color = None
         self.target_color = None
+        self.target_params = None
 
     def daemon(self):
         while True:
@@ -40,12 +41,21 @@ class Light:
             r = self.target_color["r"]
             g = self.target_color["g"]
             b = self.target_color["b"]
+
+            params = self.target_params
+            steps = None
+            if "steps" in params:
+                steps = params["steps"]
+
             if light_mode == Code.LIGHT_MODE_STATIC:
                 self.Static(r, g, b)
             elif light_mode == Code.LIGHT_MODE_GRADIENT:
                 self.Gradient(r, g, b)
             elif light_mode == Code.LIGHT_MODE_BREATHING:
-                self.Breathing(r, g, b)
+                if steps is None:
+                    self.Breathing(r, g, b)
+                else:
+                    self.Breathing(r, g, b, steps)
             else:
                 self.turn_off()
 
@@ -54,6 +64,10 @@ class Light:
     def set_mode(self, mode):
         self.light_mode = mode
         ThreadingEvent.light_daemon_event.set()
+        return True
+
+    def set_target_params(self, params = {}):
+        self.target_params = params
         return True
 
     def set_target_color(self, rgb_color):
@@ -75,6 +89,7 @@ class Light:
         else:
             b = 255
 
+        self.set_target_params(params)
         self.set_target_color(f"{r},{g},{b}")
 
         if light_mode is not None:
@@ -265,7 +280,7 @@ class Light:
                 self.strip.show()
                 time.sleep(wait_time)
 
-    def Breathing(self, r, g, b, steps = 100, wait_ms = 200):
+    def Breathing(self, r, g, b, steps = 200, wait_ms = 200):
         """ 计算两个颜色之间的渐变值 """
         # step_r = (color2[0] - color1[0]) / steps
         # step_g = (color2[1] - color1[1]) / steps
@@ -292,7 +307,7 @@ class Light:
                 # gradient.append((r1, g1, b1))
 
                 self.show_color(r1, g1, b1)
-                time.sleep(wait_ms / 1000.0)
+            time.sleep(wait_ms / 1000.0)
 
             # time.sleep(wait_ms/1000.0)
 
@@ -301,8 +316,6 @@ class Light:
                 g2 = g1 - int(step_g * j)
                 b2 = b1 - int(step_b * j)
                 self.show_color(r2, g2, b2)
-
-                time.sleep(wait_ms/1000.0)
 
             time.sleep(wait_ms / 1000.0)
 

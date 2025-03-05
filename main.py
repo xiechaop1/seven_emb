@@ -62,7 +62,7 @@ if __name__ == "__main__":
     light_thread.start()
 
     light_instance.turn_off()
-    light_instance.start(Code.LIGHT_MODE_BREATHING, {"r":0, "g":0, "b":255})
+    light_instance.start(Code.LIGHT_MODE_BREATHING, {"r":0, "g":0, "b":255, "steps": 200})
     logging.info("light initialized")
     # light_instance.set_mode(Code.LIGHT_MODE_BREATHING)
 
