@@ -113,8 +113,7 @@ class Mic:
 
             while True:
                 data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow = False)
-                if self.is_speech(data):
-                        # and not self.is_silent(data)):
+                if self.is_speech(data) and not self.is_silent(data):
                     # ThreadingEvent.audio_stop_event.set()
                     self.is_recording = True
                     audio_data = self.start_recording(data)
