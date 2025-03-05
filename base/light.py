@@ -1,10 +1,12 @@
 import time
-from rpi_ws281x import *
 import argparse
 from common.code import Code
 import wheel
-
 from common.threading_event import ThreadingEvent
+from config.config import Config
+
+if not Config.IS_DEBUG:
+    from rpi_ws281x import *
 
 
 class Light:

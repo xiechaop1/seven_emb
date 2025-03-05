@@ -1,6 +1,8 @@
 import os
-os.environ["SDL_AUDIODRIVER"] = "alsa"
-os.environ["AUDIODEV"] = "hw:3,0"
+
+
+# os.environ["SDL_AUDIODRIVER"] = "alsa"
+# os.environ["AUDIODEV"] = "hw:3,0"
 
 import wave
 import time
@@ -18,6 +20,7 @@ from common.threading_event import ThreadingEvent
 from common.common import Common
 from common.scence import Scence
 from common.code import Code
+from config.config import Config
 import base64
 from datetime import datetime
 import uuid
@@ -86,7 +89,7 @@ class Mic:
         self.spk_li_1=[-0.626114, 0.430365, 0.564255, -0.182698, 0.537145, 0.044097, 0.564515, 0.666896, 1.085733, -0.523695, 2.178851, -0.545808, 0.492513, -0.214256, 0.380257, 0.561458, 1.432191, 0.576447, 1.347584, -1.410213, -0.201343, 1.299883, 0.16591, -0.301386, 1.030398, -0.155679, 1.668122, -0.47749, 1.583658, 1.031789, -0.610194, 0.207826, -2.028657, -0.778005, 0.608732, -1.103482, -0.249394, -0.145279, -0.252108, -0.744611, -0.178013, 0.821876, 1.348644, 0.958709, -1.489057, -0.069446, 0.55689, 0.382191, 1.793885, 0.12014, 1.096465, 1.948748, -0.288994, -0.427686, -0.25332, -0.74351, 1.289284, -0.442085, -1.594271, 0.238896, -0.14475, -1.243948, -0.811971, -1.167681, -1.934597, -2.094246, 0.203778, 0.2246, 0.769156, 3.129627, 1.638138, -0.414724, 0.363555, 1.058113, -0.658691, 0.345854, -1.559133, 0.087666, 0.984442, -0.469354, 1.667347, 0.916898, -2.170697, 0.292812, 0.051197, 1.222564, 1.065773, -0.065279, 0.214764, -0.407425, 0.992222, -0.993893, 0.693716, 0.121084, 1.31698, 1.255295, -0.941613, 0.015467, 0.500375, -1.479744, -0.943895, -0.405701, 1.795941, -0.66203, 1.224589, 0.963079, -0.872087, 0.392804, 1.412374, -0.279257, -0.462107, 0.674435, 0.137653, 0.93439, 2.394885, -0.571315, 0.374555, -0.233448, 0.757664, -0.375494, 0.666074, -0.123803, 1.518769, 0.873773, -0.218161, 1.566089, -0.488127, 0.386693]
         self.keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
         self.target_keywords = ["播放音乐", "七七", "停止", "抬头","拍照","休息"]
-        self.wakeup_keywords = ["七七", "七宝", "七夕", "休息"]
+        self.wakeup_keywords = '["七七", "七宝", "七夕", "休息", "嘻嘻"]'
 
         self.device_name = "Yundea 1076"
         # device_name = "SP002Ua"
@@ -109,20 +112,25 @@ class Mic:
                                           input=True,
                                           frames_per_buffer=self.sample_rate * self.frame_duration // 1000)
                 data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow = False)
-                if self.is_speech(data) and not self.is_silent(data):
+                if self.is_speech(data):
+                        # and not self.is_silent(data)):
                     # ThreadingEvent.audio_stop_event.set()
                     self.is_recording = True
-                    audio_data = self.start_recording()
+                    audio_data = self.start_recording(data)
+                    if audio_data is None:
+                        continue
 
                     print("wakeup:", ThreadingEvent.wakeup_event)
                     if ThreadingEvent.wakeup_event.is_set() == False:
                         if self.wakeup(audio_data):
                             # self.wakeup()
                             ThreadingEvent.wakeup_event.set()
-                            #唤醒成功了点亮
-                            self.light.set_mode(Code.LIGHT_MODE_BREATHING)
-                            self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
-                            logging.info("set light turned on")
+
+                            if Config.IS_DEBUG == False:
+                                #唤醒成功了点亮
+                                self.light.set_mode(Code.LIGHT_MODE_BREATHING)
+                                self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+                                logging.info("set light turned on")
                         else:
                             continue
 
@@ -168,10 +176,10 @@ class Mic:
 
     def wakeup_check(self, indata):
         model = Model(self.MODEL_PATH)
-        rec = KaldiRecognizer(model, self.SAMPLERATE_ORIG, self.keywords)
+        rec = KaldiRecognizer(model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
 
         audio_data = indata
-        # audio_data = bytes(indata)
+        audio_data = bytes(indata)
         if rec.AcceptWaveform(audio_data):
             result = json.loads(rec.Result())
             print("LI_Result_dict_keyword:", result)
@@ -251,6 +259,7 @@ class Mic:
             data16 = np.frombuffer(raw_bytes, dtype=np.int16)
         data.seek(0)
         #
+        print(len(data16))
         audio_data = data16.tobytes()
         return self.wakeup_check(audio_data)
         # if rec.AcceptWaveform(audio_data):
@@ -312,15 +321,15 @@ class Mic:
     def stop_daemon(self):
         self.handler_interrupt = True
 
-    def start_recording(self):
+    def start_recording(self, start_frame = None):
         """开始录音"""
         self.frames = []
         # self.is_recording = True
         logging.info("Recording started...")
         # print("begin")
 
-        self.audio_player.interrupt()
-        self.audio_player.stop_audio()
+        # self.audio_player.interrupt()
+        # self.audio_player.stop_audio()
         ThreadingEvent.recv_execute_command_event.clear()
         ThreadingEvent.camera_start_event.clear()
         # ThreadingEvent.audio_play_event.clear()
@@ -330,7 +339,15 @@ class Mic:
         start_time = time.time()
         # if volume > SILENCE_THRESHOLD:
 
+        print(time.time() - start_time)
+
+        if start_frame is not None:
+            self.frames.append(start_frame)
+
         while self.is_recording:
+            if time.time() - start_time > 0.1:
+                self.audio_player.interrupt()
+                self.audio_player.stop_audio()
             data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow = False)
             self.frames.append(data)
 
@@ -348,23 +365,25 @@ class Mic:
                 # self.stop_recording()
 
             # audio_memory.write(indata.tobytes())
-        self.audio_player.interrupt()
-        self.audio_player.stop_audio()
-        # audio_memory = io.BytesIO()
-        # for frame in pre_buffer:
-            # audio_memory.write(frame.tobytes())
-        # pre_buffer.clear()
+        if time.time() - start_time > 0.1:
+            self.audio_player.interrupt()
+            self.audio_player.stop_audio()
+            # audio_memory = io.BytesIO()
+            # for frame in pre_buffer:
+                # audio_memory.write(frame.tobytes())
+            # pre_buffer.clear()
 
-        # audio_data = self.save_to_buffer_by_int16()
-        audio_data = self.save_to_buffer()
-        print("save to buffer")
-        self.save_recording(self.filename)
-        print("save to file")
-        self.slience_tag = True
-        self.silence_counter = 0
-        self.is_recording = False
+            # audio_data = self.save_to_buffer_by_int16()
+            audio_data = self.save_to_buffer()
+            print("save to buffer")
+            self.save_recording(self.filename)
+            print("save to file")
+            self.slience_tag = True
+            self.silence_counter = 0
+            self.is_recording = False
 
-        return audio_data
+            return audio_data
+        return None
     
     def send_request(self, ws, audio_data):
 

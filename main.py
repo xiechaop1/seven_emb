@@ -7,15 +7,19 @@ import logging
 from base.ws import WebSocketClient
 from base.mic import Mic
 from base.audio_player import AudioPlayer
-from base.light import Light
-from base.spray import Spray
+from config.config import Config
+if not Config.IS_DEBUG:
+    from base.light import Light
+    from base.spray import Spray
+
+import cv2
 from threading import Event
 import threading
 from common.threading_event import ThreadingEvent
 from model.recv import Recv
 from common.code import Code
 import asyncio
-import cv2
+
 
 #from base.spary import Spray
 from model.execute_command import ExecuteCommand
@@ -45,27 +49,32 @@ if __name__ == "__main__":
 
     # ws_cli = ws_instance.get_client()
 
-    # 暂时去掉，等上板子再试
-    # spray_instance = ""
-    spray_instance = Spray()
-    # spray_thread = threading.Thread(target=spray_instance.deal())
-    # spray_thread.start()
+    if not Config.IS_DEBUG:
+        # 暂时去掉，等上板子再试
+        # spray_instance = ""
+        spray_instance = Spray()
+        # spray_thread = threading.Thread(target=spray_instance.deal())
+        # spray_thread.start()
 
-    spray_instance.turn_off()
-    logging.info("spray initialized and turn off")
-    #
+        spray_instance.turn_off()
+        logging.info("spray initialized and turn off")
+        #
+
+
+        light_instance = Light()
+        light_thread = threading.Thread(target=light_instance.daemon)
+        light_thread.start()
+
+        ThreadingEvent.light_daemon_event.clear()
+        light_instance.turn_off()
+        light_instance.start(Code.LIGHT_MODE_BREATHING, {"r":0, "g":0, "b":255, "steps": 200})
+        logging.info("light initialized")
+    else:
+        spray_instance = ""
+        light_instance = ""
 
     cv2_instance = cv2.VideoCapture(0)
-
-    light_instance = Light()
-    light_thread = threading.Thread(target=light_instance.daemon)
-    light_thread.start()
-
-    ThreadingEvent.light_daemon_event.clear()
-    light_instance.turn_off()
-    light_instance.start(Code.LIGHT_MODE_BREATHING, {"r":0, "g":0, "b":255, "steps": 200})
-    logging.info("light initialized")
-    # light_instance.set_mode(Code.LIGHT_MODE_BREATHING)
+        # light_instance.set_mode(Code.LIGHT_MODE_BREATHING)
 
     # Intialize the library (must be called once before other functions).
     # strip.begin()
