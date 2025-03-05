@@ -108,7 +108,9 @@ class ExecuteCommand:
 		# if self.latest_scene_seq == scene_seq:
 		# 	return False
 
-		add_seq_idx = 0
+		add_seq_idx = 0 # 添加的index，比这个大的再添加
+
+		# 过滤已经加入列表的数据中，如果场景一样的，就不加了
 		audio_list = self.audio_player.get_audio_list()
 		if len(audio_list) > 0:
 			for curr_audio_list in audio_list:
@@ -117,6 +119,7 @@ class ExecuteCommand:
 						return False
 
 
+		# 过滤正在播放的数据，如果场景一样的，或者是对话的（因为对话不止一个请求），就不加了
 		playing_data = self.audio_player.get_current_track()
 		if playing_data is not None:
 			if playing_data["type"] == Code.REC_METHOD_VOICE_EXEC:
@@ -126,6 +129,9 @@ class ExecuteCommand:
 			elif playing_data["type"] == Code.REC_METHOD_VOICE_CHAT:
 				return False
 
+		# 过滤已经播放的列表，从后面往前找，找到最后一条Execute-Command的，如果场景一致，则找到最后一个声频的index，记录下来
+		# 如果场景不一致，并且过去的场景比现在的还靠后，那么现在的就不加了
+		# 如果>100的异常场景，和最后一条一致的，也就不加了
 		played_list = self.audio_player.get_played_list()
 		if len(played_list) > 0:
 			for idx in range(len(played_list)):
@@ -140,6 +146,7 @@ class ExecuteCommand:
 						elif scene_seq >= 100:
 							if latest_played["scene_seq"] == scene_seq:
 								return False
+					break
 		if self.latest_scene_seq == scene_seq:
 			return False
 
