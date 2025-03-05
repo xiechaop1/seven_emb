@@ -3,5 +3,5 @@
 
 class Config:
 
-	IS_DEBUG = True
+	IS_DEBUG = False
 		
