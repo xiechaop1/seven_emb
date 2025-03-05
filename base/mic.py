@@ -262,7 +262,7 @@ class Mic:
             data16 = np.frombuffer(raw_bytes, dtype=np.int16)
         data.seek(0)
         #
-        print(len(data16))
+        # print(len(data16))
         audio_data = data16.tobytes()
         return self.wakeup_check(audio_data)
         # if rec.AcceptWaveform(audio_data):
@@ -333,8 +333,8 @@ class Mic:
 
         # self.audio_player.interrupt()
         # self.audio_player.stop_audio()
-        ThreadingEvent.recv_execute_command_event.clear()
-        ThreadingEvent.camera_start_event.clear()
+        # ThreadingEvent.recv_execute_command_event.clear()
+        # ThreadingEvent.camera_start_event.clear()
         # ThreadingEvent.audio_play_event.clear()
 
         # volume = np.abs(indata).mean()
@@ -342,15 +342,19 @@ class Mic:
         start_time = time.time()
         # if volume > SILENCE_THRESHOLD:
 
-        print(time.time() - start_time)
+        # print(time.time() - start_time)
 
         if start_frame is not None:
             self.frames.append(start_frame)
 
+        has_interrupt = False
         while self.is_recording:
-            if time.time() - start_time > 0.1:
+            if time.time() - start_time > 0.1 and has_interrupt == False:
                 self.audio_player.interrupt()
                 self.audio_player.stop_audio()
+                ThreadingEvent.recv_execute_command_event.clear()
+                ThreadingEvent.camera_start_event.clear()
+                has_interrupt = True
             data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow = False)
             self.frames.append(data)
 
@@ -371,6 +375,8 @@ class Mic:
         if time.time() - start_time > 0.1:
             self.audio_player.interrupt()
             self.audio_player.stop_audio()
+            ThreadingEvent.recv_execute_command_event.clear()
+            ThreadingEvent.camera_start_event.clear()
             # audio_memory = io.BytesIO()
             # for frame in pre_buffer:
                 # audio_memory.write(frame.tobytes())
