@@ -85,6 +85,7 @@ class Mic:
         self.spk_li_1=[-0.626114, 0.430365, 0.564255, -0.182698, 0.537145, 0.044097, 0.564515, 0.666896, 1.085733, -0.523695, 2.178851, -0.545808, 0.492513, -0.214256, 0.380257, 0.561458, 1.432191, 0.576447, 1.347584, -1.410213, -0.201343, 1.299883, 0.16591, -0.301386, 1.030398, -0.155679, 1.668122, -0.47749, 1.583658, 1.031789, -0.610194, 0.207826, -2.028657, -0.778005, 0.608732, -1.103482, -0.249394, -0.145279, -0.252108, -0.744611, -0.178013, 0.821876, 1.348644, 0.958709, -1.489057, -0.069446, 0.55689, 0.382191, 1.793885, 0.12014, 1.096465, 1.948748, -0.288994, -0.427686, -0.25332, -0.74351, 1.289284, -0.442085, -1.594271, 0.238896, -0.14475, -1.243948, -0.811971, -1.167681, -1.934597, -2.094246, 0.203778, 0.2246, 0.769156, 3.129627, 1.638138, -0.414724, 0.363555, 1.058113, -0.658691, 0.345854, -1.559133, 0.087666, 0.984442, -0.469354, 1.667347, 0.916898, -2.170697, 0.292812, 0.051197, 1.222564, 1.065773, -0.065279, 0.214764, -0.407425, 0.992222, -0.993893, 0.693716, 0.121084, 1.31698, 1.255295, -0.941613, 0.015467, 0.500375, -1.479744, -0.943895, -0.405701, 1.795941, -0.66203, 1.224589, 0.963079, -0.872087, 0.392804, 1.412374, -0.279257, -0.462107, 0.674435, 0.137653, 0.93439, 2.394885, -0.571315, 0.374555, -0.233448, 0.757664, -0.375494, 0.666074, -0.123803, 1.518769, 0.873773, -0.218161, 1.566089, -0.488127, 0.386693]
         self.keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
         self.target_keywords = ["播放音乐", "七七", "停止", "抬头","拍照","休息"]
+        self.wakeup_keywords = ["七七", "七宝", "七夕", "休息"]
 
 
     def daemon(self):
@@ -108,7 +109,9 @@ class Mic:
                     if self.wakeup(audio_data):
                         ThreadingEvent.wakeup_event.set()
                         # 唤醒成功了点亮
+                        self.light.set_mode(Code.LIGHT_MODE_BREATHING)
                         self.light.Breathing(0, 0, 255)
+                        logging.info("set light turned on")
                     else:
                         continue
 
@@ -225,20 +228,30 @@ class Mic:
                     #         continue
                     #     # distance2 = cosine_dist(spk_li_2, spk_vector)
                     #     # print(f"Speaker distance2: {distance2}")
-            if self.target_keywords[1] in str(transcription):
-                # and not xiaoqi_event_triggered:
-                print(f"检测到qibao关键词: {self.target_keywords[1]}")
+            for i in self.wakeup_keywords:
+            # if self.target_keywords[1] in str(transcription):
+                if self.wakeup_keywords[i] in transcription:
+                    # and not xiaoqi_event_triggered:
+                    print(f"检测到qibao关键词: {self.wakeup_keywords[i]}")
 
-                return True
-                # continue
+                    return True
+                    # continue
         else:
             partial = json.loads(rec.PartialResult())
             partial_text = partial.get("partial", "")
             print(f"Partial Transcription: {partial_text}")
-            if self.target_keywords[1] in str(partial_text):
-                # and not xiaoqi_event_triggered:
-                print(f"检测到qibao关键词: {self.target_keywords[1]}")
-                return True
+            for i in self.wakeup_keywords:
+            # if self.target_keywords[1] in str(transcription):
+                if self.wakeup_keywords[i] in str(partial_text):
+                    # and not xiaoqi_event_triggered:
+                    print(f"检测到qibao关键词: {self.wakeup_keywords[i]}")
+
+                    return True
+                    # continue
+            # if self.target_keywords[1] in str(partial_text):
+            #     # and not xiaoqi_event_triggered:
+            #     print(f"检测到qibao关键词: {self.target_keywords[1]}")
+            #     return True
 
                 # continue
             # else:

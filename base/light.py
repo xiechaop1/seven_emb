@@ -255,10 +255,10 @@ class Light:
 
             time.sleep(wait_ms/1000.0)
 
-            for i in range(steps + 1):
-                r1 = int(-1 * step_r * i)
-                g1 = int(-1 * step_g * i)
-                b1 = int(-1 * step_b * i)
+            for j in range(steps + 1):
+                r1 = int(-1 * step_r * j)
+                g1 = int(-1 * step_g * j)
+                b1 = int(-1 * step_b * j)
                 self.show_color(r1, g1, b1)
 
             time.sleep(wait_ms/1000.0)
