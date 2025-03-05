@@ -23,7 +23,7 @@ class AudioPlayer:
         self.current_bgm = None
         self.current_light = None
         self.current_spray = None
-        self.is_interrupted = False
+        self.is_interrupted = 0
         self.played_list = []
         # self.playing_list = []
         self.spray = spray
@@ -78,7 +78,8 @@ class AudioPlayer:
     def audio_stop_event_daemon(self):
         ThreadingEvent.audio_stop_event.wait()
         self.stop_audio()
-        self.is_interrupted = True
+        # self.is_interrupted = 1
+        self.interrupt()
         ThreadingEvent.audio_stop_event.clear()
 
     def save(self, audio_data, audio_file_tag = ""):
@@ -102,8 +103,15 @@ class AudioPlayer:
             #     "wait_time": wait_time
             # }
             self.audio_list.append(audio_data)
-            ThreadingEvent.audio_play_event.set()
-            self.is_interrupted = False
+
+            self.resume_interrupted()
+            # if self.is_interrupted == 1 and self.voice_channel.get_busy():
+            #     logging.info("set interrupted for add after playing")
+            #     self.is_interrupted = 2     # 播完以后再重置
+            # else:
+            #     logging.info("set interrupted for add")
+            #     ThreadingEvent.audio_play_event.set()
+            #     self.is_interrupted = 0
             logging.info(f"Added: {audio_file} {msg_id}")
         else:
             logging.error(f"Error: {audio_file} does not exist.")
@@ -119,7 +127,7 @@ class AudioPlayer:
     def play_audio(self, index):
         """从列表中播放指定索引的音频"""
         if 0 <= index < len(self.audio_list):
-            self.is_interrupted = False
+            self.is_interrupted = 0
             audio_data = self.audio_list[index]
             logging.info(f"Playing: {index} {audio_data}")
             msg_id = audio_data["msg_id"]
@@ -160,7 +168,7 @@ class AudioPlayer:
                         ThreadingEvent.camera_start_event.set()
                         ThreadingEvent.recv_execute_command_event.set()
                 else:
-                    if self.is_interrupted == False:
+                    if self.is_interrupted == 0:
                         ThreadingEvent.audio_play_event.set()
 
             elif audio_data["type"] == Code.REC_METHOD_VOICE_EXEC:
@@ -169,7 +177,7 @@ class AudioPlayer:
                         ThreadingEvent.camera_start_event.set()
                         ThreadingEvent.recv_execute_command_event.set()
                     else:
-                        if self.is_interrupted == False:
+                        if self.is_interrupted == 0:
                             ThreadingEvent.audio_play_event.set()
                 else:
                     ThreadingEvent.camera_start_event.set()
@@ -178,8 +186,13 @@ class AudioPlayer:
             #     ThreadingEvent.camera_start_event.set()
             #     ThreadingEvent.recv_execute_command_event.set()
 
-            if self.is_interrupted == False:
+            if self.is_interrupted == 0:
                 self.i = self.i + 1
+
+            if self.is_interrupted == 2:
+                self.is_interrupted = 0     # 如果是2，播完以后重置
+                ThreadingEvent.audio_play_event.set()
+
         else:
             logging.error(f"Error: Invalid index. {index} {len(self.audio_list)}")
             # if len(self.audio_list) > 0:
@@ -193,7 +206,7 @@ class AudioPlayer:
         # pygame.mixer.music.load(audio_file)  # 加载音频文件
         # pygame.mixer.music.play()  # 播放音频
 
-        self.is_interrupted = False
+        self.is_interrupted = 0
         print("play with data")
         self.play(audio_data)
 
@@ -278,7 +291,7 @@ class AudioPlayer:
             # pygame.time.wait(50)
         # ThreadingEvent.audio_play_event.clear()
         # print("played")
-        if self.is_interrupted == False:
+        if self.is_interrupted == 0:
             if wait_time > 0:
                 # 如果不是被打断的，就需要等待一点时间
                 time.sleep(wait_time/10)
@@ -335,9 +348,19 @@ class AudioPlayer:
         print("replay")
         # if audio_data is not None:
         #     self.play_audio_with_data(audio_data, False)
-        ThreadingEvent.audio_play_event.set()
-        self.is_interrupted = False
+        # ThreadingEvent.audio_play_event.set()
+        # self.is_interrupted = 0
+        self.resume_interrupted()
         return
+
+    def resume_interrupted(self):
+        if self.is_interrupted == 1 and self.voice_channel.get_busy():
+            logging.info("Resume interrupted after played")
+            self.is_interrupted = 2
+        else:
+            logging.info("Resume interrupted now")
+            self.is_interrupted = 0
+            ThreadingEvent.audio_play_event.set()
 
     def stop_audio(self):
         """停止当前播放的音频"""
@@ -368,10 +391,13 @@ class AudioPlayer:
             if "continue" in playing_voice:
                 if playing_voice["continue"] == True:
                     self.continue_track = playing_voice
-        print("set interrupted")
 
-        self.is_interrupted = True
+        # if self.voice_channel.get_busy():
+        #     self.is_interrupted = 2
+        # else:
+        self.is_interrupted = 1
         ThreadingEvent.audio_play_event.clear()
+        print("set interrupted")
 
     def stop_music(self):
         pygame.mixer.music.stop()
@@ -389,6 +415,12 @@ class AudioPlayer:
     def get_audio_list(self):
         """返回当前音频列表"""
         return self.audio_list
+
+    def get_last_audio_list(self):
+        if len(self.audio_list) > 0:
+            return self.audio_list[-1]
+        else:
+            return None
 
     def get_played_list(self):
         return self.played_list
