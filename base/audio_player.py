@@ -22,6 +22,7 @@ class AudioPlayer:
         self.current_track = None  # 当前正在播放的音频
         self.current_bgm = None
         self.current_light = None
+        self.current_spray = None
         self.is_interrupted = False
         self.played_list = []
         # self.playing_list = []
@@ -244,9 +245,13 @@ class AudioPlayer:
         #     if audio_data["continue"] == True:
         #         self.continue_track = audio_data
 
-        # if spray == "on":
-        #     # ThreadingEvent.spray_start_event.set()
-        #     self.spray.shoot()
+        if "spray" in audio_data:
+            if audio_data["spray"] == "on" and audio_data["type"] != self.current_spray:
+                self.current_spray = audio_data["spray"]
+                ThreadingEvent.spray_start_event.set()
+                # self.spray.shoot()
+            elif audio_data["spray"] == "off" and audio_data["type"] != self.current_spray:
+                ThreadingEvent.spray_start_event.clear()
 
         if bgm and bgm != self.current_bgm:
             bgm_file = "resources/background_music/" + bgm["filename"]
