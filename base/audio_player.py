@@ -181,9 +181,9 @@ class AudioPlayer:
                 self.i = self.i + 1
         else:
             logging.error(f"Error: Invalid index. {index} {len(self.audio_list)}")
-            if len(self.audio_list) > 0:
-                self.i = 0
-                ThreadingEvent.audio_play_event.set()
+            # if len(self.audio_list) > 0:
+                # self.i = 0
+                # ThreadingEvent.audio_play_event.set()
 
     def play_audio_with_data(self, audio_data, is_temp_save = True):
         """从列表中播放指定索引的音频"""
