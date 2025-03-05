@@ -283,7 +283,7 @@ class Mic:
         # if volume > SILENCE_THRESHOLD:
 
         while self.is_recording:
-            data = self.stream.read(self.sample_rate * self.frame_duration // 1000)
+            data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow = False)
             self.frames.append(data)
 
             # 静音检测（通过 VAD 检测）
