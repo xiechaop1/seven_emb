@@ -374,7 +374,7 @@ class Light:
         return self.current_color
 
     def show_color(self, r, g, b):
-        print("r,g,b:", r, g, b)
+        # print("r,g,b:", r, g, b)
         # for j in range(255):
         for i in range(self.strip.numPixels()):
             self.strip.setPixelColor(i, Color(r, g, b))
