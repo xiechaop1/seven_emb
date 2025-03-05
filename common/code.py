@@ -1,4 +1,4 @@
-from base.code import Code
+from common.code import Code
 
 
 class Code:
