@@ -1,5 +1,5 @@
 import time
-# from rpi_ws281x import *
+from rpi_ws281x import *
 import argparse
 from common.code import Code
 import wheel
