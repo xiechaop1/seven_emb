@@ -108,30 +108,59 @@ class ExecuteCommand:
 		# if self.latest_scene_seq == scene_seq:
 		# 	return False
 
+		add_seq_idx = 0
+		audio_list = self.audio_player.get_audio_list()
+		if len(audio_list) > 0:
+			for curr_audio_list in audio_list:
+				if curr_audio_list["type"] == Code.REC_METHOD_VOICE_EXEC:
+					if scene_seq < 100 and curr_audio_list["scene_seq"] == scene_seq:
+						return False
+
+
 		playing_data = self.audio_player.get_current_track()
 		if playing_data is not None:
 			if playing_data["type"] == Code.REC_METHOD_VOICE_EXEC:
 				latest_playing_scene_seq = playing_data["scene_seq"]
 				if latest_playing_scene_seq == scene_seq:
 					return False
+			elif playing_data["type"] == Code.REC_METHOD_VOICE_CHAT:
+				return False
 
-		latest_played = self.audio_player.get_latest_played()
-		# latest_scene_seq = 0
-		if latest_played is not None:
-			if latest_played["type"] == Code.REC_METHOD_VOICE_EXEC:
-				latest_scene_seq = latest_played["scene_seq"]
-				# print("latest_scene_seq:", latest_scene_seq, scene_seq)
-				if latest_scene_seq < 100 and scene_seq < 100 and latest_scene_seq >= scene_seq:
-					return False
-				elif latest_scene_seq == scene_seq:
-					return False
-			elif latest_played["type"] == Code.REC_METHOD_VOICE_CHAT and self.audio_player.is_playing():
-				return False
-			# else:
-			# 	return False
-		else:
-			if self.latest_scene_seq == scene_seq:
-				return False
+		played_list = self.audio_player.get_played_list()
+		if len(played_list) > 0:
+			for idx in range(len(played_list)):
+				latest_played = played_list[-1 * idx]
+				if latest_played is not None:
+					if latest_played["type"] == Code.REC_METHOD_VOICE_EXEC:
+						if scene_seq < 100:
+							if latest_played["scene_seq"] == scene_seq:
+								add_seq_idx = latest_played["seq_id"]
+							elif latest_played["scene_seq"] > scene_seq:
+								return False
+						elif scene_seq >= 100:
+							if latest_played["scene_seq"] == scene_seq:
+								return False
+		if self.latest_scene_seq == scene_seq:
+			return False
+
+
+		# latest_played = self.audio_player.get_latest_played()
+		# # latest_scene_seq = 0
+		# if latest_played is not None:
+		# 	if latest_played["type"] == Code.REC_METHOD_VOICE_EXEC:
+		# 		latest_scene_seq = latest_played["scene_seq"]
+		# 		# print("latest_scene_seq:", latest_scene_seq, scene_seq)
+		# 		if latest_scene_seq < 100 and scene_seq < 100 and latest_scene_seq >= scene_seq:
+		# 			return False
+		# 		elif latest_scene_seq == scene_seq:
+		# 			return False
+		# 	elif latest_played["type"] == Code.REC_METHOD_VOICE_CHAT and self.audio_player.is_playing():
+		# 		return False
+		# 	# else:
+		# 	# 	return False
+		# else:
+		# 	if self.latest_scene_seq == scene_seq:
+		# 		return False
 
 		if scene_seq > 100:
 			self.audio_player.interrupt()
@@ -176,6 +205,9 @@ class ExecuteCommand:
 					seq_id = -1
 				else:
 					seq_id = i
+
+				if seq_id < add_seq_idx and seq_id != -1:
+					continue
 				# li_audio_base64 = li_voices_list[i]["audio_data"]
 				li_audio_fomat = li_voices_list[i]["audio_format"]
 				print("li_audio_fomat:", li_audio_fomat)
