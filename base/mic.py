@@ -108,6 +108,7 @@ class Mic:
                 self.stream = self.p.open(format=pyaudio.paInt16,
                                           channels=1,
                                           rate=self.sample_rate,
+                                          input_device_index=self.find_device_index(),
                                           input=True,
                                           frames_per_buffer=self.sample_rate * self.frame_duration // 1000)
                 data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow = False)
