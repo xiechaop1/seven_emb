@@ -34,9 +34,9 @@ class Light:
             ThreadingEvent.light_daemon_event.wait()
 
             light_mode = self.light_mode
-            if light_mode == self.last_light_mode:
-                continue
-            self.last_light_mode = light_mode
+            # if light_mode == self.last_light_mode:
+            #     continue
+            # self.last_light_mode = light_mode
 
             r = self.target_color["r"]
             g = self.target_color["g"]
