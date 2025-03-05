@@ -237,18 +237,19 @@ class Light:
         bt = b
 
         while True:
-            if self.light_mode != Code.LIGHT_MODE_GRADIENT:
+            if self.light_mode != Code.LIGHT_MODE_BREATHING:
                 break
-            step_r = rt
-            step_g = gt
-            step_b = bt
+
+            step_r = rt / steps
+            step_g = gt / steps
+            step_b = bt / steps
 
 
             # gradient = []
             for i in range(steps + 1):
-                r1 = int(step_r * i)
-                g1 = int(step_g * i)
-                b1 = int(step_b * i)
+                r1 = int(-1 * step_r * i)
+                g1 = int(-1 * step_g * i)
+                b1 = int(-1 * step_b * i)
                 # gradient.append((r1, g1, b1))
 
                 self.show_color(r1, g1, b1)
@@ -256,9 +257,9 @@ class Light:
             time.sleep(wait_ms/1000.0)
 
             for j in range(steps + 1):
-                r1 = int(-1 * step_r * j)
-                g1 = int(-1 * step_g * j)
-                b1 = int(-1 * step_b * j)
+                r1 = int(step_r * j)
+                g1 = int(step_g * j)
+                b1 = int(step_b * j)
                 self.show_color(r1, g1, b1)
 
             time.sleep(wait_ms/1000.0)
