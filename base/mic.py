@@ -233,10 +233,10 @@ class Mic:
                 # print("partial未检测到qibao关键词，xiaoqi_event.clear")
 
     def wakeup(self, data):
-        model = Model(self.MODEL_PATH)
-        spk_model = SpkModel(self.SPK_MODEL_PATH)
+        # model = Model(self.MODEL_PATH)
+        # spk_model = SpkModel(self.SPK_MODEL_PATH)
         not_send_flag=False
-        rec = KaldiRecognizer(model, self.SAMPLERATE_ORIG, self.keywords)
+        # rec = KaldiRecognizer(model, self.SAMPLERATE_ORIG, self.keywords)
         # rec.SetSpkModel(spk_model)
         # rec2 = KaldiRecognizer(model, 44100)
         samplerate = self.SAMPLERATE_ORIG
@@ -245,7 +245,7 @@ class Mic:
         #     while not ThreadingEvent.wakeup_event.is_set():
         #         pass
         # return
-        data16 = np.frombuffer(data.getvalue(), dtype=np.int16)
+        # data16 = np.frombuffer(data.getvalue(), dtype=np.int16)
         with wave.open(data, 'rb') as wf:
             raw_bytes = wf.readframes(wf.getnframes())  # 读取所有帧
             data16 = np.frombuffer(raw_bytes, dtype=np.int16)
