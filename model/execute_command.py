@@ -161,7 +161,7 @@ class ExecuteCommand:
 		bgm = resp["data"]["actions"]["bgm"]
 		light = resp["data"]["actions"]["light"]
 
-		print(bgm)
+		# print(bgm)
 		if li_voice is not None:
 			# print("li_voice:", li_voice)
 
