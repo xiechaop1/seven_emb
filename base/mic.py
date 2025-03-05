@@ -109,8 +109,8 @@ class Mic:
                     if self.wakeup(audio_data):
                         ThreadingEvent.wakeup_event.set()
                         # 唤醒成功了点亮
-                        self.light.set_mode(Code.LIGHT_MODE_BREATHING)
-                        self.light.Breathing(0, 0, 255)
+                        # self.light.set_mode(Code.LIGHT_MODE_BREATHING)
+                        self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
                         logging.info("set light turned on")
                     else:
                         continue
