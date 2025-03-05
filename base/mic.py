@@ -1,8 +1,7 @@
 import os
 
-
-# os.environ["SDL_AUDIODRIVER"] = "alsa"
-# os.environ["AUDIODEV"] = "hw:3,0"
+os.environ["SDL_AUDIODRIVER"] = "alsa"
+os.environ["AUDIODEV"] = "hw:3,0"
 
 import wave
 import time
