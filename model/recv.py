@@ -52,6 +52,8 @@ class Recv:
 				if resp["code"] == self.EMPTY_SOUND_CODE:
 					self.audio_player.replay()
 					ThreadingEvent.recv_execute_command_event.set()
+					if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+						ThreadingEvent.camera_start_event.set()
 					continue
 				else:
 					if resp["method"] == self.REC_METHOD_VOICE_CHAT:
