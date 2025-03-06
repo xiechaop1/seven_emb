@@ -354,7 +354,7 @@ class AudioPlayer:
         return
 
     def resume_interrupted(self):
-        if self.is_interrupted == 1 and self.voice_channel.get_busy():
+        if self.is_interrupted == 1 and self.voice_channel.get_busy() and self.current_track is not None:
             logging.info("Resume interrupted after played")
             self.is_interrupted = 2
         else:
