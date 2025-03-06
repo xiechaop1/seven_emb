@@ -294,7 +294,7 @@ class AudioPlayer:
             # pygame.time.wait(50)
         # ThreadingEvent.audio_play_event.clear()
         # print("played")
-        if self.is_interrupted == 0:
+        if self.is_interrupted != 1:
             if wait_time > 0:
                 # 如果不是被打断的，就需要等待一点时间
                 time.sleep(wait_time/10)

@@ -137,9 +137,9 @@ class ExecuteCommand:
 		# 如果>100的异常场景，和最后一条一致的，也就不加了
 		played_list = self.audio_player.get_played_list()
 		if len(played_list) > 0:
-			for idx in range(len(played_list)):
+			idx = 1
+			while idx < len(played_list):
 				latest_played = played_list[(-1 * idx)]
-				print("lp: ", latest_played)
 				if latest_played is not None:
 					if latest_played["type"] == Code.REC_METHOD_VOICE_EXEC:
 						logging.info("scene_seq: {latest_played['scene_seq']} {scene_seq}")
