@@ -139,6 +139,7 @@ class ExecuteCommand:
 		if len(played_list) > 0:
 			for idx in range(len(played_list)):
 				latest_played = played_list[-1 * idx]
+				print(latest_played)
 				if latest_played is not None:
 					if latest_played["type"] == Code.REC_METHOD_VOICE_EXEC:
 						logging.info("scene_seq: {latest_played['scene_seq']} {scene_seq}")
