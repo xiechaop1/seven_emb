@@ -210,7 +210,7 @@ class AudioPlayer:
         # pygame.mixer.music.play()  # 播放音频
 
         self.is_interrupted = 0
-        print("play with data")
+        logging.info("play with data")
         self.play(audio_data)
 
         if is_temp_save == True:
@@ -271,7 +271,7 @@ class AudioPlayer:
 
         if bgm and bgm != self.current_bgm:
             bgm_file = "resources/background_music/" + bgm["filename"]
-            print("bgm_file", bgm_file)
+            logging.debug("start playing bgm, bgm_file: ", bgm_file)
             if os.path.isfile(bgm_file):
                 pygame.mixer.music.load(bgm_file)  # 加载音频文件
                 pygame.mixer.music.play(-1)
@@ -348,7 +348,7 @@ class AudioPlayer:
 
     def replay(self):
         # audio_data = self.current_track
-        print("replay")
+        logging.debug("replay")
         # if audio_data is not None:
         #     self.play_audio_with_data(audio_data, False)
         # ThreadingEvent.audio_play_event.set()
@@ -400,7 +400,7 @@ class AudioPlayer:
         # else:
         self.is_interrupted = 1
         ThreadingEvent.audio_play_event.clear()
-        print("set interrupted")
+        logging.info("set interrupted")
 
     def stop_music(self):
         pygame.mixer.music.stop()
