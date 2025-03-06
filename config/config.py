@@ -25,5 +25,5 @@ logging.basicConfig(
 
 class Config:
 
-	IS_DEBUG = False
+	IS_DEBUG = True
 		

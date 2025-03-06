@@ -39,8 +39,6 @@ class ExecuteCommand:
 				if self.take_photo_max_ct > 1:
 					time.sleep(1)
 
-			# print("camera event end: ", ThreadingEvent.camera_start_event, len(photo_list))
-
 			self.commit(photo_list)
 			time.sleep(0.5)
 
@@ -48,7 +46,7 @@ class ExecuteCommand:
 	def commit(self, photo_list):
 		latest_played = self.audio_player.get_latest_played()
 		conversation_id = messageid.get_conversation_id()
-		message_id = messageid.get_message_id()
+		message_id = messageid.generate(Code.REC_METHOD_VOICE_EXEC)
 		token = messageid.get_token()
 
 		status = ""
@@ -90,7 +88,6 @@ class ExecuteCommand:
 					"status": status
 				}
 			}
-
 		}
 
 		self.ws.send(json.dumps(request))
@@ -104,12 +101,19 @@ class ExecuteCommand:
 
 		scene_seq = resp["data"]["scene_seq"]
 
-		msg_id = messageid.get_latest_message_id()
+		voice_msg_id = messageid.get_latest_message_id()
+		# print("resp_msg_id:", resp_msg_id)
+		if voice_msg_id > resp_msg_id:
+			# print("voice_msg_id, resp_msg_id:", voice_msg_id, resp_msg_id)
+			logging.warn(f"Pass the old req, voice_msg_id: {voice_msg_id} > resp_msg_id: {resp_msg_id}")
+			return
+
 
 		# if self.latest_scene_seq == scene_seq:
 		# 	return False
 
 		add_seq_idx = 0 # 添加的index，比这个大的再添加
+
 
 		# 过滤已经加入列表的数据中，如果场景一样的，就不加了
 		audio_list = self.audio_player.get_audio_list()
@@ -152,10 +156,10 @@ class ExecuteCommand:
 							if latest_played["scene_seq"] == scene_seq:
 								return False
 						break
-		if self.latest_scene_seq == scene_seq:
-			logging.info("same seq with old: {self.latest_scene_seq} {scene_seq}")
-			return False
-
+				idx += 1
+		# if self.latest_scene_seq == scene_seq:
+		# 	logging.info(f"same seq with old: {self.latest_scene_seq} {scene_seq}")
+		# 	return False
 		print("add_seq_idx: ", add_seq_idx)
 
 		# latest_played = self.audio_player.get_latest_played()
@@ -183,23 +187,23 @@ class ExecuteCommand:
 		li_voice = resp["data"]["actions"]["voice"]
 
 		fragrance = resp["data"]["actions"]["fragrance"]
-		print("fragrance:", fragrance)
+		# print("fragrance:", fragrance)
 
 		fragrance_status = "off"
 		if fragrance is not None:
 			fragrance_status = fragrance["status"]
 			fragrance_level = fragrance["level"]
 			fragrance_count = fragrance["count"]
-			print("fragrance_status:", fragrance_status)
+			# print("fragrance_status:", fragrance_status)
 			if fragrance_status is not None:
 				if fragrance_status == "on":
 					scent_spray_flag = True
 				if fragrance_status == "off":
 					scent_spray_flag = False
-			if fragrance_level is not None:
-				print("fragrance_level:", fragrance_level)
-			if fragrance_count is not None:
-				print("fragrance_count:", fragrance_count)
+			# if fragrance_level is not None:
+				# print("fragrance_level:", fragrance_level)
+			# if fragrance_count is not None:
+				# print("fragrance_count:", fragrance_count)
 
 		bgm = resp["data"]["actions"]["bgm"]
 		light = resp["data"]["actions"]["light"]
@@ -224,12 +228,12 @@ class ExecuteCommand:
 					continue
 				# li_audio_base64 = li_voices_list[i]["audio_data"]
 				li_audio_fomat = li_voices_list[i]["audio_format"]
-				print("li_audio_fomat:", li_audio_fomat)
+				# print("li_audio_fomat:", li_audio_fomat)
 				# if li_audio_base64 != None:
 				li_action = li_voices_list[i]["action"]
-				print("li_action:", li_action)
+				# print("li_action:", li_action)
 				li_wait_time = li_voices_list[i]["wait_time"]
-				print("li_wait_time:", li_wait_time)
+				# print("li_wait_time:", li_wait_time)
 				if li_wait_time is None:
 					li_wait_time = 1
 				li_audio_text = li_voices_list[i]["text"]

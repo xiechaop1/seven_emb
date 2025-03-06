@@ -8,6 +8,7 @@ import websocket
 from common.threading_event import ThreadingEvent
 from common.scence import Scence
 from common.code import Code
+from config.config import Config
 
 
 class Recv:
@@ -29,7 +30,7 @@ class Recv:
 
 	def daemon(self):
 		vc_handler = VoiceChat(self.audio_player)
-		ec_handler = ExecuteCommand(self.audio_player, self.ws, self.cv2)
+		ec_handler = ExecuteCommand(self.audio_player, self.wsClient, self.cv2)
 
 		last_resp = None
 		msg_id_2_type = {}
@@ -57,7 +58,8 @@ class Recv:
 					continue
 				else:
 					if resp["method"] == self.REC_METHOD_VOICE_CHAT:
-						self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 255, "g": 255, "b": 255})
+						if Config.IS_DEBUG == False:
+							self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 255, "g": 255, "b": 255})
 
 						# 如果已经接到对应message_id的数据，同样的数据动作都是一致的
 						# 为sleep-assistant做的处理
@@ -112,13 +114,17 @@ class Recv:
 
 						# ec_handler.latest_scene_seq = 0
 						else:
-							vc_handler.deal(resp)
+							vc_thread = threading.Thread(target=vc_handler.deal, args=(resp,))
+							vc_thread.start()
+							# vc_handler.deal(resp)
 						continue
 					elif resp["method"] == Code.REC_METHOD_VOICE_EXEC:
 						# self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 0, "b": 128})
-						print("recv event:",ThreadingEvent.recv_execute_command_event.is_set())
+						print("recv exec event:",ThreadingEvent.recv_execute_command_event.is_set(), resp["message_id"] )
 						if ThreadingEvent.recv_execute_command_event.is_set():
 							# print("recv event2:", ThreadingEvent.recv_execute_command_event)
-							ec_handler.deal(resp)
+							ec_thread = threading.Thread(target=ec_handler.deal, args=(resp,))
+							ec_thread.start()
+							# ec_handler.deal(resp)
 						continue
 

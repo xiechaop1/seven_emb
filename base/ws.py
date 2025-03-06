@@ -3,6 +3,7 @@ import threading
 import time
 import logging
 import queue
+import datetime
 
 logging.basicConfig(level=logging.INFO)
 
@@ -82,17 +83,20 @@ class WebSocketClient:
         time.sleep(self.retry_interval)
         self.connect()
 
-    def send(self, ws, message):
+    def send(self, message):
         """
         发送 WebSocket 消息
-        :param ws: WebSocket 句柄
+        # :param ws: WebSocket 句柄
         :param message: 要发送的消息
         """
+        # print(ws, self.connected)
+        ws = self.ws
         if ws and self.connected:
             try:
+                logging.info(f"Sending message: {datetime.datetime.now()}")
                 ws.send(message)
                 # print(message)
-                logging.info(f"Sent: {message}")
+                logging.info(f"Sent: {datetime.datetime.now()}")
             except Exception as e:
                 # print(f"Error: {e}")
                 logging.error(f"Failed to send message: {e}")

@@ -1,3 +1,5 @@
+from xmlrpc.client import DateTime
+
 import pygame
 import os
 from common.threading_event import ThreadingEvent
@@ -7,7 +9,8 @@ import random
 from base.messageid import messageid
 from common.scence import Scence
 from common.code import Code
-
+from config.config import Config
+from datetime import datetime
 
 class AudioPlayer:
 
@@ -16,7 +19,7 @@ class AudioPlayer:
     def __init__(self, spray, light):
         # 初始化 Pygame mixer
         pygame.mixer.init()
-        pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
+        # pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
         pygame.mixer.music.set_volume(1.0)
         self.audio_list = []  # 用于存储音频文件路径
         self.current_track = None  # 当前正在播放的音频
@@ -91,6 +94,9 @@ class AudioPlayer:
 
     def add(self, audio_data, audio_file_tag = ""):
         """将音频文件路径添加到列表"""
+        audio_data["timestamp"] = time.time()
+        audio_data["i_datetime"] = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+
         audio_file = audio_data["filename"]
         msg_id = audio_data["msg_id"]
         # type = audio_file["type"]
@@ -169,6 +175,7 @@ class AudioPlayer:
                         ThreadingEvent.recv_execute_command_event.set()
                 else:
                     if self.is_interrupted == 0:
+                        print("voice: set play event bec of interrupt is 0")
                         ThreadingEvent.audio_play_event.set()
 
             elif audio_data["type"] == Code.REC_METHOD_VOICE_EXEC:
@@ -178,6 +185,7 @@ class AudioPlayer:
                         ThreadingEvent.recv_execute_command_event.set()
                     else:
                         if self.is_interrupted == 0:
+                            print("exec: set play event bec of interrupt is 0")
                             ThreadingEvent.audio_play_event.set()
                 else:
                     ThreadingEvent.camera_start_event.set()
@@ -187,14 +195,18 @@ class AudioPlayer:
             #     ThreadingEvent.recv_execute_command_event.set()
 
             if self.is_interrupted == 0:
+                print("self.i add,", self.i)
+                # print(self.audio_list)
                 self.i = self.i + 1
 
             if self.is_interrupted == 2:
                 self.is_interrupted = 0     # 如果是2，播完以后重置
+                logging.info("set interrupt to 0 from 2")
                 ThreadingEvent.audio_play_event.set()
 
-            if self.i < len(self.audio_list):
-                ThreadingEvent.audio_play_event.set()
+            # if self.i < len(self.audio_list):
+            #     print("audio play event bec of len")
+            #     ThreadingEvent.audio_play_event.set()
 
         else:
             logging.error(f"Error: Invalid index. {index} {len(self.audio_list)}")
@@ -220,6 +232,7 @@ class AudioPlayer:
     def play_voice_with_file(self, filename):
         if filename == "" or filename is None:
             return
+        logging.info(f"Playing voice with file:{filename}")
         voice = pygame.mixer.Sound(filename)
         self.voice_channel.play(voice)
         while self.voice_channel.get_busy():
@@ -240,22 +253,23 @@ class AudioPlayer:
             bgm = ""
 
         if "light" in audio_data:
-            light = audio_data["light"]
-            if light is not None:
-                if "rgb" in light:
-                    light_rgb = light["rgb"]
-                    # r, g, b = map(int, light_rgb.split(','))
-                    light_mode = light["mode"]
-                    # light_params = {
-                    #     "r": r,
-                    #     "g": g,
-                    #     "b": b
-                    # }
+            if Config.IS_DEBUG == False:
+                light = audio_data["light"]
+                if light is not None:
+                    if "rgb" in light:
+                        light_rgb = light["rgb"]
+                        # r, g, b = map(int, light_rgb.split(','))
+                        light_mode = light["mode"]
+                        # light_params = {
+                        #     "r": r,
+                        #     "g": g,
+                        #     "b": b
+                        # }
 
-                    if light_mode != self.current_light:
-                        # if light_mode == Code.LIGHT_MODE_STATIC:
-                        self.light.start_with_code(light_mode, light_rgb)
-                        self.current_light = light_mode
+                        if light_mode != self.current_light:
+                            # if light_mode == Code.LIGHT_MODE_STATIC:
+                            self.light.start_with_code(light_mode, light_rgb)
+                            self.current_light = light_mode
 
         # if "continue" in audio_data:
         #     if audio_data["continue"] == True:

@@ -12,6 +12,7 @@ if not Config.IS_DEBUG:
     from base.light import Light
     from base.spray import Spray
 
+import os
 import cv2
 from threading import Event
 import threading
@@ -33,6 +34,9 @@ from model.execute_command import ExecuteCommand
 #     if ws:  # 连接成功
 #         return ws
 
+if Config.IS_DEBUG == False:
+    os.environ["SDL_AUDIODRIVER"] = "alsa"
+    os.environ["AUDIODEV"] = "hw:3,0"
 
 if __name__ == "__main__":
     # on_start()
