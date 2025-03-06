@@ -193,6 +193,9 @@ class AudioPlayer:
                 self.is_interrupted = 0     # 如果是2，播完以后重置
                 ThreadingEvent.audio_play_event.set()
 
+            if self.i < len(self.audio_list):
+                ThreadingEvent.audio_play_event.set()
+
         else:
             logging.error(f"Error: Invalid index. {index} {len(self.audio_list)}")
             # if len(self.audio_list) > 0:
