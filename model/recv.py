@@ -55,7 +55,7 @@ class Recv:
 					continue
 				else:
 					if resp["method"] == self.REC_METHOD_VOICE_CHAT:
-						self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 0, "b": 255})
+						self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 255, "g": 255, "b": 255})
 
 						# 如果已经接到对应message_id的数据，同样的数据动作都是一致的
 						# 为sleep-assistant做的处理
@@ -113,7 +113,7 @@ class Recv:
 							vc_handler.deal(resp)
 						continue
 					elif resp["method"] == Code.REC_METHOD_VOICE_EXEC:
-						self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 0, "b": 128})
+						# self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 0, "b": 128})
 						print("recv event:",ThreadingEvent.recv_execute_command_event.is_set())
 						if ThreadingEvent.recv_execute_command_event.is_set():
 							# print("recv event2:", ThreadingEvent.recv_execute_command_event)
