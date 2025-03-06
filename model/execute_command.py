@@ -141,7 +141,7 @@ class ExecuteCommand:
 				latest_played = played_list[-1 * idx]
 				if latest_played is not None:
 					if latest_played["type"] == Code.REC_METHOD_VOICE_EXEC:
-						logging.debug("scene_seq {latest_played['scene_seq']} {scene_seq}")
+						logging.info("scene_seq: {latest_played['scene_seq']} {scene_seq}")
 						if scene_seq < 100:
 							if latest_played["scene_seq"] == scene_seq:
 								add_seq_idx = latest_played["seq_id"]
@@ -152,6 +152,7 @@ class ExecuteCommand:
 								return False
 					break
 		if self.latest_scene_seq == scene_seq:
+			logging.info("same seq with old: {self.latest_scene_seq} {scene_seq}")
 			return False
 
 		print("add_seq_idx: ", add_seq_idx)
