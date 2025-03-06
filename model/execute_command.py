@@ -138,8 +138,8 @@ class ExecuteCommand:
 		played_list = self.audio_player.get_played_list()
 		if len(played_list) > 0:
 			for idx in range(len(played_list)):
-				latest_played = played_list[-1 * idx]
-				print(latest_played)
+				latest_played = played_list[(-1 * idx)]
+				print("lp: ", latest_played)
 				if latest_played is not None:
 					if latest_played["type"] == Code.REC_METHOD_VOICE_EXEC:
 						logging.info("scene_seq: {latest_played['scene_seq']} {scene_seq}")
@@ -151,7 +151,7 @@ class ExecuteCommand:
 						elif scene_seq >= 100:
 							if latest_played["scene_seq"] == scene_seq:
 								return False
-					break
+						break
 		if self.latest_scene_seq == scene_seq:
 			logging.info("same seq with old: {self.latest_scene_seq} {scene_seq}")
 			return False
