@@ -117,7 +117,7 @@ class ExecuteCommand:
 			for curr_audio_list in audio_list:
 				if curr_audio_list["type"] == Code.REC_METHOD_VOICE_EXEC:
 					if scene_seq < 100 and curr_audio_list["scene_seq"] == scene_seq:
-						logging.info(f"pass by audio_list: " + curr_audio_list["scene_seq"] + ", {scene_seq}")
+						logging.info(f"pass by audio_list: {curr_audio_list['scene_seq']}, {scene_seq}")
 						return False
 
 
@@ -141,7 +141,7 @@ class ExecuteCommand:
 				latest_played = played_list[-1 * idx]
 				if latest_played is not None:
 					if latest_played["type"] == Code.REC_METHOD_VOICE_EXEC:
-						logging.debug(f"scene_seq " + latest_played["scene_seq"] + " {scene_seq}")
+						logging.debug("scene_seq {latest_played['scene_seq']} {scene_seq}")
 						if scene_seq < 100:
 							if latest_played["scene_seq"] == scene_seq:
 								add_seq_idx = latest_played["seq_id"]
