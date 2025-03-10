@@ -181,7 +181,7 @@ class ExecuteCommand:
 		# 		return False
 
 		if scene_seq > 100:
-			self.audio_player.interrupt()
+			self.audio_player.reset_interrupt(resp_msg_id, Code.REC_METHOD_VOICE_EXEC, 1)
 			self.audio_player.clear_list()
 
 		li_voice = resp["data"]["actions"]["voice"]
@@ -257,7 +257,10 @@ class ExecuteCommand:
 
 				audio_data["continue"] = True # 设置标志位，打断以后，可以继续播放
 
-				self.audio_player.add(audio_data)
+				self.audio_player.resume_interrupted(None, 1)
+				interrupt = self.audio_player.get_interrupt()
+				if interrupt is None:
+					self.audio_player.add(audio_data)
 
 			self.latest_scene_seq = scene_seq
 

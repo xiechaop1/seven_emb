@@ -19,6 +19,7 @@ import threading
 from common.threading_event import ThreadingEvent
 from model.recv import Recv
 from common.code import Code
+from model.daemon import Daemon
 import asyncio
 
 
@@ -102,7 +103,9 @@ if __name__ == "__main__":
     recv_thread.start()
     # logging.info("Starting receive websocket data ...")
 
-
+    daemon_instance = Daemon(audio_instance, light_instance, spray_instance)
+    daemon_thread = threading.Thread(target=daemon_instance.deal)
+    daemon_thread.start()
     # 通过实例调用 create_websocket_client 方法
     # ws_cli = ws_instance.create_websocket_client(websocket_url)
 

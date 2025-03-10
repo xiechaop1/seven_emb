@@ -1,6 +1,7 @@
 import threading
 
 from base.messageid import messageid
+from common.code import Code
 import logging
 import base64
 
@@ -25,6 +26,8 @@ class VoiceChat:
 			return
 
 		if self.exec_lock.acquire():
+
+			self.audio_player.reset_interrupt(msg_id, Code.REC_METHOD_VOICE_CHAT, 2)
 
 			seq_li = resp["data"]["stream_seq"]
 			if seq_li == 1:
@@ -73,6 +76,7 @@ class VoiceChat:
 			if audio_data is not None:
 				# print("audio_data:", audio_data)
 				self.audio_player.add(audio_data)
+				self.audio_player.resume_interrupted(msg_id, 2)
 
 			self.exec_lock.release()
 

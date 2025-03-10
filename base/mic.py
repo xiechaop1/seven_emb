@@ -90,6 +90,7 @@ class Mic:
         self.keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
         self.target_keywords = ["播放音乐", "七七", "停止", "抬头","拍照","休息"]
         self.wakeup_keywords = '["七七", "七宝", "七夕", "休息", "嘻嘻"]'
+        # self.command_keywords = '["关机"]'
 
         self.device_name = "Yundea 1076"
         # device_name = "SP002Ua"
@@ -126,6 +127,7 @@ class Mic:
                         if self.wakeup(audio_data):
                             # self.wakeup()
                             ThreadingEvent.wakeup_event.set()
+                            # ThreadingEvent.sleep_daemon_event.set()
 
                             if Config.IS_DEBUG == False:
                                 #唤醒成功了点亮
@@ -178,6 +180,12 @@ class Mic:
             raise ValueError(f"找不到匹配的设备 '{self.device_name}'")
         print(f"使用设备: {device_index} - {self.device_name}")
         return device_index
+
+    # def command_check(self, indata, keywords = None):
+    #     model = Model(self.MODEL_PATH)
+    #     if keywords is None:
+    #         keywords = self.keywords
+    #     rec = KaldiRecognizer(model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
 
     def wakeup_check(self, indata):
         model = Model(self.MODEL_PATH)
@@ -245,6 +253,19 @@ class Mic:
 
                 # print("partial未检测到qibao关键词，xiaoqi_event.clear")
 
+    def audio_encode(self, data):
+        with wave.open(data, 'rb') as wf:
+            raw_bytes = wf.readframes(wf.getnframes())  # 读取所有帧
+            data16 = np.frombuffer(raw_bytes, dtype=np.int16)
+        data.seek(0)
+        return data16
+
+    def command(self, data):
+        data16 = self.audio_encode(data)
+        audio_data = data16.tobytes()
+
+        return
+
     def wakeup(self, data):
         # model = Model(self.MODEL_PATH)
         # spk_model = SpkModel(self.SPK_MODEL_PATH)
@@ -259,10 +280,7 @@ class Mic:
         #         pass
         # return
         # data16 = np.frombuffer(data.getvalue(), dtype=np.int16)
-        with wave.open(data, 'rb') as wf:
-            raw_bytes = wf.readframes(wf.getnframes())  # 读取所有帧
-            data16 = np.frombuffer(raw_bytes, dtype=np.int16)
-        data.seek(0)
+        data16 = self.audio_encode(data)
         #
         # print(len(data16))
         audio_data = data16.tobytes()

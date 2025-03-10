@@ -9,8 +9,10 @@ import random
 from base.messageid import messageid
 from common.scence import Scence
 from common.code import Code
+from common.common import Common
 from config.config import Config
 from datetime import datetime
+
 
 class AudioPlayer:
 
@@ -26,7 +28,10 @@ class AudioPlayer:
         self.current_bgm = None
         self.current_light = None
         self.current_spray = None
-        self.is_interrupted = 0
+
+        self.current_audio_method = None
+
+        self.is_interrupted = None
         self.played_list = []
         # self.playing_list = []
         self.spray = spray
@@ -50,7 +55,7 @@ class AudioPlayer:
                 time.sleep(0.5)
                 continue
 
-            ThreadingEvent.audio_play_event.clear()
+            # ThreadingEvent.audio_play_event.clear()
             self.play_audio(self.i)
 
             # while self.i < plCount:
@@ -110,7 +115,7 @@ class AudioPlayer:
             # }
             self.audio_list.append(audio_data)
 
-            self.resume_interrupted()
+            # self.resume_interrupted()
             # if self.is_interrupted == 1 and self.voice_channel.get_busy():
             #     logging.info("set interrupted for add after playing")
             #     self.is_interrupted = 2     # 播完以后再重置
@@ -133,7 +138,8 @@ class AudioPlayer:
     def play_audio(self, index):
         """从列表中播放指定索引的音频"""
         if 0 <= index < len(self.audio_list):
-            self.is_interrupted = 0
+            # self.is_interrupted = 0
+            # self.clear_interrupt()
             audio_data = self.audio_list[index]
             logging.info(f"Playing: {index} {audio_data}")
             msg_id = audio_data["msg_id"]
@@ -148,12 +154,14 @@ class AudioPlayer:
                 self.voice_channel.stop()  # 停止当前播放的音频
 
             # print("ad:",audio_data, self.audio_list)
+            self.set_current_audio_method(audio_data["type"])
             self.play(audio_data)
 
 
             if audio_data["type"] == Code.REC_METHOD_VOICE_CHAT:
-                # 这里需要改一下，后端返回的需要是-1才能知道是结束
                 if audio_data["seq_id"] == -1:
+
+                    self.resume_interrupted(msg_id, 2)
 
                     if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
                         time.sleep(5)
@@ -168,41 +176,60 @@ class AudioPlayer:
                             "msg_id": msg_id,
                             "seq_id": -1
                         }
-                        self.add(tmp_audio_data)
+                        # self.clear_list()
 
-                        logging.info("Sleep assistance event pass!")
-                        ThreadingEvent.camera_start_event.set()
-                        ThreadingEvent.recv_execute_command_event.set()
-                else:
-                    if self.is_interrupted == 0:
-                        print("voice: set play event bec of interrupt is 0")
-                        ThreadingEvent.audio_play_event.set()
+                        interrupt_flag = self.get_interrupt()
+                        if interrupt_flag is None:
+                            self.add(tmp_audio_data)
+
+                            logging.info("Sleep assistance event pass!")
+                            ThreadingEvent.camera_start_event.set()
+                            ThreadingEvent.recv_execute_command_event.set()
+                # else:
+                #     if self.is_interrupted == 0:
+                #         print("voice: set play event bec of interrupt is 0")
+                #         ThreadingEvent.audio_play_event.set()
 
             elif audio_data["type"] == Code.REC_METHOD_VOICE_EXEC:
                 if audio_data["scene_seq"] < 100:
                     if audio_data["scene_seq"] == audio_data["voice_count"] - 1:
                         ThreadingEvent.camera_start_event.set()
                         ThreadingEvent.recv_execute_command_event.set()
-                    else:
-                        if self.is_interrupted == 0:
-                            print("exec: set play event bec of interrupt is 0")
-                            ThreadingEvent.audio_play_event.set()
+                    # else:
+                    #     if self.is_interrupted == 0:
+                    #         print("exec: set play event because of interrupt is 0")
+                    #         ThreadingEvent.audio_play_event.set()
                 else:
                     ThreadingEvent.camera_start_event.set()
                     ThreadingEvent.recv_execute_command_event.set()
+
+                    if audio_data["scene_seq"] == audio_data["voice_count"] - 1:
+                        self.resume_interrupted(msg_id, 1)
+
+                    # 可能的bug，当正在播放坐起身，然后说话了，可能就没有打断，忽略了打断
+                    # 想办法解决
             # elif audio_data["type"] == Code.EXECUTE_COMMAND_TIP_VOICE:
             #     ThreadingEvent.camera_start_event.set()
             #     ThreadingEvent.recv_execute_command_event.set()
 
-            if self.is_interrupted == 0:
+            interrupt_flag = self.get_interrupt()
+            print("play audio interrupt flag:", interrupt_flag)
+            if interrupt_flag is None:
                 print("self.i add,", self.i)
                 # print(self.audio_list)
                 self.i = self.i + 1
+            else:
+                if interrupt_flag["msg_id"] == msg_id:
+                    print("self.i add by msg self,", self.i)
+                    # print(self.audio_list)
+                    self.i = self.i + 1
 
-            if self.is_interrupted == 2:
-                self.is_interrupted = 0     # 如果是2，播完以后重置
-                logging.info("set interrupt to 0 from 2")
-                ThreadingEvent.audio_play_event.set()
+                if interrupt_flag["type"] == 2:
+                    self.clear_interrupt()     # 如果是2，播完以后重置
+                    logging.info("set interrupt to 0 from 2")
+                    # ThreadingEvent.audio_play_event.set()
+
+            Common.set_latest_active_time(time.time())
 
             # if self.i < len(self.audio_list):
             #     print("audio play event bec of len")
@@ -210,6 +237,7 @@ class AudioPlayer:
 
         else:
             logging.error(f"Error: Invalid index. {index} {len(self.audio_list)}")
+            ThreadingEvent.audio_play_event.clear()
             # if len(self.audio_list) > 0:
                 # self.i = 0
                 # ThreadingEvent.audio_play_event.set()
@@ -221,7 +249,8 @@ class AudioPlayer:
         # pygame.mixer.music.load(audio_file)  # 加载音频文件
         # pygame.mixer.music.play()  # 播放音频
 
-        self.is_interrupted = 0
+        # self.is_interrupted = 0
+        # self.clear_interrupt()
         logging.info("play with data")
         self.play(audio_data)
 
@@ -308,7 +337,10 @@ class AudioPlayer:
             # pygame.time.wait(50)
         # ThreadingEvent.audio_play_event.clear()
         # print("played")
-        if self.is_interrupted != 1:
+        # if self.is_interrupted != 1:
+        interrupt_flag = self.get_interrupt()
+        print("play after interrupt flag:", interrupt_flag)
+        if interrupt_flag is None:
             if wait_time > 0:
                 # 如果不是被打断的，就需要等待一点时间
                 time.sleep(wait_time/10)
@@ -370,14 +402,41 @@ class AudioPlayer:
         self.resume_interrupted()
         return
 
-    def resume_interrupted(self):
-        if self.is_interrupted == 1 and self.voice_channel.get_busy() and self.current_track is not None:
-            logging.info("Resume interrupted after played")
-            self.is_interrupted = 2
+    def resume_interrupted(self, msg_id = None, level = 1):
+        interrupt_flag = self.get_interrupt()
+
+        if interrupt_flag is not None:
+            if interrupt_flag["level"] == level:
+                if self.voice_channel.get_busy() and self.current_track is not None:
+                    if msg_id is not None:
+                        if interrupt_flag["msg_id"] == msg_id:
+                            self.reset_interrupt(None, None, 0, 2)
+                    else:
+                        self.reset_interrupt(None, None, 0, 2)
+                else:
+                    if msg_id is not None:
+                        if interrupt_flag["msg_id"] == msg_id:
+                            self.clear_interrupt()
+                            ThreadingEvent.audio_play_event.set()
+                    else:
+                        self.clear_interrupt()
+                        ThreadingEvent.audio_play_event.set()
+
+
+
+            else:
+                print(f"Can't resume, {msg_id} - {interrupt_flag['msg_id']}, {level} - {interrupt_flag['level']}")
         else:
-            logging.info("Resume interrupted now")
-            self.is_interrupted = 0
             ThreadingEvent.audio_play_event.set()
+
+
+        # if self.is_interrupted == 1 and self.voice_channel.get_busy() and self.current_track is not None:
+        #     logging.info("Resume interrupted after played")
+        #     self.is_interrupted = 2
+        # else:
+        #     logging.info("Resume interrupted now")
+        #     self.is_interrupted = 0
+        #     ThreadingEvent.audio_play_event.set()
 
     def stop_audio(self):
         """停止当前播放的音频"""
@@ -401,7 +460,28 @@ class AudioPlayer:
             logging.warn("No audio is currently playing.")
         ThreadingEvent.audio_play_event.clear()
 
-    def interrupt(self):
+    def get_interrupt(self ):
+        return self.is_interrupted
+
+    def clear_interrupt(self):
+        self.is_interrupted = None
+
+    def reset_interrupt(self, msg_id = None, method = Code.REC_METHOD_VOICE_CHAT, level = 1, type = 1):
+        interrupt_flag = self.get_interrupt()
+        if interrupt_flag is None:
+            interrupt_flag = {}
+        if msg_id is not None:
+            interrupt_flag["msg_id"] = msg_id
+        if method is not None:
+            interrupt_flag["method"] = method
+        if level != 0:
+            interrupt_flag["level"] = level
+        if type != 0:
+            interrupt_flag["type"] = type
+
+        self.is_interrupted = interrupt_flag
+
+    def interrupt(self, msg_id = None, method = Code.REC_METHOD_VOICE_CHAT, level = 1, type = 1):
         playing_voice = self.get_current_track()
         if playing_voice is not None:
             #     print(playing_voice)
@@ -412,7 +492,12 @@ class AudioPlayer:
         # if self.voice_channel.get_busy():
         #     self.is_interrupted = 2
         # else:
-        self.is_interrupted = 1
+        self.is_interrupted = {
+            "method": method,
+            "level": level,
+            "type": type,
+            "msg_id": msg_id
+        }
         ThreadingEvent.audio_play_event.clear()
         logging.info("set interrupted")
 
@@ -425,6 +510,12 @@ class AudioPlayer:
         self.audio_list.clear()
         self.i = 0
         logging.info("Audio list cleared.")
+
+    def set_current_audio_method(self, method = Code.REC_METHOD_VOICE_CHAT):
+        self.current_audio_method = method
+
+    def get_current_audio_method(self):
+        return self.current_audio_method
 
     def set_play_index(self, idx):
         self.i = idx

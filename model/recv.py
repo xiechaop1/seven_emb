@@ -1,3 +1,4 @@
+from base.messageid import messageid
 from model.voice_chat import VoiceChat
 from model.execute_command import ExecuteCommand
 from websocket import WebSocketException, WebSocketConnectionClosedException
@@ -51,13 +52,17 @@ class Recv:
 
 			if resp is not None:
 				if resp["code"] == self.EMPTY_SOUND_CODE:
+					print("Received empty sound code")
+					self.audio_player.clear_interrupt()
 					self.audio_player.replay()
 					ThreadingEvent.recv_execute_command_event.set()
+					# messageid.cover_with_last(Code.REC_METHOD_VOICE_CHAT)
 					if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
 						ThreadingEvent.camera_start_event.set()
 					continue
 				else:
 					if resp["method"] == self.REC_METHOD_VOICE_CHAT:
+						messageid.confirm_message_id(resp["method"])
 						if Config.IS_DEBUG == False:
 							self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 255, "g": 255, "b": 255})
 
@@ -110,6 +115,7 @@ class Recv:
 							}
 							self.audio_player.clear_list()
 							self.audio_player.add(audio_data)
+							self.audio_player.resume_interrupted(None, 1)
 							last_resp = resp
 
 						# ec_handler.latest_scene_seq = 0
@@ -119,6 +125,7 @@ class Recv:
 							# vc_handler.deal(resp)
 						continue
 					elif resp["method"] == Code.REC_METHOD_VOICE_EXEC:
+						messageid.confirm_message_id(resp["method"])
 						# self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 0, "b": 128})
 						print("recv exec event:",ThreadingEvent.recv_execute_command_event.is_set(), resp["message_id"] )
 						if ThreadingEvent.recv_execute_command_event.is_set():
