@@ -261,6 +261,8 @@ class ExecuteCommand:
 				interrupt = self.audio_player.get_interrupt()
 				if interrupt is None:
 					self.audio_player.add(audio_data)
+				elif interrupt["level"] == 1:
+					self.audio_player.add(audio_data)
 
 			self.latest_scene_seq = scene_seq
 
