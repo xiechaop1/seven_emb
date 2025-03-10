@@ -403,6 +403,7 @@ class AudioPlayer:
         return
 
     def resume_interrupted(self, msg_id = None, level = 1):
+        print("resume interrupted")
         interrupt_flag = self.get_interrupt()
 
         if interrupt_flag is not None:

@@ -102,20 +102,24 @@ class Recv:
 								last_resp = None
 								continue
 
-							msg_id = resp["message_id"]
-							resp_conv_id = resp["conversation_id"]
+							# msg_id = resp["message_id"]
+							# resp_conv_id = resp["conversation_id"]
+							# output_file_name = "resources/sound/enter_sleep_mode.mp3"
+							# audio_data = {
+							# 	"filename": output_file_name,
+							# 	"msg_id": msg_id,
+							# 	"conversion_id": resp_conv_id,
+							# 	"type": Code.EXECUTE_COMMAND_TIP_VOICE,
+							# 	"wait_time": 0,
+							# 	"seq_id": -1
+							# }
+							# self.audio_player.clear_list()
+							# self.audio_player.add(audio_data)
+							# self.audio_player.resume_interrupted(None, 1)
+
 							output_file_name = "resources/sound/enter_sleep_mode.mp3"
-							audio_data = {
-								"filename": output_file_name,
-								"msg_id": msg_id,
-								"conversion_id": resp_conv_id,
-								"type": Code.EXECUTE_COMMAND_TIP_VOICE,
-								"wait_time": 0,
-								"seq_id": -1
-							}
-							self.audio_player.clear_list()
-							self.audio_player.add(audio_data)
-							self.audio_player.resume_interrupted(None, 1)
+							print("play enter_sleep_mode!")
+							self.audio_player.play_voice_with_file(output_file_name)
 							last_resp = resp
 
 						# ec_handler.latest_scene_seq = 0
