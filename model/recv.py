@@ -113,7 +113,7 @@ class Recv:
 							# 	"wait_time": 0,
 							# 	"seq_id": -1
 							# }
-							# self.audio_player.clear_list()
+							self.audio_player.clear_list()
 							# self.audio_player.add(audio_data)
 							# self.audio_player.resume_interrupted(None, 1)
 
