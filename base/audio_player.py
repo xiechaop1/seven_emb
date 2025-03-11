@@ -434,6 +434,7 @@ class AudioPlayer:
             else:
                 print(f"Can't resume, {msg_id} - {interrupt_flag['msg_id']}, {level} - {interrupt_flag['level']}")
         else:
+            logging.info(f"Resume interrupted with no interrupt")
             ThreadingEvent.audio_play_event.set()
 
 
