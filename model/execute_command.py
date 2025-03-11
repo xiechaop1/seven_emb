@@ -130,7 +130,7 @@ class ExecuteCommand:
 		if playing_data is not None:
 			if playing_data["type"] == Code.REC_METHOD_VOICE_EXEC:
 				latest_playing_scene_seq = playing_data["scene_seq"]
-				if playing_data["scene_seq"] < 100
+				if playing_data["scene_seq"] < 100:
 					add_seq_idx = playing_data["scene_seq"]
 				if latest_playing_scene_seq == scene_seq:
 					logging.info(f"add voice, pass by playing_data: {latest_playing_scene_seq}, {scene_seq}")
