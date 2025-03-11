@@ -130,7 +130,8 @@ class ExecuteCommand:
 		if playing_data is not None:
 			if playing_data["type"] == Code.REC_METHOD_VOICE_EXEC:
 				latest_playing_scene_seq = playing_data["scene_seq"]
-				add_seq_idx = playing_data["scene_seq"]
+				if playing_data["scene_seq"] < 100
+					add_seq_idx = playing_data["scene_seq"]
 				if latest_playing_scene_seq == scene_seq:
 					logging.info(f"add voice, pass by playing_data: {latest_playing_scene_seq}, {scene_seq}")
 					return False
@@ -227,7 +228,7 @@ class ExecuteCommand:
 				else:
 					seq_id = i
 
-				print("seq_id:", seq_id, add_seq_idx)
+				print("seq_id:", scene_seq, seq_id, add_seq_idx)
 
 				if scene_seq < 100 and seq_id < add_seq_idx and seq_id != -1:
 					continue
