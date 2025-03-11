@@ -102,6 +102,7 @@ class WebSocketClient:
                 logging.error(f"Failed to send message: {e}")
         else:
             logging.warning("WebSocket is not connected. Unable to send message.")
+            self.connect()
 
     def receive(self, timeout=None):
         """

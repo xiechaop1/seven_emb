@@ -48,6 +48,7 @@ class Daemon:
 
 		self.audio_player.stop_audio()
 		self.audio_player.stop_music()
+		self.audio_player.clear_list()
 		if Config.IS_DEBUG == False:
 			self.light.turn_off()
 			self.spray.stop()
