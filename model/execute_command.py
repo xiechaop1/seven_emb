@@ -258,7 +258,7 @@ class ExecuteCommand:
 
 				audio_data["continue"] = True # 设置标志位，打断以后，可以继续播放
 
-				self.audio_player.resume_interrupted(None, 1)
+				self.audio_player.resume_interrupted(resp_msg_id, 1)
 				interrupt = self.audio_player.get_interrupt()
 				if interrupt is None:
 					self.audio_player.add(audio_data)
