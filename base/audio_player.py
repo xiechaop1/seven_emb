@@ -412,16 +412,22 @@ class AudioPlayer:
                     if msg_id is not None:
                         if interrupt_flag["msg_id"] == msg_id:
                             self.reset_interrupt(None, None, 0, 2)
+                            logging.info(f"Resume interrupted after played: {msg_id}")
+                        else:
+                            logging.info(f"Can't resume interrupted after played: {msg_id}, {interrupt_flag['msg_id']}")
                     else:
                         self.reset_interrupt(None, None, 0, 2)
+                        logging.info(f"Resume interrupted after played: None")
                 else:
                     if msg_id is not None:
                         if interrupt_flag["msg_id"] == msg_id:
                             self.clear_interrupt()
                             ThreadingEvent.audio_play_event.set()
+                            logging.info(f"Resume interrupted immediately: {msg_id}")
                     else:
                         self.clear_interrupt()
                         ThreadingEvent.audio_play_event.set()
+                        logging.info(f"Resume interrupted immediately: None")
 
 
 
