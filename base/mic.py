@@ -369,7 +369,7 @@ class Mic:
 
         has_interrupt = False
         while self.is_recording:
-            if time.time() - start_time > 0.1 and has_interrupt == False:
+            if time.time() - start_time > 0.2 and has_interrupt == False:
                 self.audio_player.interrupt()
                 self.audio_player.stop_audio()
                 ThreadingEvent.recv_execute_command_event.clear()
@@ -392,7 +392,7 @@ class Mic:
                 # self.stop_recording()
 
             # audio_memory.write(indata.tobytes())
-        if time.time() - start_time > 0.1:
+        if time.time() - start_time > 0.2:
             self.audio_player.interrupt()
             self.audio_player.stop_audio()
             ThreadingEvent.recv_execute_command_event.clear()
@@ -481,7 +481,7 @@ class Mic:
             if self.slience_tag == True and self.silence_counter < 1:
                 return True
             # print("未检测到静音")
-            self.silence_tag = False
+            self.slience_tag = False
             return False
 
     def is_speech(self, data):
