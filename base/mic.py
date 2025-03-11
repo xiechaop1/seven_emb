@@ -470,7 +470,7 @@ class Mic:
         print("max, threshold, slic_counter, tag:",np.max(np.abs(audio_data)), self.threshold, self.silence_counter, self.slience_tag)
         if np.max(np.abs(audio_data)) < self.threshold:
             if self.silence_counter > 0:
-                self.slience_counter = 0
+                self.silence_counter = 0
             self.silence_counter = self.silence_counter - 1
             if self.slience_tag == False and self.silence_counter > -3:
                 return False
@@ -479,8 +479,8 @@ class Mic:
             self.silence_counter = 0
             return True
         else:
-            if self.slience_counter < 0:
-                self.slience_counter = 0
+            if self.silence_counter < 0:
+                self.silence_counter = 0
             self.silence_counter = self.silence_counter + 1
             if self.slience_tag == True and self.silence_counter < 1:
                 return True
