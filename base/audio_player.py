@@ -293,7 +293,6 @@ class AudioPlayer:
                         #     "g": g,
                         #     "b": b
                         # }
-
                         if light_mode != self.current_light:
                             # if light_mode == Code.LIGHT_MODE_STATIC:
                             self.light.start_with_code(light_mode, light_rgb)
@@ -547,6 +546,9 @@ class AudioPlayer:
 
     def get_current_track(self):
         return self.current_track
+
+    def set_current_light(self, mode):
+        self.current_light = mode
 
     # def get_latest_playing(self):
     #     if len(self.played_list) == 0:

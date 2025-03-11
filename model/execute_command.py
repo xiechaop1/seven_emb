@@ -227,6 +227,8 @@ class ExecuteCommand:
 				else:
 					seq_id = i
 
+				print("seq_id:", seq_id, add_seq_idx)
+
 				if seq_id < add_seq_idx and seq_id != -1:
 					continue
 				# li_audio_base64 = li_voices_list[i]["audio_data"]
@@ -262,6 +264,7 @@ class ExecuteCommand:
 
 				self.audio_player.resume_interrupted(resp_msg_id, 1)
 				interrupt = self.audio_player.get_interrupt()
+				print(interrupt)
 				if interrupt is None:
 					self.audio_player.add(audio_data)
 				elif interrupt["level"] == 1:
