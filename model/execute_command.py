@@ -105,7 +105,7 @@ class ExecuteCommand:
 		print("resp_msg_id:", resp_msg_id)
 		if voice_msg_id > resp_msg_id:
 			# print("voice_msg_id, resp_msg_id:", voice_msg_id, resp_msg_id)
-			logging.warn(f"Pass the old req, voice_msg_id: {voice_msg_id} > resp_msg_id: {resp_msg_id}")
+			logging.warn(f"add voice, Pass the old req, voice_msg_id: {voice_msg_id} > resp_msg_id: {resp_msg_id}")
 			return
 
 
@@ -121,7 +121,7 @@ class ExecuteCommand:
 			for curr_audio_list in audio_list:
 				if curr_audio_list["type"] == Code.REC_METHOD_VOICE_EXEC:
 					if scene_seq < 100 and curr_audio_list["scene_seq"] == scene_seq:
-						logging.info(f"pass by audio_list: {curr_audio_list['scene_seq']}, {scene_seq}")
+						logging.info(f"add voice, pass by audio_list: {curr_audio_list['scene_seq']}, {scene_seq}")
 						return False
 
 
@@ -130,11 +130,12 @@ class ExecuteCommand:
 		if playing_data is not None:
 			if playing_data["type"] == Code.REC_METHOD_VOICE_EXEC:
 				latest_playing_scene_seq = playing_data["scene_seq"]
+				add_seq_idx = playing_data["scene_seq"]
 				if latest_playing_scene_seq == scene_seq:
-					logging.info(f"pass by playing_data: {latest_playing_scene_seq}, {scene_seq}")
+					logging.info(f"add voice, pass by playing_data: {latest_playing_scene_seq}, {scene_seq}")
 					return False
 			elif playing_data["type"] == Code.REC_METHOD_VOICE_CHAT:
-				logging.info(f"pass by wrong type: {playing_data['type']}, {scene_seq}")
+				logging.info(f"add voice, pass by wrong type: {playing_data['type']}, {scene_seq}")
 				return False
 
 		# 过滤已经播放的列表，从后面往前找，找到最后一条Execute-Command的，如果场景一致，则找到最后一个声频的index，记录下来
@@ -147,10 +148,11 @@ class ExecuteCommand:
 				latest_played = played_list[(-1 * idx)]
 				if latest_played is not None:
 					if latest_played["type"] == Code.REC_METHOD_VOICE_EXEC:
-						logging.info(f"scene_seq: {latest_played['scene_seq']} {scene_seq}")
+						logging.info(f"add voice, scene_seq: {latest_played['scene_seq']} {scene_seq}")
 						if scene_seq < 100:
 							if latest_played["scene_seq"] == scene_seq:
-								add_seq_idx = latest_played["seq_id"]
+								if add_seq_idx == 0:
+									add_seq_idx = latest_played["seq_id"]
 							elif latest_played["scene_seq"] > scene_seq:
 								return False
 						elif scene_seq >= 100:

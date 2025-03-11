@@ -467,7 +467,7 @@ class Mic:
         audio_data = np.frombuffer(data, dtype=np.int16)
         # print("li_audio_data:",audio_data)
         # 检查最大值是否低于阈值
-        # print("max, threshold, slic_counter, tag:",np.max(np.abs(audio_data)), self.threshold, self.silence_counter, self.slience_tag)
+        print("max, threshold, slic_counter, tag:",np.max(np.abs(audio_data)), self.threshold, self.silence_counter, self.slience_tag)
         if np.max(np.abs(audio_data)) < self.threshold:
             self.silence_counter = self.silence_counter - 1
             if self.slience_tag == False and self.silence_counter > -3:

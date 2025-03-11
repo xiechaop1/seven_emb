@@ -157,7 +157,6 @@ class AudioPlayer:
             self.set_current_audio_method(audio_data["type"])
             self.play(audio_data)
 
-
             if audio_data["type"] == Code.REC_METHOD_VOICE_CHAT:
                 if audio_data["seq_id"] == -1:
 
@@ -333,7 +332,7 @@ class AudioPlayer:
         # ThreadingEvent.audio_play_event.set()
         # pygame.mixer.music.play()  # 播放音频
         while self.voice_channel.get_busy():
-            time.sleep(0.5)
+            time.sleep(0.05)
             # pygame.time.wait(50)
         # ThreadingEvent.audio_play_event.clear()
         # print("played")
@@ -403,7 +402,7 @@ class AudioPlayer:
         return
 
     def resume_interrupted(self, msg_id = None, level = 1):
-        print("resume interrupted")
+        # print("resume interrupted")
         interrupt_flag = self.get_interrupt()
 
         if interrupt_flag is not None:
