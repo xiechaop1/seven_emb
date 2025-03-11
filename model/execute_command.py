@@ -102,7 +102,7 @@ class ExecuteCommand:
 		scene_seq = resp["data"]["scene_seq"]
 
 		voice_msg_id = messageid.get_latest_message_id()
-		# print("resp_msg_id:", resp_msg_id)
+		print("resp_msg_id:", resp_msg_id)
 		if voice_msg_id > resp_msg_id:
 			# print("voice_msg_id, resp_msg_id:", voice_msg_id, resp_msg_id)
 			logging.warn(f"Pass the old req, voice_msg_id: {voice_msg_id} > resp_msg_id: {resp_msg_id}")

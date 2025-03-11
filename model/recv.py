@@ -134,6 +134,7 @@ class Recv:
 						print("recv exec event:",ThreadingEvent.recv_execute_command_event.is_set(), resp["message_id"] )
 						if ThreadingEvent.recv_execute_command_event.is_set():
 							# print("recv event2:", ThreadingEvent.recv_execute_command_event)
+							print("pre resp for exec", resp["message_id"])
 							ec_thread = threading.Thread(target=ec_handler.deal, args=(resp,))
 							ec_thread.start()
 							# ec_handler.deal(resp)
