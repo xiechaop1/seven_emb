@@ -341,7 +341,7 @@ class AudioPlayer:
         if interrupt_flag is None:
             if wait_time > 0:
                 # 如果不是被打断的，就需要等待一点时间
-                time.sleep(wait_time/10)
+                time.sleep(wait_time)
 
             logging.info(f"Played: {audio_file}")
             self.played_list.append(audio_data)

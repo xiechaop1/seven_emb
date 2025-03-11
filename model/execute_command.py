@@ -242,6 +242,9 @@ class ExecuteCommand:
 				# print("li_wait_time:", li_wait_time)
 				if li_wait_time is None:
 					li_wait_time = 1
+				if scene_seq > 100:
+					# 临时写入，如果是异常动作，播放完语音，停留3s
+					li_wait_time = 3
 				li_audio_text = li_voices_list[i]["text"]
 				print("li_audio_text:", li_audio_text)
 				li_filename = li_voices_list[i]["filename"]
