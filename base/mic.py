@@ -42,7 +42,7 @@ class Mic:
     SAMPLE_RATE = 16000  # 采样率
     CHANNELS = 1  # 单声道
 
-    SILENCE_THRESHOLD = 1000  # 静音阈值
+    SILENCE_THRESHOLD = 1200  # 静音阈值
     SILENCE_FRAMES = 10  # 静音帧数量阈值
     PRE_RECORD_FRAMES = 1  # 预录制帧数
     # 定义队列和缓冲区
