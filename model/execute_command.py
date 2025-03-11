@@ -229,7 +229,7 @@ class ExecuteCommand:
 
 				print("seq_id:", seq_id, add_seq_idx)
 
-				if seq_id < add_seq_idx and seq_id != -1:
+				if scene_seq < 100 and seq_id < add_seq_idx and seq_id != -1:
 					continue
 				# li_audio_base64 = li_voices_list[i]["audio_data"]
 				li_audio_fomat = li_voices_list[i]["audio_format"]
