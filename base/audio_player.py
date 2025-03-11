@@ -13,7 +13,6 @@ from common.common import Common
 from config.config import Config
 from datetime import datetime
 
-
 class AudioPlayer:
 
     PATH = "/tmp/"
@@ -160,30 +159,31 @@ class AudioPlayer:
             if audio_data["type"] == Code.REC_METHOD_VOICE_CHAT:
                 if audio_data["seq_id"] == -1:
 
-                    self.resume_interrupted(msg_id, 2)
+                    # self.resume_interrupted(msg_id, 2)
 
                     if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
                         time.sleep(5)
-                        resume_rand_idx = random.randint(1, 6)
-                        resume_audio_filename = f"resources/sound/flow_resume_0{resume_rand_idx}.mp3"
-                        # self.play_voice_with_file(resume_audio_filename)
-
-                        tmp_audio_data = {
-                            "filename": resume_audio_filename,
-                            "type": Code.EXECUTE_COMMAND_TIP_VOICE,
-                            "wait_time": 0,
-                            "msg_id": msg_id,
-                            "seq_id": -1
-                        }
-                        # self.clear_list()
-
                         interrupt_flag = self.get_interrupt()
                         if interrupt_flag is None:
+                            resume_rand_idx = random.randint(1, 6)
+                            resume_audio_filename = f"resources/sound/flow_resume_0{resume_rand_idx}.mp3"
+                        # self.play_voice_with_file(resume_audio_filename)
+
+                            tmp_audio_data = {
+                                "filename": resume_audio_filename,
+                                "type": Code.EXECUTE_COMMAND_TIP_VOICE,
+                                "wait_time": 0,
+                                "msg_id": msg_id,
+                                "seq_id": -1
+                            }
+                            # self.clear_list()
+
                             self.add(tmp_audio_data)
 
                             logging.info("Sleep assistance event pass!")
                             ThreadingEvent.camera_start_event.set()
                             ThreadingEvent.recv_execute_command_event.set()
+                    # self.resume_interrupted(msg_id, 2)
                 # else:
                 #     if self.is_interrupted == 0:
                 #         print("voice: set play event bec of interrupt is 0")
@@ -227,8 +227,6 @@ class AudioPlayer:
                     self.clear_interrupt()     # 如果是2，播完以后重置
                     logging.info("set interrupt to 0 from 2")
                     # ThreadingEvent.audio_play_event.set()
-
-            Common.set_latest_active_time(time.time())
 
             # if self.i < len(self.audio_list):
             #     print("audio play event bec of len")
@@ -325,6 +323,7 @@ class AudioPlayer:
 
         # self.playing_list.append(audio_data)
         # print("play")
+        Common.set_latest_active_time(time.time())
         self.voice_channel.play(voice)
 
         # pygame.mixer.music.load(audio_file)  # 加载音频文件

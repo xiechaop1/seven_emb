@@ -11,7 +11,7 @@ import time
 
 class Daemon:
 
-	TURN_OFF_DURATION = 60   # (s)
+	TURN_OFF_DURATION = 600   # (s)
 
 	def __init__(self, audio_ins, light_ins, spray_ins):
 		self.light = light_ins
