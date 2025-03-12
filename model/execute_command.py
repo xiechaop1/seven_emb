@@ -219,12 +219,14 @@ class ExecuteCommand:
 		if li_voice is not None:
 			# print("li_voice:", li_voice)
 
-			print("lock: ", self.voice_add_lock.locked())
 
-			if scene_seq < 100:
-				if not self.voice_add_lock.acquire():
-					logging.warn("Duplicate Voice Add", resp_msg_id)
-					return
+			if scene_seq > 100:
+				if self.voice_add_lock.locked():
+					self.voice_add_lock.release()
+
+			if not self.voice_add_lock.acquire():
+				logging.warn("Duplicate Voice Add", resp_msg_id)
+				return
 
 			print("lock: ", self.voice_add_lock.locked())
 
