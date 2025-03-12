@@ -67,7 +67,7 @@ class Mic:
         self.sample_rate = sample_rate
         self.frame_duration = frame_duration
         self.p = pyaudio.PyAudio()
-        self.vad = webrtcvad.Vad(2)  # VAD模式设置，0为最宽松，3为最严格
+        self.vad = webrtcvad.Vad(0)  # VAD模式设置，0为最宽松，3为最严格
         self.stream = None
         self.frames = []
         self.is_recording = False
