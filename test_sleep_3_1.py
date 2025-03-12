@@ -89,14 +89,51 @@ old_message_id=0
 last_message_id=0
 continue_shot_and_record=False
 
-sleep_voice_list=[["PREPARE_0e4469908950edf80d00d50388e22b72.mp3","PREPARE_fb554feefb09a53a8bb55c6320e7cdb1.mp3","PREPARE_b28c329834ff637ff3a73c5e01bd7d52.mp3","PREPARE_2e60034d42489d4b7b411366b9295356.mp3"],
-                  ["POSTURE_b929bab873c406f9fcecc3abdd324ec1.mp3","POSTURE_c08908db7c842e01fbd8f965dfa85d89.mp3","POSTURE_06d311023745d1a866490c0d0ce42f44.mp3","POSTURE_080ed47b54f21a0b6709de6484d1dc1e.mp3","POSTURE_e444af1a781082ba399ff9eaebb507eb.mp3"],
-                  ["BREATHING_a291d037d81ddc94e0fc33bcf729dea9.mp3","BREATHING_4dc3129193b03d217cddf651ba366fe6.mp3","BREATHING_a7c0c188a373ea0a69c1f46f17eaeb31.mp3","BREATHING_36c798c145115acc2b01ca8339fa4981.mp3","BREATHING_9685385b968f6512da7ee169fe861b9c.mp3","BREATHING_7663c2e11fd2cc1179d6850a99db75aa.mp3","BREATHING_d460b7c6cb07b406dcdbde371afca1bc.mp3","BREATHING_bb6957ab273cbdf11a4aae3244e3f5cc.mp3","BREATHING_7941fd6f49d176f0dd2ee7bb0a93afcd.mp3","BREATHING_bd7ce9ce5e10201cdfe0b9bd4f634a5e.mp3","BREATHING_b361ddc8c2ca77b5493c7469c6e9b3d6.mp3",
-                   "BREATHING_9dce53484234ed669c45bcd4edb04d22.mp3","BREATHING_5049ad4ccc4a737f2361b13a47090613.mp3","BREATHING_6e8fe98a2b2102f12ced5ea46aea85af.mp3","BREATHING_e55fb3e213cba1408e0ef40c547ae640.mp3","BREATHING_4cb6818bd595b5516cc6e7b4757809cd.mp3","BREATHING_b270ed55b5b4dc2123ec0797ef450cb5.mp3","BREATHING_91003bd2e4ec5844b6c9f5d1c5da573f.mp3","BREATHING_7585a88baebd17e29d5c36a74a2f2bd8.mp3"],
-                  ["RELAX_1_f493e41a829211386884d7e1ae27abdf.mp3","RELAX_1_1c8f90b4f914a54f9e8b0ce67fc0952b.mp3","RELAX_1_274cce17599bfbe6d9a887aa46cbe2b8.mp3","RELAX_1_c49ec684c3c07d6a15f0f234bb0b0251.mp3","RELAX_1_225bebee5a4a2dfa4ed8cb756f13f99e.mp3","RELAX_1_55e1498701aa227d2fd8d5ac46ef5d2d.mp3","RELAX_1_ad1e671152487bb40daede8cc38eaf9a.mp3","RELAX_1_11e6a3fa3caa2c265564202c09a2164f.mp3","RELAX_1_0e56b97ebb717c43c9edbbd4a876742e.mp3","RELAX_1_3b2a13dc2c6f2ecbf02a52b8adaf1908.mp3","RELAX_1_1230b134033f975c74a4c63d45ea6d12.mp3"],
-                  ["RELAX_2_06728bad68a989b8f735dac2b86102c0.mp3","RELAX_2_02971319602ea73cb3309270c2ca5be3.mp3"],
-                  ["SLEEP_READY_af5dbd5a079133dd483b998db2ea2c73.mp3","SLEEP_READY_88a2a7c12cb7637af4df21ff704ee849.mp3"],
-                  ]
+import json
+
+def extract_voice_filenames(file_path):
+    # 读取 JSON 文件
+    with open(file_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    # 初始化存储文件名的二维数组
+    sleep_voice_list = []
+
+    # 遍历 JSON 数据并提取 filenames
+    for key, value in data.items():
+        # 排除序号大于 400 的键
+        if key.isdigit() and int(key) > 100:
+            continue
+
+        # 检查 voice 字段是否存在且不为 None
+        if "voice" in value and value["voice"] is not None:
+            # 为每个 key 创建一个新的子列表
+            voice_filenames = []
+            # 遍历 voice 中的声音列表
+            for voice in value["voice"]["voices"]:
+                if "filename" in voice:
+                    voice_filenames.append(voice["filename"])  # 将文件名添加到子列表中
+            # 如果子列表非空，则将该子列表添加到二维数组中
+            if voice_filenames:
+                sleep_voice_list.append(voice_filenames)
+
+    return sleep_voice_list
+
+file_path = '/home/li/vosk-api/python/example/sleep_config.json'
+sleep_voice_list = extract_voice_filenames(file_path)
+print(sleep_voice_list)
+
+
+
+# sleep_voice_list=[["PREPARE_0e4469908950edf80d00d50388e22b72.mp3","PREPARE_fb554feefb09a53a8bb55c6320e7cdb1.mp3","PREPARE_b28c329834ff637ff3a73c5e01bd7d52.mp3","PREPARE_2e60034d42489d4b7b411366b9295356.mp3"],
+#                   ["POSTURE_b929bab873c406f9fcecc3abdd324ec1.mp3","POSTURE_c08908db7c842e01fbd8f965dfa85d89.mp3","POSTURE_06d311023745d1a866490c0d0ce42f44.mp3","POSTURE_080ed47b54f21a0b6709de6484d1dc1e.mp3","POSTURE_e444af1a781082ba399ff9eaebb507eb.mp3"],
+#                   ["BREATHING_a291d037d81ddc94e0fc33bcf729dea9.mp3","BREATHING_4dc3129193b03d217cddf651ba366fe6.mp3","BREATHING_a7c0c188a373ea0a69c1f46f17eaeb31.mp3","BREATHING_36c798c145115acc2b01ca8339fa4981.mp3","BREATHING_9685385b968f6512da7ee169fe861b9c.mp3","BREATHING_7663c2e11fd2cc1179d6850a99db75aa.mp3","BREATHING_d460b7c6cb07b406dcdbde371afca1bc.mp3","BREATHING_bb6957ab273cbdf11a4aae3244e3f5cc.mp3","BREATHING_7941fd6f49d176f0dd2ee7bb0a93afcd.mp3","BREATHING_bd7ce9ce5e10201cdfe0b9bd4f634a5e.mp3","BREATHING_b361ddc8c2ca77b5493c7469c6e9b3d6.mp3",
+#                    "BREATHING_9dce53484234ed669c45bcd4edb04d22.mp3","BREATHING_5049ad4ccc4a737f2361b13a47090613.mp3","BREATHING_a061599b298b1c1b9ec843adfcd603a9.mp3","BREATHING_e55fb3e213cba1408e0ef40c547ae640.mp3","BREATHING_4cb6818bd595b5516cc6e7b4757809cd.mp3","BREATHING_b270ed55b5b4dc2123ec0797ef450cb5.mp3","BREATHING_91003bd2e4ec5844b6c9f5d1c5da573f.mp3","BREATHING_7585a88baebd17e29d5c36a74a2f2bd8.mp3"],
+#                   ["RELAX_1_f493e41a829211386884d7e1ae27abdf.mp3","RELAX_1_1c8f90b4f914a54f9e8b0ce67fc0952b.mp3","RELAX_1_274cce17599bfbe6d9a887aa46cbe2b8.mp3","RELAX_1_c49ec684c3c07d6a15f0f234bb0b0251.mp3","RELAX_1_225bebee5a4a2dfa4ed8cb756f13f99e.mp3","RELAX_1_55e1498701aa227d2fd8d5ac46ef5d2d.mp3","RELAX_1_ad1e671152487bb40daede8cc38eaf9a.mp3","RELAX_1_11e6a3fa3caa2c265564202c09a2164f.mp3","RELAX_1_0e56b97ebb717c43c9edbbd4a876742e.mp3","RELAX_1_3b2a13dc2c6f2ecbf02a52b8adaf1908.mp3","RELAX_1_1230b134033f975c74a4c63d45ea6d12.mp3"],
+#                   ["RELAX_2_3ba13deebbfaeb5a4cf04c82754a40b6.mp3","RELAX_2_bfd4eca8e39de89c7265bf8e6d55730a.mp3","RELAX_2_e5ea75249220a27add48c06b54260940.mp3"],
+#                   ["RELAX_3_a6021cb1d737ff2d7a8a43485997da19.mp3","RELAX_3_f8dab332854a5e654df5542257de64ca.mp3","RELAX_3_ada2322282a890d2c98ac9f3bec8f77b.mp3","RELAX_3_c2975e4744a580e949bf3d58d31a06aa.mp3","RELAX_3_5a0ffc0586ffa94a735acc4b842dcdf6.mp3","RELAX_3_bd084a1ab9b2fd71be2a5250f39742ca.mp3","RELAX_3_65de72dc4f3b72a8baae9935ca089b90.mp3","RELAX_3_81f64bc10409fecbc98e46ba0ccfa7d4.mp3","RELAX_3_d6bb357ca57fb66f77ba10f51690cefb.mp3","RELAX_3_60c0a661673bfd0c4e0a94106e78c56d.mp3","RELAX_3_4339bd12983b2e8c50cf86f348d888eb.mp3","RELAX_3_88b5c239c20894e2ce33cb31566d5643.mp3","RELAX_3_07b6df2e119f0584ebc8ae38a9e5f16c.mp3","RELAX_3_26a9ea20bae6fa79521c83b6116def97.mp3","RELAX_3_de3bd6c4258adee1912bf4ed60a662b1.mp3","RELAX_3_69276b9c68a77c243fd3bff2eb99fbbd.mp3","RELAX_3_006176f6070953796c98b1a862995111.mp3","RELAX_3_963836fb12b5400e3cb1d3c1ac8efa14.mp3","RELAX_3_d2f94f3596a4035cf01cdfff30bc6c4c.mp3","RELAX_3_5b466122e879a47e3ffa07042f53e98f.mp3","RELAX_3_d1a364faaa79227542cf752bfec9b81d.mp3","RELAX_3_7f3784c850518b5520e1a9b978a87dc4.mp3","RELAX_3_8b1d4e6b680ae027d5f4adfecdbf3f6b.mp3","RELAX_3_08755d2a66c8210580e9b4410db4db6d.mp3","RELAX_3_e06ced3dd1c0481826bce1476bf3ed13.mp3","RELAX_3_b9c4c656d09aff1e6c01a4063859dcf9.mp3",],
+#                   []
+#                   ]
 
 # PID 控制器类
 class PIDController:
@@ -335,7 +372,7 @@ def face_detection_run1():
     top = 0.0
     right = 0.0
     down = 0.0
-    print("face_detection_switch:",face_detection_switch)
+    # print("face_detection_switch:",face_detection_switch)
     # under_score_count=0
     # local_image_path="/home/li/vosk-api/python/example/guan1.jpg"
     max_photo=0
@@ -350,8 +387,8 @@ def face_detection_run1():
         # Grab a single frame of video
         success, img = video_capture.read()
         orin_img=img
-        print("!!!continue_shot_and_record:",continue_shot_and_record)
-        print("!!!count:",count)
+        # print("!!!continue_shot_and_record:",continue_shot_and_record)
+        # print("!!!count:",count)
 
         if paizhao_voice_command:
             photo_filename = f"/home/li/vosk-api/python/example/shot_and_recording/captured_image_{int(tt2)}.jpg"
@@ -363,7 +400,7 @@ def face_detection_run1():
                 photo_base64 = base64.b64encode(buffer).decode('utf-8')
                 time.sleep(0.1)
                 generate_photo_base64 = True
-                print("send_generate_photo_base64:", generate_photo_base64)
+                # print("send_generate_photo_base64:", generate_photo_base64)
                 # send_photo_request(photo_base64)
                 send_photo_thread = threading.Thread(target=send_photo_request, args=(photo_base64,))
                 send_photo_thread.start()
@@ -372,7 +409,7 @@ def face_detection_run1():
                 # print(f"!!!!!!找到音频设备: {device}")
                 with threading.Lock():
                     subprocess.run(
-                        ["aplay", "-D", "plughw:1,0", "-f", "S16_LE", "-r", "16000", "-c", "1", take_photo_file])
+                        ["aplay", "-D", "plughw:3,0", "-f", "S16_LE", "-r", "16000", "-c", "1", take_photo_file])
                 # send_photo_thread.join()
         paizhao_voice_command = False
 
@@ -381,8 +418,8 @@ def face_detection_run1():
             if count==1:
                 max_photo=1
             elif count>1:
-                max_photo = 2
-            print("shot!")
+                max_photo = 3
+            # print("shot!")
             photo_filename = f"/home/li/vosk-api/python/example/shot_and_recording/continued_image_{int(tt2)}.jpg"
             cv2.imwrite(photo_filename, img)
             # 使用cv2.imencode将图像转换为JPEG格式的字节流
@@ -445,7 +482,7 @@ def face_detection_run1():
 
                 # with threading.Lock():
                 #     subprocess.run(
-                #         ["aplay", "-D", "plughw:3,0", "-f", "S16_LE", "-r", "16000", "-c", "1", qibaozaine_file])
+                #         ["aplay", "-D", "plughw:1,0", "-f", "S16_LE", "-r", "16000", "-c", "1", qibaozaine_file])
                 # send_photo_request(photo_base64)
                 # if len(photo_base64_list) >= 4:
                 #     print("Sending 4 photos...")
@@ -455,7 +492,7 @@ def face_detection_run1():
                 #     photo_base64_list = []
                 # with threading.Lock():
                 #     subprocess.run(
-                #         ["aplay", "-D", "plughw:4,0", "-f", "S16_LE", "-r", "16000", "-c", "1", take_photo_file])
+                #         ["aplay", "-D", "plughw:1,0", "-f", "S16_LE", "-r", "16000", "-c", "1", take_photo_file])
                 # send_photo_thread.join()
 
         # paizhao_voice_command=False
@@ -547,7 +584,7 @@ def face_detection_run1():
         # error_y = (position[0] - 110)
         error_x = (position[0] - 244)
         error_y = (position[1] - 122-35)
-        print("under_score_count2:",under_score_count)
+        # print("under_score_count2:",under_score_count)
         if under_score_count>5:
             error_x=0
             error_y=0
@@ -570,52 +607,52 @@ def face_detection_run1():
         # center_y_max = 455
         if center_x_min <= x <= center_x_max and center_y_min <= y <= center_y_max:
             # 中心区域
-            print("Center-Center")
+            # print("Center-Center")
             flag_break = True
             flag_break2 = True
             speed_control(0, 0, 0)
         elif x < center_x_min and center_y_min <= y <= center_y_max:
             # 左边 & 垂直中心
-            print("Left-Center")
+            # print("Left-Center")
             flag_break2 = True
             speed_control(1.4 * abs(int(speed_h)), 0, 20)
 
         elif x > center_x_max and center_y_min <= y <= center_y_max:
             # 右边 & 垂直中心
-            print("Right-Center")
+            # print("Right-Center")
             flag_break2 = True
             speed_control(-1.4 * abs(int(speed_h)), 0, 20)
 
         elif center_x_min <= x <= center_x_max and y < center_y_min:
             # 水平中心 & 上
-            print("Center-Up")
+            # print("Center-Up")
             flag_break = True
             speed_control(0, -abs(int(speed_v * 1.2)), 20)
 
         elif center_x_min <= x <= center_x_max and y > center_y_max:
             # 水平中心 & 下
-            print("Center-Down")
+            # print("Center-Down")
             flag_break = True
             speed_control(0, abs(int(speed_v * 1.2)), 20)
         #
         elif x < center_x_min and y < center_y_min:
             # 左边 & 上
-            print("Left-Up")
+            # print("Left-Up")
             speed_control(1.4 * abs(int(speed_h)), -abs(int(speed_v * 1.2)), 20)
 
         elif x < center_x_min and y > center_y_max:
             # 左边 & 下
-            print("Left-Down")
+            # print("Left-Down")
             speed_control(1.4 * abs(int(speed_h)), abs(int(speed_v * 1.2)), 20)
 
         elif x > center_x_max and y < center_y_min:
             # 右边 & 上
-            print("Right-Up")
+            # print("Right-Up")
             speed_control(-1.4 * abs(int(speed_h)), -abs(int(speed_v * 1.2)), 20)
 
         elif x > center_x_max and y > center_y_max:
             # 右边 & 下
-            print("Right-Down")
+            # print("Right-Down")
             speed_control(-1.4 * abs(int(speed_h)), abs(int(speed_v * 1.2)), 20)
         else:
             print("Something else")
@@ -624,7 +661,7 @@ def face_detection_run1():
         d_t1 = t1 - t0
         last_x=x
         last_y=y
-        print("!!!last_x,last_y:", last_x, last_y)
+        # print("!!!last_x,last_y:", last_x, last_y)
         # print("d_t1:", d_t1)
         # print("d_t2:", d_t2)
         # cv2.imshow('Video', img)
@@ -633,7 +670,7 @@ def face_detection_run1():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     # Release handle to the webcam
-    print("break from face_detection_run1!")
+    # print("break from face_detection_run1!")
     video_capture.release()
     cv2.destroyAllWindows()
 
@@ -750,7 +787,7 @@ import subprocess
 import pypinyin
 ###########drawing code
 
-print("AAA")
+# print("AAA")
 
 websocket_url = "ws://114.55.90.104:9001/ws"
 # ws=None
@@ -845,9 +882,9 @@ thread_control_event.set()  # 初始状态为允许线程运行
 audio_thread_control_event = threading.Event()
 audio_thread_control_event.set()  # 初始状态为允许线程运行
 start_threads_control = threading.Event()  # 用于控制 start_threads 线程的启动和关闭
-print("CCC")
+# print("CCC")
 
-print("DDD")
+# print("DDD")
 xiaoqi_event=Event()
 recording_event=Event()
 output_file_stack=[]
@@ -1124,7 +1161,7 @@ BUFFER_DURATION = 300  # mss
 SAMPLE_RATE = 16000  # 采样率
 CHANNELS = 1  # 单声道
 
-SILENCE_THRESHOLD = 800  # 静音阈值
+SILENCE_THRESHOLD = 180  # 静音阈值
 SILENCE_FRAMES = 10  # 静音帧数量阈值
 PRE_RECORD_FRAMES = 1  # 预录制帧数
 # 定义队列和缓冲区
@@ -1151,7 +1188,7 @@ output_file_name = None
 audio_file_stack_length=0
 data_id1=0
 
-print("EEE")
+# print("EEE")
 def callback10(indata, frames, time1, status):
     global message_id
     audio_data_dic = (bytes(indata), message_id)
@@ -1226,8 +1263,14 @@ def get_message_id() -> str:
 
 ####时间戳生成
 def get_rfc3339_with_timezone():
-    tz = pytz.timezone('Asia/Shanghai')
-    return datetime.now(tz).isoformat()
+    # tz = pytz.timezone('Asia/Shanghai')
+    now2 = datetime.now()
+
+    # print("timezone_before:",now2.strftime("%Y-%m-%d %H:%M:%S"))
+    t2=datetime.now().isoformat()
+    now2 = datetime.now()
+    # print("timezone_after:",now2.strftime("%Y-%m-%d %H:%M:%S"))
+    return t2
 
 last_t1=0
 t1=0
@@ -1283,25 +1326,33 @@ def send_photo_request(photo_base64_list):
             print(f"Unexpected error: {e}")
             print(f"Retrying2 in {retry_interval} seconds...")
             time.sleep(retry_interval)
-
+last_send_time = 0
+send_interval = 1
 def continue_send_photo():
     global flag_error, audio_file_stack_length, paizhao_voice_command, \
         generate_photo_base64, nihao_detected, xiaoqi_detected, result_detected, \
         hello_detected, file_counter, message_id, resp_code_id, conversation_id, ws, \
-        shield_after_send, flag_think2, old_message_id, photo_base64_list,message_id2
+        shield_after_send, flag_think2, old_message_id, photo_base64_list, message_id2,last_send_time,send_interval
     # WebSocket 地址
     retries = 0
     max_retries = 10000
     retry_interval = 0.3
-    c_count=0
+    c_count = 0
     while True:
-        c_count+=1
+        # print("c_count:",c_count)
+        c_count += 1
         time.sleep(0.01)
-        if c_count==1:
-            max_photo=1
-        elif c_count>1:
-            max_photo = 2
+        if c_count == 1:
+            max_photo = 1
+        elif c_count > 1:
+            max_photo = 3
+        # print("max_photo:", max_photo)
+        current_time = time.time()
+        if current_time - last_send_time < send_interval:
+#            print("等待时间不够，跳过本次发送")
+            continue  # 跳过本次发送操作
         if len(photo_base64_list) >= max_photo:
+            last_send_time = current_time
             with open("li_scene_seq.txt", "r") as file_scene:
                 content = file_scene.read().strip()  # 读取并去除空白字符
                 if content == 'None' or content == '':
@@ -1311,25 +1362,25 @@ def continue_send_photo():
                     li_scene_seq2 = int(content)  # 转换为整数
                     print("li_scene_seq2:", li_scene_seq2)  # 打印读取的值
 
-
-
                 # 读取play_status.txt中的字符串
             with open("play_status.txt", "r") as file_status:
                 content2 = file_status.read().strip()  # 读取并去除任何多余的空白字符
+
                 if content2 == 'None' or content2 == '':
                     print("content2 is empty or None")
                     play_status2 = ""  # 如果文件为空，可以设置默认值，或者根据需求处理
                 else:
                     play_status2 = content2
-
-            with open("play_status.txt", "w") as file_status:
-                file_status.write(str("None"))  # 将play_status写入文件，确保是字符串格式（"IN_PROGRESS" 或 "COMPLETED"）
-
+                    # if play_status2!="COMPLETED":
+                    with open("play_status.txt", "w") as file_status:
+                        file_status.write(str("None"))  # 将play_status写入文件，确保是字符串格式（"IN_PROGRESS" 或 "COMPLETED"）
             message_id_orin2 = get_message_id()
             message_id2 = message_id_orin2
-            print("Sending 3 photos...")
-            print("message_id2:",message_id2)
-            print("continue_send_photo conversation_id:",conversation_id)
+            print(f"Sending {len(photo_base64_list)} photos...")
+            now1 = datetime.now()
+            print("Sending time:",now1.strftime("%Y-%m-%d %H:%M:%S"))
+            print("message_id2:", message_id2)
+            print("continue_send_photo conversation_id:", conversation_id)
             request2 = {
                 "version": "1.0",
                 "method": "report-state",  # 始终使用 "report-state"
@@ -1350,7 +1401,7 @@ def continue_send_photo():
 
             }
             # print("request2:",request2)
-            print("li_scene_seq2:",li_scene_seq2)
+            print("li_scene_seq2:", li_scene_seq2)
             print("play_status2:", play_status2)
             while True:  # 无限重连直到成功
                 try:
@@ -1380,7 +1431,6 @@ def continue_send_photo():
             photo_base64_list.clear()
         # file_counter = 1
 
-
 ###local_output_file_name
 is_playing = False
 player2 = None  # 初始化播放器变量
@@ -1389,6 +1439,29 @@ qibaozaine_file=f"/home/li/vosk-api/python/example/qibaozaine.pcm"
 take_photo_file=f"/home/li/vosk-api/python/example/take_photo.pcm"
 play_haode_event = threading.Event()
 play_qibaozaina_event= threading.Event()
+enen_file="/home/li/vosk-api/python/example/en.mp3"
+last_play_time=0
+def voice_channel_play_function():
+    global play_haode, xiaoqi_detected, nihao_detected, output_file_stack, enen_file
+    while 1:
+        time.sleep(0.01)
+        if xiaoqi_detected:
+            print("xiaoqi_detected not response")
+        if not xiaoqi_detected:
+            if play_haode == True:
+                if has_added_sleep_mode_command == True:
+                    # output_file_stack.append(("voice-chat", 1, enen_file))
+                    # print("voice-chat append:",enen_file)
+                    temp_voice = pygame.mixer.Sound("/home/li/vosk-api/python/example/en.mp3")
+                    voice_channel = pygame.mixer.Channel(1)
+                    voice_channel.play(temp_voice)
+                    print("play en!")
+                    # while voice_channel.get_busy():  # 如果音频正在播放
+                    #    pygame.time.wait(20)
+                    play_haode = False
+                    play_haode_event.set()
+
+
 def play_haode_function():
     global play_haode,xiaoqi_detected
     while 1:
@@ -1410,7 +1483,7 @@ def play_haode_function():
             index = random_number % 4
             with threading.Lock():
                 subprocess.run(
-                ["aplay", "-D", "plughw:1,0", "-f", "S16_LE", "-r", "16000", "-c", "1", pcm_files[index]])
+                ["aplay", "-D", "plughw:3,0", "-f", "S16_LE", "-r", "16000", "-c", "1", pcm_files[index]])
 
             play_haode = False
             # time.sleep(1)
@@ -1427,7 +1500,7 @@ def play_qibaozaine_function():
 
             with threading.Lock():
                 subprocess.run(
-                    ["aplay", "-D", "plughw:1,0", "-f", "S16_LE", "-r", "16000", "-c", "1", qibaozaine_file])
+                    ["aplay", "-D", "plughw:3,0", "-f", "S16_LE", "-r", "16000", "-c", "1", qibaozaine_file])
 
             play_qibaozaina = False
             # time.sleep(1)
@@ -1436,11 +1509,12 @@ def play_qibaozaine_function():
 play_queue = queue.Queue()
 local_output_file_name_list=[]
 # local_output_file_name='/home/li/vosk-api/python/example/A13_4.wav'
-bmg_file_name='/home/li/vosk-api/python/example/sleep2.mp3'
+bmg_file_name='/home/li/vosk-api/python/example/background_music/bo_1036.mp3'
 bmg_file_name_list = [
-    "/home/li/vosk-api/python/example/sleep1.mp3",
-    "/home/li/vosk-api/python/example/sleep2.mp3",
-    "/home/li/vosk-api/python/example/sleep3.mp3"
+    "/home/li/vosk-api/python/example/background_music/xyxh.mp3",
+    "/home/li/vosk-api/python/example/background_music/bo_asmr.mp3",
+    "/home/li/vosk-api/python/example/background_music/bo_1036.mp3",
+    "/home/li/vosk-api/python/example/background_music/hailang_776.mp3",
 ]
 
 li_scene_seq=None
@@ -1450,24 +1524,26 @@ interrupt_flag=False
 
 garbage_content_event = threading.Event()
 add_once_list_flag_with_sleep = False
-
+voice_channel=None
 def mix_play():
     global recording_event,nihao_detected,xiaoqi_detected,local_output_file_name_list,standup_flag,\
-        li_voices_list_len,play_status,interrupt_flag,li_wait_time,is_garbage_content,garbage_flag,resp_message_id,message_id
+        li_voices_list_len,play_status,interrupt_flag,li_wait_time,is_garbage_content,garbage_flag,resp_message_id,message_id,voice_channel
 
-    global qibao_sentence_complete,add_once_list_flag_with_sleep
+    global qibao_sentence_complete,add_once_list_flag_with_sleep,noise_break_flag
 
     while True:
         try:
             # if standup_flag==False:
             #     continue
-
+            print("interrupt_flag by choice", interrupt_flag)
             if interrupt_flag:
                 print("Interrupt skipping")
-                time.sleep(0.1)
+                time.sleep(0.2)
                 continue
 
+            print("Current contents of play_queue:",list(play_queue.queue))
             command2,j2,local_output_file_name = play_queue.get()
+            print("Current contents of play_queue:",list(play_queue.queue))
             old_command2=command2
             old_j2=j2
             old_local_output_file_name=local_output_file_name
@@ -1485,7 +1561,11 @@ def mix_play():
             #     with open("play_status.txt", "w") as file_status:
             #         file_status.write(str(play_status))  # 将play_status写入文件，确保是字符串格式（"IN_PROGRESS" 或 "COMPLETED"）
             # play_status = "IN_PROGRESS"
-            if command2=="execute-command":
+
+            # Add len > 1, except for USING_PHONE
+            # Add by choice
+            if command2=="execute-command" and li_voices_list_len > 1:
+                print("Tag play_status2 by choice:", j2, li_voices_list_len)
                 if j2<li_voices_list_len-1:
                     play_status="IN_PROGRESS"
                 elif j2==li_voices_list_len-1:
@@ -1526,8 +1606,9 @@ def mix_play():
                     #     voice_channel = pygame.mixer.Channel(1)
                     resp_message_id = message_id
                     voice_channel.play(temp_voice)
-                    while voice_channel.get_busy():  # 如果音频正在播放
-                        pygame.time.wait(20)
+#                    print("play temp voice by choice", temp_voice)
+#                    while voice_channel.get_busy():  # 如果音频正在播放
+#                        pygame.time.wait(20)
 
                     garbage_content_event.clear()
                     garbage_flag = 0
@@ -1543,20 +1624,21 @@ def mix_play():
                     #     file_status.write(str(play_status))  # 更新文件
                     # break
 
-
+                print("Now playing file ", local_output_file_name)
                 voice_channel.play(voice)
-
+#                while voice_channel.get_busy():  # 如果音频正在播放
+#                    pygame.time.wait(20)
                 temp_voice = voice
 
-                print("################")
-                print("command and j2",command2,j2)
-                print("####################")
+                # print("################")
+                # print("command and j2",command2,j2)
+                # print("####################")
                 if command2 == "voice-chat":
                     if j2 == -1:
                         qibao_sentence_complete = True
                         interrupt_flag = False
                         add_once_list_flag_with_sleep = True
-                if command2 == "execute-command" and (local_output_file_name == "/home/li/vosk-api/python/example/enter_sleep_mode.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/lahuisixu2.mp3"):
+                if command2 == "execute-command" and (local_output_file_name == "/home/li/vosk-api/python/example/enter_sleep_mode.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/lahuisixu2.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/flow_resume_01.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/flow_resume_02.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/flow_resume_03.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/flow_resume_04.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/flow_resume_05.mp3" or local_output_file_name == "/home/li/vosk-api/python/example/flow_resume_06.mp3"):
                     qibao_sentence_complete = True
                     interrupt_flag = False
                     add_once_list_flag_with_sleep = True
@@ -1577,8 +1659,7 @@ def mix_play():
 
                 print("wait end!!!")
                 while voice_channel.get_busy() :
-                    if command2 == "execute-command":
-                        time.sleep(li_wait_time)
+
                         # (pygame.time.get_ticks() - start_time < li_wait_time * 1000)
                     #current_position = (pygame.time.get_ticks() - start_time) / 1000.0
                     #print("current position:", current_position)
@@ -1595,15 +1676,23 @@ def mix_play():
                     #         file_status.write(str(play_status))  # 更新文件
                     #
                     #     break
-                    print("resp_message_id:",resp_message_id)
-                    print("message_id:",message_id)
+                    #print("resp_message_id:",resp_message_id)
+                    #print("message_id:",message_id)
                     if resp_message_id != message_id :
+                        print("resp_message_id:",resp_message_id)
+                        print("message_id:",message_id)
                         print("!resp_message_id != message_id break!")
+                        print("######################")
+                        # print("noise_break_flag", noise_break_flag)
+                        # noise_break_flag = False
                         voice_channel.stop()  # 停止语音播放
+
+                        qibao_sentence_complete = False
                         interrupt_flag = True
                         garbage_flag=0
+#                        play_queue.queue.clear()
                         # print('voice garbage', garbage_flag)
-                        time.sleep(0.1)
+                        time.sleep(0.05)
                         #interrupted_position = current_position
                         #print("interrupted_position:",interrupted_position)
                         play_status = "IN_PROGRESS"  # 播放状态更改为IN_PROGRESS
@@ -1645,7 +1734,7 @@ def mix_play():
                     if standup_flag:
                         print("standup_flag detected, breaking playback")
                         voice_channel.stop()  # 停止语音播放
-                        time.sleep(0.1)
+                        time.sleep(0.05)
                         play_status = "IN_PROGRESS"  # 播放状态更改为IN_PROGRESS
                         with open("play_status.txt", "w") as file_status:
                             file_status.write(str(play_status))  # 更新文件
@@ -1654,7 +1743,7 @@ def mix_play():
                     if recording_event.is_set() or nihao_detected or xiaoqi_detected :
                         print("!xiaoqi_detected break!")
                         voice_channel.stop()  # 停止语音播放
-                        time.sleep(0.1)
+                        time.sleep(0.05)
                         # 重置打断标志
                         nihao_detected = False
                         xiaoqi_detected = False
@@ -1662,10 +1751,12 @@ def mix_play():
                         with open("play_status.txt", "w") as file_status:
                             file_status.write(str(play_status))  # 更新文件
                         break
-                    print(f"语音 {local_output_file_name} 播放完毕")
-                    pygame.time.Clock().tick(10)
+                print(f"语音 {local_output_file_name} 播放完毕")
+                pygame.time.Clock().tick(10)
 
-
+                if command2 == "execute-command":
+                    print("execute-command sleep")
+                    time.sleep(li_wait_time)
 
 
             except pygame.error as e:
@@ -1676,7 +1767,7 @@ last_bgm_num=0
 def combine_bgm_sound():
     global bmg_file_name_list,bmg_file_name,bgm_num,last_bgm_num,standup_flag
     os.environ["SDL_AUDIODRIVER"] = "alsa"
-    os.environ["AUDIODEV"] = "hw:1,0"
+    os.environ["AUDIODEV"] = "hw:3,0"
     while 1:
         thread_control_event.wait()
         try:
@@ -1718,6 +1809,11 @@ def combine_bgm_sound():
                     print(f"swtich to bgm {bmg_file_name}")
                 if bgm_num == 3:
                     bmg_file_name = bmg_file_name_list[0]
+                    pygame.mixer.music.load(bmg_file_name)
+                    pygame.mixer.music.play(-1)
+                    print(f"swtich to bgm {bmg_file_name}")
+                if bgm_num == 4:
+                    bmg_file_name = bmg_file_name_list[3]
                     pygame.mixer.music.load(bmg_file_name)
                     pygame.mixer.music.play(-1)
                     print(f"swtich to bgm {bmg_file_name}")
@@ -1796,10 +1892,17 @@ def send_audio_request(audio_data):
     # 加载音频文件并编码为 base64
     # with open(audio_file_path, "rb") as audio_file:
     #     audio_data = base64.b64encode(audio_file.read()).decode('utf-8')
+    now2 = datetime.now()
+    # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+    # print("soundbase64 start by choice: ", message_id)
     audio_data = base64.b64encode(audio_data).decode('utf-8')
-        # audio_data = resample_audio1(audio_data, SAMPLERATE_ORIG, SAMPLERATE_TARGET)
+    now2 = datetime.now()
+    # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+    # print("soundbase64 end by choice: ", message_id)
+    # audio_data = resample_audio1(audio_data, SAMPLERATE_ORIG, SAMPLERATE_TARGET)
     # 构建 JSON 请求
     print("$$$$$$$$$$$$$$$$message_id_send:",message_id)
+    print("request_before:", now2.strftime("%Y-%m-%d %H:%M:%S"))
     request = {
         "version": "1.0",
         "method": "voice-chat",
@@ -1817,23 +1920,35 @@ def send_audio_request(audio_data):
     retries = 0
     max_retries = 10000
     retry_interval = 0.3
+    print("request_after:", now2.strftime("%Y-%m-%d %H:%M:%S"))
     while True:  # 无限重连直到成功
         try:
+            now2 = datetime.now()
+            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+            # print("websocket start by choice: ", message_id)
             if ws is None or not ws.connected:
                 print("WebSocket not connected. Attempting to reconnect...")
                 ws = websocket.create_connection(websocket_url)
                 print("WebSocket reconnected successfully!")
                 # remote_host, remote_port = ws.sock.getpeername()
                 # print(f"Connected to host: {remote_host}, port: {remote_port}")
+            now2 = datetime.now()
+            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+            # print("websocket end by choice: ", message_id)
 
             # 发送照片数据
             qibao_sentence_complete = False
             garbage_flag = 2
-
+            now2 = datetime.now()
+            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+            # print("send audio start by choice: ", message_id)
             ws.send(json.dumps(request))
+            now2 = datetime.now()
+            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+            # print("send audio stop by choice: ", message_id)
             # remote_host, remote_port = ws.sock.getpeername()
             # print(f"Connected to host: {remote_host}, port: {remote_port}")
-            print("Photo data sent successfully.")
+            print("Audio data sent successfully.")
             break  # 成功后退出无限重连循环
 
         except (WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
@@ -1858,6 +1973,7 @@ def send_audio_request(audio_data):
         finally:
             print("we closed!")
             pass
+        print("request_after2:", now2.strftime("%Y-%m-%d %H:%M:%S"))
 
 
 
@@ -1882,7 +1998,7 @@ def receive_audio_request():
     while True:
         print("receive_audio_request!")
         current_time_loop = datetime.now()
-        print("current time loop：", current_time_loop.strftime("%Y-%m-%d %H:%M:%S"))
+        # print("current time loop：", current_time_loop.strftime("%Y-%m-%d %H:%M:%S"))
         print("print receive_audio_request")
 
         time.sleep(0.005)
@@ -1890,14 +2006,14 @@ def receive_audio_request():
         t1 = time.time()
         # print("@@@@@@SReceive_break_send_audio:", break_send_audio)
         if  nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
-            print("***************************")
-            print("***************************")
-
-            print("nihao_detected:", nihao_detected)
-            print("xiaoqi_detected:", xiaoqi_detected)
-            print("audio_file_stack_length > 1:", audio_file_stack_length > 1)
-            print("***************************")
-            print("***************************")
+            # print("***************************")
+            # print("***************************")
+            #
+            # print("nihao_detected:", nihao_detected)
+            # print("xiaoqi_detected:", xiaoqi_detected)
+            # print("audio_file_stack_length > 1:", audio_file_stack_length > 1)
+            # print("***************************")
+            # print("***************************")
             output_audio_stack.clear()
             print("Clear output_file_stack @@SReceive_break_send_audio")
 
@@ -1905,23 +2021,23 @@ def receive_audio_request():
             nihao_detected = False
             xiaoqi_detected = False
             break
-        print("Time_cycle:", t1 - last_t1)
+        # print("Time_cycle:", t1 - last_t1)
         # 等待响应
-        # response = await websocket.recv()
+        #response = await websocket.recv()
         try:
             try:
                 print("reconnect_flag!!:",reconnect_flag)
                 if reconnect_flag==True:
                     print("write COMPLETED to play_status.txt")
                     play_queue.queue.clear()
-                    output_file_stack.clear()
+                    # output_file_stack.clear()
                     with open("play_status.txt", "w") as file_status:
                         file_status.write(str("COMPLETED"))
                     reconnect_flag=False
                 t1=time.time()
                 response = ws.recv()
                 t2=time.time()
-                print("Time_diff2:", t2 - t1)
+                # print("Time_diff2:", t2 - t1)
                 # remote_host, remote_port = ws.sock.getpeername()
                 # print(f"Connected to host: {remote_host}, port: {remote_port}")
                 #print("recv_message_id2:",message_id)
@@ -1969,9 +2085,12 @@ def receive_audio_request():
                             print("response_data recieived:......")
                             print("response_data time:", time.time())
                             # resp_message_id = response_data["message_id"]
-                            if resp_message_id != message_id or recording_event.is_set():  # and resp_message_id != old_message_id:
+                            print("resp_message_id:",resp_message_id)
+                            print("message_id:", message_id)
+                            if resp_message_id < message_id or recording_event.is_set():  # and resp_message_id != old_message_id:
                                 print("resp_message_id!= message_id break2!!!!!!!!!!!!!!")
                                 recording_event.clear()
+                                play_queue.queue.clear()
                                 continue
                             interrupt_flag = True
                 # print("response_data:",response_data)
@@ -2033,10 +2152,12 @@ def deal_received_audio_request():
         ,li_wait_time,scent_spray_flag,bgm_num,standup_flag,li_voices_list_len,li_scene_seq,\
         qibao_sentence_complete,li_voice,interrupt_flag,cant_connect_flag,li_filename,sleep_mode,play_enter_sleep_mode,has_added_sleep_mode_command
 
-    global add_once_list_flag_with_sleep
+    global add_once_list_flag_with_sleep,light_m
     li_voices_list=[]
-
+    old_light_mode = ""
     while True:
+        now2 = datetime.now()
+        # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
         print("deal_received_audio_request!")
         time.sleep(0.003)
         print("audio_data_queue:",audio_data_queue)
@@ -2084,6 +2205,12 @@ def deal_received_audio_request():
                                 if "bo_asmr" in li_bgm_filename:
                                     print("enter bgm_num 2")
                                     bgm_num = 2
+                                if "xyxh" in li_bgm_filename:
+                                    print("enter bgm_num 3")
+                                    bgm_num = 3
+                                if "hailang_776" in li_bgm_filename:
+                                    print("enter bgm_num 4")
+                                    bgm_num = 4
 
                         li_scene=response_data["data"]["scene"]
                         print("li_scene:", li_scene)
@@ -2093,7 +2220,7 @@ def deal_received_audio_request():
 
                         print("li_scene_seq:", li_scene_seq)
                         now2 = datetime.now()
-                        print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+                        # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
                         print("***************************************")
                         print("***************************************")
 
@@ -2218,42 +2345,50 @@ def deal_received_audio_request():
                             light_mode = light["mode"]
                             print("light_mode:", light_mode)
                             if light_mode is not None:
-                                if str(light_mode) == "Off":
-                                    print("Off!!!")
-                                    turn_off()
-                                    # time.sleep(2)
-                                if str(light_mode) == "Shadowing":
-                                    print("Shadowing!!!")
-                                    turn_off()
-                                    time.sleep(0.1)
-                                    # theaterChaseRainbow(strip, wait_ms=50)
-                                    theaterChaseRainbow_thread=threading.Thread(target=theaterChaseRainbow,args=(strip,50))
-                                    theaterChaseRainbow_thread.start()
-                                    # time.sleep(1)
-                                if str(light_mode) == "Breathing":
-                                    print("Breathing!!!")
-                                    turn_off()
-                                    time.sleep(0.1)
-                                    # wheel(100)
-                                    wheel_thread = threading.Thread(target=wheel, args=(100,))
-                                    wheel_thread.start()
-                                    # time.sleep(1)
-                                if str(light_mode) == "Gradient":
-                                    print("Gradient!!!")
-                                    turn_off()
-                                    time.sleep(0.1)
-                                    # colorWipe_single(strip,  color=Color(0, 255, 0),wait_ms=50)
-                                    colorWipe_single_thread = threading.Thread(target=breath)
-                                    colorWipe_single_thread.start()
-                                    # time.sleep(1)
-                                if str(light_mode) == "Static":
-                                    print("Static!!!")
-                                    turn_off()
-                                    time.sleep(0.1)
-                                    # rainbow(strip, wait_ms=30)
-                                    rainbow_thread = threading.Thread(target=const_color,args=(r, g, b,))
-                                    rainbow_thread.start()
-                                    # time.sleep(1)
+                                # print("---- old_light_mode by choice", old_light_mode, light_mode)
+                                if old_light_mode != light_mode:
+#                                    light_m = light_mode
+#                                     print("---- light_m by choice", light_m)
+                                    if str(light_mode) == "Off":
+                                        print("Off!!!")
+                                        turn_off()
+                                        # time.sleep(2)
+                                    if str(light_mode) == "Shadowing":
+                                        print("Shadowing!!!")
+                                        turn_off()
+                                        time.sleep(0.1)
+                                        # theaterChaseRainbow(strip, wait_ms=50)
+                                        theaterChaseRainbow_thread=threading.Thread(target=colorWipe2,args=(strip,Color(r, g, b),50))
+                                        theaterChaseRainbow_thread.start()
+                                        # time.sleep(1)
+                                    if str(light_mode) == "Breathing":
+                                        print("Breathing!!!")
+                                        turn_off()
+                                        time.sleep(0.1)
+                                        # wheel(100)
+                                        wheel_thread = threading.Thread(target=wheel, args=(100,))
+                                        wheel_thread.start()
+                                        # time.sleep(1)
+                                    if str(light_mode) == "Gradient":
+                                        print("Gradient!!!")
+                                        turn_off()
+                                        time.sleep(0.1)
+                                        light_m = "breath"
+                                        # colorWipe_single(strip,  color=Color(0, 255, 0),wait_ms=50)
+                                        colorWipe_single_thread = threading.Thread(target=breath,args=(r, g, b,))
+                                        colorWipe_single_thread.start()
+                                        # time.sleep(1)
+                                    if str(light_mode) == "Static":
+                                        print("Static!!!")
+                                        turn_off()
+                                        time.sleep(0.1)
+                                        light_m = "const_color"
+                                        # rainbow(strip, wait_ms=30)
+                                        rainbow_thread = threading.Thread(target=const_color,args=(r, g, b,))
+                                        rainbow_thread.start()
+                                        # time.sleep(1)
+                                    old_light_mode = light_mode
+
 
                         fragrance = response_data["data"]["actions"]["fragrance"]
                         print("fragrance:",fragrance)
@@ -2274,18 +2409,23 @@ def deal_received_audio_request():
 
             if response_data['method'] == 'voice-chat':
                 if is_garbage_content==False:
-                    if response_data['data']['text'] is not None and response_data["data"]["stream_seq"] is not None and response_data["data"]["stream_seq"] == 1 :
-                        print("garbage")
-                        response_text = response_data['message_id']
-                        print("gar response_text:", response_text)
-                        play_queue.queue.clear()
-                        print("clear play_queue")
-                        output_file_stack.clear()
-                        print("clear output_file_stack")
-                        #interrupt_flag = False
-                        qibao_sentence_complete = False
+                    if response_data["data"]["stream_seq"] is not None:
+                        if response_data['data']['text'] is not None:
+                            if response_data["data"]["stream_seq"] == 1 :
+                                response_text = response_data['message_id']
+                                print("gar response_text:", response_text)
+                                play_queue.queue.clear()
+                                print("clear play_queue")
+                                output_file_stack.clear()
+                                print("clear output_file_stack")
+                                #interrupt_flag = False
+                                qibao_sentence_complete = False
+                else:
+                    qibao_sentence_complete = True
+                    interrupt_flag = False
 
                 if response_data.get("code") == 0:
+                    interrupt_flag = False
                     seq_li = response_data["data"]["stream_seq"]
                     print("seq_li:", seq_li)
                     if seq_li == -1:
@@ -2293,9 +2433,15 @@ def deal_received_audio_request():
                         #print("qibao_sentence_complete:", qibao_sentence_complete)
                         print("sleep_mode:",sleep_mode)
                         if sleep_mode==True:
-                            time.sleep(10)
+#                            random.seed(42)  # 设置种子
+                            fnum = random.randint(1, 3)
+                            flow_res_filename = "/home/li/vosk-api/python/example/flow_resume_0" + str(fnum) + ".mp3"
+                            print("flow res by choice:", flow_res_filename)
+                            time.sleep(12)
                             output_file_stack.append(
-                                ("execute-command", 1, f"/home/li/vosk-api/python/example/lahuisixu2.mp3"))
+                                ("execute-command", 1, flow_res_filename))
+#                            output_file_stack.append(
+#                                ("execute-command", 1, f"/home/li/vosk-api/python/example/lahuisixu2.mp3"))
                             time.sleep(3)
                         sleep_mode = False
 
@@ -2348,7 +2494,7 @@ def deal_received_audio_request():
                         paizhao_voice_command = True
 
                     elif response_action == "sleep_assistant":
-                        print("sleep_assistant")
+                        print("sleep_assistant: ", resp_message_id)
                         response_text = response_data['message_id']
                         print("sleep_assistant response_text:", response_text)
                         play_queue.queue.clear()
@@ -2360,6 +2506,9 @@ def deal_received_audio_request():
                         print("web ask to sleep assistant.")
                         continue_shot_and_record = True
                         play_enter_sleep_mode=True
+                        continue_send_photo_thread = threading.Thread(target=continue_send_photo)
+                        continue_send_photo_thread.daemon = True  # 设置为守护线程，这样程序退出时线程会自动退出
+                        continue_send_photo_thread.start()
                         if play_enter_sleep_mode and not has_added_sleep_mode_command:
                             output_file_stack.append(
                                 ("execute-command", 1, f"/home/li/vosk-api/python/example/enter_sleep_mode.mp3"))
@@ -2382,7 +2531,6 @@ def deal_received_audio_request():
                         response_action = response_data["data"]["action"]
                         print("response_action:", response_action)
 
-
                         response_text = response_data["data"]["text"]
                         print("response_text:", response_text)
                         # if audio_file_stack_length>1:
@@ -2404,12 +2552,13 @@ def deal_received_audio_request():
                         # nihao_detected = False
                         # xiaoqi_detected = False
                         # break
-                        file_counter += 1  # 递增文件计数器
+                        # file_counter += 1  # 递增文件计数器
+                        file_counter = random.randint(100000, 999999)
                         flag_think2 = False
                         if str(resp_fomat) == 'mp3':
                             if resp_message_id != message_id or recording_event.is_set():  # and resp_message_id != old_message_id:
                                 print("resp_message_id!= message_id break1!!!!!!!!!!!!!!")
-
+                                play_queue.queue.clear()
                                 recording_event.clear()
                                 continue
 
@@ -2430,13 +2579,13 @@ def deal_received_audio_request():
 
                         else:
                             print("no mp3")
-
-            interrupt_flag = False
-
-
+#            print("set interrupt flag to false by choice")
+#            interrupt_flag = False
 
 
 
+
+import random
 # 判断是否有语音活动
 import webrtcvad
 
@@ -2459,6 +2608,7 @@ def is_speech(data, sample_rate=16000):
     return vad.is_speech(data_bytes, sample_rate)
 
 def is_silent(data, threshold=150):
+    global tmp_ct
     """检测是否为静音段。"""
     # 将字节数据转换为 numpy 数组
     audio_data = np.frombuffer(data, dtype=np.int16)
@@ -2553,18 +2703,20 @@ def callback(indata, frames, time1, status):
     """每次接收音频数据时调用"""
     global t_play_haode,output_file_name, recording, silence_counter, output_pcm_file, pre_buffer, audio_file_stack, \
         noise_break_flag, silent_start_time, silent_end_time, pop_swtich, message_id, start_record_time,play_haode,\
-        is_silent_flag,recording_event,flag_think,old_message_id,last_message_id,not_send_flag,play_qibaozaina,audio_memory
+        is_silent_flag,recording_event,flag_think,old_message_id,last_message_id,not_send_flag,play_qibaozaina,audio_memory,voice_channel
+    global interrupt_flag, qibao_sentence_complete
     denoise_output_file_name = f"/home/li/vosk-api/python/example/send_pcm_folder/denoise_output{message_id}.pcm"
     if status:
         print(status, file=sys.stderr)
 
     # 计算当前帧的音量能量
-    volume = np.abs(indata).mean()
+    volume = np.abs(indata).mean() 
     indata = resample_audio1(indata, SAMPLERATE_ORIG, SAMPLERATE_TARGET)
     current_time = time.time()
     # if current_time-t_play_haode>1:
     #     play_haode_event.set()
     if is_silent_flag==False:
+        print("volume by choice", volume)
         if volume >= SILENCE_THRESHOLD:
             flag_think=True
             noise_break_flag = True
@@ -2572,6 +2724,11 @@ def callback(indata, frames, time1, status):
 
             if not recording:
                 print("@@@@@@@@@@@@开始录音......")
+                voice_channel = pygame.mixer.Channel(1)
+                voice_channel.stop()
+                interrupt_flag = True
+                time.sleep(0.1)
+                qibao_sentence_complete = False
                 recording = True
                 print("audio_data_queue_size:", audio_data_queue.qsize())
                 while not audio_data_queue.empty():
@@ -2607,14 +2764,13 @@ def callback(indata, frames, time1, status):
                 audio_memory = None
                 # output_pcm_file.close()
                 # process_audio(output_file_name, denoise_output_file_name)
-
+                play_haode = True
                 if pop_swtich and audio_data is not None:
-
                     if not_send_flag==False:
                         # play_qibaozaina=True
                         audio_file_stack.append(audio_data)
-                    else:
-                        play_haode = True
+                    # else:
+
 
                     # flag_think = False
                     recording_event.clear()
@@ -2629,7 +2785,7 @@ def callback(indata, frames, time1, status):
                 silence_counter += 1
 
                 # 如果静音超过指定时间或总录音时长超过4秒，立即停止录音
-                if current_time - start_record_time > 1.0 and silence_counter >= 2:
+                if current_time - start_record_time > 2.0 and silence_counter >= 4:
                     print("@@@@@@@@@@@@检测到静音，停止录音")
                     recording = False
                     audio_data = audio_memory.getvalue()  # 获取内存中的音频数据
@@ -2643,9 +2799,14 @@ def callback(indata, frames, time1, status):
                         # print("!!!!!!!!!!!!!!!Send_play_haode:", play_haode)
                         if not_send_flag == False:
                             # play_qibaozaina = True
+                            now2 = datetime.now()
+                            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+                            # print("append to stack by choice")
                             audio_file_stack.append(audio_data)
-                        else:
-                            play_haode = True
+                            now2 = datetime.now()
+                            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+                        # else:
+                        #     play_haode = True
                         last_message_id = message_id
                         # flag_think = False
                         recording_event.clear()
@@ -2733,7 +2894,7 @@ args = parser.parse_args(remaining)
 model_path = "/home/li/vosk-model-small-cn-0.22"
 text_stack = []
 # 定义文件路径
-file_path = "/home/li/saved_text.txt"
+file_path1 = "/home/li/saved_text.txt"
 shared_variable_path = "/home/li/shared_variable.txt"
 shared_stop_variable_path = "/home/li/shared_stop_variable.txt"
 
@@ -2758,7 +2919,7 @@ def write_to_file(sentence):
         time.sleep(0.05)  # 如果共享变量不为 0，等待重试
 
     # 追加写入文件
-    with open(file_path, 'a') as file:
+    with open(file_path1, 'a') as file:
         file.write(sentence + "\n")
 
     # 更新共享变量为 1，表示数据已写入
@@ -2857,11 +3018,12 @@ def process_interupt():
     print("Waiting for garbage content event to be set...")
     # 等待事件被触发
     while 1:
-        time.sleep(0.05)
+        time.sleep(0.5)
         garbage_content_event.wait()  # 等待事件被触发
         print("garbage_content receive")  # 事件触发后打印
         is_garbage_content = True
         garbage_flag=1
+        #print("garbage_flag by choice", garbage_flag)
 
 thread_process_interupt = threading.Thread(target=process_interupt)
 thread_process_interupt.start()
@@ -2914,6 +3076,9 @@ def audio_run():
     print("audio_run")
     audio_file_stack.clear()
     time.sleep(0.005)  # 保证事件循环可以调度其他任务
+    now2 = datetime.now()
+    # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+    # print("running2 and time by choice", running2)
     if running2:
         audio_thread_control_event.wait()
         thread_control_event.wait()
@@ -2921,18 +3086,24 @@ def audio_run():
         # time.sleep(0.01)
     # time.sleep(0.1)
     con_num=0
+    now2 = datetime.now()
+    # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+    # print("running2 end and time by choice", running2)
     while running2:
+        now2 = datetime.now()
+        # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+        # print("running2 loop and time by choice", running2)
         con_num+=1
         # print("flag_think:",flag_think)
         # print("network audio_run!!!")
         audio_thread_control_event.wait()
         thread_control_event.wait()
         flag_len = len(audio_file_stack)
-        # print("!!!!!!!!!!!!!!!len(audio_file_stack):",len(audio_file_stack))
+        # print("!!!!!!!!!!!!!!!len(audio_file_stack):",flag_len)
         time.sleep(0.005)  # 确保事件循环可以调度其他任务
         # print("Entering while循环")
         # print("发送栈length:", flag_len)
-        # if conversion_success==True:
+        # if conversion_succss==True:
         #     send_audio_request(audio_file_path)
         # if generate_photo_base64:
         #     send_audio_request(audio_file_path)
@@ -2955,9 +3126,13 @@ def audio_run():
             #         continue
             # audio_file_path = os.path.join("/home/orangepi/vosk-api/python/example", audio_file_path)
             # print(f"audio file_full: {audio_file_path}")
-
-            print("send_audio_request")
+            now2 = datetime.now()
+            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+            # print("send_audio_request by choice")
             send_audio_request(audio_data)
+            now2 = datetime.now()
+            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+            # print("send_audio_request end by choice")
 
             # run_async(send_audio_request, audio_file_path)
             # success =send_audio_request(audio_file_path)
@@ -2970,6 +3145,9 @@ def audio_run():
         #     print("No more audio files to send.")
         #     print("No more audio files to send.")
             # break  # 如果栈空则退出
+        now2 = datetime.now()
+        # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+        # print("running2 loop end and time by choice", running2)
     print("break from audio_run!")
 
 def stop_threads():
@@ -3045,6 +3223,8 @@ def start_threads():
         # receive_audio_request2_thread.start()
         deal_received_audio_request_thread=threading.Thread(target=deal_received_audio_request)
         deal_received_audio_request_thread.start()
+        voice_channel_play_function_thread = threading.Thread(target=voice_channel_play_function)
+        voice_channel_play_function_thread.start()
 
         # playhaode_thread_instance = threading.Thread(target=play_haode_function, daemon=True)
         # playhaode_thread_instance.start()
@@ -3167,7 +3347,7 @@ def kaldi_listener():
     args.samplerate = SAMPLERATE_ORIG
 
     rec = KaldiRecognizer(model, SAMPLERATE_ORIG, keywords)
-    rec.SetSpkModel(spk_model)
+    # rec.SetSpkModel(spk_model)
     # rec2 = KaldiRecognizer(model, 44100)
     with sd.InputStream(samplerate=args.samplerate, blocksize=8000, device=find_device_index(),
                         dtype="int16", channels=1, callback=main_callback):
@@ -3317,7 +3497,7 @@ from rpi_ws281x import *
 import argparse
 
 # LED strip configuration:
-LED_COUNT      = 50      # Number of LED pixels.
+LED_COUNT      = 120      # Number of LED pixels.
 LED_PIN        = 18#18      # GPIO pin connected to the pixels (18 uses PWM!).
 #LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -3326,6 +3506,7 @@ LED_BRIGHTNESS =64     # Set to 0 for darkest and 255 for brightest
 LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
+light_m = "breath"
 
 def colorWipe2(strip, color, wait_ms=100):
     """Wipe color across display a pixel at a time."""
@@ -3408,32 +3589,111 @@ def theaterChaseRainbow(strip, wait_ms=50):
                 strip.setPixelColor(i+q, 0)
 
 
-def breath():
+# def breath():
+#     # print("breath act.")
+#     for j in range(255, -1, -1):
+#         for i in range(strip.numPixels()):
+#             strip.setPixelColor(i, Color(j, 255 - j, 0))
+#             # print("j:", j)
+#         strip.show()
+#         time.sleep(0.01)
+#     time.sleep(2)
+#     for j in range(255):
+#         for i in range(strip.numPixels()):
+#             strip.setPixelColor(i, Color(0, 255, j))
+#             # print("j:", j)
+#         strip.show()
+#         time.sleep(0.01)
+#     time.sleep(2)
+
+def breath(r=0, g=0, b=255, waittime = 0.01):
+    global light_m
     # print("breath act.")
-    for j in range(255, -1, -1):
-        for i in range(strip.numPixels()):
-            strip.setPixelColor(i, Color(j, 255 - j, 0))
-            # print("j:", j)
-        strip.show()
-        time.sleep(0.01)
-    time.sleep(2)
-    for j in range(255):
-        for i in range(strip.numPixels()):
-            strip.setPixelColor(i, Color(0, 255, j))
-            # print("j:", j)
-        strip.show()
-        time.sleep(0.01)
-    time.sleep(2)
+    # for j in range(255, -1, -1):
+    #     for i in range(strip.numPixels()):
+    #         strip.setPixelColor(i, Color(j, 255 - j, 0))
+    #         # print("j:", j)
+    #     strip.show()
+    #     time.sleep(0.01)
+    # time.sleep(2)
+    # for j in range(255):
+    #     for i in range(strip.numPixels()):
+    #         strip.setPixelColor(i, Color(0, 255, j))
+    #         # print("j:", j)
+    #     strip.show()
+    #     time.sleep(0.01)
+    # time.sleep(2)
+    print("------ breath 1", light_m)
+
+
+        # r = 25
+        # g = 12
+        # b = 12
+    m = max(r, g, b)
+    r1 = r
+    g1 = g
+    b1 = b
+    inter = 1
+    for t in range(1000):
+        print("------ breath light_m", light_m)
+        if light_m != "breath":
+            break
+        for i in range(m):
+            if light_m != "breath":
+                break
+            if r1 > inter:
+                r1 = r1 - inter
+            else:
+                r1 = 0
+            if g1 > inter:
+                g1 = g1 - inter
+            else:
+                g1 = 0
+            if b1 > inter:
+                b1 = b1 - inter
+            else:
+                b1 = 0
+            for i in range(strip.numPixels()):
+                strip.setPixelColor(i, Color(r1, g1, b1))
+            #print("r1,g1,b1:", r1, g1, b1)
+            strip.show()
+#            time.sleep(waittime)
+            if r1==0 and g1==0 and b1==0:
+                break
+
+        for i in range(m):
+            if light_m != "breath":
+                break
+            if r1 < r:
+                r1 = r1 + inter
+            else:
+                r1 = r
+            if g1 < g:
+                g1 = g1 + inter
+            else:
+                g1 = g
+            if b1 < b:
+                b1 = b1 + inter
+            else:
+                b1 = b
+            for i in range(strip.numPixels()):
+                strip.setPixelColor(i, Color(r1, g1, b1))
+            #print("r1,g1,b12:", r1, g1, b1)
+            strip.show()
+#            time.sleep(waittime)
+            if r1 == r and g1 == g and b1 == b:
+                break
+
 
 def const_color(r,g,b):
     print("r,g,b:",r,g,b)
-    for j in range(255):
-        for i in range(strip.numPixels()):
-            strip.setPixelColor(i, Color(r, g, b))
-            # print("j:", j)
-        strip.show()
-        time.sleep(0.01)
-    time.sleep(2)
+    #for j in range(255):
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, Color(r, g, b))
+        # print("j:", j)
+    strip.show()
+        #time.sleep(0.01)
+    #time.sleep(2)
 
 def turn_off():
     # print("turn_off act.")
@@ -3573,13 +3833,13 @@ def scent_spray():
             continue
         if scent_spray_flag==True:
             for j in range(30):
-                time.sleep(5)
-                for i in range(6):
+                for i in range(3):
                     GPIO.output(22, GPIO.HIGH)
-                    time.sleep(0.1)
+                    time.sleep(0.3)
                     GPIO.output(22, GPIO.LOW)
                     print("GPIO.HIGH!")
-                    time.sleep(7.9)
+                    time.sleep(18)
+                # time.sleep(5)
         if scent_spray_flag == False:
             GPIO.output(22, GPIO.LOW)
             print("GPIO.LOW!")
@@ -3646,31 +3906,28 @@ if __name__ == "__main__":
 
     turn_off()
 
+    os.environ["SDL_AUDIODRIVER"] = "alsa"
+    os.environ["AUDIODEV"] = "hw:3,0"
+    pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
+    pygame.mixer.music.set_volume(1.0)
 
     try:
         if args.samplerate is None:
-            print("1111")
             print(sd.query_devices())
             print("args.device:",args.device)
             device_info = sd.query_devices(args.device, "input")
-            print("1112")
             # soundfile expects an int, sounddevice provides a float:
             args.samplerate = int(device_info["default_samplerate"])
-            print("1113")
         if args.model is None:
-            print("2222")
             # model = Model(lang="en-us")
             model = Model(model_path)
         else:
-            print("3333")
             # model = Model(lang=args.model)
             model = Model(model_path)
 
         if args.filename:
-            print("4444")
             dump_fn = open(args.filename, "wb")
         else:
-            print("5555")
             dump_fn = None
         # kaldi_thread=threading.Thread(target=kaldi_run)
         # kaldi_thread.start()
