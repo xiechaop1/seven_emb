@@ -365,7 +365,7 @@ class AudioPlayer:
 
         if interrupt_flag is not None:
             if interrupt_flag["level"] == level:
-                if self.voice_channel.get_busy() and self.current_track is not None:
+                if self.voice_channel.get_busy() and self.current_track is not None and level == 1:
                     if msg_id is not None:
                         if interrupt_flag["msg_id"] == msg_id:
                             self.reset_interrupt(None, None, 0, 2)
@@ -430,7 +430,10 @@ class AudioPlayer:
             logging.warn("No audio is currently playing.")
         ThreadingEvent.audio_play_event.clear()
 
-    def get_interrupt(self ):
+    def set_audio_play_event(self):
+        ThreadingEvent.audio_play_event.set()
+
+    def get_interrupt(self):
         return self.is_interrupted
 
     def clear_interrupt(self):

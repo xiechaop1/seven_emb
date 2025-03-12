@@ -76,7 +76,9 @@ class VoiceChat:
 			if audio_data is not None:
 				# print("audio_data:", audio_data)
 				self.audio_player.add(audio_data)
-				self.audio_player.resume_interrupted(msg_id, 2)
+				# self.audio_player.resume_interrupted(msg_id, 2)
+				self.audio_player.reset_interrupt(msg_id, Code.REC_METHOD_VOICE_CHAT, 2)
+				self.audio_player.set_audio_play_event()
 
 			self.exec_lock.release()
 
