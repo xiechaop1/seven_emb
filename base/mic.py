@@ -43,7 +43,7 @@ class Mic:
     CHANNELS = 1  # 单声道
 
     SILENCE_THRESHOLD = 1200  # 静音阈值
-    SILENCE_FRAMES = 10  # 静音帧数量阈值
+    SILENCE_FRAMES = 6  # 静音帧数量阈值
     PRE_RECORD_FRAMES = 1  # 预录制帧数
     # 定义队列和缓冲区
 
@@ -372,7 +372,7 @@ class Mic:
 
         has_interrupt = False
         while self.is_recording:
-            if time.time() - start_time > 0.2 and has_interrupt == False:
+            if time.time() - start_time > 0.4 and has_interrupt == False:
                 self.audio_player.interrupt()
                 self.audio_player.stop_audio()
                 ThreadingEvent.recv_execute_command_event.clear()
@@ -395,7 +395,7 @@ class Mic:
                 # self.stop_recording()
 
             # audio_memory.write(indata.tobytes())
-        if time.time() - start_time > 0.2:
+        if time.time() - start_time > 0.4:
             self.audio_player.interrupt()
             self.audio_player.stop_audio()
             ThreadingEvent.recv_execute_command_event.clear()
@@ -475,7 +475,7 @@ class Mic:
             if self.silence_counter > 0:
                 self.silence_counter = 0
             self.silence_counter = self.silence_counter - 1
-            if self.slience_tag == False and self.silence_counter > -3:
+            if self.slience_tag == False and self.silence_counter > (-1 * self.SILENCE_FRAMES):
                 return False
             # print("检测到静音")
             self.slience_tag = True
