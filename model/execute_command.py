@@ -12,6 +12,7 @@ from base.messageid import messageid
 from common.threading_event import ThreadingEvent
 from common.common import Common
 from common.code import Code
+import threading
 
 
 class ExecuteCommand:
@@ -24,6 +25,7 @@ class ExecuteCommand:
 		self.cv2 = cv2
 		self.camera = Camera(cv2)
 		self.max_seq = 0
+		self.voice_add_lock = threading.Lock()
 
 	def take_photo(self):
 		while True:
@@ -204,10 +206,10 @@ class ExecuteCommand:
 					scent_spray_flag = True
 				if fragrance_status == "off":
 					scent_spray_flag = False
-			# if fragrance_level is not None:
-				# print("fragrance_level:", fragrance_level)
-			# if fragrance_count is not None:
-				# print("fragrance_count:", fragrance_count)
+		# if fragrance_level is not None:
+		# print("fragrance_level:", fragrance_level)
+		# if fragrance_count is not None:
+		# print("fragrance_count:", fragrance_count)
 
 		bgm = resp["data"]["actions"]["bgm"]
 		light = resp["data"]["actions"]["light"]
@@ -215,6 +217,9 @@ class ExecuteCommand:
 		# print(bgm)
 		if li_voice is not None:
 			# print("li_voice:", li_voice)
+
+			if not self.voice_add_lock.acquire():
+				return
 
 			li_voices_list = li_voice["voices"]
 			print("len(li_voices_list):", len(li_voices_list))
@@ -277,6 +282,7 @@ class ExecuteCommand:
 					self.audio_player.resume_interrupted(resp_msg_id, 1)
 
 			self.latest_scene_seq = scene_seq
+			self.voice_add_lock.release()
 
 		return
 
