@@ -348,46 +348,6 @@ class AudioPlayer:
             self.continue_track = None
             # self.replay_idx = 0
 
-            # if audio_data["type"] == Code.REC_METHOD_VOICE_CHAT:
-            #     # 这里需要改一下，后端返回的需要是-1才能知道是结束
-            #     if audio_data["seq_id"] == -1:
-            #         if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
-            #             time.sleep(3)
-            #             resume_rand_idx = random.randint(1, 6)
-            #             resume_audio_filename = f"resources/sound/flow_resume_0{resume_rand_idx}.mp3"
-            #             # self.play_voice_with_file(resume_audio_filename)
-            #
-            #             tmp_audio_data = {
-            #                 "filename": resume_audio_filename,
-            #                 "type": Code.EXECUTE_COMMAND_TIP_VOICE,
-            #                 "wait_time": 0
-            #             }
-            #             self.add(tmp_audio_data)
-            #
-            #             logging.info("Sleep assistance event pass!")
-            #             ThreadingEvent.camera_start_event.set()
-            #             ThreadingEvent.recv_execute_command_event.set()
-            #     else:
-            #         ThreadingEvent.audio_play_event.set()
-            #
-            # elif audio_data["type"] == Code.REC_METHOD_VOICE_EXEC:
-            #     if audio_data["scene_seq"] < 100:
-            #         if audio_data["scene_seq"] == audio_data["voice_count"] - 1:
-            #             ThreadingEvent.camera_start_event.set()
-            #             ThreadingEvent.recv_execute_command_event.set()
-            #         else:
-            #             ThreadingEvent.audio_play_event.set()
-            #     else:
-            #         ThreadingEvent.camera_start_event.set()
-            #         ThreadingEvent.recv_execute_command_event.set()
-            # elif audio_data["type"] == Code.EXECUTE_COMMAND_TIP_VOICE:
-            #     ThreadingEvent.camera_start_event.set()
-            #     ThreadingEvent.recv_execute_command_event.set()
-
-            # self.i = self.i + 1
-            # ThreadingEvent.audio_play_event.set()
-                # if self.replay_idx > 0:
-                #     self.i = self.i + self.replay_idx - 1
 
     def replay(self):
         # audio_data = self.current_track

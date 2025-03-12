@@ -3,8 +3,6 @@ import time
 
 # from gevent import time
 
-global ct
-
 def is_valid_expression(expr):
     """ 检查表达式是否合法 """
     # 不能有前导0的数字
