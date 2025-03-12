@@ -159,7 +159,7 @@ class AudioPlayer:
             if audio_data["type"] == Code.REC_METHOD_VOICE_CHAT:
                 if audio_data["seq_id"] == -1:
 
-                    # self.resume_interrupted(msg_id, 2)
+                    self.resume_interrupted(msg_id, 2)
 
                     if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
                         time.sleep(5)
