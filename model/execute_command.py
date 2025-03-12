@@ -219,6 +219,7 @@ class ExecuteCommand:
 			# print("li_voice:", li_voice)
 
 			if not self.voice_add_lock.acquire():
+				logging.warn("Duplicate Voice Add", resp_msg_id)
 				return
 
 			li_voices_list = li_voice["voices"]
