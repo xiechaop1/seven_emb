@@ -289,7 +289,8 @@ class ExecuteCommand:
 					self.audio_player.resume_interrupted(resp_msg_id, 1)
 
 			self.latest_scene_seq = scene_seq
-			self.voice_add_lock.release()
+			if self.voice_add_lock.locked():
+				self.voice_add_lock.release()
 
 		return
 
