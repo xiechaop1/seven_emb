@@ -215,12 +215,18 @@ class ExecuteCommand:
 		light = resp["data"]["actions"]["light"]
 
 		# print(bgm)
+		# self.voice_add_lock.Lock()
 		if li_voice is not None:
 			# print("li_voice:", li_voice)
 
-			if not self.voice_add_lock.acquire():
-				logging.warn("Duplicate Voice Add", resp_msg_id)
-				return
+			print("lock: ", self.voice_add_lock.locked())
+
+			if scene_seq < 100:
+				if not self.voice_add_lock.acquire():
+					logging.warn("Duplicate Voice Add", resp_msg_id)
+					return
+
+			print("lock: ", self.voice_add_lock.locked())
 
 			li_voices_list = li_voice["voices"]
 			print("len(li_voices_list):", len(li_voices_list))
