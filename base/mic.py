@@ -44,7 +44,7 @@ class Mic:
     CHANNELS = 1  # 单声道
 
     SILENCE_THRESHOLD = 1200  # 静音阈值
-    SILENCE_FRAMES = 6  # 静音帧数量阈值
+    SILENCE_FRAMES = 4  # 静音帧数量阈值
     PRE_RECORD_FRAMES = 1  # 预录制帧数
     # 定义队列和缓冲区
 
@@ -118,12 +118,13 @@ class Mic:
         self.spk_model = SpkModel(self.SPK_MODEL_PATH)
         self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
         self.rec.SetSpkModel(self.spk_model)
+        self.voice_buffer = None
 
     def kaldi_listener(self):
 
         while True:
             if not ThreadingEvent.wakeup_event.is_set():
-                with sd.InputStream(samplerate=self.SAMPLERATE_ORIG, blocksize=8000, device=2,
+                with sd.InputStream(samplerate=self.sample_rate, blocksize=16000, device=2,
                                     dtype="int16", channels=1, callback=self.main_callback):
                     while not ThreadingEvent.wakeup_event.is_set():
                         pass
@@ -136,8 +137,9 @@ class Mic:
         # callback2(indata, frames, time1, status)
         # 调用本地 Kaldi 处理的处理函数
 
-        message_id = 1
-        audio_data_dic = (bytes(indata), message_id)
+        if ThreadingEvent.wakeup_event.is_set():
+            return
+
         data = bytes(indata)
         """This is called (from a separate thread) for each audio block."""
         # if status:
@@ -169,6 +171,7 @@ class Mic:
             #     # print(f"Speaker distance2: {distance2}")
             if self.target_keywords[1] in str(transcription):
                 print(f"检测到qibao关键词: {self.target_keywords[1]}")
+                self.voice_buffer = indata
                 ThreadingEvent.wakeup_event.set()
                 # print(f"检测到qibao关键词: {phonemes}")
 
@@ -182,6 +185,7 @@ class Mic:
             print(f"Partial Transcription: {partial_text}")
             if self.target_keywords[1] in str(partial_text):
                 print(f"检测到qibao关键词: {self.target_keywords[1]}")
+                self.voice_buffer = indata
                 ThreadingEvent.wakeup_event.set()
                 # print(f"检测到qibao关键词: {phonemes}")
                 if Config.IS_DEBUG == False:
@@ -189,7 +193,7 @@ class Mic:
                     logging.info("turn on the light for weakup")
 
 
-        print("final:", self.rec.FinalResult())
+        # print("final:", self.rec.FinalResult())
 
     def daemon(self):
 
@@ -197,7 +201,6 @@ class Mic:
             if self.handler_interrupt == False:
                 break
 
-            ThreadingEvent.wakeup_event.wait()
             # if ThreadingEvent.wakeup_event.is_set() == False:
             #     # self.p.terminate()
             #     self.wakeup()
@@ -205,16 +208,23 @@ class Mic:
             # if ThreadingEvent.wakeup_event.is_set() == False:
             #     continue
 
+            ThreadingEvent.wakeup_event.wait()
+
             self.stream = self.p.open(format=pyaudio.paInt16,
                                       channels=1,
                                       rate=self.sample_rate,
+                                      # blocksize=8000,
                                       # input_device_index=self.find_device_index(),
                                       input=True,
-                                      frames_per_buffer=self.sample_rate * self.frame_duration // 1000)
+                                      # frames_per_buffer=self.sample_rate * self.frame_duration // 1000,
+                                      frames_per_buffer=8000,
+                                      output=True)
 
+            # if self.voice_buffer is not None:
+            #     # print("a")
+            #     self.stream.write(self.voice_buffer.tobytes())
 
             # self.wakeup()
-            # ThreadingEvent.wakeup_event.wait()
 
 
                     #     if Config.IS_DEBUG == False:
@@ -233,19 +243,33 @@ class Mic:
                 #                           # input_device_index=self.find_device_index(),
                 #                           input=True,
                 #                           frames_per_buffer=self.sample_rate * self.frame_duration // 1000)
+                # if self.voice_buffer is not None:
+                #     data = self.voice_buffer
+                #     # data = self.audio_encode(data)
+                #     data = self.resample_audio1(data, self.SAMPLERATE_ORIG, self.sample_rate * self.frame_duration // 1000)
+                #     # data = np.frombuffer(self.voice_buffer, dtype=np.int16)
+                #     data = data.tobytes()
+                #     self.voice_buffer = None
+                # else:
                 data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
-                if self.is_speech(data) and not self.is_silent(data):
+                if self.is_speech(data) or self.voice_buffer is not None:
                     # 暂时去掉，再start_recording里判断静音
                     # and not self.is_silent(data)
 
 
                     # ThreadingEvent.audio_stop_event.set()
-                    self.is_recording = True
-                    audio_data = self.start_recording(data)
-                    if audio_data is None:
-                        continue
+                    if self.voice_buffer is None:
+                        self.is_recording = True
+                        audio_data = self.start_recording(data)
+                        if audio_data is None:
+                            continue
+                    else:
+                        audio_data = self.save_to_buffer_with_audio(self.voice_buffer)
+                        self.voice_buffer = None
+                        if audio_data is None:
+                            continue
 
-                    print("wakeup:", ThreadingEvent.wakeup_event)
+                    # print("wakeup:", ThreadingEvent.wakeup_event)
                     # if ThreadingEvent.wakeup_event.is_set() == False:
                     #     if self.wakeup(audio_data):
                     #         # self.wakeup()
@@ -261,6 +285,9 @@ class Mic:
                     #         continue
 
                     # ThreadingEvent.wakeup_event.wait()
+                    if not ThreadingEvent.wakeup_event.is_set():
+                        # audio_data = None
+                        continue
                     try:
                         # # 场景化策略（垫音）
                         # # 后面应该单独拆走
@@ -500,7 +527,9 @@ class Mic:
 
         has_interrupt = False
         while self.is_recording:
-            if time.time() - start_time > 0.4 and has_interrupt == False:
+            time_duration = time.time() - start_time
+            # print(time_duration)
+            if time_duration > 0.5 and has_interrupt == False:
                 self.audio_player.interrupt()
                 self.audio_player.stop_audio()
                 ThreadingEvent.recv_execute_command_event.clear()
@@ -511,7 +540,7 @@ class Mic:
 
             # 静音检测（通过 VAD 检测）
             if (not self.is_speech(data)) or self.is_silent(data):
-                print("tag:", self.is_speech(data), self.slience_tag)
+                # print("tag:", self.is_speech(data), self.slience_tag)
                 logging.info("Silence detected.")
                 break
                 # self.stop_recording()
@@ -523,7 +552,8 @@ class Mic:
                 # self.stop_recording()
 
             # audio_memory.write(indata.tobytes())
-        if time.time() - start_time > 0.4:
+        time_duration = time.time() - start_time
+        if time_duration > 0.5:
             self.audio_player.interrupt()
             self.audio_player.stop_audio()
             ThreadingEvent.recv_execute_command_event.clear()
@@ -535,9 +565,9 @@ class Mic:
 
             # audio_data = self.save_to_buffer_by_int16()
             audio_data = self.save_to_buffer()
-            print("save to buffer")
+            # print("save to buffer")
             self.save_recording(self.filename)
-            print("save to file")
+            # print("save to file")
             self.slience_tag = True
             self.silence_counter = 0
 
@@ -545,6 +575,8 @@ class Mic:
             print("voice duration:", (time.time() - start_time))
 
             return audio_data
+        # else:
+            # print("cancel with short time, ", time_duration)
 
         self.silence_counter = 0
         return None
@@ -573,7 +605,7 @@ class Mic:
         re = 0
         while re < self.MAX_RETRIES:
             try:
-                print("Sending request...")
+                print("Sending request...", re)
                 ws.send(json.dumps(request))
                 break
                 # return ret
@@ -596,8 +628,8 @@ class Mic:
         audio_data = np.frombuffer(data, dtype=np.int16)
         # print("li_audio_data:",audio_data)
         # 检查最大值是否低于阈值
-        print("max, threshold, slic_counter, tag:", np.max(np.abs(audio_data)), self.threshold, self.silence_counter,
-              self.slience_tag)
+        print("max, threshold, slic_counter, tag, time:", np.max(np.abs(audio_data)), self.threshold, self.silence_counter,
+              self.slience_tag, time.time())
         if np.max(np.abs(audio_data)) < self.threshold:
             if self.silence_counter > 0:
                 self.silence_counter = 0
@@ -622,6 +654,19 @@ class Mic:
         """使用 WebRTC VAD 检测是否为语音"""
         audio_data = np.frombuffer(data, dtype=np.int16)
         return self.vad.is_speech(audio_data.tobytes(), self.sample_rate)
+
+    def save_to_buffer_with_audio(self, audio_data):
+        memory_file = io.BytesIO()
+        with wave.open(memory_file, 'wb') as wf:
+            wf.setnchannels(1)
+            wf.setsampwidth(self.p.get_sample_size(pyaudio.paInt16))
+            wf.setframerate(self.sample_rate)
+            wf.writeframes(b''.join(audio_data))
+
+        # 将文件指针重置为开头，以便读取
+        memory_file.seek(0)
+        # print(memory_file)
+        return memory_file
 
     def save_to_buffer(self):
         if not self.frames:
