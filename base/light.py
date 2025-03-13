@@ -12,7 +12,7 @@ if not Config.IS_DEBUG:
 class Light:
 
     # LED strip configuration:
-    LED_COUNT = 200  # Number of LED pixels.
+    LED_COUNT = 112  # Number of LED pixels.
     LED_PIN = 18  # 18      # GPIO pin connected to the pixels (18 uses PWM!).
     # LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
     LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -103,6 +103,7 @@ class Light:
 
         return True
 
+
     def start_with_code(self, light_code, light_rgb):
         light_mode = None
         code_map = Code.lightModelMap()
@@ -115,6 +116,30 @@ class Light:
 
         return True
 
+    def circle(self, r1, g1, b1, r2, g2, b2):
+
+        steps = 4
+        nums = [40, 32, 24, 16]
+
+        step_r = (r2 - r1) / steps
+        step_g = (g2 - g1) / steps
+        step_b = (b2 - b1) / steps
+
+        params = []
+        i = 0
+        start = 0
+        for i in range(steps):
+            r = int(r1 + step_r * i)
+            g = int(g1 + step_g * i)
+            b = int(b1 + step_b * i)
+
+            start = start + nums[i]
+
+            params.append({"r": r, "g": g, "b": b, "start": start, "num": nums[i]})
+
+        self.show_color_by_range(params)
+
+        return
 
     def colorWipe2(self, strip, color, wait_ms=100):
         """Wipe color across display a pixel at a time."""
@@ -393,11 +418,35 @@ class Light:
     def get_color(self):
         return self.current_color
 
-    def show_color(self, r, g, b):
+    def show_color_by_range(self, params_range = []):
+        if len(params_range) == 0:
+            return
+
+        for p in params_range:
+            r, g, b = p["r"], p["g"], p["b"]
+            if "start" in p:
+                start = p["start"]
+            else:
+                start = 0
+
+            if "num" in p:
+                num = p["num"]
+            else:
+                num = 0
+
+            self.show_color(r, g, b, start, num)
+
+        return
+
+
+    def show_color(self, r, g, b, start = 0, num = 0):
         # print("r,g,b:", r, g, b)
         # for j in range(255):
-        for i in range(self.strip.numPixels()):
-            self.strip.setPixelColor(i, Color(r, g, b))
+        if num == 0:
+            num = self.strip.numPixels()
+
+        for i in range(num):
+            self.strip.setPixelColor(i + start, Color(r, g, b))
             # print("j:", j)
         self.strip.show()
         self.current_color = {
