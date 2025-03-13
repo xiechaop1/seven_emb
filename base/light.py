@@ -12,7 +12,7 @@ if not Config.IS_DEBUG:
 class Light:
 
     # LED strip configuration:
-    LED_COUNT = 112  # Number of LED pixels.
+    LED_COUNT = 200  # Number of LED pixels.
     LED_PIN = 18  # 18      # GPIO pin connected to the pixels (18 uses PWM!).
     # LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
     LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -160,9 +160,9 @@ class Light:
                 g = int(g1 + step_g * i)
                 b = int(b1 + step_b * i)
 
-                start = start + nums[i]
 
                 params.append({"r": r, "g": g, "b": b, "start": start, "num": nums[i]})
+                start = start + nums[i]
 
             self.show_color_by_range(params, time_duration)
 
@@ -175,9 +175,9 @@ class Light:
                     g = int(g2 + (-1) * step_g * i)
                     b = int(b2 + (-1) * step_b * i)
 
-                    start = start + nums[(-1) * i]
 
                     params.append({"r": r, "g": g, "b": b, "start": start, "num": nums[(-1) * i]})
+                    start = start + nums[(-1) * i]
 
                 self.show_color_by_range(params, time_duration)
             elif times == 0:
