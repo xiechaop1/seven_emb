@@ -135,7 +135,7 @@ class Light:
 
         return True
 
-    def circle(self, r1, g1, b1, r2, g2, b2, time_duration = 0, times = -1):
+    def circle(self, r1, g1, b1, r2, g2, b2, wait_ms = 0, times = -1):
 
         steps = 4
         nums = [40, 32, 24, 16]
@@ -164,10 +164,10 @@ class Light:
                 params.append({"r": r, "g": g, "b": b, "start": start, "num": nums[i]})
                 start = start + nums[i]
 
-            self.show_color_by_range(params, time_duration)
+            self.show_color_by_range(params, wait_ms / 1000)
 
             if times > 0:
-                time.sleep(time_duration)
+                time.sleep(wait_ms / 1000.0)
 
                 i = 0
                 for i in range(steps):
@@ -175,13 +175,17 @@ class Light:
                     g = int(g2 + (-1) * step_g * i)
                     b = int(b2 + (-1) * step_b * i)
 
+                    nums_idx = steps - i - 1
 
-                    params.append({"r": r, "g": g, "b": b, "start": start, "num": nums[(-1) * i]})
-                    start = start + nums[(-1) * i]
 
-                self.show_color_by_range(params, time_duration)
+                    params.append({"r": r, "g": g, "b": b, "start": start, "num": nums[nums_idx]})
+                    start = start + nums[nums_idx]
+
+                self.show_color_by_range(params, wait_ms / 1000)
             elif times == 0:
                 break
+
+            curr_times += 1
 
         return
 
