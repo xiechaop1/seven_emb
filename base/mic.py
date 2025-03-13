@@ -213,12 +213,19 @@ class Mic:
             self.stream = self.p.open(format=pyaudio.paInt16,
                                       channels=1,
                                       rate=self.sample_rate,
-                                      # blocksize=8000,
                                       # input_device_index=self.find_device_index(),
                                       input=True,
-                                      # frames_per_buffer=self.sample_rate * self.frame_duration // 1000,
-                                      frames_per_buffer=8000,
-                                      output=True)
+                                      frames_per_buffer=self.sample_rate * self.frame_duration // 1000)
+
+            # self.stream = self.p.open(format=pyaudio.paInt16,
+            #                           channels=1,
+            #                           rate=self.sample_rate,
+            #                           # blocksize=8000,
+            #                           # input_device_index=self.find_device_index(),
+            #                           input=True,
+            #                           # frames_per_buffer=self.sample_rate * self.frame_duration // 1000,
+            #                           frames_per_buffer=8000,
+            #                           output=True)
 
             # if self.voice_buffer is not None:
             #     # print("a")
