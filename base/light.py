@@ -140,9 +140,9 @@ class Light:
         steps = 4
         nums = [40, 32, 24, 16]
 
-        step_r = (r2 - r1) / steps
-        step_g = (g2 - g1) / steps
-        step_b = (b2 - b1) / steps
+        step_r = (r2 - r1) / (steps - 1)
+        step_g = (g2 - g1) / (steps - 1)
+        step_b = (b2 - b1) / (steps - 1)
 
         curr_times = 0
         while True:
@@ -156,10 +156,9 @@ class Light:
             i = 0
             start = 0
             for i in range(steps):
-                r = int(r1 + step_r * i)
-                g = int(g1 + step_g * i)
-                b = int(b1 + step_b * i)
-
+                r = int(r1 + (step_r - 1) * i)
+                g = int(g1 + (step_g - 1) * i)
+                b = int(b1 + (step_b - 1) * i)
 
                 params.append({"r": r, "g": g, "b": b, "start": start, "num": nums[i]})
                 start = start + nums[i]
@@ -169,7 +168,7 @@ class Light:
             if times > 0 or times == -1:
                 time.sleep(wait_ms / 1000.0)
 
-                self.turn_off()
+                self.clear()
 
                 i = 0
                 params = []
@@ -509,6 +508,11 @@ class Light:
         }
         # time.sleep(0.01)
         # time.sleep(2)
+
+    def clear(self):
+        for i in range(self.strip.numPixels()):
+            self.strip.setPixelColor(i, Color(0, 0, 0))
+        self.strip.show()
 
     def turn_off(self):
         # print("turn_off act.")
