@@ -173,35 +173,9 @@ class Mic:
                 # print(f"检测到qibao关键词: {phonemes}")
 
                 # continue
-            # else:
-            #     # print("未检测到qibao关键词，xiaoqi_event.clear")
-            #     xiaoqi_event.clear()
-
-            # continue
-            # if target_keywords[5] in str(transcription):
-            #     print(f"检测到sleep关键词: {target_keywords[5]}")
-            #     continue_shot_and_record=True
-            #     print("continue_shot_and_record0:",continue_shot_and_record)
-            #     # print(f"检测到qibao关键词: {phonemes}")
-            #     sleep_detected = True
-            # if target_keywords[2] in str(transcription) :
-            #     print(f"检测到stop_phonemes关键词: {target_keywords[2] }")
-            #     # print(f"检测到stop_phonemes关键词: {phonemes}")
-            #     nihao_detected=True
-            #     nihao_event.set()
-            #     continue
-            # if target_keywords[3] in str(transcription):
-            #     print(f"检测到stop_phonemes关键词: {target_keywords[3]}")
-            #     # print(f"检测到stop_phonemes关键词: {phonemes}")
-            #     nihao_detected = True
-            # if target_keywords[4] in str(transcription):
-            #     print(f"识别到paizhao_word: {target_keywords[4]}")
-            #     paizhao_voice_command=True
-            #     data_id_no_send=int(data_id_get)
-            #     print("time_data_id_no_send:", time.time())
-            #     print("data_id_no_send:",data_id_no_send)
-            # write_variable("1")
-            # print("共享变量已改为 1")
+                if Config.IS_DEBUG == False:
+                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+                    logging.info("turn on the light for weakup")
         else:
             partial = json.loads(self.rec.PartialResult())
             partial_text = partial.get("partial", "")
@@ -210,6 +184,9 @@ class Mic:
                 print(f"检测到qibao关键词: {self.target_keywords[1]}")
                 ThreadingEvent.wakeup_event.set()
                 # print(f"检测到qibao关键词: {phonemes}")
+                if Config.IS_DEBUG == False:
+                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+                    logging.info("turn on the light for weakup")
 
 
         print("final:", self.rec.FinalResult())
