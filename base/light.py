@@ -166,7 +166,7 @@ class Light:
 
             self.show_color_by_range(params, wait_ms / 1000)
 
-            if times > 0:
+            if times > 0 or times == -1:
                 time.sleep(wait_ms / 1000.0)
 
                 i = 0
@@ -177,9 +177,8 @@ class Light:
 
                     nums_idx = steps - i - 1
 
-
+                    start = start - nums[nums_idx]
                     params.append({"r": r, "g": g, "b": b, "start": start, "num": nums[nums_idx]})
-                    start = start + nums[nums_idx]
 
                 self.show_color_by_range(params, wait_ms / 1000)
             elif times == 0:
