@@ -156,9 +156,9 @@ class Light:
             i = 0
             start = 0
             for i in range(steps):
-                r = int(r1 + (step_r - 1) * i)
-                g = int(g1 + (step_g - 1) * i)
-                b = int(b1 + (step_b - 1) * i)
+                r = int(r1 + step_r * i)
+                g = int(g1 + step_g * i)
+                b = int(b1 + step_b * i)
 
                 params.append({"r": r, "g": g, "b": b, "start": start, "num": nums[i]})
                 start = start + nums[i]
