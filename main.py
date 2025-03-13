@@ -73,7 +73,7 @@ if __name__ == "__main__":
         ThreadingEvent.light_daemon_event.clear()
         light_instance.turn_off()
         # light_instance.start(Code.LIGHT_MODE_BREATHING, {"r":0, "g":0, "b":255, "steps": 200})
-        light_instance.start(Code.LIGHT_MODE_CIRCLE, {"r1": 0, "g1": 0, "b1": 255, "r2": 0, "g2": 255, "b2": 0, "time_duration": 0.5})
+        light_instance.start(Code.LIGHT_MODE_CIRCLE, {"r1": 0, "g1": 0, "b1": 255, "r2": 0, "g2": 255, "b2": 0, "time_duration": 0.05})
         logging.info("light initialized")
     else:
         spray_instance = ""
