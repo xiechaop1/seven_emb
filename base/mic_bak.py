@@ -31,7 +31,7 @@ from scipy import signal
 
 class Mic:
     """麦克风控制类，负责录音和语音活动检测（VAD）"""
-
+    
     # 定义帧大小
     # SAMPLERATE_ORIG = 48000#44100  # 原始采样率（您的麦克风采样率）
     SAMPLERATE_ORIG = 16000
@@ -52,7 +52,6 @@ class Mic:
 
     SPK_MODEL_PATH = "utils/vosk-model-spk-0.4"
     MODEL_PATH = "utils/vosk-model-small-cn-0.22"
-
     # SPK_MODEL_PATH = "/home/li/vosk-api/python/example/vosk-model-spk-0.4"
     # model_path = "/home/li/vosk-model-small-cn-0.22"
 
@@ -88,122 +87,92 @@ class Mic:
         self.light = light
         # self.req_send_time = 0
 
-        self.spk_li_1 = [-0.626114, 0.430365, 0.564255, -0.182698, 0.537145, 0.044097, 0.564515, 0.666896, 1.085733,
-                         -0.523695, 2.178851, -0.545808, 0.492513, -0.214256, 0.380257, 0.561458, 1.432191, 0.576447,
-                         1.347584, -1.410213, -0.201343, 1.299883, 0.16591, -0.301386, 1.030398, -0.155679, 1.668122,
-                         -0.47749, 1.583658, 1.031789, -0.610194, 0.207826, -2.028657, -0.778005, 0.608732, -1.103482,
-                         -0.249394, -0.145279, -0.252108, -0.744611, -0.178013, 0.821876, 1.348644, 0.958709, -1.489057,
-                         -0.069446, 0.55689, 0.382191, 1.793885, 0.12014, 1.096465, 1.948748, -0.288994, -0.427686,
-                         -0.25332, -0.74351, 1.289284, -0.442085, -1.594271, 0.238896, -0.14475, -1.243948, -0.811971,
-                         -1.167681, -1.934597, -2.094246, 0.203778, 0.2246, 0.769156, 3.129627, 1.638138, -0.414724,
-                         0.363555, 1.058113, -0.658691, 0.345854, -1.559133, 0.087666, 0.984442, -0.469354, 1.667347,
-                         0.916898, -2.170697, 0.292812, 0.051197, 1.222564, 1.065773, -0.065279, 0.214764, -0.407425,
-                         0.992222, -0.993893, 0.693716, 0.121084, 1.31698, 1.255295, -0.941613, 0.015467, 0.500375,
-                         -1.479744, -0.943895, -0.405701, 1.795941, -0.66203, 1.224589, 0.963079, -0.872087, 0.392804,
-                         1.412374, -0.279257, -0.462107, 0.674435, 0.137653, 0.93439, 2.394885, -0.571315, 0.374555,
-                         -0.233448, 0.757664, -0.375494, 0.666074, -0.123803, 1.518769, 0.873773, -0.218161, 1.566089,
-                         -0.488127, 0.386693]
+        self.spk_li_1=[-0.626114, 0.430365, 0.564255, -0.182698, 0.537145, 0.044097, 0.564515, 0.666896, 1.085733, -0.523695, 2.178851, -0.545808, 0.492513, -0.214256, 0.380257, 0.561458, 1.432191, 0.576447, 1.347584, -1.410213, -0.201343, 1.299883, 0.16591, -0.301386, 1.030398, -0.155679, 1.668122, -0.47749, 1.583658, 1.031789, -0.610194, 0.207826, -2.028657, -0.778005, 0.608732, -1.103482, -0.249394, -0.145279, -0.252108, -0.744611, -0.178013, 0.821876, 1.348644, 0.958709, -1.489057, -0.069446, 0.55689, 0.382191, 1.793885, 0.12014, 1.096465, 1.948748, -0.288994, -0.427686, -0.25332, -0.74351, 1.289284, -0.442085, -1.594271, 0.238896, -0.14475, -1.243948, -0.811971, -1.167681, -1.934597, -2.094246, 0.203778, 0.2246, 0.769156, 3.129627, 1.638138, -0.414724, 0.363555, 1.058113, -0.658691, 0.345854, -1.559133, 0.087666, 0.984442, -0.469354, 1.667347, 0.916898, -2.170697, 0.292812, 0.051197, 1.222564, 1.065773, -0.065279, 0.214764, -0.407425, 0.992222, -0.993893, 0.693716, 0.121084, 1.31698, 1.255295, -0.941613, 0.015467, 0.500375, -1.479744, -0.943895, -0.405701, 1.795941, -0.66203, 1.224589, 0.963079, -0.872087, 0.392804, 1.412374, -0.279257, -0.462107, 0.674435, 0.137653, 0.93439, 2.394885, -0.571315, 0.374555, -0.233448, 0.757664, -0.375494, 0.666074, -0.123803, 1.518769, 0.873773, -0.218161, 1.566089, -0.488127, 0.386693]
         self.keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
-        self.target_keywords = ["播放音乐", "七七", "停止", "抬头", "拍照", "休息"]
+        self.target_keywords = ["播放音乐", "七七", "停止", "抬头","拍照","休息"]
         self.wakeup_keywords = '["七七", "七宝", "七夕", "休息", "嘻嘻"]'
         # self.command_keywords = '["关机"]'
 
         self.device_name = "Yundea 1076"
+        if Config.IS_DEBUG == True:
+            self.device_name = "Beoplay EX"
         # device_name = "SP002Ua"
         # device_name='JieLi BR21'
         self.device_index = None
 
     def daemon(self):
 
-        while True:
-            if self.handler_interrupt == False:
-                break
+        # while True:
+        #     if self.handler_interrupt == False:
+        #         break
 
-            self.stream = self.p.open(format=pyaudio.paInt16,
-                                      channels=1,
-                                      rate=self.sample_rate,
-                                      # input_device_index=self.find_device_index(),
-                                      input=True,
-                                      frames_per_buffer=self.sample_rate * self.frame_duration // 1000)
-
-            # self.wakeup()
-            # ThreadingEvent.wakeup_event.wait()
-
-
-                    #     if Config.IS_DEBUG == False:
-                    #         # 唤醒成功了点亮
-                    #         # self.light.set_mode(Code.LIGHT_MODE_BREATHING)
-                    #         self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
-                    #         logging.info("set light turned on")
-                    # else:
-                    #     continue
-
-            # ThreadingEvent.wakeup_event.wait()
-            while True:
-                data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
-                if self.is_speech(data) and not self.is_silent(data):
-                    # 暂时去掉，再start_recording里判断静音
-                    # and not self.is_silent(data)
-                    if ThreadingEvent.wakeup_event.is_set() == False:
-                        self.wakeup()
-
-                    if ThreadingEvent.wakeup_event.is_set() == False:
-                        continue
-
-                    # ThreadingEvent.audio_stop_event.set()
-                    self.is_recording = True
-                    audio_data = self.start_recording(data)
-                    if audio_data is None:
-                        continue
-
-                    print("wakeup:", ThreadingEvent.wakeup_event)
-                    # if ThreadingEvent.wakeup_event.is_set() == False:
-                    #     if self.wakeup(audio_data):
-                    #         # self.wakeup()
-                    #         ThreadingEvent.wakeup_event.set()
-                    #         # ThreadingEvent.sleep_daemon_event.set()
-                    #
-                    #         if Config.IS_DEBUG == False:
-                    #             # 唤醒成功了点亮
-                    #             # self.light.set_mode(Code.LIGHT_MODE_BREATHING)
-                    #             self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
-                    #             logging.info("set light turned on")
-                    #     else:
-                    #         continue
-
-                    ThreadingEvent.wakeup_event.wait()
-                    try:
-                        # # 场景化策略（垫音）
-                        # # 后面应该单独拆走
-                        # if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
-                        #     output_file_name = "resources/sound/sa_wait_voice.mp3"
-                        #     self.audio_player.play_voice_with_file(output_file_name)
-
-                        # 记录发送请求的时间
-                        # self.req_send_time = time.time()
-                        self.send_request(self.ws, audio_data)
-                        if Config.IS_DEBUG == False:
-                            self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 254, "g": 211, "b": 76})
-                            logging.info("set light to loading mode")
-                        # 场景化策略（垫音）
-                        # 后面应该单独拆走
-                        if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
-                            output_file_name = "resources/sound/sa_wait_voice.mp3"
-                            print("play en!")
-                            self.audio_player.play_voice_with_file(output_file_name)
-
-                    except (WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
-                        print(f"WebSocket connection failed: {e}")
-
-                    except Exception as e:
-                        print(f"Unexpected error: {e}")
+        samplerate = self.SAMPLERATE_ORIG
+        with sd.InputStream(samplerate=samplerate, blocksize=8000, device=self.find_device_index(),
+                            dtype="int16", channels=1, callback=self.audio_callback):
+            while not ThreadingEvent.wakeup_event.is_set():
+                pass
+                # data = self.start_recording(samplerate)
+                #
+                # if self.is_speech(data):
+                #     # 暂时去掉，再start_recording里判断静音
+                #     # and not self.is_silent(data)
+                #
+                #     # ThreadingEvent.audio_stop_event.set()
+                #     self.is_recording = True
+                #     audio_data = self.start_recording(data)
+                #     if audio_data is None:
+                #         continue
+                #
+                #     print("wakeup:", ThreadingEvent.wakeup_event)
+                #     if ThreadingEvent.wakeup_event.is_set() == False:
+                #         if self.wakeup(audio_data):
+                #             # self.wakeup()
+                #             ThreadingEvent.wakeup_event.set()
+                #             # ThreadingEvent.sleep_daemon_event.set()
+                #
+                #             if Config.IS_DEBUG == False:
+                #                 #唤醒成功了点亮
+                #                 # self.light.set_mode(Code.LIGHT_MODE_BREATHING)
+                #                 self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+                #                 logging.info("set light turned on")
+                #         else:
+                #             continue
+                #
+                #     ThreadingEvent.wakeup_event.wait()
+                #     try:
+                #         # # 场景化策略（垫音）
+                #         # # 后面应该单独拆走
+                #         # if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+                #         #     output_file_name = "resources/sound/sa_wait_voice.mp3"
+                #         #     self.audio_player.play_voice_with_file(output_file_name)
+                #
+                #         # 记录发送请求的时间
+                #         # self.req_send_time = time.time()
+                #         self.send_request(self.ws, audio_data)
+                #         if Config.IS_DEBUG == False:
+                #             self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 254, "g": 211, "b": 76})
+                #             logging.info("set light to loading mode")
+                #         # 场景化策略（垫音）
+                #         # 后面应该单独拆走
+                #         if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+                #             output_file_name = "resources/sound/sa_wait_voice.mp3"
+                #             print("play en!")
+                #             self.audio_player.play_voice_with_file(output_file_name)
+                #
+                #     except (WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
+                #         print(f"WebSocket connection failed: {e}")
+                #
+                #     except Exception as e:
+                #         print(f"Unexpected error: {e}")
 
     # def get_req_send_time(self):
     #     return self.req_send_time
 
+
     def find_device_index(self):
         global device_index
         # 遍历设备列表查找设备索引
+        # print(sd.query_devices())
         for i, device in enumerate(sd.query_devices()):
             print(f"Device {i}: {device['name']}")
             if self.device_name in device['name'] and device['max_input_channels'] > 0:
@@ -220,44 +189,86 @@ class Mic:
     #         keywords = self.keywords
     #     rec = KaldiRecognizer(model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
 
-    def wakeup_check(self, indata, frames, time, status):
-        model = Model(self.MODEL_PATH)
+    def audio_callback(self, indata, frames, time, status):
+        if ThreadingEvent.wakeup_event.is_set() == False:
+            if self.wakeup(indata):
+                # self.wakeup()
+                ThreadingEvent.wakeup_event.set()
+                # ThreadingEvent.sleep_daemon_event.set()
+
+                if Config.IS_DEBUG == False:
+                    # 唤醒成功了点亮
+                    # self.light.set_mode(Code.LIGHT_MODE_BREATHING)
+                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+                    logging.info("set light turned on")
+            else:
+                return
+
+
+        ThreadingEvent.wakeup_event.wait()
+        try:
+            # # 场景化策略（垫音）
+            # # 后面应该单独拆走
+            # if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+            #     output_file_name = "resources/sound/sa_wait_voice.mp3"
+            #     self.audio_player.play_voice_with_file(output_file_name)
+
+            # 记录发送请求的时间
+            # self.req_send_time = time.time()
+            self.is_recording = True
+            audio_data = self.start_recording(indata)
+            self.send_request(self.ws, audio_data)
+            if Config.IS_DEBUG == False:
+                self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 254, "g": 211, "b": 76})
+                logging.info("set light to loading mode")
+            # 场景化策略（垫音）
+            # 后面应该单独拆走
+            if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+                output_file_name = "resources/sound/sa_wait_voice.mp3"
+                print("play en!")
+                self.audio_player.play_voice_with_file(output_file_name)
+
+        except (WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
+            print(f"WebSocket connection failed: {e}")
+
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+
+        return
+
+    def wakeup_check(self, indata):
         spk_model = SpkModel(self.SPK_MODEL_PATH)
+        model = Model(self.MODEL_PATH)
         rec = KaldiRecognizer(model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
         rec.SetSpkModel(spk_model)
 
-        # data16 = self.audio_encode(indata)
-        # audio_data = data16.tobytes()
-        # indata = self.resample_audio1(indata, self.SAMPLERATE_ORIG, self.SAMPLERATE_TARGET)
-        # audio_data1 = indata.tobytes()
+        audio_data = indata
         # audio_data = bytes(indata)
-        # print("audio_data:", audio_data)
-        audio_data = bytes(indata)
         if rec.AcceptWaveform(audio_data):
             result = json.loads(rec.Result())
             print("LI_Result_dict_keyword:", result)
             transcription = result.get("text", "")
             print(f"Transcription@@: {transcription}")
-            # detect_keywords(transcription)
-            # print("keywords[1]:",target_keywords[1])
-            # 检测关键词
-            # for word, phonemes in qibao_phonemes.items():
-            #     if any(phoneme in recognized_phonemes for phoneme in phonemes):
-            # if "spk" in result:
-            #     spk_vector = result["spk"]
-            #     print("spk_vector:", spk_vector)
-            #     print("len(spk_vector):", len(spk_vector))
-            #     # print("len(spk_sig):", len(spk_sig))
-            #
-            #     distance1 = cosine_dist(spk_li_1, spk_vector)
-            #     print(f"Speaker distance1: {distance1}")
-            #     if distance1>0.5:
-            #         print("speaker distance larger than 0.5!!!!!!!!")
-            #         continue
-            #     # distance2 = cosine_dist(spk_li_2, spk_vector)
-            #     # print(f"Speaker distance2: {distance2}")
+                    # detect_keywords(transcription)
+                    # print("keywords[1]:",target_keywords[1])
+                    # 检测关键词
+                    # for word, phonemes in qibao_phonemes.items():
+                    #     if any(phoneme in recognized_phonemes for phoneme in phonemes):
+                    # if "spk" in result:
+                    #     spk_vector = result["spk"]
+                    #     print("spk_vector:", spk_vector)
+                    #     print("len(spk_vector):", len(spk_vector))
+                    #     # print("len(spk_sig):", len(spk_sig))
+                    #
+                    #     distance1 = cosine_dist(spk_li_1, spk_vector)
+                    #     print(f"Speaker distance1: {distance1}")
+                    #     if distance1>0.5:
+                    #         print("speaker distance larger than 0.5!!!!!!!!")
+                    #         continue
+                    #     # distance2 = cosine_dist(spk_li_2, spk_vector)
+                    #     # print(f"Speaker distance2: {distance2}")
             for keyword in self.wakeup_keywords:
-                # if self.target_keywords[1] in str(transcription):
+            # if self.target_keywords[1] in str(transcription):
                 if keyword in transcription:
                     # and not xiaoqi_event_triggered:
                     print(f"检测到qibao关键词: {keyword}")
@@ -272,7 +283,7 @@ class Mic:
             partial_text = partial.get("partial", "")
             print(f"Partial Transcription: {partial_text}")
             for keyword in self.wakeup_keywords:
-                # if self.target_keywords[1] in str(transcription):
+            # if self.target_keywords[1] in str(transcription):
                 if keyword in str(partial_text):
                     # and not xiaoqi_event_triggered:
                     print(f"检测到qibao关键词: {keyword}")
@@ -287,12 +298,11 @@ class Mic:
             #     print(f"检测到qibao关键词: {self.target_keywords[1]}")
             #     return True
 
-            # continue
+                # continue
             # else:
-            # xiaoqi_event.clear()
+                # xiaoqi_event.clear()
 
-            # print("partial未检测到qibao关键词，xiaoqi_event.clear")
-        return
+                # print("partial未检测到qibao关键词，xiaoqi_event.clear")
 
     def audio_encode(self, data):
         with wave.open(data, 'rb') as wf:
@@ -307,29 +317,25 @@ class Mic:
 
         return
 
-    def wakeup(self):
-               # , data):
+    def wakeup(self, data):
         # model = Model(self.MODEL_PATH)
         # spk_model = SpkModel(self.SPK_MODEL_PATH)
-        not_send_flag = False
+        not_send_flag=False
         # rec = KaldiRecognizer(model, self.SAMPLERATE_ORIG, self.keywords)
         # rec.SetSpkModel(spk_model)
         # rec2 = KaldiRecognizer(model, 44100)
         samplerate = self.SAMPLERATE_ORIG
-        # self.find_device_index()
-        with sd.InputStream(samplerate=samplerate, blocksize=8000, device=0,
-                            dtype="int16", channels=1, callback=self.wakeup_check):
-            while not ThreadingEvent.wakeup_event.is_set():
-                time.sleep(1)
-                return
-                # pass
-
-        return
+        # with sd.InputStream(samplerate=samplerate, blocksize=8000, device=self.find_device_index(),
+        #                     dtype="int16", channels=1, callback=self.wakeup_check):
+        #     while not ThreadingEvent.wakeup_event.is_set():
+        #         pass
+        # return
         # data16 = np.frombuffer(data.getvalue(), dtype=np.int16)
-        data16 = self.audio_encode(data)
+        # data16 = self.audio_encode(data)
         #
         # print(len(data16))
-        audio_data = data16.tobytes()
+        # audio_data = data16.tobytes()
+        audio_data = bytes(data)
         return self.wakeup_check(audio_data)
         # if rec.AcceptWaveform(audio_data):
         #     result = json.loads(rec.Result())
@@ -390,7 +396,7 @@ class Mic:
     def stop_daemon(self):
         self.handler_interrupt = True
 
-    def start_recording(self, start_frame=None):
+    def start_recording(self, data = None):
         """开始录音"""
         self.frames = []
         # self.is_recording = True
@@ -410,8 +416,8 @@ class Mic:
 
         # print(time.time() - start_time)
 
-        if start_frame is not None:
-            self.frames.append(start_frame)
+        # if data is not None:
+        #     self.frames.append(data)
 
         has_interrupt = False
         while self.is_recording:
@@ -421,16 +427,18 @@ class Mic:
                 ThreadingEvent.recv_execute_command_event.clear()
                 ThreadingEvent.camera_start_event.clear()
                 has_interrupt = True
-            data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
+            # data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow = False)
+            volume = np.abs(data).mean()
+            data = self.resample_audio1(data, self.SAMPLERATE_ORIG, self.SAMPLERATE_TARGET)
             self.frames.append(data)
 
             # 静音检测（通过 VAD 检测）
-            if (not self.is_speech(data)) or self.is_silent(data):
+            if (not self.is_speech(data)) or self.is_silent(data, volume):
                 print("tag:", self.is_speech(data), self.slience_tag)
                 logging.info("Silence detected.")
                 break
                 # self.stop_recording()
-
+            
             # 超过 timeout 秒自动停止
             if time.time() - start_time > self.timeout:
                 logging.info("Recording time exceeded, stopping...")
@@ -445,7 +453,7 @@ class Mic:
             ThreadingEvent.camera_start_event.clear()
             # audio_memory = io.BytesIO()
             # for frame in pre_buffer:
-            # audio_memory.write(frame.tobytes())
+                # audio_memory.write(frame.tobytes())
             # pre_buffer.clear()
 
             # audio_data = self.save_to_buffer_by_int16()
@@ -458,12 +466,14 @@ class Mic:
 
             self.is_recording = False
             print("voice duration:", (time.time() - start_time))
-
+            self.is_recording = False
             return audio_data
 
         self.silence_counter = 0
-        return None
+        self.is_recording = False
 
+        return None
+    
     def send_request(self, ws, audio_data):
 
         conversation_id = messageid.get_conversation_id()
@@ -478,7 +488,7 @@ class Mic:
             "message_id": message_id,
             "token": token,
             # "timestamp": datetime.utcnow().isoformat() + "Z",
-            "timestamp": Common.get_rfc3339_with_timezone(),
+            "timestamp":Common.get_rfc3339_with_timezone(),
             "data": {
                 "content_type": "audio",
                 "content": audio_data
@@ -497,6 +507,8 @@ class Mic:
                 logging.warn(f"Error send request: {e}.")
                 re = re + 1
 
+
+
     def stop_recording(self):
         """停止录音"""
         if self.stream is not None:
@@ -504,16 +516,17 @@ class Mic:
             self.stream.close()
         self.is_recording = False
         logging.info("Recording stopped.")
-
-    def is_silent(self, data):
+    
+    def is_silent(self, data, volume = 0):
         """检测是否为静音段。"""
-        # 将字节数据转换为 numpy 数组
-        audio_data = np.frombuffer(data, dtype=np.int16)
-        # print("li_audio_data:",audio_data)
-        # 检查最大值是否低于阈值
-        print("max, threshold, slic_counter, tag:", np.max(np.abs(audio_data)), self.threshold, self.silence_counter,
-              self.slience_tag)
-        if np.max(np.abs(audio_data)) < self.threshold:
+        if volume == 0:
+            # 将字节数据转换为 numpy 数组
+            audio_data = np.frombuffer(data, dtype=np.int16)
+            # print("li_audio_data:",audio_data)
+            # 检查最大值是否低于阈值
+            print("max, threshold, slic_counter, tag:",np.max(np.abs(audio_data)), self.threshold, self.silence_counter, self.slience_tag)
+            volume = np.max(np.abs(audio_data))
+        if volume < self.threshold:
             if self.silence_counter > 0:
                 self.silence_counter = 0
             self.silence_counter = self.silence_counter - 1
@@ -537,7 +550,7 @@ class Mic:
         """使用 WebRTC VAD 检测是否为语音"""
         audio_data = np.frombuffer(data, dtype=np.int16)
         return self.vad.is_speech(audio_data.tobytes(), self.sample_rate)
-
+    
     def save_to_buffer(self):
         if not self.frames:
             logging.warning("No audio data recorded.")
@@ -549,7 +562,7 @@ class Mic:
             wf.setsampwidth(self.p.get_sample_size(pyaudio.paInt16))
             wf.setframerate(self.sample_rate)
             wf.writeframes(b''.join(self.frames))
-
+        
         # 将文件指针重置为开头，以便读取
         memory_file.seek(0)
         # print(memory_file)
@@ -573,18 +586,18 @@ class Mic:
         if not self.frames:
             logging.warning("No audio data recorded.")
             return
-
+        
         with wave.open(filename, 'wb') as wf:
             wf.setnchannels(1)
             wf.setsampwidth(self.p.get_sample_size(pyaudio.paInt16))
             wf.setframerate(self.sample_rate)
             wf.writeframes(b''.join(self.frames))
         logging.info(f"Recording saved as {filename}")
-
+    
     def get_audio_file(self):
         return self.filename
 
-    def resample_audio1(self, audio_data, orig_rate, target_rate):
+    def resample_audio1(audio_data, orig_rate, target_rate):
         """重采样音频数据"""
         # 计算重采样后的长度
         new_length = int(len(audio_data) * target_rate / orig_rate)
