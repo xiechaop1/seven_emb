@@ -183,6 +183,9 @@ class Light:
                     params.append({"r": r, "g": g, "b": b, "start": start, "num": nums[nums_idx]})
 
                 self.show_color_by_range(params, wait_ms / 1000)
+
+                time.sleep(wait_ms / 1000.0)
+                self.clear()
             elif times == 0:
                 break
 
