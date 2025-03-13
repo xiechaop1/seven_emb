@@ -172,6 +172,7 @@ class Light:
                 self.turn_off()
 
                 i = 0
+                params = []
                 for i in range(steps):
                     r = int(r2 + (-1) * step_r * i)
                     g = int(g2 + (-1) * step_g * i)
