@@ -105,7 +105,8 @@ class Mic:
                          -0.488127, 0.386693]
         self.keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
         self.target_keywords = ["播放音乐", "七七", "停止", "抬头", "拍照", "休息"]
-        self.wakeup_keywords = '["七七", "七宝", "七夕", "休息", "嘻嘻"]'
+        # self.wakeup_keywords = '["七七", "七宝", "七夕", "休息", "嘻嘻"]'
+        self.wakeup_keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
         # self.command_keywords = '["关机"]'
 
         self.device_name = "Yundea 1076"
@@ -113,11 +114,119 @@ class Mic:
         # device_name='JieLi BR21'
         self.device_index = None
 
+        self.model = Model(self.MODEL_PATH)
+        self.spk_model = SpkModel(self.SPK_MODEL_PATH)
+        self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
+        self.rec.SetSpkModel(self.spk_model)
+
+    def kaldi_listener(self):
+
+        while True:
+            if not ThreadingEvent.wakeup_event.is_set():
+                with sd.InputStream(samplerate=self.SAMPLERATE_ORIG, blocksize=8000, device=2,
+                                    dtype="int16", channels=1, callback=self.main_callback):
+                    while not ThreadingEvent.wakeup_event.is_set():
+                        pass
+
+    def main_callback(self, indata, frames, time1, status):
+        global file_counter
+        # 调用网络传输的处理函数
+
+        # callback(indata, frames, time1, status)
+        # callback2(indata, frames, time1, status)
+        # 调用本地 Kaldi 处理的处理函数
+
+        message_id = 1
+        audio_data_dic = (bytes(indata), message_id)
+        data = bytes(indata)
+        """This is called (from a separate thread) for each audio block."""
+        # if status:
+            # print(status, file=sys.stderr)
+        # q.put(audio_data_dic)
+
+        if self.rec.AcceptWaveform(data):
+            result = json.loads(self.rec.Result())
+            print("LI_Result_dict_keyword:", result)
+            transcription = result.get("text", "")
+            print(f"Transcription@@: {transcription}")
+            # detect_keywords(transcription)
+            # print("keywords[1]:",target_keywords[1])
+            # 检测关键词
+            # for word, phonemes in qibao_phonemes.items():
+            #     if any(phoneme in recognized_phonemes for phoneme in phonemes):
+            # if "spk" in result:
+            #     spk_vector = result["spk"]
+            #     print("spk_vector:", spk_vector)
+            #     print("len(spk_vector):", len(spk_vector))
+            #     # print("len(spk_sig):", len(spk_sig))
+            #
+            #     distance1 = cosine_dist(spk_li_1, spk_vector)
+            #     print(f"Speaker distance1: {distance1}")
+            #     if distance1>0.5:
+            #         print("speaker distance larger than 0.5!!!!!!!!")
+            #         continue
+            #     # distance2 = cosine_dist(spk_li_2, spk_vector)
+            #     # print(f"Speaker distance2: {distance2}")
+            if self.target_keywords[1] in str(transcription):
+                print(f"检测到qibao关键词: {self.target_keywords[1]}")
+                ThreadingEvent.wakeup_event.set()
+                # print(f"检测到qibao关键词: {phonemes}")
+
+                # continue
+            # else:
+            #     # print("未检测到qibao关键词，xiaoqi_event.clear")
+            #     xiaoqi_event.clear()
+
+            # continue
+            # if target_keywords[5] in str(transcription):
+            #     print(f"检测到sleep关键词: {target_keywords[5]}")
+            #     continue_shot_and_record=True
+            #     print("continue_shot_and_record0:",continue_shot_and_record)
+            #     # print(f"检测到qibao关键词: {phonemes}")
+            #     sleep_detected = True
+            # if target_keywords[2] in str(transcription) :
+            #     print(f"检测到stop_phonemes关键词: {target_keywords[2] }")
+            #     # print(f"检测到stop_phonemes关键词: {phonemes}")
+            #     nihao_detected=True
+            #     nihao_event.set()
+            #     continue
+            # if target_keywords[3] in str(transcription):
+            #     print(f"检测到stop_phonemes关键词: {target_keywords[3]}")
+            #     # print(f"检测到stop_phonemes关键词: {phonemes}")
+            #     nihao_detected = True
+            # if target_keywords[4] in str(transcription):
+            #     print(f"识别到paizhao_word: {target_keywords[4]}")
+            #     paizhao_voice_command=True
+            #     data_id_no_send=int(data_id_get)
+            #     print("time_data_id_no_send:", time.time())
+            #     print("data_id_no_send:",data_id_no_send)
+            # write_variable("1")
+            # print("共享变量已改为 1")
+        else:
+            partial = json.loads(self.rec.PartialResult())
+            partial_text = partial.get("partial", "")
+            print(f"Partial Transcription: {partial_text}")
+            if self.target_keywords[1] in str(partial_text):
+                print(f"检测到qibao关键词: {self.target_keywords[1]}")
+                ThreadingEvent.wakeup_event.set()
+                # print(f"检测到qibao关键词: {phonemes}")
+
+
+        print("final:", self.rec.FinalResult())
+
     def daemon(self):
 
         while True:
             if self.handler_interrupt == False:
                 break
+
+            ThreadingEvent.wakeup_event.wait()
+            # if ThreadingEvent.wakeup_event.is_set() == False:
+            #     # self.p.terminate()
+            #     self.wakeup()
+            #
+            # if ThreadingEvent.wakeup_event.is_set() == False:
+            #     continue
 
             self.stream = self.p.open(format=pyaudio.paInt16,
                                       channels=1,
@@ -125,6 +234,7 @@ class Mic:
                                       # input_device_index=self.find_device_index(),
                                       input=True,
                                       frames_per_buffer=self.sample_rate * self.frame_duration // 1000)
+
 
             # self.wakeup()
             # ThreadingEvent.wakeup_event.wait()
@@ -140,15 +250,17 @@ class Mic:
 
             # ThreadingEvent.wakeup_event.wait()
             while True:
+                # self.stream = self.p.open(format=pyaudio.paInt16,
+                #                           channels=1,
+                #                           rate=self.sample_rate,
+                #                           # input_device_index=self.find_device_index(),
+                #                           input=True,
+                #                           frames_per_buffer=self.sample_rate * self.frame_duration // 1000)
                 data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
                 if self.is_speech(data) and not self.is_silent(data):
                     # 暂时去掉，再start_recording里判断静音
                     # and not self.is_silent(data)
-                    if ThreadingEvent.wakeup_event.is_set() == False:
-                        self.wakeup()
 
-                    if ThreadingEvent.wakeup_event.is_set() == False:
-                        continue
 
                     # ThreadingEvent.audio_stop_event.set()
                     self.is_recording = True
@@ -171,7 +283,7 @@ class Mic:
                     #     else:
                     #         continue
 
-                    ThreadingEvent.wakeup_event.wait()
+                    # ThreadingEvent.wakeup_event.wait()
                     try:
                         # # 场景化策略（垫音）
                         # # 后面应该单独拆走
@@ -221,10 +333,6 @@ class Mic:
     #     rec = KaldiRecognizer(model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
 
     def wakeup_check(self, indata, frames, time, status):
-        model = Model(self.MODEL_PATH)
-        spk_model = SpkModel(self.SPK_MODEL_PATH)
-        rec = KaldiRecognizer(model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
-        rec.SetSpkModel(spk_model)
 
         # data16 = self.audio_encode(indata)
         # audio_data = data16.tobytes()
@@ -233,8 +341,8 @@ class Mic:
         # audio_data = bytes(indata)
         # print("audio_data:", audio_data)
         audio_data = bytes(indata)
-        if rec.AcceptWaveform(audio_data):
-            result = json.loads(rec.Result())
+        if self.rec.AcceptWaveform(audio_data):
+            result = json.loads(self.rec.Result())
             print("LI_Result_dict_keyword:", result)
             transcription = result.get("text", "")
             print(f"Transcription@@: {transcription}")
@@ -268,7 +376,7 @@ class Mic:
                     return True
                     # continue
         else:
-            partial = json.loads(rec.PartialResult())
+            partial = json.loads(self.rec.PartialResult())
             partial_text = partial.get("partial", "")
             print(f"Partial Transcription: {partial_text}")
             for keyword in self.wakeup_keywords:

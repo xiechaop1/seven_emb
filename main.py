@@ -93,6 +93,9 @@ if __name__ == "__main__":
     logging.info("audio is ready")
 
     mic_instance = Mic(client, audio_instance, light_instance)
+    kaldi_thread = threading.Thread(target=mic_instance.kaldi_listener)
+    kaldi_thread.start()
+
     mic_thread = threading.Thread(target=mic_instance.daemon)
     mic_thread.start()
     logging.info("Mic is ready")
