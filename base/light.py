@@ -169,6 +169,8 @@ class Light:
             if times > 0 or times == -1:
                 time.sleep(wait_ms / 1000.0)
 
+                self.turn_off()
+
                 i = 0
                 for i in range(steps):
                     r = int(r2 + (-1) * step_r * i)
