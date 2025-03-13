@@ -61,6 +61,25 @@ class Light:
                     self.Breathing(r, g, b)
                 else:
                     self.Breathing(r, g, b, steps)
+            elif light_mode == Code.LIGHT_MODE_CIRCLE:
+                keys = ["r1", "g1", "b1", "r2", "g2", "b2", "time_duration", "times"]
+
+                input ={
+                    "r1": 0,
+                    "g1": 0,
+                    "b1": 0,
+                    "r2": 255,
+                    "g2": 255,
+                    "b2": 255,
+                    "times": -1,
+                    "time_duration": 0,
+                }
+
+                for key in keys:
+                    if key in params:
+                        input[key] = params[key]
+
+                self.circle(input["r1"], input["g1"], input["b1"], input["r2"], input["g2"], input["b2"], input["time_duration"], input["times"])
             else:
                 self.turn_off()
 
@@ -116,7 +135,7 @@ class Light:
 
         return True
 
-    def circle(self, r1, g1, b1, r2, g2, b2):
+    def circle(self, r1, g1, b1, r2, g2, b2, time_duration = 0, times = -1):
 
         steps = 4
         nums = [40, 32, 24, 16]
@@ -125,19 +144,44 @@ class Light:
         step_g = (g2 - g1) / steps
         step_b = (b2 - b1) / steps
 
-        params = []
-        i = 0
-        start = 0
-        for i in range(steps):
-            r = int(r1 + step_r * i)
-            g = int(g1 + step_g * i)
-            b = int(b1 + step_b * i)
+        curr_times = 0
+        while True:
+            if self.light_mode != Code.LIGHT_MODE_CIRCLE or self.ts > self.run_ts:
+                break
 
-            start = start + nums[i]
+            if times > 0 and curr_times >= times:
+                break
 
-            params.append({"r": r, "g": g, "b": b, "start": start, "num": nums[i]})
+            params = []
+            i = 0
+            start = 0
+            for i in range(steps):
+                r = int(r1 + step_r * i)
+                g = int(g1 + step_g * i)
+                b = int(b1 + step_b * i)
 
-        self.show_color_by_range(params)
+                start = start + nums[i]
+
+                params.append({"r": r, "g": g, "b": b, "start": start, "num": nums[i]})
+
+            self.show_color_by_range(params, time_duration)
+
+            if times > 0:
+                time.sleep(time_duration)
+
+                i = 0
+                for i in range(steps):
+                    r = int(r2 + (-1) * step_r * i)
+                    g = int(g2 + (-1) * step_g * i)
+                    b = int(b2 + (-1) * step_b * i)
+
+                    start = start + nums[(-1) * i]
+
+                    params.append({"r": r, "g": g, "b": b, "start": start, "num": nums[(-1) * i]})
+
+                self.show_color_by_range(params, time_duration)
+            elif times == 0:
+                break
 
         return
 
@@ -418,7 +462,7 @@ class Light:
     def get_color(self):
         return self.current_color
 
-    def show_color_by_range(self, params_range = []):
+    def show_color_by_range(self, params_range = [], time_duration = 0):
         if len(params_range) == 0:
             return
 
@@ -435,6 +479,9 @@ class Light:
                 num = 0
 
             self.show_color(r, g, b, start, num)
+
+            if time_duration > 0:
+                time.sleep(time_duration)
 
         return
 
