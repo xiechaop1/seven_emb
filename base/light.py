@@ -166,7 +166,7 @@ class Light:
             self.show_color_by_range(params, wait_ms / 1000)
 
             if times > 0 or times == -1:
-                time.sleep(wait_ms / 1000.0)
+                time.sleep(1)
 
                 self.clear()
 
@@ -184,7 +184,7 @@ class Light:
 
                 self.show_color_by_range(params, wait_ms / 1000)
 
-                time.sleep(wait_ms / 1000.0)
+                time.sleep(1)
                 self.clear()
             elif times == 0:
                 break
