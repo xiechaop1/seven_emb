@@ -265,7 +265,7 @@ class Mic:
                 #     data = data.tobytes()
                 #     self.voice_buffer = None
                 # else:
-                data = self.stream.read(self.buffer_size, exception_on_overflow=False)
+                data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
                 if self.is_speech(data) or self.voice_buffer is not None:
                     # 暂时去掉，再start_recording里判断静音
                     # and not self.is_silent(data)
