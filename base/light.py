@@ -191,7 +191,7 @@ class Light:
             start += num
 
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
-        self.insert(idx, color)
+        self.current_colors.insert(idx, color)
 
 
     def circle2(self, r1, g1, b1, r2, g2, b2, time_duration, times):
