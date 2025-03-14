@@ -32,6 +32,7 @@ class Light:
         self.target_params = None
         self.ts = 0
         self.run_ts = 0
+        self.light_nums = [40, 32, 24, 16]
 
     def daemon(self):
         while True:
@@ -135,10 +136,20 @@ class Light:
 
         return True
 
+    def circle2(self, r1, g1, b1, r2, g2, b2, time_duration, times):
+        steps = 4
+        nums = self.light_nums
+        step_r = (r2 - r1) / (steps - 1)
+        step_g = (g2 - g1) / (steps - 1)
+        step_b = (b2 - b1) / (steps - 1)
+
+        
+
     def circle(self, r1, g1, b1, r2, g2, b2, wait_ms = 0, times = -1):
 
         steps = 4
-        nums = [40, 32, 24, 16]
+        # nums = [40, 32, 24, 16]
+        nums = self.light_nums
 
         step_r = (r2 - r1) / (steps - 1)
         step_g = (g2 - g1) / (steps - 1)
