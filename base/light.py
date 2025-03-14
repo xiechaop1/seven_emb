@@ -192,8 +192,9 @@ class Light:
         start = 0
         if idx > 0:
             total = 0
-            for _, val in enumerate(self.light_nums):
-                start += val
+            for light_idx, val in enumerate(self.light_nums):
+                if light_idx < idx:
+                    start += val
 
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
         self.current_colors.insert(idx, color)
