@@ -119,12 +119,19 @@ class Mic:
         self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
         self.rec.SetSpkModel(self.spk_model)
         self.voice_buffer = None
+        self.buffer_size = 1024
+        # self.buffer_size = self.sample_rate * self.frame_duration // 1000
 
     def kaldi_listener(self):
 
         while True:
             if not ThreadingEvent.wakeup_event.is_set():
-                with sd.InputStream(samplerate=self.sample_rate, blocksize=16000, device=2,
+                if Config.IS_DEBUG == True:
+                    device_idx = 0
+                else:
+                    device_idx = self.find_device_index()
+
+                with sd.InputStream(samplerate=self.sample_rate, blocksize=16000, device=device_idx,
                                     dtype="int16", channels=1, callback=self.main_callback):
                     while not ThreadingEvent.wakeup_event.is_set():
                         pass
@@ -215,7 +222,7 @@ class Mic:
                                       rate=self.sample_rate,
                                       # input_device_index=self.find_device_index(),
                                       input=True,
-                                      frames_per_buffer=self.sample_rate * self.frame_duration // 1000)
+                                      frames_per_buffer=self.buffer_size)
 
             # self.stream = self.p.open(format=pyaudio.paInt16,
             #                           channels=1,
@@ -258,7 +265,7 @@ class Mic:
                 #     data = data.tobytes()
                 #     self.voice_buffer = None
                 # else:
-                data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
+                data = self.stream.read(self.buffer_size, exception_on_overflow=False)
                 if self.is_speech(data) or self.voice_buffer is not None:
                     # 暂时去掉，再start_recording里判断静音
                     # and not self.is_silent(data)
@@ -543,7 +550,7 @@ class Mic:
                 ThreadingEvent.camera_start_event.clear()
                 has_interrupt = True
             # data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
-            data = self.stream.read(1024)
+            data = self.stream.read(self.buffer_size)
             self.frames.append(data)
 
             # 静音检测（通过 VAD 检测）
