@@ -1,3 +1,4 @@
+import threading
 import time
 import argparse
 from common.code import Code
@@ -173,8 +174,8 @@ class Light:
                 else:
                     color_buffer = colors[color_i]
                 # print(color_buffer_idx, len(color_buffer))
-                self.rainbow_circle_exec(color_pos, color_buffer)
-            time.sleep(0.2)
+                threading.Thread(target=self.rainbow_circle_exec, args=(color_pos, color_buffer)).start()
+            time.sleep(1)
 
             color_idx += 1
 
@@ -197,7 +198,10 @@ class Light:
                     start += val
 
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
-        self.current_colors.insert(idx, color)
+        if idx in self.current_colors:
+            self.current_colors[idx] = curr_color
+        else:
+            self.current_colors.insert(idx, color)
 
 
     def circle2(self, r1, g1, b1, r2, g2, b2, time_duration, times):
