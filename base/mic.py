@@ -119,8 +119,8 @@ class Mic:
         self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
         self.rec.SetSpkModel(self.spk_model)
         self.voice_buffer = None
-        self.buffer_size = 1024
-        # self.buffer_size = self.sample_rate * self.frame_duration // 1000
+        # self.buffer_size = 1024
+        self.buffer_size = self.sample_rate * self.frame_duration // 1000
 
     def kaldi_listener(self):
 
@@ -550,7 +550,7 @@ class Mic:
                 ThreadingEvent.camera_start_event.clear()
                 has_interrupt = True
             # data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
-            data = self.stream.read(self.buffer_size)
+            data = self.stream.read(512)
             self.frames.append(data)
 
             # 静音检测（通过 VAD 检测）
