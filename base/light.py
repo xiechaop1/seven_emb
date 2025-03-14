@@ -166,9 +166,9 @@ class Light:
             for color_i in range(color_num):
                 color_buffer_idx = color_idx + color_i
                 if color_buffer_idx >= len(colors):
-                    color_buffer.append(def_color)
+                    color_buffer.insert(color_buffer_idx, def_color)
                 else:
-                    color_buffer.append(colors[color_buffer_idx])
+                    color_buffer.insert(color_buffer_idx, colors[color_buffer_idx])
 
                 self.rainbow_circle_exec(color_buffer_idx, color_buffer[color_buffer_idx])
                 time.sleep(0.2)
@@ -191,7 +191,7 @@ class Light:
             start += num
 
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
-        self.current_colors[idx] = color
+        self.insert(idx, color)
 
 
     def circle2(self, r1, g1, b1, r2, g2, b2, time_duration, times):
