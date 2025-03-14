@@ -165,19 +165,16 @@ class Light:
                 color_idx = 0
 
             # color_buffer = []
-            for color_i in range(color_num):
-                color_buffer_idx = color_idx + color_i
-                if color_buffer_idx >= len(colors):
-                    color_buffer.insert(color_buffer_idx, def_color)
+            for color_pos in range(len(self.light_nums)):
+                # color_buffer.append(colors[color_idx])
+                color_i = color_idx + color_pos
+                if color_i >= len(colors):
+                    color_buffer = def_color
                 else:
-                    if color_buffer_idx >= len(color_buffer):
-                        color_buffer.insert(color_buffer_idx, colors[color_buffer_idx])
-                    else:
-                        color_buffer[color_buffer_idx] = colors[color_buffer_idx]
-
+                    color_buffer = colors[color_i]
                 # print(color_buffer_idx, len(color_buffer))
-                self.rainbow_circle_exec(color_buffer_idx, color_buffer[color_buffer_idx])
-                time.sleep(0.2)
+                self.rainbow_circle_exec(color_pos, color_buffer)
+            time.sleep(0.2)
 
             color_idx += 1
 
