@@ -542,7 +542,8 @@ class Mic:
                 ThreadingEvent.recv_execute_command_event.clear()
                 ThreadingEvent.camera_start_event.clear()
                 has_interrupt = True
-            data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
+            # data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
+            data = self.stream.read(1024)
             self.frames.append(data)
 
             # 静音检测（通过 VAD 检测）
