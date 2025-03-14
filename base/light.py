@@ -175,6 +175,7 @@ class Light:
                     color_buffer = colors[color_i]
                 # print(color_buffer_idx, len(color_buffer))
                 threading.Thread(target=self.rainbow_circle_exec, args=(color_pos, color_buffer)).start()
+                time.sleep(0.05)
             time.sleep(3)
 
             color_idx += 1
@@ -197,12 +198,11 @@ class Light:
                 if light_idx < idx:
                     start += val
 
-        self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
-        if idx in self.current_colors:
+        if idx < self.current_colors:
             self.current_colors[idx] = curr_color
         else:
-            self.current_colors.insert(idx, color)
-
+            self.current_colors.append(color)
+        self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
 
     def circle2(self, r1, g1, b1, r2, g2, b2, time_duration, times):
         steps = 4
