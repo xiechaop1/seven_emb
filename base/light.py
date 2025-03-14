@@ -162,14 +162,16 @@ class Light:
             if color_idx >= len(colors):
                 color_idx = 0
 
+            color_buffer = []
             for color_i in range(color_num):
                 color_buffer_idx = color_idx + color_i
                 if color_buffer_idx >= len(colors):
-                    color_buffer[color_buffer_idx] = def_color
+                    color_buffer.append(def_color)
                 else:
-                    color_buffer[color_buffer_idx] = colors[color_buffer_idx]
+                    color_buffer.append(colors[color_buffer_idx])
 
                 self.rainbow_circle_exec(color_buffer_idx, color_buffer[color_buffer_idx])
+                time.sleep(0.2)
 
             color_idx += 1
 
