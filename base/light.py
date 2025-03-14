@@ -144,10 +144,12 @@ class Light:
         if len(colors) == 0:
             colors = [
                 [255, 0, 0],
-                [0, 255, 0],
-                [0, 0, 255],
                 [128, 128, 0],
-                [0, 128, 128],
+                [96, 128, 128],
+                [0, 255, 128],
+                [0, 255, 255],
+                [0, 128, 255],
+                [0, 0, 255]
             ]
 
         def_color = [0, 0, 0]
@@ -162,7 +164,7 @@ class Light:
             if color_idx >= len(colors):
                 color_idx = 0
 
-            color_buffer = []
+            # color_buffer = []
             for color_i in range(color_num):
                 color_buffer_idx = color_idx + color_i
                 if color_buffer_idx >= len(colors):
@@ -170,6 +172,7 @@ class Light:
                 else:
                     color_buffer.insert(color_buffer_idx, colors[color_buffer_idx])
 
+                # print(color_buffer_idx, len(color_buffer))
                 self.rainbow_circle_exec(color_buffer_idx, color_buffer[color_buffer_idx])
                 time.sleep(0.2)
 
@@ -188,7 +191,9 @@ class Light:
         num = self.light_nums[idx]
         start = 0
         if idx > 0:
-            start += num
+            total = 0
+            for _, val in enumerate(self.light_nums):
+                start += val
 
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
         self.current_colors.insert(idx, color)
