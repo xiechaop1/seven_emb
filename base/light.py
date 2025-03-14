@@ -175,7 +175,7 @@ class Light:
                     color_buffer = colors[color_i]
                 # print(color_buffer_idx, len(color_buffer))
                 threading.Thread(target=self.rainbow_circle_exec, args=(color_pos, color_buffer)).start()
-            time.sleep(1)
+            time.sleep(3)
 
             color_idx += 1
 
