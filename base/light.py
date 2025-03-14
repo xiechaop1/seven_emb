@@ -198,7 +198,7 @@ class Light:
                 if light_idx < idx:
                     start += val
 
-        if idx < self.current_colors:
+        if idx < len(self.current_colors):
             self.current_colors[idx] = curr_color
         else:
             self.current_colors.append(color)
