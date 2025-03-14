@@ -44,7 +44,7 @@ class Mic:
     CHANNELS = 1  # 单声道
 
     SILENCE_THRESHOLD = 1200  # 静音阈值
-    SILENCE_FRAMES = 4  # 静音帧数量阈值
+    SILENCE_FRAMES = 6  # 静音帧数量阈值
     PRE_RECORD_FRAMES = 1  # 预录制帧数
     # 定义队列和缓冲区
 
@@ -72,7 +72,7 @@ class Mic:
         self.vad = webrtcvad.Vad(0)  # VAD模式设置，0为最宽松，3为最严格
         self.stream = None
         self.frames = []
-        self.is_recording = False
+        self.is_recording = "Waiting"
         self.filename = "temp_audio.wav"
 
         self.de_frames = collections.deque(maxlen=int(self.BUFFER_DURATION / self.FRAME_DURATION))
@@ -86,6 +86,7 @@ class Mic:
         self.ws = ws
         self.audio_player = audio_player
         self.light = light
+
         # self.req_send_time = 0
 
         self.spk_li_1 = [-0.626114, 0.430365, 0.564255, -0.182698, 0.537145, 0.044097, 0.564515, 0.666896, 1.085733,
@@ -121,6 +122,7 @@ class Mic:
         self.voice_buffer = None
         # self.buffer_size = 1024
         self.buffer_size = self.sample_rate * self.frame_duration // 1000
+        self.start_time = 0
 
     def kaldi_listener(self):
 
@@ -131,13 +133,13 @@ class Mic:
                 else:
                     device_idx = self.find_device_index()
 
-                with sd.InputStream(samplerate=self.sample_rate, blocksize=16000, device=device_idx,
+                with sd.InputStream(samplerate=self.sample_rate, blocksize=self.buffer_size, device=device_idx,
                                     dtype="int16", channels=1, callback=self.main_callback):
-                    while not ThreadingEvent.wakeup_event.is_set():
+                    # while not ThreadingEvent.wakeup_event.is_set():
+                    while True:
                         pass
 
     def main_callback(self, indata, frames, time1, status):
-        global file_counter
         # 调用网络传输的处理函数
 
         # callback(indata, frames, time1, status)
@@ -145,6 +147,13 @@ class Mic:
         # 调用本地 Kaldi 处理的处理函数
 
         if ThreadingEvent.wakeup_event.is_set():
+            if self.is_recording == "Waiting" and self.is_speech(indata) and not self.is_silent(indata):
+                self.is_recording = "Start"
+                self.start_time = time.time()
+                self.has_interrupt = False
+                self.frames = []
+            if self.is_recording == "Start":
+                self.voice_exec(indata, frames, time1, status)
             return
 
         data = bytes(indata)
@@ -201,28 +210,108 @@ class Mic:
 
 
         # print("final:", self.rec.FinalResult())
+    # def voice_exec(self, indata):
+    #     data_bytes = self.save_to_buffer_with_audio(indata)
+    #
+    #     if self.is_speech(data_bytes):
+    #         self.is_recording = True
+    #         audio_data = self.start_recording(data_bytes)
+
+    def voice_exec(self, indata, frames, time1, status):
+        # self.is_recording = True
+        # data = self.save_to_buffer_with_audio(indata)
+        data = indata.tobytes()
+        # self.is_recording = True
+        if not self.is_speech(indata):
+            return
+        audio_data = self.start_recording_with_indata(data)
+        if audio_data is None:
+            return
+        if self.is_recording == "Complete":
+            # 暂时去掉，再start_recording里判断静音
+            # and not self.is_silent(data)
+
+            # ThreadingEvent.audio_stop_event.set()
+            # print("wakeup:", ThreadingEvent.wakeup_event)
+            # if ThreadingEvent.wakeup_event.is_set() == False:
+            #     if self.wakeup(audio_data):
+            #         # self.wakeup()
+            #         ThreadingEvent.wakeup_event.set()
+            #         # ThreadingEvent.sleep_daemon_event.set()
+            #
+            #         if Config.IS_DEBUG == False:
+            #             # 唤醒成功了点亮
+            #             # self.light.set_mode(Code.LIGHT_MODE_BREATHING)
+            #             self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+            #             logging.info("set light turned on")
+            #     else:
+            #         continue
+
+            # ThreadingEvent.wakeup_event.wait()
+            if not ThreadingEvent.wakeup_event.is_set():
+                # audio_data = None
+                return
+            try:
+                # # 场景化策略（垫音）
+                # # 后面应该单独拆走
+                # if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+                #     output_file_name = "resources/sound/sa_wait_voice.mp3"
+                #     self.audio_player.play_voice_with_file(output_file_name)
+
+                # 记录发送请求的时间
+                # self.req_send_time = time.time()
+                self.send_request(self.ws, audio_data)
+                if Config.IS_DEBUG == False:
+                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 254, "g": 211, "b": 76})
+                    logging.info("set light to loading mode")
+                # 场景化策略（垫音）
+                # 后面应该单独拆走
+                if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+                    output_file_name = "resources/sound/sa_wait_voice.mp3"
+                    print("play en!")
+                    self.audio_player.play_voice_with_file(output_file_name)
+                self.is_recording = "Waiting"
+
+            except (WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
+                print(f"WebSocket connection failed: {e}")
+
+            except Exception as e:
+                print(f"Unexpected error: {e}")
+
+        return
 
     def daemon(self):
 
         while True:
             if self.handler_interrupt == False:
                 break
-
+            break
             # if ThreadingEvent.wakeup_event.is_set() == False:
             #     # self.p.terminate()
             #     self.wakeup()
             #
             # if ThreadingEvent.wakeup_event.is_set() == False:
             #     continue
-
             ThreadingEvent.wakeup_event.wait()
 
-            self.stream = self.p.open(format=pyaudio.paInt16,
-                                      channels=1,
-                                      rate=self.sample_rate,
-                                      # input_device_index=self.find_device_index(),
-                                      input=True,
-                                      frames_per_buffer=self.buffer_size)
+            # Temp cancel by choice on 14 March
+            # self.stream = self.p.open(format=pyaudio.paInt16,
+            #                           channels=1,
+            #                           rate=self.sample_rate,
+            #                           # input_device_index=self.find_device_index(),
+            #                           input=True,
+            #                           frames_per_buffer=self.buffer_size)
+            if Config.IS_DEBUG == True:
+                device_idx = 2
+            else:
+                device_idx = self.find_device_index()
+
+            self.is_recording = "Start"
+            with sd.InputStream(samplerate=self.sample_rate, blocksize=512, device=device_idx,
+                                dtype="int16", channels=1, callback=self.voice_exec):
+                while self.is_recording != "Waiting" and self.is_recording is not None:
+                    pass
+            return
 
             # self.stream = self.p.open(format=pyaudio.paInt16,
             #                           channels=1,
@@ -265,68 +354,68 @@ class Mic:
                 #     data = data.tobytes()
                 #     self.voice_buffer = None
                 # else:
-                data = self.stream.read(self.buffer_size, exception_on_overflow=False)
-                if self.is_speech(data) or self.voice_buffer is not None:
-                    # 暂时去掉，再start_recording里判断静音
-                    # and not self.is_silent(data)
-
-
-                    # ThreadingEvent.audio_stop_event.set()
-                    if self.voice_buffer is None:
-                        self.is_recording = True
-                        audio_data = self.start_recording(data)
-                        if audio_data is None:
-                            continue
-                    else:
-                        audio_data = self.save_to_buffer_with_audio(self.voice_buffer)
-                        self.voice_buffer = None
-                        if audio_data is None:
-                            continue
-
-                    # print("wakeup:", ThreadingEvent.wakeup_event)
-                    # if ThreadingEvent.wakeup_event.is_set() == False:
-                    #     if self.wakeup(audio_data):
-                    #         # self.wakeup()
-                    #         ThreadingEvent.wakeup_event.set()
-                    #         # ThreadingEvent.sleep_daemon_event.set()
-                    #
-                    #         if Config.IS_DEBUG == False:
-                    #             # 唤醒成功了点亮
-                    #             # self.light.set_mode(Code.LIGHT_MODE_BREATHING)
-                    #             self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
-                    #             logging.info("set light turned on")
-                    #     else:
-                    #         continue
-
-                    # ThreadingEvent.wakeup_event.wait()
-                    if not ThreadingEvent.wakeup_event.is_set():
-                        # audio_data = None
-                        continue
-                    try:
-                        # # 场景化策略（垫音）
-                        # # 后面应该单独拆走
-                        # if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
-                        #     output_file_name = "resources/sound/sa_wait_voice.mp3"
-                        #     self.audio_player.play_voice_with_file(output_file_name)
-
-                        # 记录发送请求的时间
-                        # self.req_send_time = time.time()
-                        self.send_request(self.ws, audio_data)
-                        if Config.IS_DEBUG == False:
-                            self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 254, "g": 211, "b": 76})
-                            logging.info("set light to loading mode")
-                        # 场景化策略（垫音）
-                        # 后面应该单独拆走
-                        if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
-                            output_file_name = "resources/sound/sa_wait_voice.mp3"
-                            print("play en!")
-                            self.audio_player.play_voice_with_file(output_file_name)
-
-                    except (WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
-                        print(f"WebSocket connection failed: {e}")
-
-                    except Exception as e:
-                        print(f"Unexpected error: {e}")
+                data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
+                # if self.is_speech(data) or self.voice_buffer is not None:
+                #     # 暂时去掉，再start_recording里判断静音
+                #     # and not self.is_silent(data)
+                #
+                #
+                #     # ThreadingEvent.audio_stop_event.set()
+                #     if self.voice_buffer is None:
+                #         self.is_recording = True
+                #         audio_data = self.start_recording(data)
+                #         if audio_data is None:
+                #             continue
+                #     else:
+                #         audio_data = self.save_to_buffer_with_audio(self.voice_buffer)
+                #         self.voice_buffer = None
+                #         if audio_data is None:
+                #             continue
+                #
+                #     # print("wakeup:", ThreadingEvent.wakeup_event)
+                #     # if ThreadingEvent.wakeup_event.is_set() == False:
+                #     #     if self.wakeup(audio_data):
+                #     #         # self.wakeup()
+                #     #         ThreadingEvent.wakeup_event.set()
+                #     #         # ThreadingEvent.sleep_daemon_event.set()
+                #     #
+                #     #         if Config.IS_DEBUG == False:
+                #     #             # 唤醒成功了点亮
+                #     #             # self.light.set_mode(Code.LIGHT_MODE_BREATHING)
+                #     #             self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+                #     #             logging.info("set light turned on")
+                #     #     else:
+                #     #         continue
+                #
+                #     # ThreadingEvent.wakeup_event.wait()
+                #     if not ThreadingEvent.wakeup_event.is_set():
+                #         # audio_data = None
+                #         continue
+                #     try:
+                #         # # 场景化策略（垫音）
+                #         # # 后面应该单独拆走
+                #         # if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+                #         #     output_file_name = "resources/sound/sa_wait_voice.mp3"
+                #         #     self.audio_player.play_voice_with_file(output_file_name)
+                #
+                #         # 记录发送请求的时间
+                #         # self.req_send_time = time.time()
+                #         self.send_request(self.ws, audio_data)
+                #         if Config.IS_DEBUG == False:
+                #             self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 254, "g": 211, "b": 76})
+                #             logging.info("set light to loading mode")
+                #         # 场景化策略（垫音）
+                #         # 后面应该单独拆走
+                #         if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
+                #             output_file_name = "resources/sound/sa_wait_voice.mp3"
+                #             print("play en!")
+                #             self.audio_player.play_voice_with_file(output_file_name)
+                #
+                #     except (WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
+                #         print(f"WebSocket connection failed: {e}")
+                #
+                #     except Exception as e:
+                #         print(f"Unexpected error: {e}")
 
     # def get_req_send_time(self):
     #     return self.req_send_time
@@ -516,6 +605,92 @@ class Mic:
     def stop_daemon(self):
         self.handler_interrupt = True
 
+    def start_recording_with_indata(self, indata=None):
+        """开始录音"""
+        # self.frames = []
+        # self.is_recording = True
+        # logging.info("Recording started...")
+
+
+        # print("begin")
+
+        # self.audio_player.interrupt()
+        # self.audio_player.stop_audio()
+        # ThreadingEvent.recv_execute_command_event.clear()
+        # ThreadingEvent.camera_start_event.clear()
+        # ThreadingEvent.audio_play_event.clear()
+
+        # volume = np.abs(indata).mean()
+        # indata = resample_audio1(indata, SAMPLERATE_ORIG, SAMPLERATE_TARGET)
+        start_time = self.start_time
+        # if volume > SILENCE_THRESHOLD:
+
+        # print(time.time() - start_time)
+
+        # self.has_interrupt = False
+        if self.is_recording == "Start":
+            # print(self.is_recording)
+            time_duration = time.time() - start_time
+            print(time_duration)
+            if time_duration > 0.5 and self.has_interrupt == False:
+                self.audio_player.interrupt()
+                self.audio_player.stop_audio()
+                ThreadingEvent.recv_execute_command_event.clear()
+                ThreadingEvent.camera_start_event.clear()
+                self.has_interrupt = True
+            # data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
+            # data = self.stream.read(512, exception_on_overflow=False)
+            self.frames.append(indata)
+
+            # 静音检测（通过 VAD 检测）
+            if time_duration < 0.5:
+                return
+
+            if (not self.is_speech(indata)) or self.is_silent(indata):
+                print("tag:", self.is_speech(indata), self.slience_tag)
+                logging.info("Silence detected.")
+                self.is_recording = "PreSave"
+                # return
+                # self.stop_recording()
+
+            # 超过 timeout 秒自动停止
+            if time.time() - start_time > self.timeout:
+                logging.info("Recording time exceeded, stopping...")
+                self.is_recording = "PreSave"
+                # return
+                # self.stop_recording()
+
+            # audio_memory.write(indata.tobytes())
+        time_duration = time.time() - start_time
+        if time_duration > 0.5 and self.is_recording == "PreSave":
+            # self.is_recording = "Save"
+            self.audio_player.interrupt()
+            self.audio_player.stop_audio()
+            ThreadingEvent.recv_execute_command_event.clear()
+            ThreadingEvent.camera_start_event.clear()
+            # audio_memory = io.BytesIO()
+            # for frame in pre_buffer:
+            # audio_memory.write(frame.tobytes())
+            # pre_buffer.clear()
+
+            # audio_data = self.save_to_buffer_by_int16()
+            audio_data = self.save_to_buffer()
+            # print("save to buffer")
+            self.save_recording(self.filename)
+            # print("save to file")
+            self.slience_tag = True
+            self.silence_counter = 0
+
+            self.is_recording = "Complete"
+            print("voice duration:", (time.time() - start_time))
+
+            return audio_data
+        # else:
+            # print("cancel with short time, ", time_duration)
+
+        # self.silence_counter = 0
+        return None
+
     def start_recording(self, start_frame=None):
         """开始录音"""
         self.frames = []
@@ -550,7 +725,7 @@ class Mic:
                 ThreadingEvent.camera_start_event.clear()
                 has_interrupt = True
             # data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
-            data = self.stream.read(self.buffer_size, exception_on_overflow=False)
+            data = self.stream.read(512, exception_on_overflow=False)
             self.frames.append(data)
 
             # 静音检测（通过 VAD 检测）

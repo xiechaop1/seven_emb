@@ -138,7 +138,7 @@ class ExecuteCommand:
 					logging.info(f"add voice, pass by playing_data: {latest_playing_scene_seq}, {scene_seq}")
 					return False
 			elif playing_data["type"] == Code.REC_METHOD_VOICE_CHAT:
-				logging.info(f"add voice, pass by wrong type: {playing_data['type']}, {scene_seq}")
+				logging.info(f"add voice, pass by wrong type: {playing_data['type']}, {playing_data}, {scene_seq}")
 				return False
 
 		# 过滤已经播放的列表，从后面往前找，找到最后一条Execute-Command的，如果场景一致，则找到最后一个声频的index，记录下来
