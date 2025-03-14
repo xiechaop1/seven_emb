@@ -33,6 +33,7 @@ class Light:
         self.ts = 0
         self.run_ts = 0
         self.light_nums = [40, 32, 24, 16]
+        self.current_colors = []
 
     def daemon(self):
         while True:
@@ -81,6 +82,9 @@ class Light:
                         input[key] = params[key]
 
                 self.circle(input["r1"], input["g1"], input["b1"], input["r2"], input["g2"], input["b2"], input["time_duration"], input["times"])
+            elif light_mode == Code.LIGHT_MODE_CIRCLE_RAINBOW:
+                color_list = []
+                self.rainbow_circle(color_list)
             else:
                 self.turn_off()
 
@@ -136,6 +140,58 @@ class Light:
 
         return True
 
+    def rainbow_circle(self, colors = []):
+        if len(colors) == 0:
+            colors = [
+                [255, 0, 0],
+                [0, 255, 0],
+                [0, 0, 255],
+                [128, 128, 0],
+                [0, 128, 128],
+            ]
+
+        def_color = [0, 0, 0]
+
+        color_idx = 0
+        color_num = 4
+        color_buffer = []
+        while True:
+            if self.light_mode != Code.LIGHT_MODE_CIRCLE_RAINBOW or self.ts > self.run_ts:
+                break
+
+            if color_idx >= len(colors):
+                color_idx = 0
+
+            for color_i in range(color_num):
+                color_buffer_idx = color_idx + color_i
+                if color_buffer_idx >= len(colors):
+                    color_buffer[color_buffer_idx] = def_color
+                else:
+                    color_buffer[color_buffer_idx] = colors[color_buffer_idx]
+
+                self.rainbow_circle_exec(color_buffer_idx, color_buffer[color_buffer_idx])
+
+            color_idx += 1
+
+
+    def rainbow_circle_exec(self, idx, color):
+        if self.current_colors[idx] is not None:
+            curr_color = self.current_colors[idx]
+        else:
+            curr_color = [0, 0, 0]
+
+        curr_r, curr_g, curr_b = curr_color
+        r, g, b = color
+
+        num = self.light_nums[idx]
+        start = 0
+        if idx > 0:
+            start += num
+
+        self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
+        self.current_colors[idx] = color
+
+
     def circle2(self, r1, g1, b1, r2, g2, b2, time_duration, times):
         steps = 4
         nums = self.light_nums
@@ -143,7 +199,7 @@ class Light:
         step_g = (g2 - g1) / (steps - 1)
         step_b = (b2 - b1) / (steps - 1)
 
-        
+
 
     def circle(self, r1, g1, b1, r2, g2, b2, wait_ms = 0, times = -1):
 
@@ -252,7 +308,7 @@ class Light:
         return
 
 
-    def fade(self, r1, g1, b1, r2 = 0, g2 = 0, b2 = 255, steps = 100, wait_time = 0.2):
+    def fade(self, r1, g1, b1, r2 = 0, g2 = 0, b2 = 255, start = 0, num = 0, steps = 100, wait_time = 0.2):
         step_r = (r2 - r1) / steps
         step_g = (g2 - g1) / steps
         step_b = (b2 - b1) / steps
@@ -261,7 +317,10 @@ class Light:
             r = int(r1 + step_r * i)
             g = int(g1 + step_g * i)
             b = int(b1 + step_b * i)
-            self.show_color(r, g, b)
+            if start > 0 or num > 0:
+                self.show_color(r, g, b, start, num)
+            else:
+                self.show_color(r, g, b)
 
         return
 
