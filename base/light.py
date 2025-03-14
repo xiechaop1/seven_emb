@@ -177,7 +177,7 @@ class Light:
 
 
     def rainbow_circle_exec(self, idx, color):
-        if self.current_colors[idx] is not None:
+        if idx < len(self.current_colors):
             curr_color = self.current_colors[idx]
         else:
             curr_color = [0, 0, 0]
