@@ -170,7 +170,10 @@ class Light:
                 if color_buffer_idx >= len(colors):
                     color_buffer.insert(color_buffer_idx, def_color)
                 else:
-                    color_buffer[color_buffer_idx] = colors[color_buffer_idx]
+                    if color_buffer_idx >= len(color_buffer):
+                        color_buffer.insert(color_buffer_idx, colors[color_buffer_idx])
+                    else:
+                        color_buffer[color_buffer_idx] = colors[color_buffer_idx]
 
                 # print(color_buffer_idx, len(color_buffer))
                 self.rainbow_circle_exec(color_buffer_idx, color_buffer[color_buffer_idx])
