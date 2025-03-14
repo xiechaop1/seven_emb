@@ -199,7 +199,7 @@ class Light:
                     start += val
 
         if idx < len(self.current_colors):
-            self.current_colors[idx] = curr_color
+            self.current_colors[idx] = color
         else:
             self.current_colors.append(color)
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
