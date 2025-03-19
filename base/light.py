@@ -231,12 +231,14 @@ class Light:
         for idx in range(sector_num):
             sector_buffer = []
             sector_start = 0
+            old_start = 0
             for l_idx in range(line_num):
                 if l_idx > 0:
                     sector_start = self.light_nums[l_idx - 1]
-                sector_start += self.light_sector_step[l_idx] * idx
+                sector_start += old_start + self.light_sector_step[l_idx] * idx
 
                 sector_buffer.append(sector_start)
+                old_start = sector_start
             sector_area.append(sector_buffer)
 
 
@@ -250,7 +252,7 @@ class Light:
                 sector_pos += step
                 show_pos = sector_pos % sector_num
 
-                sector = sector_area[sector_pos]
+                sector = sector_area[show_pos]
 
                 if show_pos < len(sector_color_old):
                     old_color = sector_color_old[show_pos]
