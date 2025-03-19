@@ -216,7 +216,7 @@ class Light:
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
 
     def sector_flowing(self):
-        time_duration = 2500           # ms
+        time_duration = 400           # ms
         sector_num = 8
         colors = [
             [255, 0, 0],
@@ -284,7 +284,7 @@ class Light:
                 #                 args=(curr_colors, sector_color_old, sector, self.light_sector_step)).start()
 
                 if  show_pos < len(sector_color_old):
-                    sector_color_old[show_pos] = colors[show_pos]
+                    sector_color_old[step] = colors[show_pos]
                 else:
                     sector_color_old.append(colors[show_pos])
 
