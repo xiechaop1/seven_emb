@@ -244,7 +244,7 @@ class Light:
         while True:
             if self.light_mode != Code.LIGHT_MODE_SECTOR_FLOWING or self.ts > self.run_ts:
                 break
-            for color in enumerate(colors):
+            for _, color in enumerate(colors):
 
                 sector_pos += step
                 show_pos = sector_pos % sector_num
@@ -259,7 +259,7 @@ class Light:
                 old_r, old_g, old_b = old_color
                 curr_r, curr_g, curr_b = color
 
-                for sector_one in enumerate(sector):
+                for _, sector_one in enumerate(sector):
                     for one_idx in range(sector_one):
                         self.fade(curr_r, curr_g, curr_b, old_r, old_g, old_b, sector_num[one_idx], self.light_sector_step[one_idx])
 
