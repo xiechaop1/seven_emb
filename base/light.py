@@ -284,15 +284,15 @@ class Light:
                 #                 args=(curr_colors, sector_color_old, sector, self.light_sector_step)).start()
 
                 if  show_pos < len(sector_color_old):
-                    sector_color_old[show_pos] = old_color
+                    sector_color_old[show_pos] = colors[show_pos]
                 else:
-                    sector_color_old.append(old_color)
+                    sector_color_old.append(colors[show_pos])
 
                 # for one_idx, sector_one in enumerate(sector):
                 #     # for one_idx in range(sector_one - 1):
                 #     threading.Thread(target=self.fade_by_rage, args=(color, old_color, sector_one, self.light_sector_step[one_idx])).start()
 
-            self.fade_total_by_range(curr_colors, sector_color_old, curr_sector, self.light_sector_step)
+            self.fade_total_by_range(curr_colors, sector_color_old, sector_area, self.light_sector_step)
             steps += 1
 
             time.sleep(time_duration / 1000)
