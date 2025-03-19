@@ -10,6 +10,7 @@ from common.threading_event import ThreadingEvent
 from common.scence import Scence
 from common.code import Code
 from config.config import Config
+import time
 
 
 class Recv:
@@ -28,13 +29,17 @@ class Recv:
 		self.audio_player = audioPlayerIns
 		self.light = lightIns
 		self.cv2 = cv2Ins
+		self.undertake = False
 
 	def daemon(self):
 		vc_handler = VoiceChat(self.audio_player)
+
+		# self.wsClient.set_callback = ec_handler.undertake
 		ec_handler = ExecuteCommand(self.audio_player, self.wsClient, self.cv2)
 
 		last_resp = None
 		msg_id_2_type = {}
+		retry_ct = 0
 		while True:
 			if self.recv_daemon == False:
 				break
@@ -45,7 +50,12 @@ class Recv:
 				# print(response)
 			except (websocket.WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
 				print(e)
-				break
+				retry_ct += 1
+				if retry_ct >= 3:
+					self.undertake = True
+				else:
+					time.sleep(1)		# 3s以后重试
+					continue
 
 			resp = json.loads(response)
 			# print(resp)
@@ -115,6 +125,7 @@ class Recv:
 							# 	"seq_id": -1
 							# }
 							self.audio_player.clear_list()
+							self.audio_player.stop_audio()
 							# self.audio_player.add(audio_data)
 							# self.audio_player.resume_interrupted(None, 1)
 
@@ -136,6 +147,7 @@ class Recv:
 						if ThreadingEvent.recv_execute_command_event.is_set():
 							# print("recv event2:", ThreadingEvent.recv_execute_command_event)
 							print("pre resp for exec", resp["message_id"])
+
 							ec_thread = threading.Thread(target=ec_handler.deal, args=(resp,))
 							ec_thread.start()
 							# ec_handler.deal(resp)

@@ -12,6 +12,8 @@ class ThreadingEvent:
 
 	wakeup_event = threading.Event()
 
+	execute_command_undertake = threading.Event()
+
 	interrupt_lock = None
 
 	# interrupt_lock = threading.Lock()

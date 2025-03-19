@@ -20,6 +20,7 @@ from common.threading_event import ThreadingEvent
 from model.recv import Recv
 from common.code import Code
 from model.daemon import Daemon
+from model.undertake_callback import UndertakeCallback
 import asyncio
 
 
@@ -46,6 +47,7 @@ if __name__ == "__main__":
     websocket_url = "ws://114.55.90.104:9001/ws"
     # ws_cli = asyncio.run(main())
     client = WebSocketClient(websocket_url)
+    # client.set_callback(UndertakeCallback.undertake)
     ws_cli = client.connect()
     # exit(0)
     #ws_cli = WebSocketClient.create_websocket_client(websocket_url)
@@ -74,7 +76,7 @@ if __name__ == "__main__":
         light_instance.turn_off()
         # light_instance.start(Code.LIGHT_MODE_BREATHING, {"r":0, "g":0, "b":255, "steps": 200})
         # light_instance.start(Code.LIGHT_MODE_CIRCLE, {"r1": 0, "g1": 0, "b1": 255, "r2": 0, "g2": 255, "b2": 0, "time_duration": 100, "times": -1})
-        light_instance.start(Code.LIGHT_MODE_CIRCLE_RAINBOW, {})
+        light_instance.start(Code.LIGHT_MODE_SECTOR_FLOWING, {})
         logging.info("light initialized")
     else:
         spray_instance = ""

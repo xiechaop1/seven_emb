@@ -1,5 +1,6 @@
 import json
 import logging
+import traceback
 
 from base.messageid import messageid
 import base64
@@ -17,15 +18,23 @@ import threading
 
 class ExecuteCommand:
 
+
+	MAX_SCENE = 6	# 最大场景ID
+
 	def __init__(self, audioPlayerIns, ws, cv2):
 		self.audio_player = audioPlayerIns
 		self.latest_scene_seq = 0
+		self.req_scene_seq = 0
 		self.take_photo_max_ct = 3
 		self.ws = ws
 		self.cv2 = cv2
 		self.camera = Camera(cv2)
 		self.max_seq = 0
 		self.voice_add_lock = threading.Lock()
+		self.undertake = False
+		self.commit_status = None
+
+		self.undertake_lock = threading.Lock()
 
 	def take_photo(self):
 		while True:
@@ -44,6 +53,33 @@ class ExecuteCommand:
 			self.commit(photo_list)
 			time.sleep(0.5)
 
+	def get_status_by_audio(self, audio):
+		status = None
+		if audio is not None:
+			if audio["type"] == Code.REC_METHOD_VOICE_EXEC:
+				seq_id = audio["seq_id"]
+				scene_seq = audio["scene_seq"]
+				voice_count = audio["voice_count"]
+
+				# print(latest_played)
+				if scene_seq < 100:
+					if self.max_seq < scene_seq:
+						if seq_id >= voice_count - 1:
+							status = "COMPLETED"
+							self.max_seq = scene_seq
+							self.req_scene_seq = scene_seq + 1
+						else:
+							status = "IN_PROGRESS"
+					else:
+						status = ""
+				else:
+					status = ""
+
+				self.commit_status = status
+
+				print(status, scene_seq, seq_id, voice_count)
+
+		return status
 
 	def commit(self, photo_list):
 		latest_played = self.audio_player.get_latest_played()
@@ -53,25 +89,31 @@ class ExecuteCommand:
 
 		status = ""
 		scene_seq = 0
-		if latest_played is not None:
-			if latest_played["type"] == Code.REC_METHOD_VOICE_EXEC:
-				seq_id = latest_played["seq_id"]
-				scene_seq = latest_played["scene_seq"]
-				voice_count = latest_played["voice_count"]
-
-				if scene_seq < 100:
-					if self.max_seq < scene_seq:
-						if seq_id >= voice_count - 1:
-							status = "COMPLETED"
-							self.max_seq = scene_seq
-						else:
-							status = "IN_PROGRESS"
-					else:
-						status = ""
-				else:
-					status = ""
-
-				print(status, scene_seq, seq_id, voice_count)
+		# print("commit:", latest_played)
+		# if latest_played is not None:
+		# 	if latest_played["type"] == Code.REC_METHOD_VOICE_EXEC:
+		# 		seq_id = latest_played["seq_id"]
+		# 		scene_seq = latest_played["scene_seq"]
+		# 		voice_count = latest_played["voice_count"]
+		#
+		# 		# print(latest_played)
+		# 		if scene_seq < 100:
+		# 			if self.max_seq < scene_seq:
+		# 				if seq_id >= voice_count - 1:
+		# 					status = "COMPLETED"
+		# 					self.max_seq = scene_seq
+		# 					self.req_scene_seq += 1
+		# 				else:
+		# 					status = "IN_PROGRESS"
+		# 			else:
+		# 				status = ""
+		# 		else:
+		# 			status = ""
+		#
+		# 		self.commit_status = status
+		#
+		# 		print(status, scene_seq, seq_id, voice_count)
+		status = self.get_status_by_audio(latest_played)
 
 		request = {
 			"version": "1.0",
@@ -92,9 +134,51 @@ class ExecuteCommand:
 			}
 		}
 
-		self.ws.send(json.dumps(request))
+		try:
+			self.ws.set_callback(self.undertake_callback)
+			# print("cb ut:", self.ws.error_callback)
+			self.ws.send(json.dumps(request))
+			self.undertake = False
+
+		# if self.undertake_lock.acquire():
+			# 	undertake_threading = threading.Thread(target=self.undertake)
+			# 	undertake_threading.start()
+
+		except Exception as e:
+			# print(e)
+			# print("got exception")
+			logging.error(traceback.format_exc())
 
 		return
+
+	def undertake_callback(self, error):
+		# 报错以后启动兜底
+		# ThreadingEvent.execute_command_undertake.wait()
+
+		if self.undertake_lock.acquire(False):
+			latest_played = self.audio_player.get_latest_played()
+			status = self.get_status_by_audio(latest_played)
+
+			print("undertake")
+
+			self.undertake = True
+			file_path = 'sleep_config.json'
+			# latest_scene_seq = self.latest_scene_seq
+			voice_list = self.decode_sleep_json(file_path, self.req_scene_seq)
+			# print(voice_list)
+
+			resp = {
+				"message_id": messageid.get_latest_message_id(),
+				"conversation_id": messageid.get_conversation_id(),
+				"data": voice_list,
+				"method": "execute-command",
+			}
+			print(resp)
+			ec_thread = threading.Thread(target=self.deal, args=(resp,))
+			ec_thread.start()
+			time.sleep(6)
+			self.undertake_lock.release()
+
 
 	def deal(self, resp):
 
@@ -224,7 +308,7 @@ class ExecuteCommand:
 				if self.voice_add_lock.locked():
 					self.voice_add_lock.release()
 
-			if not self.voice_add_lock.acquire():
+			if not self.voice_add_lock.acquire(False):
 				logging.warn("Duplicate Voice Add", resp_msg_id)
 				return
 
@@ -291,8 +375,59 @@ class ExecuteCommand:
 					self.audio_player.resume_interrupted(resp_msg_id, 1)
 
 			self.latest_scene_seq = scene_seq
+			self.req_scene_seq = scene_seq
 			if self.voice_add_lock.locked():
 				self.voice_add_lock.release()
 
 		return
+
+	def decode_sleep_json(self, file_path, latest_scene_seq = 1):
+		# 读取 JSON 文件
+		with open(file_path, 'r', encoding='utf-8') as f:
+			data = json.load(f)
+
+		# 初始化存储文件名的二维数组
+		sleep_voice_list = []
+
+		# latest_scene_seq = self.latest_scene_seq
+
+		# 遍历 JSON 数据并提取 filenames
+
+		if latest_scene_seq == 0:
+			latest_scene_seq = 1
+
+		ret = {}
+		for key, value in data.items():
+			# print("key:", key, "latest_scene_seq:", latest_scene_seq)
+			# 排除序号大
+			# 于 400 的键
+			if key.isdigit() and int(key) > 100:
+				continue
+
+			if int(key) == latest_scene_seq:
+				ret["actions"] = value
+				ret["scene_seq"] = int(key)
+				ret["code"] = 0
+
+				# value["scene_seq"] = int(key)
+				# sleep_voice_list.append(value)
+				sleep_voice_list = ret
+				break
+
+			# 检查 voice 字段是否存在且不为 None
+			# if "voice" in value and value["voice"] is not None:
+			# 	# 为每个 key 创建一个新的子列表
+			# 	voice_filenames = []
+			# 	# 遍历 voice 中的声音列表
+			# 	for voice in value["voice"]["voices"]:
+			# 		if "filename" in voice:
+			# 			voice_filenames.append(voice["filename"])  # 将文件名添加到子列表中
+			# 	# 如果子列表非空，则将该子列表添加到二维数组中
+			# 	if voice_filenames:
+			# 		sleep_voice_list.append(voice_filenames)
+		# print(sleep_voice_list)
+		return sleep_voice_list
+
+	# file_path = '/home/li/vosk-api/python/example/sleep_config.json'
+	# sleep_voice_list = extract_voice_filenames(file_path)
 

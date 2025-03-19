@@ -16,8 +16,9 @@ import logging
 # L.addHandler(handler)
 
 logging.basicConfig(
-	level=logging.DEBUG,
-	format="%(asctime)s - %(name)s - %(levelname)s - [%(pathname)s:%(lineno)d] - %(message)s",
+	level=logging.INFO,
+	format="%(asctime)s - %(threadName)s - %(module)s"
+		   " - %(name)s - %(levelname)s - [%(pathname)s:%(lineno)d] - %(message)s",
 	datefmt="%m/%d/%Y %I:%M:%S %p",
 	filename="./log/seven_emb.log",
 	filemode="a"

@@ -310,7 +310,7 @@ class AudioPlayer:
 
         if bgm and bgm != self.current_bgm:
             bgm_file = "resources/background_music/" + bgm["filename"]
-            logging.debug("start playing bgm, bgm_file: ", bgm_file)
+            logging.debug(f"start playing bgm, bgm_file: {bgm_file}")
             if os.path.isfile(bgm_file):
                 pygame.mixer.music.load(bgm_file)  # 加载音频文件
                 pygame.mixer.music.play(-1)

@@ -4,12 +4,10 @@ import time
 import logging
 import queue
 import datetime
-from config import config
-from model.undertake_callback import UndertakeCallback
 
 from common.scence import Scence
 
-# logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 
 class WebSocketClient:
@@ -24,15 +22,9 @@ class WebSocketClient:
         self.ws = None
         self.max_retries = max_retries
         self.retry_interval = retry_interval
-        self.close_retries = 0
-        self.timeout = 3
         self.connected = False
-        self.error_callback = None
 
         self.message_queue = queue.Queue()
-
-    def set_callback(self, callback):
-        self.error_callback = callback
 
     def on_message(self, ws, message):
         """接收 WebSocket 消息"""
@@ -43,20 +35,15 @@ class WebSocketClient:
         """处理 WebSocket 错误"""
         logging.error(f"Error: {error}")
 
-        if self.error_callback:
-            self.error_callback(error)
-
     def on_close(self, ws, close_status_code, close_msg):
         """WebSocket 连接关闭时触发"""
         self.connected = False
         logging.warning("WebSocket closed. Attempting to reconnect...")
-        time.sleep(self.retry_interval)
         self.reconnect()
 
     def on_open(self, ws):
         """WebSocket 连接成功时触发"""
         logging.info("WebSocket connection established.")
-        ws.sock.settimeout(self.timeout)
         self.connected = True
 
     def connect(self):
@@ -72,8 +59,7 @@ class WebSocketClient:
                     self.url,
                     on_message=self.on_message,
                     on_error=self.on_error,
-                    on_close=
-                    self.on_close,
+                    on_close=self.on_close,
                     on_open=self.on_open
                 )
 
@@ -89,7 +75,7 @@ class WebSocketClient:
             except Exception as e:
                 logging.error(f"Connection failed: {e}")
                 retries += 1
-                time.sleep(self.retry_interval * retries)
+                time.sleep(self.retry_interval)
 
         logging.error("Max retries reached. Could not connect.")
         return None
@@ -107,7 +93,6 @@ class WebSocketClient:
         """
         # print(ws, self.connected)
         ws = self.ws
-        # print("cb:", self.error_callback)
         if ws and self.connected:
             try:
                 logging.info(f"Sending message: {datetime.datetime.now()}")

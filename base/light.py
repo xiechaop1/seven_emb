@@ -5,6 +5,7 @@ from common.code import Code
 import wheel
 from common.threading_event import ThreadingEvent
 from config.config import Config
+import random
 
 if not Config.IS_DEBUG:
     from rpi_ws281x import *
@@ -34,6 +35,9 @@ class Light:
         self.ts = 0
         self.run_ts = 0
         self.light_nums = [40, 32, 24, 16]
+        self.light_sector_step = [
+            5, 4, 3, 2
+        ]
         self.current_colors = []
 
     def daemon(self):
@@ -55,7 +59,9 @@ class Light:
             if "steps" in params:
                 steps = params["steps"]
 
-            if light_mode == Code.LIGHT_MODE_STATIC:
+            if light_mode == Code.LIGHT_MODE_SECTOR_FLOWING:
+                self.sector_flowing()
+            elif light_mode == Code.LIGHT_MODE_STATIC:
                 self.Static(r, g, b)
             elif light_mode == Code.LIGHT_MODE_GRADIENT:
                 self.Gradient(r, g, b)
@@ -204,6 +210,64 @@ class Light:
             self.current_colors.append(color)
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
 
+    def sector_flowing(self):
+        time_duration = 1500           # ms
+        sector_num = 8
+        colors = [
+            [255, 0, 0],
+            [128, 128, 0],
+            [96, 128, 128],
+            [0, 255, 128],
+            [0, 255, 255],
+            [0, 128, 255],
+            [0, 0, 255],
+            [0, 0, 128]
+        ]
+
+        sector_color_old = []
+        sector_buffer = []
+        line_num = 4
+        sector_area = []
+        for idx in range(sector_num) - 1:
+            for l_idx in range(line_num):
+                sector_start = 0
+                if l_idx > 0:
+                    sector_start = self.light_nums[l_idx - 1]
+                sector_start += self.light_sector_step[l_idx] * idx
+
+                sector_buffer.append(sector_start)
+            sector_area.append(sector_buffer)
+
+
+        step = 0
+        sector_pos = 0
+        while True:
+            if self.light_mode != Code.LIGHT_MODE_SECTOR_FLOWING or self.ts > self.run_ts:
+                break
+            for color in enumerate(colors):
+
+                sector_pos += step
+                show_pos = sector_pos % sector_num
+
+                sector = sector_area[sector_pos]
+
+                if sector_pos < len(self.sector_color_old):
+                    old_color = sector_color_old[sector_pos]
+                else:
+                    old_color = [0, 0, 0]
+
+                old_r, old_g, old_b = old_color
+                curr_r, curr_g, curr_b = color
+
+                for sector_one in enumerate(sector):
+                    for one_idx in range(sector_one):
+                        self.fade(curr_r, curr_g, curr_b, old_r, old_g, old_b, sector_num[one_idx], self.light_sector_step[one_idx])
+
+            time.sleep(time_duration / 1000)
+            step += 1
+
+
+
     def circle2(self, r1, g1, b1, r2, g2, b2, time_duration, times):
         steps = 4
         nums = self.light_nums
@@ -318,6 +382,34 @@ class Light:
         self.fade(old_color['r'], old_color['g'], old_color['b'], r, g, b)
 
         return
+
+    def overflowing(self, line_num = 1, light_num = 7, steps = 5):
+
+        colors = [
+            [255, 0, 0],
+            [128, 128, 0],
+            [96, 128, 128],
+            [0, 255, 128],
+            [0, 255, 255],
+            [0, 128, 255],
+            [0, 0, 255]
+        ]
+
+
+
+
+        for i in range(line_num):
+            line_pos = random.randint(1, 4)
+            light_max = self.light_nums[light_num - 1]
+            start = random.randint(0, light_max)
+
+            color_idx = random.randint(0, len(colors) - 1)
+            color = colors[color_idx]
+
+
+
+
+
 
 
     def fade(self, r1, g1, b1, r2 = 0, g2 = 0, b2 = 255, start = 0, num = 0, steps = 100, wait_time = 0.2):
