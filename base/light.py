@@ -272,9 +272,6 @@ class Light:
 
                 # self.fade_by_range(color, old_color, sector, self.light_sector_step)
 
-
-                self.fade_total_by_range(curr_colors, sector_color_old, sector, self.light_sector_step)
-
                 # threading.Thread(target=self.fade_total_by_range,
                 #                 args=(curr_colors, sector_color_old, sector, self.light_sector_step)).start()
 
@@ -284,6 +281,7 @@ class Light:
                 #     # for one_idx in range(sector_one - 1):
                 #     threading.Thread(target=self.fade_by_rage, args=(color, old_color, sector_one, self.light_sector_step[one_idx])).start()
 
+            self.fade_total_by_range(curr_colors, sector_color_old, sector, self.light_sector_step)
             steps += 1
 
             time.sleep(time_duration / 1000)
