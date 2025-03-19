@@ -216,7 +216,7 @@ class Light:
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
 
     def sector_flowing(self):
-        time_duration = 1500           # ms
+        time_duration = 2500           # ms
         sector_num = 8
         colors = [
             [255, 0, 0],
@@ -259,6 +259,7 @@ class Light:
                 break
             curr_colors = []
             curr_sector = []
+            # sector_color_old = []
             for step, color in enumerate(colors):
 
                 sector_pos = step + steps
@@ -282,7 +283,10 @@ class Light:
                 # threading.Thread(target=self.fade_total_by_range,
                 #                 args=(curr_colors, sector_color_old, sector, self.light_sector_step)).start()
 
-                sector_color_old.append(old_color)
+                if show_pos < len(sector_color_old):
+                    sector_color_old.append(old_color)
+                else:
+                    sector_color_old[show_pos] = old_color
 
                 # for one_idx, sector_one in enumerate(sector):
                 #     # for one_idx in range(sector_one - 1):
