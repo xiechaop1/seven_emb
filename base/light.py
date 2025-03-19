@@ -230,8 +230,8 @@ class Light:
         sector_area = []
         for idx in range(sector_num):
             sector_buffer = []
+            sector_start = 0
             for l_idx in range(line_num):
-                sector_start = 0
                 if l_idx > 0:
                     sector_start = self.light_nums[l_idx - 1]
                 sector_start += self.light_sector_step[l_idx] * idx
@@ -260,9 +260,9 @@ class Light:
                 old_r, old_g, old_b = old_color
                 curr_r, curr_g, curr_b = color
 
-                for _, sector_one in enumerate(sector):
-                    for one_idx in range(sector_one - 1):
-                        self.fade(curr_r, curr_g, curr_b, old_r, old_g, old_b, sector[one_idx], self.light_sector_step[one_idx])
+                for one_idx, sector_one in enumerate(sector):
+                    # for one_idx in range(sector_one - 1):
+                    self.fade(curr_r, curr_g, curr_b, old_r, old_g, old_b, sector_one, self.light_sector_step[one_idx])
 
             time.sleep(time_duration / 1000)
             step += 1
