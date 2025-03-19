@@ -216,7 +216,7 @@ class Light:
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
 
     def sector_flowing(self):
-        time_duration = 400           # ms
+        time_duration = 50           # ms
         sector_num = 8
         colors = [
             [255, 0, 0],

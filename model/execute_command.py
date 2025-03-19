@@ -55,6 +55,9 @@ class ExecuteCommand:
 
 	def get_status_by_audio(self, audio):
 		status = None
+		seq_id = 0
+		scene_seq = 0
+		voice_count = 0
 		if audio is not None:
 			if audio["type"] == Code.REC_METHOD_VOICE_EXEC:
 				seq_id = audio["seq_id"]
@@ -79,7 +82,7 @@ class ExecuteCommand:
 
 				print(status, scene_seq, seq_id, voice_count)
 
-		return status
+		return {"status": status, "scene_seq": scene_seq, "voice_count": voice_count, "seq_id": seq_id}
 
 	def commit(self, photo_list):
 		latest_played = self.audio_player.get_latest_played()
@@ -113,7 +116,9 @@ class ExecuteCommand:
 		# 		self.commit_status = status
 		#
 		# 		print(status, scene_seq, seq_id, voice_count)
-		status = self.get_status_by_audio(latest_played)
+		data = self.get_status_by_audio(latest_played)
+		status = data["status"]
+		scene_seq = data["scene_seq"]
 
 		request = {
 			"version": "1.0",
@@ -157,7 +162,8 @@ class ExecuteCommand:
 
 		if self.undertake_lock.acquire(False):
 			latest_played = self.audio_player.get_latest_played()
-			status = self.get_status_by_audio(latest_played)
+			data = self.get_status_by_audio(latest_played)
+			status = data["status"]
 
 			print("undertake")
 
