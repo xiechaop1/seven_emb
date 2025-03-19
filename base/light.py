@@ -439,7 +439,7 @@ class Light:
         if len(starts) == 0:
             return
 
-        if len(rgbs1) != len(rgbs2) or len(rgbs1) == 0:
+        if len(rgbs1) != len(old_rgbs2) or len(rgbs1) == 0:
             return
 
         for i in range(steps + 1):
