@@ -424,10 +424,10 @@ class AudioPlayer:
             self.voice_channel.stop()
             # print(self.voice_channel.get_busy())
             logging.info("Playback stopped.")
-            self.current_track = None
 
         else:
             logging.warn("No audio is currently playing.")
+        self.current_track = None
         ThreadingEvent.audio_play_event.clear()
 
     def set_audio_play_event(self):
