@@ -3147,3 +3147,6 @@
 03/19/2025 11:44:40 AM - Thread-4 (daemon) - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:559] - Silence detected.
 03/19/2025 11:44:40 AM - Thread-4 (daemon) - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:523] - Recording started...
 03/19/2025 11:44:40 AM - Thread-4 (daemon) - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:559] - Silence detected.
+03/19/2025 12:02:30 PM - MainThread - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:69] - Connecting to WebSocket: ws://114.55.90.104:9001/ws (Attempt 1)
+03/19/2025 12:02:30 PM - Thread-1 (run_forever) - _logging - websocket - INFO - [/usr/local/lib/python3.13/site-packages/websocket/_logging.py:89] - Websocket connected
+03/19/2025 12:02:30 PM - Thread-1 (run_forever) - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:58] - WebSocket connection established.

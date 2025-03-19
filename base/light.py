@@ -228,7 +228,7 @@ class Light:
         sector_buffer = []
         line_num = 4
         sector_area = []
-        for idx in range(sector_num) - 1:
+        for idx in range(sector_num):
             for l_idx in range(line_num):
                 sector_start = 0
                 if l_idx > 0:
