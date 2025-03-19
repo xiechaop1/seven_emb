@@ -252,7 +252,7 @@ class Light:
                 break
             for _, color in enumerate(colors):
 
-                sector_pos += step
+                sector_pos = step
                 show_pos = sector_pos % sector_num
 
                 sector = sector_area[show_pos]
@@ -265,12 +265,16 @@ class Light:
                 old_r, old_g, old_b = old_color
                 curr_r, curr_g, curr_b = color
 
-                for one_idx, sector_one in enumerate(sector):
-                    # for one_idx in range(sector_one - 1):
-                    threading.Thread(target=self.fade, args=(curr_r, curr_g, curr_b, old_r, old_g, old_b, sector_one, self.light_sector_step[one_idx])).start()
+
+                threading.Thread(target=self.fade_by_rage,
+                                 args=(color, old_color, sector, self.light_sector_step)).start()
+
+                # for one_idx, sector_one in enumerate(sector):
+                #     # for one_idx in range(sector_one - 1):
+                #     threading.Thread(target=self.fade_by_rage, args=(color, old_color, sector_one, self.light_sector_step[one_idx])).start()
 
                 step += 1
-                
+
             time.sleep(time_duration / 1000)
 
 
@@ -403,9 +407,6 @@ class Light:
             [0, 0, 255]
         ]
 
-
-
-
         for i in range(line_num):
             line_pos = random.randint(1, 4)
             light_max = self.light_nums[light_num - 1]
@@ -418,7 +419,24 @@ class Light:
 
 
 
+    def fade_by_range(self, rgb1, rgb2, starts = [], nums = [], steps = 100):
+        if len(starts) == 0:
+            return
 
+        r1, g1, b1 = rgb1
+        r2, g2, b2 = rgb2
+
+        step_r = (r2 - r1) / steps
+        step_g = (g2 - g1) / steps
+        step_b = (b2 - b1) / steps
+
+        for i in range(steps + 1):
+            r = int(r1 + step_r * i)
+            g = int(g1 + step_g * i)
+            b = int(b1 + step_b * i)
+            self.show_color(r, g, b, starts, nums)
+
+        return
 
     def fade(self, r1, g1, b1, r2 = 0, g2 = 0, b2 = 255, start = 0, num = 0, steps = 100, wait_time = 0.2):
         step_r = (r2 - r1) / steps
@@ -675,6 +693,18 @@ class Light:
 
         return
 
+    def show_color_by_range(self, r, g, b, starts = [], nums = []):
+        if len(starts) == 0:
+            return
+
+        for idx, start in enumerate(starts):
+            num = nums[idx]
+
+            for i in range(num):
+                self.show_color(r, g, b, start, num)
+
+        self.strip.show()
+        return
 
     def show_color(self, r, g, b, start = 0, num = 0):
         # print("r,g,b:", r, g, b)
