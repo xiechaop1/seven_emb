@@ -269,8 +269,10 @@ class Light:
                     # for one_idx in range(sector_one - 1):
                     threading.Thread(target=self.fade, args=(curr_r, curr_g, curr_b, old_r, old_g, old_b, sector_one, self.light_sector_step[one_idx])).start()
 
+                step += 1
+                
             time.sleep(time_duration / 1000)
-            step += 1
+
 
 
 
