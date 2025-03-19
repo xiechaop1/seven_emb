@@ -233,9 +233,9 @@ class Light:
             sector_start = 0
             old_start = 0
             for l_idx in range(line_num):
-                if l_idx > 0:
-                    sector_start = self.light_nums[l_idx - 1]
-                sector_start += old_start + self.light_sector_step[l_idx] * idx
+                # if l_idx > 0:
+                sector_start = self.light_nums[l_idx - 1]
+                sector_start += self.light_sector_step[l_idx] * idx
 
                 sector_buffer.append(sector_start)
                 old_start = sector_start
