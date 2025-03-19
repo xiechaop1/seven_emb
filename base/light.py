@@ -436,7 +436,7 @@ class Light:
             r = int(r1 + step_r * i)
             g = int(g1 + step_g * i)
             b = int(b1 + step_b * i)
-            self.show_color(r, g, b, starts, nums)
+            self.show_color_by_start_range(r, g, b, starts, nums)
 
         return
 
@@ -695,7 +695,7 @@ class Light:
 
         return
 
-    def show_color_by_range(self, r, g, b, starts = [], nums = []):
+    def show_color_by_start_range(self, r, g, b, starts = [], nums = []):
         if len(starts) == 0:
             return
 
