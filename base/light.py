@@ -39,6 +39,11 @@ class Light:
             5, 4, 3, 2
         ]
         self.current_colors = []
+        self.curr_light_buffer = []
+
+        # 把颜色填充
+        for i in range(112):
+            self.curr_light_buffer.append(Color(0,0,0))
 
     def daemon(self):
         while True:
@@ -253,12 +258,14 @@ class Light:
             if self.light_mode != Code.LIGHT_MODE_SECTOR_FLOWING or self.ts > self.run_ts:
                 break
             curr_colors = []
+            curr_sector = []
             for step, color in enumerate(colors):
 
                 sector_pos = step + steps
                 show_pos = sector_pos % sector_num
 
                 sector = sector_area[show_pos]
+                curr_sector.append(sector)
 
                 if show_pos < len(sector_color_old):
                     old_color = sector_color_old[show_pos]
@@ -275,13 +282,13 @@ class Light:
                 # threading.Thread(target=self.fade_total_by_range,
                 #                 args=(curr_colors, sector_color_old, sector, self.light_sector_step)).start()
 
-                sector_color_old.append(color)
+                sector_color_old.append(old_color)
 
                 # for one_idx, sector_one in enumerate(sector):
                 #     # for one_idx in range(sector_one - 1):
                 #     threading.Thread(target=self.fade_by_rage, args=(color, old_color, sector_one, self.light_sector_step[one_idx])).start()
 
-            self.fade_total_by_range(curr_colors, sector_color_old, sector, self.light_sector_step)
+            self.fade_total_by_range(curr_colors, sector_color_old, curr_sector, self.light_sector_step)
             steps += 1
 
             time.sleep(time_duration / 1000)
@@ -428,7 +435,7 @@ class Light:
 
 
 
-    def fade_total_by_range(self, rgbs1 = [], rgbs2 = [], starts = [], nums = [], steps = 100):
+    def fade_total_by_range(self, rgbs1 = [], old_rgbs2 = [], starts = [], nums = [], steps = 100):
         if len(starts) == 0:
             return
 
@@ -438,17 +445,20 @@ class Light:
         for i in range(steps + 1):
             for idx, rgb1 in enumerate(rgbs1):
                 r1, g1, b1 = rgb1
-                r2, g2, b2 = rgbs2[idx]
+                if idx > len(old_rgbs2):
+                    r2 = g2 = b2 = 0
+                else:
+                    r2, g2, b2 = old_rgbs2[idx]
 
-                step_r = (r2 - r1) / steps
-                step_g = (g2 - g1) / steps
-                step_b = (b2 - b1) / steps
+                step_r = (r1 - r2) / steps
+                step_g = (g1 - g2) / steps
+                step_b = (b1 - b2) / steps
 
-                r = int(r1 + step_r * i)
-                g = int(g1 + step_g * i)
-                b = int(b1 + step_b * i)
-                self.show_color_by_range_buffer(r, g, b, starts, nums)
-            self.strip.show()
+                r = int(r2 + step_r * i)
+                g = int(g2 + step_g * i)
+                b = int(b2 + step_b * i)
+                self.show_color_by_range_buffer(r, g, b, starts[idx], nums)
+            self.show_color_by_buffer()
 
         return
 
@@ -715,7 +725,7 @@ class Light:
             num = nums[idx]
 
             for i in range(num):
-                self.show_color(r, g, b, start, num)
+                self.save_color_to_buffer(r, g, b, start, num)
 
         return
 
@@ -731,6 +741,15 @@ class Light:
 
         self.strip.show()
         return
+
+    def save_color_to_buffer(self, r, g, b, start, num):
+        for i in range(num):
+            self.curr_light_buffer[i + start] = Color(r, g, b)
+
+    def show_color_by_buffer(self):
+        for idx, color in enumerate(self.curr_light_buffer):
+            self.strip.setPixelColor(idx, color)
+        self.strip.show()
 
     def show_color(self, r, g, b, start = 0, num = 0):
         # print("r,g,b:", r, g, b)
