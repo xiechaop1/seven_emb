@@ -268,8 +268,13 @@ class Light:
 
                 # self.fade_by_range(color, old_color, sector, self.light_sector_step)
 
-                threading.Thread(target=self.fade_by_range,
+                if show_pos < len(sector_color_old):
+                    self.show_color_by_start_range(color, old_color, sector, self.light_sector_step)
+                else:
+                    threading.Thread(target=self.fade_by_range,
                                  args=(color, old_color, sector, self.light_sector_step)).start()
+
+                sector_color_old.append(color)
 
                 # for one_idx, sector_one in enumerate(sector):
                 #     # for one_idx in range(sector_one - 1):
