@@ -266,8 +266,10 @@ class Light:
                 curr_r, curr_g, curr_b = color
 
 
-                threading.Thread(target=self.fade_by_rage,
-                                 args=(color, old_color, sector, self.light_sector_step)).start()
+                self.fade_by_range(color, old_color, sector, self.light_sector_step)
+
+                # threading.Thread(target=self.fade_by_range,
+                #                  args=(color, old_color, sector, self.light_sector_step)).start()
 
                 # for one_idx, sector_one in enumerate(sector):
                 #     # for one_idx in range(sector_one - 1):
