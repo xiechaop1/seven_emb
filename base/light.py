@@ -251,8 +251,8 @@ class Light:
 
                 sector = sector_area[sector_pos]
 
-                if sector_pos < len(sector_color_old):
-                    old_color = sector_color_old[sector_pos]
+                if show_pos < len(sector_color_old):
+                    old_color = sector_color_old[show_pos]
                 else:
                     old_color = [0, 0, 0]
 
