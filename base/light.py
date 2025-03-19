@@ -229,6 +229,7 @@ class Light:
         line_num = 4
         sector_area = []
         for idx in range(sector_num):
+            sector_buffer = []
             for l_idx in range(line_num):
                 sector_start = 0
                 if l_idx > 0:
@@ -261,7 +262,7 @@ class Light:
 
                 for _, sector_one in enumerate(sector):
                     for one_idx in range(sector_one):
-                        self.fade(curr_r, curr_g, curr_b, old_r, old_g, old_b, sector_num[one_idx], self.light_sector_step[one_idx])
+                        self.fade(curr_r, curr_g, curr_b, old_r, old_g, old_b, sector[one_idx], self.light_sector_step[one_idx])
 
             time.sleep(time_duration / 1000)
             step += 1
