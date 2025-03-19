@@ -215,13 +215,13 @@ class Light:
         sector_num = 8
         colors = [
             [255, 0, 0],
-            [128, 128, 0],
-            [96, 128, 128],
-            [0, 255, 128],
-            [0, 255, 255],
-            [0, 128, 255],
-            [0, 0, 255],
-            [0, 0, 128]
+            [255, 3, 255],
+            [15, 122, 255],
+            [0, 222, 255],
+            [3, 255, 3],
+            [246, 255, 0],
+            [255, 192, 0],
+            [255, 96, 0]
         ]
 
         sector_color_old = []
@@ -230,20 +230,20 @@ class Light:
         sector_area = []
         for idx in range(sector_num):
             sector_buffer = []
-            sector_start = 0
-            old_start = 0
+            first_num = 0
             for l_idx in range(line_num):
+
                 if l_idx > 0:
-                    max_num = self.light_nums[l_idx]
+                    max_num = self.light_nums[l_idx - 1]
                 else:
                     max_num = 0
-                sector_start = max_num
-                sector_start += old_start + self.light_sector_step[l_idx] * idx
+
+                first_num += max_num
+
+                sector_start = first_num + self.light_sector_step[l_idx] * idx
 
                 sector_buffer.append(sector_start)
-                old_start = sector_start
             sector_area.append(sector_buffer)
-
 
         step = 0
         sector_pos = 0
@@ -267,7 +267,7 @@ class Light:
 
                 for one_idx, sector_one in enumerate(sector):
                     # for one_idx in range(sector_one - 1):
-                    self.fade(curr_r, curr_g, curr_b, old_r, old_g, old_b, sector_one, self.light_sector_step[one_idx])
+                    threading.Thread(target=self.fade, args=(curr_r, curr_g, curr_b, old_r, old_g, old_b, sector_one, self.light_sector_step[one_idx])).start()
 
             time.sleep(time_duration / 1000)
             step += 1
