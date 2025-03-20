@@ -620,7 +620,8 @@ class Mic:
                 frame = frame_data["data"]
                 ts = frame_data["ts"]
                 now_time = time.time()
-                if now_time - ts > 0.4:
+                if now_time - ts > 1:
+                    # 把1s以内的声音也放进来
                     continue
                 self.audio_memory.write(frame)
             self.frames = []
