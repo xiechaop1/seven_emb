@@ -268,7 +268,7 @@ class Mic:
                 #     self.voice_buffer = None
                 # else:
                 data = self.stream.read(self.speech_buffer_size, exception_on_overflow=False)
-                if self.is_speech(data) or self.voice_buffer is not None:
+                if (self.is_speech(data) and not self.is_silent(data)) or self.voice_buffer is not None:
                 # if not self.is_silent(data) or self.voice_buffer is not None:
                     # 暂时去掉，再start_recording里判断静音
                     # and not self.is_silent(data)
@@ -665,7 +665,7 @@ class Mic:
             if self.silence_counter < 0:
                 self.silence_counter = 0
             self.silence_counter = self.silence_counter + 1
-            if self.slience_tag == True and self.silence_counter < 1:
+            if self.slience_tag == True and self.silence_counter < 2:
                 return True
             # print("未检测到静音")
             self.slience_tag = False
