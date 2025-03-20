@@ -119,8 +119,8 @@ class Mic:
         self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
         self.rec.SetSpkModel(self.spk_model)
         self.voice_buffer = None
-        # self.buffer_size = 1024
-        self.buffer_size = self.sample_rate * self.frame_duration // 1000
+        self.buffer_size = 2048
+        # self.buffer_size = self.sample_rate * self.frame_duration // 1000
 
     def kaldi_listener(self):
 
@@ -268,7 +268,8 @@ class Mic:
                 #     self.voice_buffer = None
                 # else:
                 data = self.stream.read(self.buffer_size, exception_on_overflow=False)
-                if self.is_speech(data) or self.voice_buffer is not None:
+                # if self.is_speech(data) or self.voice_buffer is not None:
+                if not self.is_silent(data) or self.voice_buffer is not None:
                     # 暂时去掉，再start_recording里判断静音
                     # and not self.is_silent(data)
 
