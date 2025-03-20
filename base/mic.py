@@ -119,7 +119,7 @@ class Mic:
         self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
         self.rec.SetSpkModel(self.spk_model)
         self.voice_buffer = None
-        self.buffer_size = 2048
+        self.buffer_size = 1024
         # self.buffer_size = self.sample_rate * self.frame_duration // 1000
 
     def kaldi_listener(self):
@@ -557,7 +557,10 @@ class Mic:
             self.frames.append(data)
 
             # 静音检测（通过 VAD 检测）
-            if (not self.is_speech(data)) or self.is_silent(data):
+            if self.is_silent(data):
+                # (not self.is_speech(data)) or 暂时去掉
+
+
                 # print("tag:", self.is_speech(data), self.slience_tag)
                 logging.info("Silence detected.")
                 break
