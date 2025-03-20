@@ -126,6 +126,7 @@ class Recv:
 							# }
 							self.audio_player.clear_list()
 							self.audio_player.stop_audio()
+							self.audio_player.clear_interrupt()
 							# self.audio_player.add(audio_data)
 							# self.audio_player.resume_interrupted(None, 1)
 

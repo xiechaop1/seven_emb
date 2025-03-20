@@ -119,7 +119,7 @@ class Mic:
         self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
         self.rec.SetSpkModel(self.spk_model)
         self.voice_buffer = None
-        self.buffer_size = 1024
+        self.buffer_size = 4096
         self.speech_buffer_size = self.sample_rate * self.frame_duration // 1000
 
     def kaldi_listener(self):
