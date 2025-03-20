@@ -246,7 +246,7 @@ class ExecuteCommand:
 							if latest_played["scene_seq"] == scene_seq:
 								if add_seq_idx == 0:
 									add_seq_idx = latest_played["seq_id"]
-							elif latest_played["scene_seq"] > scene_seq:
+							elif latest_played["scene_seq"] > scene_seq and latest_played["scene_seq"] < 100:
 								return False
 						elif scene_seq >= 100:
 							if latest_played["scene_seq"] == scene_seq:

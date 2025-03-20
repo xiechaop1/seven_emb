@@ -44,6 +44,7 @@ def solve_math_expression(expression):
     values = []
     for expr in possible_expressions:
         try:
+            # print("expr:",expr)
             values.append(eval(expr))
         except:
             continue  # 可能存在非法计算，跳过
@@ -60,7 +61,7 @@ def solve_math_expression(expression):
 
 
 # 示例测试
-expression = "1*1+9-2*3/1"
+expression = "1*/*0+9-2*3/1"
 
 time1 = time.time()
 print(solve_math_expression(expression))
