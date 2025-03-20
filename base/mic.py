@@ -176,7 +176,7 @@ class Mic:
             # indata = self.resample_audio1(indata, self.SAMPLERATE_ORIG, self.SAMPLERATE_TARGET)
             audio_data = self.start_recording(indata, volume)
         else:
-            self.frames.append(indata)
+            self.frames.append({"data": indata, "ts": time.time()})
 
         if self.recording_status == "Save" and audio_data is not None:
             logging.info("Recording saving...")
@@ -615,7 +615,12 @@ class Mic:
         #     self.audio_memory.write(start_frame)
 
         if len(self.frames) > 0:
-            for _, frame in enumerate(self.frames):
+            for _, frame_data in enumerate(self.frames):
+                frame = frame_data["data"]
+                ts = frame_data["ts"]
+                now_time = time.time()
+                if now_time - ts > 0.4:
+                    continue
                 self.audio_memory.write(frame)
             self.frames = []
 
@@ -623,7 +628,7 @@ class Mic:
         # if self.recording_status == "Recording":
         time_duration = time.time() - self.start_time
         # print(time_duration, self.has_interrupt)
-        if time_duration > 0.5 and self.has_interrupt == False:
+        if time_duration > 0.4 and self.has_interrupt == False:
             self.audio_player.interrupt()
             self.audio_player.stop_audio()
             ThreadingEvent.recv_execute_command_event.clear()
@@ -655,7 +660,7 @@ class Mic:
         # audio_memory.write(indata.tobytes())
         if self.recording_status == "Save":
             time_duration = time.time() - self.start_time
-            if time_duration > 0.5:
+            if time_duration > 0.4:
                 self.audio_player.interrupt()
                 self.audio_player.stop_audio()
                 ThreadingEvent.recv_execute_command_event.clear()
