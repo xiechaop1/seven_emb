@@ -1,0 +1,3 @@
+class Scence:
+
+	scence = None

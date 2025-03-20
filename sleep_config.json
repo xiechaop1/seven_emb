@@ -1,0 +1,1056 @@
+{
+  "1": {
+    "fragrance": {
+      "status": "on",
+      "level": null,
+      "count": 1
+    },
+    "light": {
+      "mode": "Static",
+      "rgb": "255, 147, 41"
+    },
+    "voice": {
+      "voices": [
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "PREPARE_0a5d18b7ccc364d4a6878642e3cd4875.mp3",
+          "wait_time": 1.5,
+          "repeat": null,
+          "text": "在开始冥想前，请先找到一个不易被打扰的地方，选择一个让你感到舒适的姿势。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "PREPARE_fb554feefb09a53a8bb55c6320e7cdb1.mp3",
+          "wait_time": 1.5,
+          "repeat": null,
+          "text": "你可以选择倚靠着沙发或椅背。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "PREPARE_b28c329834ff637ff3a73c5e01bd7d52.mp3",
+          "wait_time": 1.5,
+          "repeat": null,
+          "text": "接下的时间里，你将不再需要思索工作或者生活。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "PREPARE_2e60034d42489d4b7b411366b9295356.mp3",
+          "wait_time": 1.5,
+          "repeat": null,
+          "text": "请跟随我的动作，我将引导你获得内心的平静"
+        }
+      ],
+      "repeat": null
+    },
+    "bgm": {
+      "action": "play",
+      "volume": 50,
+      "audio_data": null,
+      "audio_format": null,
+      "filename": "bo_asmr.mp3"
+    },
+    "display": null,
+    "action_feature": "(半躺 || 躺姿 ) AND 存在 AND !(手持)"
+  },
+  "2": {
+    "fragrance": {
+      "status": "on",
+      "level": null,
+      "count": 1
+    },
+    "light": {
+      "mode": "Static",
+      "rgb": "255, 147, 41"
+    },
+    "voice": {
+      "voices": [
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "POSTURE_b929bab873c406f9fcecc3abdd324ec1.mp3",
+          "wait_time": 2.0,
+          "repeat": null,
+          "text": "现在，请将你的肩膀慢慢放松。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "POSTURE_c08908db7c842e01fbd8f965dfa85d89.mp3",
+          "wait_time": 2.0,
+          "repeat": null,
+          "text": "双手自然的垂下，掌心向上，放在大腿的前侧。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "POSTURE_06d311023745d1a866490c0d0ce42f44.mp3",
+          "wait_time": 2.0,
+          "repeat": null,
+          "text": "然后轻轻的闭上双眼，感受周围的变化"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "POSTURE_080ed47b54f21a0b6709de6484d1dc1e.mp3",
+          "wait_time": 2.0,
+          "repeat": null,
+          "text": "体验臀部与座椅的接触，双脚与地面的接触"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "POSTURE_e444af1a781082ba399ff9eaebb507eb.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "此刻你的身体正被椅子和下方的大地稳稳的承托着"
+        }
+      ],
+      "repeat": null
+    },
+    "bgm": {
+      "action": "play",
+      "volume": 45,
+      "audio_data": null,
+      "audio_format": null,
+      "filename": "bo_1036.mp3"
+    },
+    "display": null,
+    "action_feature": ""
+  },
+  "3": {
+    "fragrance": {
+      "status": "on",
+      "level": 5,
+      "count": null
+    },
+    "light": {
+      "mode": "Gradient",
+      "rgb": "255, 147, 41"
+    },
+    "voice": {
+      "voices": [
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_a291d037d81ddc94e0fc33bcf729dea9.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "现在，让我们做几组深呼吸。用鼻子深深吸气"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_4dc3129193b03d217cddf651ba366fe6.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "用嘴巴缓缓呼气"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_a7c0c188a373ea0a69c1f46f17eaeb31.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "深深的吸气"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_36c798c145115acc2b01ca8339fa4981.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "缓缓的呼气"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_9685385b968f6512da7ee169fe861b9c.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "继续保持深呼吸"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_7663c2e11fd2cc1179d6850a99db75aa.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "用鼻子吸气"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_d460b7c6cb07b406dcdbde371afca1bc.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "用嘴巴呼气。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_bb6957ab273cbdf11a4aae3244e3f5cc.mp3",
+          "wait_time": 6.0,
+          "repeat": null,
+          "text": "感觉呼吸渐渐慢下来，变得越来越深长"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_7941fd6f49d176f0dd2ee7bb0a93afcd.mp3",
+          "wait_time": 6.0,
+          "repeat": null,
+          "text": "感觉身体的每一寸肌肉正随着每一次的呼吸，慢慢的放松下来。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_bd7ce9ce5e10201cdfe0b9bd4f634a5e.mp3",
+          "wait_time": 2.0,
+          "repeat": null,
+          "text": "你做的很好"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_b361ddc8c2ca77b5493c7469c6e9b3d6.mp3",
+          "wait_time": 2.0,
+          "repeat": null,
+          "text": "现在让我们将呼吸，调节成我们日常呼吸的节奏"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_9dce53484234ed669c45bcd4edb04d22.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "用鼻子吸气。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_5049ad4ccc4a737f2361b13a47090613.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "用鼻子呼气。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_c7ca9e5955e8c5e66fe4fb25ce05b801.mp3",
+          "wait_time": 4.0,
+          "repeat": null,
+          "text": "吸气时，感觉气流经过鼻腔、喉咙、胸腔，一直到腹部。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_4cb6818bd595b5516cc6e7b4757809cd.mp3",
+          "wait_time": 4.0,
+          "repeat": null,
+          "text": "呼气时，感受气流从嘴巴缓缓呼出的过程。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_b270ed55b5b4dc2123ec0797ef450cb5.mp3",
+          "wait_time": 4.0,
+          "repeat": null,
+          "text": "此刻你只需要将自己的注意力放在呼吸上。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_91003bd2e4ec5844b6c9f5d1c5da573f.mp3",
+          "wait_time": 4.0,
+          "repeat": null,
+          "text": "感觉你的思绪随着每一次又深又长的呼吸，一点点的释放出去。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "BREATHING_7585a88baebd17e29d5c36a74a2f2bd8.mp3",
+          "wait_time": 6.0,
+          "repeat": null,
+          "text": "用鼻子均匀的呼吸，让鼻子将空气带到你的胸部，去感受，胸部是如何收缩和扩张的。"
+        }
+      ],
+      "repeat": null
+    },
+    "bgm": {
+      "action": "play",
+      "volume": 45,
+      "audio_data": null,
+      "audio_format": null,
+      "filename": "bo_1036.mp3"
+    },
+    "display": null,
+    "action_feature": ""
+  },
+  "4": {
+    "fragrance": {
+      "status": "on",
+      "level": null,
+      "count": 1
+    },
+    "light": {
+      "mode": "Gradient",
+      "rgb": "255, 147, 41"
+    },
+    "voice": {
+      "voices": [
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_1_a8bf6c1590f26967ff1a4e4ebae6a8a5.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "现在，让我们顺着呼吸的气流，将注意力带到腹部"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_1_1c8f90b4f914a54f9e8b0ce67fc0952b.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "仔细的体会一下，你的腹部是怎样跟随着呼吸上下起伏的。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_1_274cce17599bfbe6d9a887aa46cbe2b8.mp3",
+          "wait_time": 4.0,
+          "repeat": null,
+          "text": "你可以将一只手，轻轻的放在腹部，让手跟随着腹部一起上下起伏。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_1_f2f111ec7ab70589e1ed2f7c557274ca.mp3",
+          "wait_time": 2.0,
+          "repeat": null,
+          "text": "接下来的时间，请将注意力持续的保持在这个部位"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_1_1795be936a2e8f560044b50bdf15001e.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "仔细的体会，呼吸给身体带来的感觉。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_1_55e1498701aa227d2fd8d5ac46ef5d2d.mp3",
+          "wait_time": 8.0,
+          "repeat": null,
+          "text": "感觉自己就像是一杯，被摇晃过的水，正随着呼吸一点点的平静摇晃，一点点的平静下来。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_1_617e8e5b08175e5b4d726feea6c4f048.mp3",
+          "wait_time": 2.0,
+          "repeat": null,
+          "text": "在这个过程中，或许杂乱的思绪仍然会不时浮现出来"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_1_0e56b97ebb717c43c9edbbd4a876742e.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "给你带来干扰，让注意力从身体上悄然游走"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_1_3b2a13dc2c6f2ecbf02a52b8adaf1908.mp3",
+          "wait_time": 2.0,
+          "repeat": null,
+          "text": "没关系。这是非常自然的现象。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_1_1230b134033f975c74a4c63d45ea6d12.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "你只需要在发现注意力出现游走的时候，重新将注意力，带回到腹部，感受呼吸给腹部带来的起伏就好。"
+        }
+      ],
+      "repeat": null
+    },
+    "bgm": {
+      "action": "play",
+      "volume": 35,
+      "audio_data": null,
+      "audio_format": null,
+      "filename": "bo_1036.mp3"
+    },
+    "display": null,
+    "action_feature": ""
+  },
+  "5": {
+    "fragrance": {
+      "status": "on",
+      "level": null,
+      "count": 1
+    },
+    "light": {
+      "mode": "Gradient",
+      "rgb": "255, 147, 41"
+    },
+    "voice": {
+      "voices": [
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_2_3ba13deebbfaeb5a4cf04c82754a40b6.mp3",
+          "wait_time": 6.0,
+          "repeat": null,
+          "text": "很好，就像这样，你可以将手放回大腿上，继续保持绵长舒缓的呼吸。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_2_bfd4eca8e39de89c7265bf8e6d55730a.mp3",
+          "wait_time": 6.0,
+          "repeat": null,
+          "text": "让每一次呼气，都带走你身体里的疲惫。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_2_e5ea75249220a27add48c06b54260940.mp3",
+          "wait_time": 6.0,
+          "repeat": null,
+          "text": "感觉你的心也随着呼吸，慢慢变得舒缓而平静。"
+        }
+      ],
+      "repeat": null
+    },
+    "bgm": {
+      "action": "play",
+      "volume": 25,
+      "audio_data": null,
+      "audio_format": null,
+      "filename": "hailang_776.mp3"
+    },
+    "display": null,
+    "action_feature": ""
+  },
+  "6": {
+    "fragrance": {
+      "status": "on",
+      "level": null,
+      "count": 1
+    },
+    "light": {
+      "mode": "Gradient",
+      "rgb": "255, 147, 41"
+    },
+    "voice": {
+      "voices": [
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_3022ae8a480d2ec7895267c06e62a7d7.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "现在，带着这样舒缓和平静的感觉"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_a6021cb1d737ff2d7a8a43485997da19.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "我将邀请你和我一起，前往一个宁静惬意的空间"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_d1add3fa1571e5bb8b48eb59d7a0ce95.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "想象一下，这是一个宁静傍晚。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_f75c822ad32eb93a43af4efb2cca92dc.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "太阳正缓缓的消失在海岸，落日的霞光铺满了整个海面。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_2e78fba7a4bdc3b8e033bd78ccd7a3f3.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "你将双脚，踩进潮湿的软沙中。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_0dbdbe25d5320884c08de1d656cae918.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "感受海浪正在温柔的拍打着你的脚面。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_950cdb502b81547cb8bc5170577d9a76.mp3",
+          "wait_time": 3.0,
+          "repeat": null,
+          "text": "你的双脚，可以感觉到海水带来的温暖"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_85e1e21c9d0c0f0f40dcedd92e43759a.mp3",
+          "wait_time": 4.0,
+          "repeat": null,
+          "text": "体会这股温暖，正慢慢的透过你的皮肤，传递到你的身体。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_60c0a661673bfd0c4e0a94106e78c56d.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "从你的脚趾"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_4339bd12983b2e8c50cf86f348d888eb.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "脚掌"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_88b5c239c20894e2ce33cb31566d5643.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "脚面"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_07b6df2e119f0584ebc8ae38a9e5f16c.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "脚踝"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_26a9ea20bae6fa79521c83b6116def97.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "小腿"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_de3bd6c4258adee1912bf4ed60a662b1.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "自下而上的来到你的膝盖"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_69276b9c68a77c243fd3bff2eb99fbbd.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "大腿"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_006176f6070953796c98b1a862995111.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "臀部"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_963836fb12b5400e3cb1d3c1ac8efa14.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "腰部"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_d2f94f3596a4035cf01cdfff30bc6c4c.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "腹部"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_5b466122e879a47e3ffa07042f53e98f.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "感受这股温暖的水流，在身体里游走。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_d1a364faaa79227542cf752bfec9b81d.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "从双手的指尖"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_7f3784c850518b5520e1a9b978a87dc4.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "手指"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_8b1d4e6b680ae027d5f4adfecdbf3f6b.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "手掌"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_08755d2a66c8210580e9b4410db4db6d.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "手腕"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_e06ced3dd1c0481826bce1476bf3ed13.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "小手臂"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_b9c4c656d09aff1e6c01a4063859dcf9.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "大手臂"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_272fff979553d714d95c0a244ce91e6f.mp3",
+          "wait_time": 1.2,
+          "repeat": null,
+          "text": "直至整个肩部"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_2caa6b9d4c0ea805db8f8bfdb2a94e39.mp3",
+          "wait_time": 2.0,
+          "repeat": null,
+          "text": "感觉自己的每一寸肌肤都被温暖包裹着。"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_86bcc92c02999153cf819b689765d581.mp3",
+          "wait_time": 2.0,
+          "repeat": null,
+          "text": "你可以记住，这个宁静的沙滩"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_8cb4bba8e10dd436d27d6a388e695ea3.mp3",
+          "wait_time": 2.0,
+          "repeat": null,
+          "text": "在你任何需要的时候，都能通过它，让自己好好的放松"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_d9bb62671ebbe43c97a41746df4b3eb5.mp3",
+          "wait_time": 4.0,
+          "repeat": null,
+          "text": "现在继续静静的躺着"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_b05008d16dea39b2077b2aa30893ca58.mp3",
+          "wait_time": 4.0,
+          "repeat": null,
+          "text": "感觉周围的声音越来越远"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_563a0e727c5f15eb591088f242e09169.mp3",
+          "wait_time": 4.0,
+          "repeat": null,
+          "text": "感觉你的睡意，越来越深"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_ab9aaa5587b9741032fe184ec33899f8.mp3",
+          "wait_time": 4.0,
+          "repeat": null,
+          "text": "越来越深"
+        },
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "RELAX_3_ab9aaa5587b9741032fe184ec33899f8.mp3",
+          "wait_time": 4.0,
+          "repeat": null,
+          "text": "越来越深"
+        }
+      ],
+      "repeat": null
+    },
+    "bgm": {
+      "action": "play",
+      "volume": 25,
+      "audio_data": null,
+      "audio_format": null,
+      "filename": "xyxh.mp3"
+    },
+    "display": null,
+    "action_feature": ""
+  },
+  "10": {
+    "fragrance": {
+      "status": "on",
+      "level": null,
+      "count": 1
+    },
+    "light": {
+      "mode": "Gradient",
+      "rgb": "255, 147, 41"
+    },
+    "voice": {
+      "voices": [
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "SLEEP_READY_9195c6ea096e1398aae674413b2985ab.mp3",
+          "wait_time": 0.0,
+          "repeat": null,
+          "text": "你做的很好，就在这样安心的，放松的，进入到睡梦中去吧。"
+        }
+      ],
+      "repeat": null
+    },
+    "bgm": {
+      "action": "play",
+      "volume": 25,
+      "audio_data": null,
+      "audio_format": null,
+      "filename": "xyxh.mp3"
+    },
+    "display": null,
+    "action_feature": ""
+  },
+  "11": {
+    "fragrance": {
+      "status": "on",
+      "level": null,
+      "count": 1
+    },
+    "light": {
+      "mode": "Gradient",
+      "rgb": "255, 147, 41"
+    },
+    "voice": null,
+    "bgm": {
+      "action": "play",
+      "volume": 20,
+      "audio_data": null,
+      "audio_format": null,
+      "filename": "xyxh.mp3"
+    },
+    "display": null,
+    "action_feature": ""
+  },
+  "12": {
+    "fragrance": {
+      "status": "off",
+      "level": null,
+      "count": null
+    },
+    "light": {
+      "mode": "Gradient",
+      "rgb": "255, 147, 41"
+    },
+    "voice": null,
+    "bgm": {
+      "action": "play",
+      "volume": 20,
+      "audio_data": null,
+      "audio_format": null,
+      "filename": "xyxh.mp3"
+    },
+    "display": null,
+    "action_feature": ""
+  },
+  "13": {
+    "fragrance": {
+      "status": "off",
+      "level": null,
+      "count": null
+    },
+    "light": {
+      "mode": "Off",
+      "rgb": null
+    },
+    "voice": null,
+    "bgm": {
+      "action": "stop",
+      "volume": null,
+      "audio_data": null,
+      "audio_format": null,
+      "filename": null
+    },
+    "display": null,
+    "action_feature": null
+  },
+  "400": {
+    "fragrance": null,
+    "light": null,
+    "voice": {
+      "voices": [
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "USING_PHONE_5c1692d9968a8340c6156cc36537ab47.mp3",
+          "wait_time": null,
+          "repeat": null,
+          "text": "请放下手中的事物，让我们继续关注到当下的感受中"
+        }
+      ],
+      "repeat": null
+    },
+    "bgm": null,
+    "display": null,
+    "action_feature": ""
+  },
+  "401": {
+    "fragrance": null,
+    "light": null,
+    "voice": {
+      "voices": [
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "SITTING_UP_67088e7d70e0fd47ec78a55b205a9358.mp3",
+          "wait_time": null,
+          "repeat": null,
+          "text": "唔，舒适的姿势能够更好的帮助我们放松身心。现在，请调整一个舒适的姿继续平躺下来吧。"
+        }
+      ],
+      "repeat": null
+    },
+    "bgm": null,
+    "display": null,
+    "action_feature": ""
+  },
+  "402": {
+    "fragrance": null,
+    "light": null,
+    "voice": {
+      "voices": [
+        {
+          "action": "play",
+          "volume": null,
+          "audio_data": null,
+          "audio_format": null,
+          "filename": "LEAVING_9b3345669ed649e825600e6531bd2408.mp3",
+          "wait_time": null,
+          "repeat": null,
+          "text": "是突然想起什么重要的事情吗？还需要我继续帮您助眠吗？"
+        }
+      ],
+      "repeat": null
+    },
+    "bgm": null,
+    "display": null,
+    "action_feature": ""
+  }
+}
