@@ -315,7 +315,7 @@ class ExecuteCommand:
 					self.voice_add_lock.release()
 
 			if not self.voice_add_lock.acquire(False):
-				logging.warn("Duplicate Voice Add", resp_msg_id)
+				logging.warning("Duplicate Voice Add", resp_msg_id)
 				return
 
 			print("lock: ", self.voice_add_lock.locked())

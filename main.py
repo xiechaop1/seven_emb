@@ -100,8 +100,8 @@ if __name__ == "__main__":
     kaldi_thread = threading.Thread(target=mic_instance.kaldi_listener)
     kaldi_thread.start()
 
-    mic_thread = threading.Thread(target=mic_instance.daemon)
-    mic_thread.start()
+    # mic_thread = threading.Thread(target=mic_instance.daemon)
+    # mic_thread.start()
     logging.info("Mic is ready")
 
     #

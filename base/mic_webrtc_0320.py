@@ -43,14 +43,12 @@ class Mic:
     SAMPLE_RATE = 16000  # 采样率
     CHANNELS = 1  # 单声道
 
-    SILENCE_THRESHOLD = 200  # 静音阈值
+    SILENCE_THRESHOLD = 1200  # 静音阈值
     SILENCE_FRAMES = 4  # 静音帧数量阈值
     PRE_RECORD_FRAMES = 1  # 预录制帧数
     # 定义队列和缓冲区
 
     MAX_RETRIES = 3
-
-    # VOLUME_THRESHOLD = 200
 
     SPK_MODEL_PATH = "utils/vosk-model-spk-0.4"
     MODEL_PATH = "utils/vosk-model-small-cn-0.22"
@@ -75,7 +73,6 @@ class Mic:
         self.stream = None
         self.frames = []
         self.is_recording = False
-        self.recording_status = "Waiting"
         self.filename = "temp_audio.wav"
 
         self.de_frames = collections.deque(maxlen=int(self.BUFFER_DURATION / self.FRAME_DURATION))
@@ -124,8 +121,6 @@ class Mic:
         self.voice_buffer = None
         self.buffer_size = 4096
         self.speech_buffer_size = self.sample_rate * self.frame_duration // 1000
-        self.audio_memory = io.BytesIO()
-        self.start_time = time.time()
 
     def kaldi_listener(self):
 
@@ -136,78 +131,12 @@ class Mic:
                 else:
                     device_idx = self.find_device_index()
 
-                with sd.InputStream(samplerate=self.sample_rate, blocksize=4000, device=device_idx,
+                with sd.InputStream(samplerate=self.sample_rate, blocksize=16000, device=device_idx,
                                     dtype="int16", channels=1, callback=self.main_callback):
-                    while True:
+                    while not ThreadingEvent.wakeup_event.is_set():
                         pass
 
     def main_callback(self, indata, frames, time1, status):
-        if not ThreadingEvent.wakeup_event.is_set():
-            self.wake_callback(indata, frames, time1, status)
-
-        # ThreadingEvent.wakeup_event.wait(1)
-        if not ThreadingEvent.wakeup_event.is_set():
-            return
-        self.voice_callback(indata, frames, time1, status)
-
-    def voice_callback(self, indata, frames, time1, status):
-        # print("voice")
-        data = indata.tobytes()
-        volume = np.abs(indata).mean()
-        indata = self.resample_audio1(indata, self.SAMPLERATE_ORIG, self.SAMPLERATE_TARGET)
-
-        # print(volume, self.recording_status)
-        if self.recording_status != "Recording" and self.is_speech_by_volume(indata, volume) and not self.is_silent(data, volume):
-            self.is_recording = True
-            self.audio_memory = io.BytesIO()
-            self.audio_memory.seek(0)
-            self.audio_memory.truncate(0)
-            # self.frames = []
-            self.has_interrupt = False
-            self.start_time = time.time()
-            self.silence_counter = 0
-            self.recording_status = "Recording"
-            logging.info("Recording started...")
-
-        # print(self.recording_status)
-
-        audio_data = None
-        if self.recording_status == "Recording":
-            # indata = self.resample_audio1(indata, self.SAMPLERATE_ORIG, self.SAMPLERATE_TARGET)
-            audio_data = self.start_recording(indata, volume)
-        else:
-            self.frames.append(indata)
-
-        if self.recording_status == "Save" and audio_data is not None:
-            logging.info("Recording saving...")
-            try:
-                # # 场景化策略（垫音）
-                # # 后面应该单独拆走
-                # if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
-                #     output_file_name = "resources/sound/sa_wait_voice.mp3"
-                #     self.audio_player.play_voice_with_file(output_file_name)
-
-                # 记录发送请求的时间
-                # self.req_send_time = time.time()
-                self.send_request(self.ws, audio_data)
-                self.recording_status = "Waiting"
-                if Config.IS_DEBUG == False:
-                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 254, "g": 211, "b": 76})
-                    logging.info("set light to loading mode")
-                # 场景化策略（垫音）
-                # 后面应该单独拆走
-                if Scence.scence == Code.REC_ACTION_SLEEP_ASSISTANT:
-                    output_file_name = "resources/sound/sa_wait_voice.mp3"
-                    print("play en!")
-                    self.audio_player.play_voice_with_file(output_file_name)
-
-            except (WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
-                print(f"WebSocket connection failed: {e}")
-
-            except Exception as e:
-                print(f"Unexpected error: {e}")
-
-    def wake_callback(self, indata, frames, time1, status):
         global file_counter
         # 调用网络传输的处理函数
 
@@ -590,11 +519,11 @@ class Mic:
     def stop_daemon(self):
         self.handler_interrupt = True
 
-    def start_recording(self, indata, volume, start_frame = None):
+    def start_recording(self, start_frame=None):
         """开始录音"""
-        # self.frames = []
+        self.frames = []
         # self.is_recording = True
-        # logging.info("Recording started...")
+        logging.info("Recording started...")
         # print("begin")
 
         # self.audio_player.interrupt()
@@ -605,94 +534,79 @@ class Mic:
 
         # volume = np.abs(indata).mean()
         # indata = resample_audio1(indata, SAMPLERATE_ORIG, SAMPLERATE_TARGET)
-        # start_time = time.time()
+        start_time = time.time()
         # if volume > SILENCE_THRESHOLD:
 
         # print(time.time() - start_time)
 
-        # if start_frame is not None:
-        # #     self.frames.append(start_frame)
-        #     self.audio_memory.write(start_frame)
+        if start_frame is not None:
+            self.frames.append(start_frame)
 
-        if len(self.frames) > 0:
-            for _, frame in enumerate(self.frames):
-                self.audio_memory.write(frame)
-            self.frames = []
-
-        # has_interrupt = False
-        # if self.recording_status == "Recording":
-        time_duration = time.time() - self.start_time
-        # print(time_duration, self.has_interrupt)
-        if time_duration > 0.5 and self.has_interrupt == False:
-            self.audio_player.interrupt()
-            self.audio_player.stop_audio()
-            ThreadingEvent.recv_execute_command_event.clear()
-            ThreadingEvent.camera_start_event.clear()
-            self.has_interrupt = True
-        # data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
-        # data = self.stream.read(self.buffer_size, exception_on_overflow=False)
-        # self.frames.append(data)
-
-        self.audio_memory.write(indata.tobytes())
-        # self.frames.append(indata.tobytes())
-
-        # 静音检测（通过 VAD 检测）
-        if self.is_silent(indata, volume):
-            # (not self.is_speech(data)) or 暂时去掉
-
-
-            # print("tag:", self.is_speech(data), self.slience_tag)
-            logging.info("Silence detected.")
-            self.recording_status = "Save"
-            # self.stop_recording()
-
-        # 超过 timeout 秒自动停止
-        if time.time() - self.start_time > self.timeout:
-            logging.info("Recording time exceeded, stopping...")
-            self.recording_status = "Save"
-            # self.stop_recording()
-
-        # audio_memory.write(indata.tobytes())
-        if self.recording_status == "Save":
-            time_duration = time.time() - self.start_time
-            if time_duration > 0.5:
+        has_interrupt = False
+        while self.is_recording:
+            time_duration = time.time() - start_time
+            # print(time_duration)
+            if time_duration > 0.5 and has_interrupt == False:
                 self.audio_player.interrupt()
                 self.audio_player.stop_audio()
                 ThreadingEvent.recv_execute_command_event.clear()
                 ThreadingEvent.camera_start_event.clear()
-                # audio_memory = io.BytesIO()
-                # for frame in pre_buffer:
-                # audio_memory.write(frame.tobytes())
-                # pre_buffer.clear()
-            audio_data = self.audio_memory.getvalue()
-            # self.save_recording()
-            # audio_data = self.save_to_buffer()
-            return audio_data
+                has_interrupt = True
+            # data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
+            data = self.stream.read(self.buffer_size, exception_on_overflow=False)
+            self.frames.append(data)
+
+            # 静音检测（通过 VAD 检测）
+            if self.is_silent(data):
+                # (not self.is_speech(data)) or 暂时去掉
+
+
+                # print("tag:", self.is_speech(data), self.slience_tag)
+                logging.info("Silence detected.")
+                break
+                # self.stop_recording()
+
+            # 超过 timeout 秒自动停止
+            if time.time() - start_time > self.timeout:
+                logging.info("Recording time exceeded, stopping...")
+                break
+                # self.stop_recording()
+
+            # audio_memory.write(indata.tobytes())
+        time_duration = time.time() - start_time
+        if time_duration > 0.5:
+            self.audio_player.interrupt()
+            self.audio_player.stop_audio()
+            ThreadingEvent.recv_execute_command_event.clear()
+            ThreadingEvent.camera_start_event.clear()
+            # audio_memory = io.BytesIO()
+            # for frame in pre_buffer:
+            # audio_memory.write(frame.tobytes())
+            # pre_buffer.clear()
 
             # audio_data = self.save_to_buffer_by_int16()
-            # audio_data = self.save_to_buffer()
-            # # print("save to buffer")
-            # self.save_recording(self.filename)
-            # # print("save to file")
-            # self.slience_tag = True
-            # self.silence_counter = 0
-            #
-            # self.is_recording = False
-            # print("voice duration:", (time.time() - start_time))
-            #
-            # return audio_data
+            audio_data = self.save_to_buffer()
+            # print("save to buffer")
+            self.save_recording(self.filename)
+            # print("save to file")
+            self.slience_tag = True
+            self.silence_counter = 0
+
+            self.is_recording = False
+            print("voice duration:", (time.time() - start_time))
+
+            return audio_data
         # else:
             # print("cancel with short time, ", time_duration)
 
-        # self.silence_counter = 0
+        self.silence_counter = 0
         return None
 
     def send_request(self, ws, audio_data):
 
         conversation_id = messageid.get_conversation_id()
         message_id = messageid.generate()
-        # audio_data = base64.b64encode(audio_data.getvalue()).decode('utf-8')
-        audio_data = base64.b64encode(audio_data).decode('utf-8')
+        audio_data = base64.b64encode(audio_data.getvalue()).decode('utf-8')
         token = messageid.get_token()
 
         request = {
@@ -729,16 +643,15 @@ class Mic:
         self.is_recording = False
         logging.info("Recording stopped.")
 
-    def is_silent(self, data, volume):
+    def is_silent(self, data):
         """检测是否为静音段。"""
         # 将字节数据转换为 numpy 数组
-        # audio_data = np.frombuffer(data, dtype=np.int16)
-        # volume = np.max(np.abs(audio_data))
+        audio_data = np.frombuffer(data, dtype=np.int16)
         # print("li_audio_data:",audio_data)
         # 检查最大值是否低于阈值
-        print("max, threshold, slic_counter, tag, time:", volume, self.threshold, self.silence_counter,
+        print("max, threshold, slic_counter, tag, time:", np.max(np.abs(audio_data)), self.threshold, self.silence_counter,
               self.slience_tag, time.time())
-        if volume < self.threshold:
+        if np.max(np.abs(audio_data)) < self.threshold:
             if self.silence_counter > 0:
                 self.silence_counter = 0
             self.silence_counter = self.silence_counter - 1
@@ -756,15 +669,6 @@ class Mic:
                 return True
             # print("未检测到静音")
             self.slience_tag = False
-            return False
-
-    def is_speech_by_volume(self, indata, volume):
-        # volume = np.abs(indata).mean()
-        # indata = self.resample_audio1(indata, self.SAMPLERATE_ORIG, self.SAMPLERATE_TARGET)
-
-        if volume > self.SILENCE_THRESHOLD:
-            return True
-        else:
             return False
 
     def is_speech(self, data):

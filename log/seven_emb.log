@@ -3232,3 +3232,113 @@
 03/20/2025 09:08:38 AM - Thread-4 (daemon) - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:561] - Silence detected.
 03/20/2025 09:08:38 AM - Thread-4 (daemon) - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:525] - Recording started...
 03/20/2025 09:08:38 AM - Thread-4 (daemon) - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:561] - Silence detected.
+03/20/2025 11:31:35 AM - MainThread - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:69] - Connecting to WebSocket: ws://114.55.90.104:9001/ws (Attempt 1)
+03/20/2025 11:31:35 AM - Thread-1 (run_forever) - _logging - websocket - INFO - [/usr/local/lib/python3.13/site-packages/websocket/_logging.py:89] - Websocket connected
+03/20/2025 11:31:35 AM - Thread-1 (run_forever) - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:58] - WebSocket connection established.
+03/20/2025 11:31:39 AM - MainThread - main - root - INFO - [/Users/choice/Projects/seven/seven_emb/./main.py:97] - audio is ready
+03/20/2025 11:31:40 AM - MainThread - main - root - INFO - [/Users/choice/Projects/seven/seven_emb/./main.py:105] - Mic is ready
+03/20/2025 11:32:23 AM - MainThread - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:69] - Connecting to WebSocket: ws://114.55.90.104:9001/ws (Attempt 1)
+03/20/2025 11:32:23 AM - Thread-1 (run_forever) - _logging - websocket - INFO - [/usr/local/lib/python3.13/site-packages/websocket/_logging.py:89] - Websocket connected
+03/20/2025 11:32:23 AM - Thread-1 (run_forever) - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:58] - WebSocket connection established.
+03/20/2025 11:32:27 AM - MainThread - main - root - INFO - [/Users/choice/Projects/seven/seven_emb/./main.py:97] - audio is ready
+03/20/2025 11:32:27 AM - MainThread - main - root - INFO - [/Users/choice/Projects/seven/seven_emb/./main.py:105] - Mic is ready
+03/20/2025 11:32:51 AM - MainThread - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:69] - Connecting to WebSocket: ws://114.55.90.104:9001/ws (Attempt 1)
+03/20/2025 11:32:51 AM - Thread-1 (run_forever) - _logging - websocket - INFO - [/usr/local/lib/python3.13/site-packages/websocket/_logging.py:89] - Websocket connected
+03/20/2025 11:32:51 AM - Thread-1 (run_forever) - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:58] - WebSocket connection established.
+03/20/2025 11:32:55 AM - MainThread - main - root - INFO - [/Users/choice/Projects/seven/seven_emb/./main.py:97] - audio is ready
+03/20/2025 11:32:55 AM - MainThread - main - root - INFO - [/Users/choice/Projects/seven/seven_emb/./main.py:105] - Mic is ready
+03/20/2025 11:33:40 AM - MainThread - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:69] - Connecting to WebSocket: ws://114.55.90.104:9001/ws (Attempt 1)
+03/20/2025 11:33:40 AM - Thread-1 (run_forever) - _logging - websocket - INFO - [/usr/local/lib/python3.13/site-packages/websocket/_logging.py:89] - Websocket connected
+03/20/2025 11:33:40 AM - Thread-1 (run_forever) - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:58] - WebSocket connection established.
+03/20/2025 11:33:43 AM - MainThread - main - root - INFO - [/Users/choice/Projects/seven/seven_emb/./main.py:97] - audio is ready
+03/20/2025 11:33:43 AM - MainThread - main - root - INFO - [/Users/choice/Projects/seven/seven_emb/./main.py:105] - Mic is ready
+03/20/2025 11:34:16 AM - MainThread - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:69] - Connecting to WebSocket: ws://114.55.90.104:9001/ws (Attempt 1)
+03/20/2025 11:34:16 AM - Thread-1 (run_forever) - _logging - websocket - INFO - [/usr/local/lib/python3.13/site-packages/websocket/_logging.py:89] - Websocket connected
+03/20/2025 11:34:16 AM - Thread-1 (run_forever) - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:58] - WebSocket connection established.
+03/20/2025 11:34:20 AM - MainThread - main - root - INFO - [/Users/choice/Projects/seven/seven_emb/./main.py:97] - audio is ready
+03/20/2025 11:34:20 AM - MainThread - main - root - INFO - [/Users/choice/Projects/seven/seven_emb/./main.py:105] - Mic is ready
+03/20/2025 11:34:24 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:586] - Recording started...
+03/20/2025 11:34:47 AM - MainThread - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:69] - Connecting to WebSocket: ws://114.55.90.104:9001/ws (Attempt 1)
+03/20/2025 11:34:47 AM - Thread-1 (run_forever) - _logging - websocket - INFO - [/usr/local/lib/python3.13/site-packages/websocket/_logging.py:89] - Websocket connected
+03/20/2025 11:34:47 AM - Thread-1 (run_forever) - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:58] - WebSocket connection established.
+03/20/2025 11:34:50 AM - MainThread - main - root - INFO - [/Users/choice/Projects/seven/seven_emb/./main.py:97] - audio is ready
+03/20/2025 11:34:50 AM - MainThread - main - root - INFO - [/Users/choice/Projects/seven/seven_emb/./main.py:105] - Mic is ready
+03/20/2025 11:34:55 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:587] - Recording started...
+03/20/2025 11:34:56 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:587] - Recording started...
+03/20/2025 11:34:57 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:587] - Recording started...
+03/20/2025 11:34:57 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:34:57 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:34:57 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:34:57 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:34:58 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:587] - Recording started...
+03/20/2025 11:34:58 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:34:58 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:34:58 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:34:58 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:34:59 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:587] - Recording started...
+03/20/2025 11:34:59 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:34:59 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:34:59 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:34:59 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:00 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:587] - Recording started...
+03/20/2025 11:35:00 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:00 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:00 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:00 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:01 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:587] - Recording started...
+03/20/2025 11:35:01 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:01 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:01 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:01 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:02 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:587] - Recording started...
+03/20/2025 11:35:02 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:02 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:02 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:02 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:03 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:587] - Recording started...
+03/20/2025 11:35:03 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:03 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:03 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:03 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:04 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:587] - Recording started...
+03/20/2025 11:35:04 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:04 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:04 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:04 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:05 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:587] - Recording started...
+03/20/2025 11:35:06 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:587] - Recording started...
+03/20/2025 11:35:06 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:06 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:06 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:06 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:07 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:587] - Recording started...
+03/20/2025 11:35:07 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:07 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:07 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:07 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:08 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:587] - Recording started...
+03/20/2025 11:35:08 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:08 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:08 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:08 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:36 AM - MainThread - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:69] - Connecting to WebSocket: ws://114.55.90.104:9001/ws (Attempt 1)
+03/20/2025 11:35:36 AM - Thread-1 (run_forever) - _logging - websocket - INFO - [/usr/local/lib/python3.13/site-packages/websocket/_logging.py:89] - Websocket connected
+03/20/2025 11:35:36 AM - Thread-1 (run_forever) - ws - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/ws.py:58] - WebSocket connection established.
+03/20/2025 11:35:40 AM - MainThread - main - root - INFO - [/Users/choice/Projects/seven/seven_emb/./main.py:97] - audio is ready
+03/20/2025 11:35:40 AM - MainThread - main - root - INFO - [/Users/choice/Projects/seven/seven_emb/./main.py:105] - Mic is ready
+03/20/2025 11:35:45 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:589] - Recording started...
+03/20/2025 11:35:46 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:589] - Recording started...
+03/20/2025 11:35:46 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:46 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:46 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:46 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:47 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:589] - Recording started...
+03/20/2025 11:35:47 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:47 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:47 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:47 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:48 AM - Dummy-6 - mic - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/mic.py:589] - Recording started...
+03/20/2025 11:35:48 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:48 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
+03/20/2025 11:35:48 AM - Dummy-6 - audio_player - root - INFO - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:475] - set interrupted
+03/20/2025 11:35:48 AM - Dummy-6 - audio_player - root - WARNING - [/Users/choice/Projects/seven/seven_emb/base/audio_player.py:429] - No audio is currently playing.
