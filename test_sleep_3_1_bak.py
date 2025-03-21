@@ -89,37 +89,67 @@ old_message_id = 0
 last_message_id = 0
 continue_shot_and_record = False
 
-sleep_voice_list = [["PREPARE_0e4469908950edf80d00d50388e22b72.mp3", "PREPARE_fb554feefb09a53a8bb55c6320e7cdb1.mp3",
-                     "PREPARE_b28c329834ff637ff3a73c5e01bd7d52.mp3", "PREPARE_2e60034d42489d4b7b411366b9295356.mp3"],
-                    ["POSTURE_b929bab873c406f9fcecc3abdd324ec1.mp3", "POSTURE_c08908db7c842e01fbd8f965dfa85d89.mp3",
-                     "POSTURE_06d311023745d1a866490c0d0ce42f44.mp3", "POSTURE_080ed47b54f21a0b6709de6484d1dc1e.mp3",
-                     "POSTURE_e444af1a781082ba399ff9eaebb507eb.mp3"],
-                    ["BREATHING_a291d037d81ddc94e0fc33bcf729dea9.mp3", "BREATHING_4dc3129193b03d217cddf651ba366fe6.mp3",
-                     "BREATHING_a7c0c188a373ea0a69c1f46f17eaeb31.mp3", "BREATHING_36c798c145115acc2b01ca8339fa4981.mp3",
-                     "BREATHING_9685385b968f6512da7ee169fe861b9c.mp3", "BREATHING_7663c2e11fd2cc1179d6850a99db75aa.mp3",
-                     "BREATHING_d460b7c6cb07b406dcdbde371afca1bc.mp3", "BREATHING_bb6957ab273cbdf11a4aae3244e3f5cc.mp3",
-                     "BREATHING_7941fd6f49d176f0dd2ee7bb0a93afcd.mp3", "BREATHING_bd7ce9ce5e10201cdfe0b9bd4f634a5e.mp3",
-                     "BREATHING_b361ddc8c2ca77b5493c7469c6e9b3d6.mp3",
-                     "BREATHING_9dce53484234ed669c45bcd4edb04d22.mp3", "BREATHING_5049ad4ccc4a737f2361b13a47090613.mp3",
-                     "BREATHING_6e8fe98a2b2102f12ced5ea46aea85af.mp3", "BREATHING_e55fb3e213cba1408e0ef40c547ae640.mp3",
-                     "BREATHING_4cb6818bd595b5516cc6e7b4757809cd.mp3", "BREATHING_b270ed55b5b4dc2123ec0797ef450cb5.mp3",
-                     "BREATHING_91003bd2e4ec5844b6c9f5d1c5da573f.mp3",
-                     "BREATHING_7585a88baebd17e29d5c36a74a2f2bd8.mp3"],
-                    ["RELAX_1_f493e41a829211386884d7e1ae27abdf.mp3", "RELAX_1_1c8f90b4f914a54f9e8b0ce67fc0952b.mp3",
-                     "RELAX_1_274cce17599bfbe6d9a887aa46cbe2b8.mp3", "RELAX_1_c49ec684c3c07d6a15f0f234bb0b0251.mp3",
-                     "RELAX_1_225bebee5a4a2dfa4ed8cb756f13f99e.mp3", "RELAX_1_55e1498701aa227d2fd8d5ac46ef5d2d.mp3",
-                     "RELAX_1_ad1e671152487bb40daede8cc38eaf9a.mp3", "RELAX_1_11e6a3fa3caa2c265564202c09a2164f.mp3",
-                     "RELAX_1_0e56b97ebb717c43c9edbbd4a876742e.mp3", "RELAX_1_3b2a13dc2c6f2ecbf02a52b8adaf1908.mp3",
-                     "RELAX_1_1230b134033f975c74a4c63d45ea6d12.mp3"],
-                    ["RELAX_2_06728bad68a989b8f735dac2b86102c0.mp3", "RELAX_2_02971319602ea73cb3309270c2ca5be3.mp3"],
-                    ["SLEEP_READY_af5dbd5a079133dd483b998db2ea2c73.mp3",
-                     "SLEEP_READY_88a2a7c12cb7637af4df21ff704ee849.mp3"],
-                    ]
+import json
 
 
+def extract_voice_filenames(file_path):
+    # 读取 JSON 文件
+    with open(file_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    # 初始化存储文件名的二维数组
+    sleep_voice_list = []
+
+    # 遍历 JSON 数据并提取 filenames
+    for key, value in data.items():
+        # 排除序号大于 400 的键
+        if key.isdigit() and int(key) > 100:
+            continue
+
+        # 检查 voice 字段是否存在且不为 None
+        if "voice" in value and value["voice"] is not None:
+            # 为每个 key 创建一个新的子列表
+            voice_filenames = []
+            # 遍历 voice 中的声音列表
+            for voice in value["voice"]["voices"]:
+                if "filename" in voice:
+                    voice_filenames.append(voice["filename"])  # 将文件名添加到子列表中
+            # 如果子列表非空，则将该子列表添加到二维数组中
+            if voice_filenames:
+                sleep_voice_list.append(voice_filenames)
+
+    return sleep_voice_list
+
+
+file_path = '/home/li/vosk-api/python/example/sleep_config.json'
+sleep_voice_list = extract_voice_filenames(file_path)
+print(sleep_voice_list)
+
+
+# sleep_voice_list=[["PREPARE_0e4469908950edf80d00d50388e22b72.mp3","PREPARE_fb554feefb09a53a8bb55c6320e7cdb1.mp3","PREPARE_b28c329834ff637ff3a73c5e01bd7d52.mp3","PREPARE_2e60034d42489d4b7b411366b9295356.mp3"],
+#                   ["POSTURE_b929bab873c406f9fcecc3abdd324ec1.mp3","POSTURE_c08908db7c842e01fbd8f965dfa85d89.mp3","POSTURE_06d311023745d1a866490c0d0ce42f44.mp3","POSTURE_080ed47b54f21a0b6709de6484d1dc1e.mp3","POSTURE_e444af1a781082ba399ff9eaebb507eb.mp3"],
+#                   ["BREATHING_a291d037d81ddc94e0fc33bcf729dea9.mp3","BREATHING_4dc3129193b03d217cddf651ba366fe6.mp3","BREATHING_a7c0c188a373ea0a69c1f46f17eaeb31.mp3","BREATHING_36c798c145115acc2b01ca8339fa4981.mp3","BREATHING_9685385b968f6512da7ee169fe861b9c.mp3","BREATHING_7663c2e11fd2cc1179d6850a99db75aa.mp3","BREATHING_d460b7c6cb07b406dcdbde371afca1bc.mp3","BREATHING_bb6957ab273cbdf11a4aae3244e3f5cc.mp3","BREATHING_7941fd6f49d176f0dd2ee7bb0a93afcd.mp3","BREATHING_bd7ce9ce5e10201cdfe0b9bd4f634a5e.mp3","BREATHING_b361ddc8c2ca77b5493c7469c6e9b3d6.mp3",
+#                    "BREATHING_9dce53484234ed669c45bcd4edb04d22.mp3","BREATHING_5049ad4ccc4a737f2361b13a47090613.mp3","BREATHING_a061599b298b1c1b9ec843adfcd603a9.mp3","BREATHING_e55fb3e213cba1408e0ef40c547ae640.mp3","BREATHING_4cb6818bd595b5516cc6e7b4757809cd.mp3","BREATHING_b270ed55b5b4dc2123ec0797ef450cb5.mp3","BREATHING_91003bd2e4ec5844b6c9f5d1c5da573f.mp3","BREATHING_7585a88baebd17e29d5c36a74a2f2bd8.mp3"],
+#                   ["RELAX_1_f493e41a829211386884d7e1ae27abdf.mp3","RELAX_1_1c8f90b4f914a54f9e8b0ce67fc0952b.mp3","RELAX_1_274cce17599bfbe6d9a887aa46cbe2b8.mp3","RELAX_1_c49ec684c3c07d6a15f0f234bb0b0251.mp3","RELAX_1_225bebee5a4a2dfa4ed8cb756f13f99e.mp3","RELAX_1_55e1498701aa227d2fd8d5ac46ef5d2d.mp3","RELAX_1_ad1e671152487bb40daede8cc38eaf9a.mp3","RELAX_1_11e6a3fa3caa2c265564202c09a2164f.mp3","RELAX_1_0e56b97ebb717c43c9edbbd4a876742e.mp3","RELAX_1_3b2a13dc2c6f2ecbf02a52b8adaf1908.mp3","RELAX_1_1230b134033f975c74a4c63d45ea6d12.mp3"],
+#                   ["RELAX_2_3ba13deebbfaeb5a4cf04c82754a40b6.mp3","RELAX_2_bfd4eca8e39de89c7265bf8e6d55730a.mp3","RELAX_2_e5ea75249220a27add48c06b54260940.mp3"],
+#                   ["RELAX_3_a6021cb1d737ff2d7a8a43485997da19.mp3","RELAX_3_f8dab332854a5e654df5542257de64ca.mp3","RELAX_3_ada2322282a890d2c98ac9f3bec8f77b.mp3","RELAX_3_c2975e4744a580e949bf3d58d31a06aa.mp3","RELAX_3_5a0ffc0586ffa94a735acc4b842dcdf6.mp3","RELAX_3_bd084a1ab9b2fd71be2a5250f39742ca.mp3","RELAX_3_65de72dc4f3b72a8baae9935ca089b90.mp3","RELAX_3_81f64bc10409fecbc98e46ba0ccfa7d4.mp3","RELAX_3_d6bb357ca57fb66f77ba10f51690cefb.mp3","RELAX_3_60c0a661673bfd0c4e0a94106e78c56d.mp3","RELAX_3_4339bd12983b2e8c50cf86f348d888eb.mp3","RELAX_3_88b5c239c20894e2ce33cb31566d5643.mp3","RELAX_3_07b6df2e119f0584ebc8ae38a9e5f16c.mp3","RELAX_3_26a9ea20bae6fa79521c83b6116def97.mp3","RELAX_3_de3bd6c4258adee1912bf4ed60a662b1.mp3","RELAX_3_69276b9c68a77c243fd3bff2eb99fbbd.mp3","RELAX_3_006176f6070953796c98b1a862995111.mp3","RELAX_3_963836fb12b5400e3cb1d3c1ac8efa14.mp3","RELAX_3_d2f94f3596a4035cf01cdfff30bc6c4c.mp3","RELAX_3_5b466122e879a47e3ffa07042f53e98f.mp3","RELAX_3_d1a364faaa79227542cf752bfec9b81d.mp3","RELAX_3_7f3784c850518b5520e1a9b978a87dc4.mp3","RELAX_3_8b1d4e6b680ae027d5f4adfecdbf3f6b.mp3","RELAX_3_08755d2a66c8210580e9b4410db4db6d.mp3","RELAX_3_e06ced3dd1c0481826bce1476bf3ed13.mp3","RELAX_3_b9c4c656d09aff1e6c01a4063859dcf9.mp3",],
+#                   []
+#                   ]
+import cv2
+import time
+import numpy as np
+import argparse
+import onnxruntime as ort
+import math
+import matplotlib.pyplot as plt
+import queue
+person_found_flag=False
+MAX_DISTANCE = 60
+x_diff=0
+y_diff=0
 # PID 控制器类
 class PIDController:
-    def __init__(self, Kp, Ki, Kd, integral_limit=None):
+    def __init__(self, Kp, Ki, Kd,integral_limit=None):
         self.Kp = Kp  # 比例增益
         self.Ki = Ki  # 积分增益
         self.Kd = Kd  # 微分增益
@@ -132,6 +162,7 @@ class PIDController:
         # 计算时间差
         current_time = time.time()
         delta_time = current_time - self.last_time
+        print("delta_time:",delta_time)
         self.last_time = current_time
 
         # 计算积分部分
@@ -333,6 +364,1504 @@ photo_base64_list = []
 reconnect_flag = False
 old_cant_connect_flag = False
 
+current_center=(0,0)
+last_current_center=(0,0)
+class yolov5_lite():
+    def __init__(self, model_pb_path, label_path, confThreshold=0.5, nmsThreshold=0.5,objThreshold=0.5):
+        so = ort.SessionOptions()
+        so.log_severity_level = 3
+        self.net = ort.InferenceSession(model_pb_path, so)
+        self.classes = list(map(lambda x: x.strip(), open(label_path, 'r').readlines()))
+        self.num_classes = len(self.classes)
+        anchors = [[10, 13, 16, 30, 33, 23], [30, 61, 62, 45, 59, 119], [116, 90, 156, 198, 373, 326]]
+        self.nl = len(anchors)
+        self.na = len(anchors[0]) // 2
+        self.no = self.num_classes + 5
+        self.grid = [np.zeros(1)] * self.nl
+        self.stride = np.array([8., 16., 32.])
+        self.anchor_grid = np.asarray(anchors, dtype=np.float32).reshape(self.nl, -1, 2)
+        self.confThreshold = confThreshold
+        self.nmsThreshold = nmsThreshold
+        self.objThreshold = objThreshold
+        self.input_shape = (self.net.get_inputs()[0].shape[2], self.net.get_inputs()[0].shape[3])
+
+    def letterBox(self, srcimg, keep_ratio=True):
+        top, left, newh, neww = 0, 0, self.input_shape[0], self.input_shape[1]
+        if keep_ratio and srcimg.shape[0] != srcimg.shape[1]:
+            hw_scale = srcimg.shape[0] / srcimg.shape[1]
+            if hw_scale > 1:
+                newh, neww = self.input_shape[0], int(self.input_shape[1] / hw_scale)
+                img = cv2.resize(srcimg, (neww, newh), interpolation=cv2.INTER_AREA)
+                left = int((self.input_shape[1] - neww) * 0.5)
+                img = cv2.copyMakeBorder(img, 0, 0, left, self.input_shape[1] - neww - left, cv2.BORDER_CONSTANT,
+                                         value=0)  # add border
+            else:
+                newh, neww = int(self.input_shape[0] * hw_scale), self.input_shape[1]
+                img = cv2.resize(srcimg, (neww, newh), interpolation=cv2.INTER_AREA)
+                top = int((self.input_shape[0] - newh) * 0.5)
+                img = cv2.copyMakeBorder(img, top, self.input_shape[0] - newh - top, 0, 0, cv2.BORDER_CONSTANT, value=0)
+        else:
+            img = cv2.resize(srcimg, self.input_shape, interpolation=cv2.INTER_AREA)
+        return img, newh, neww, top, left
+
+    def drawPred(self, frame, classId, conf, x1, y1, x2, y2,person_count=None):
+        # Draw a bounding box.
+        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), thickness=2)
+
+        label = '%.2f' % conf
+        text = '%s:%s' % (self.classes[int(classId)], label)
+
+        if person_count is not None:
+            text += f" Person ID: {person_count}"  # 将person_count加入到text中
+
+        # Display the label at the top of the bounding box
+        labelSize, baseLine = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+        y1 = max(y1, labelSize[1])
+        cv2.putText(frame, text, (x1, y1 - 10), cv2.FONT_HERSHEY_TRIPLEX, 0.4, (0, 255, 0), thickness=1)
+        # cv2.imshow('frame', frame)
+        # cv2.waitKey(0)
+        return frame
+
+
+    def calculate_distance(self,center1, center2):
+        return math.sqrt((center1[0] - center2[0]) ** 2 + (center1[1] - center2[1]) ** 2)
+
+    def postprocess(self, frame, outs, pad_hw):
+        global person_found_flag, x_diff, y_diff, roaming_stop_flag, current_center, last_current_center
+        # person_found_flag=False
+        newh, neww, padh, padw = pad_hw
+        frameHeight = frame.shape[0]
+        frameWidth = frame.shape[1]
+        ratioh, ratiow = frameHeight / newh, frameWidth / neww
+
+        classIds = []
+        confidences = []
+        boxes = []
+        person_count = 0  # 用来给每个person加编号
+        prev_person_centers = []
+        person_id_dict = {}
+
+        # 遍历每个输出（检测结果）
+        for detection in outs:
+            # print("Detection shape:", detection.shape)  # 打印输出的形状
+            # print("Detection contents:", detection)  # 打印输出的内容
+
+            scores = detection[5:]
+            # print("scores:", scores)
+            classId = np.argmax(scores)
+            # print("classId:", classId)
+            confidence = scores[classId]
+
+            # print("confidence:", confidence)
+            # print("self.confThreshold:",self.confThreshold)
+            # print("x1, y1, x2, y2, conf:", detection[0], detection[1], detection[2], detection[3], detection[4])
+            if confidence > self.confThreshold and detection[4] > self.objThreshold:
+                center_x = int((detection[0] - padw) * ratiow)
+                center_y = int((detection[1] - padh) * ratioh)
+                width = int(detection[2] * ratiow)
+                height = int(detection[3] * ratioh)
+                left = int(center_x - width / 2)
+                top = int(center_y - height / 2)
+                # print("center_x,center_y,width,height,left,top:",center_x,center_y,width,height,left,top)
+                classIds.append(classId)
+                confidences.append(float(confidence))
+                boxes.append([left, top, width, height])
+
+                if classId == 0:  # 如果是person类
+                    current_center = (left + width / 2, top + height / 2)
+                    matched = False
+
+                    for prev_center in prev_person_centers:
+                        distance = self.calculate_distance(current_center, prev_center)
+                        print(
+                            f"delta_x: {abs(current_center[0] - prev_center[0])}, delta_y: {abs(current_center[1] - prev_center[1])}, distance: {distance}")
+
+                        if distance < MAX_DISTANCE:  # 如果两个人的距离小于阈值
+                            matched = True
+                            break
+
+                    if matched:
+                        pass  # 视为同一个人
+                    else:
+                        person_count += 1  # 认为是一个新的人
+                        print(
+                            f"New person detected! Person {person_count}, Confidence: {confidence}, Box: {left, top, width, height}, Center: {current_center}")
+
+                    prev_person_centers.append(current_center)
+                    area = width * height
+                    print(f"Person {person_count} Area: {area} pixels")
+                    print("person_found_flag:", person_found_flag)
+                    motor_stop()  # 停止第一个电机
+                    motor_stop2()  # 停止第二个电机
+                    time.sleep(0.05)
+                    roaming_stop_flag = True
+                    if area > 0:
+                        person_found_flag = True
+                        print("Person current_center:", current_center)
+                        # if abs(current_center-last_current_center)>20:
+                        #     print("Moving!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                        x_diff = current_center[0] - 320
+                        y_diff = current_center[1] - 240 - 30
+
+                    last_current_center = current_center
+
+                    # 更新上一帧的person中心坐标
+                    # prev_person_centers.append(current_center)
+
+            # Perform non maximum suppression to eliminate redundant overlapping boxes with
+            # lower confidences.
+        indices = cv2.dnn.NMSBoxes(boxes, confidences, self.confThreshold, self.nmsThreshold)
+        for i in indices:
+            i = i[0] if isinstance(i, (tuple, list)) else i
+            box = boxes[i]
+            left = box[0]
+            top = box[1]
+            width = box[2]
+            height = box[3]
+            frame = self.drawPred(frame, classIds[i], confidences[i], left, top, left + width, top + height,
+                                  person_count)
+        return frame
+
+    def detect(self, srcimg):
+        img, newh, neww, top, left = self.letterBox(srcimg)
+        # cv2.imshow('YOLOv5-img', img)
+        # cv2.waitKey(0)
+        # print("Image shape:", img.shape)
+        # print("newh, neww, top, left:",newh, neww, top, left)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = img.astype(np.float32) / 255.0
+        blob = np.expand_dims(np.transpose(img, (2, 0, 1)), axis=0)
+
+        t1 = time.time()
+        # print("self.net.get_inputs()[0].name:",self.net.run(None, {self.net.get_inputs()[0].name: blob}))
+        outs = self.net.run(None, {self.net.get_inputs()[0].name: blob})[0].squeeze(axis=0)
+
+        cost_time = time.time() - t1
+        print("outs.shape:",outs.shape)
+
+        srcimg = self.postprocess(srcimg, outs, (newh, neww, top, left))
+        # infer_time = 'Inference Time: ' + str(int(cost_time * 1000)) + 'ms'
+        # cv2.putText(srcimg, infer_time, (5, 20), cv2.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 0), thickness=1)
+
+        return srcimg
+
+#########################################################################################################################
+import cv2
+import numpy as np
+import tensorflow as tf
+import time
+
+# 关节连接
+EDGES = {
+    (0, 1): 'm',
+    (0, 2): 'c',
+    (1, 3): 'm',
+    (2, 4): 'c',
+    (0, 5): 'm',
+    (0, 6): 'c',
+    (5, 7): 'm',
+    (7, 9): 'm',
+    (6, 8): 'c',
+    (8, 10): 'c',
+    (5, 6): 'y',
+    (5, 11): 'm',
+    (6, 12): 'c',
+    (11, 12): 'y',
+    (11, 13): 'm',
+    (13, 15): 'm',
+    (12, 14): 'c',
+    (14, 16): 'c'
+}
+
+# 关键点名称映射
+KEYPOINT_NAMES = [
+    'Nose', 'Left Eye', 'Right Eye', 'Left Ear', 'Right Ear',
+    'Left Shoulder', 'Right Shoulder', 'Left Elbow', 'Right Elbow',
+    'Left Wrist', 'Right Wrist', 'Left Hip', 'Right Hip',
+    'Left Knee', 'Right Knee', 'Left Ankle', 'Right Ankle'
+]
+
+# 保存所有循环的坐标列表
+
+
+all_keypoints=[]
+# 画关键点函数
+def draw_keypoints(frame, keypoints, confidence_threshold):
+    global all_keypoints
+    all_keypoints = []
+    y, x, c = frame.shape
+    shaped = np.squeeze(np.multiply(keypoints, [y, x, 1]))  # 恢复为原图大小
+    current_keypoints = []  # 用于保存每一帧的关键点坐标
+
+    for i, kp in enumerate(shaped):
+        ky, kx, kp_conf = kp
+        if kp_conf > confidence_threshold:
+            cv2.circle(frame, (int(kx), int(ky)), 4, (0, 255, 0), -1)
+            cv2.putText(frame, KEYPOINT_NAMES[i], (int(kx), int(ky) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0),
+                        2)
+
+            # 打印并保存每个关键点的坐标
+            print(f"{KEYPOINT_NAMES[i]}: ({kx}, {ky})")
+            current_keypoints.append((KEYPOINT_NAMES[i], (kx, ky)))  # 保存当前帧的坐标
+
+        else:
+            # 如果置信度低于阈值，保存为 (None, None)
+            print(f"{KEYPOINT_NAMES[i]}: (None, None)")
+            current_keypoints.append((KEYPOINT_NAMES[i], (None, None)))  # 保存为 (None, None)
+
+    # 将当前帧的关键点坐标添加到所有关键点的列表中
+    all_keypoints.append(current_keypoints)
+    # print("all_keypoints:",all_keypoints)
+
+
+# 画骨骼函数
+def draw_connections(frame, keypoints, edges, confidence_threshold):
+    y, x, c = frame.shape
+    shaped = np.squeeze(np.multiply(keypoints, [y, x, 1]))  # 恢复为原图大小
+
+    for edge, color in edges.items():
+        p1, p2 = edge
+        y1, x1, c1 = shaped[p1]
+        y2, x2, c2 = shaped[p2]
+
+        if (c1 > confidence_threshold) & (c2 > confidence_threshold):
+            cv2.line(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 0, 255), 2)
+
+
+img_share=None
+def yolo_run(img, done_event):
+    global person_found_flag,flag_all_break
+
+    if flag_all_break:
+        print("flag_all_break is True. YOLO thread exiting.")
+        done_event.set()  # Signal that the thread is done
+        return
+
+    # 直接在 img 上绘制 YOLO 检测结果（假设 net.detect 返回绘制了人体框的图像）
+    net2 = yolov5_lite(args2.modelpath, args2.classfile, confThreshold=args2.confThreshold,
+                       nmsThreshold=args2.nmsThreshold)
+
+    img[:] = net2.detect(img)  # 注意：net.detect 需要直接修改 img
+    done_event.set()  # 标记 YOLO 处理完成
+
+# MoveNet 推理线程
+def fastnet_run(img, keypoints_queue, done_event):
+    global flag_all_break
+    if flag_all_break:
+        print("flag_all_break is True. FastNet thread exiting.")
+        done_event.set()  # Signal that the thread is done
+        return
+    # 图片预处理
+    img_resized = cv2.resize(img, (192, 192))
+    img_resized = np.expand_dims(img_resized, axis=0)
+    input_image = tf.cast(img_resized, dtype=tf.float32)
+    model_path = '/home/li/Downloads/Pose-detection/lite-model_movenet_singlepose_lightning_3.tflite'
+    interpreter = tf.lite.Interpreter(model_path=model_path)
+    interpreter.allocate_tensors()
+    # 执行推理
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+
+    interpreter.set_tensor(input_details[0]['index'], np.array(input_image))
+    interpreter.invoke()
+
+    # 获取推理结果
+    keypoints_with_scores = interpreter.get_tensor(output_details[0]['index'])
+
+    # 画出关键点和骨骼（直接在 img 上绘制）
+    draw_connections(img, keypoints_with_scores, EDGES, 0.4)
+    draw_keypoints(img, keypoints_with_scores, 0.4)
+
+    # 将关键点存储到队列
+    keypoints_queue.put(keypoints_with_scores)
+    done_event.set()  # 标记 MoveNet 处理完成
+
+def run_keypoint_main():
+    global under_score_count,person_found_flag, all_keypoints,face_detection_switch,running2,continue_shot_and_record, photo_base64_list, \
+        cant_connect_flag, reconnect_flag, old_cant_connect_flag, li_wait_time,paizhao_voice_command,photo_base64, generate_photo_base64,flag_all_break
+
+    if not cap.isOpened():
+        print("无法打开摄像头")
+        exit()
+    count=0
+    frame_counter = 0
+    last_processed_img = None  # 保存最近一次处理后的图像
+    max_photo = 0
+    while running2:
+        if flag_all_break==True:
+            print("flag_all_break!")
+            break
+        count += 1
+        thread_control_event.wait()
+        ret, img = cap.read()
+        orin_img = img
+        if frame_counter % 16 == 0:  # 每 2 帧处理一次
+            # 创建事件对象，用于同步线程
+            yolo_done = threading.Event()
+            fastnet_done = threading.Event()
+
+            # 创建队列存储关键点
+            keypoints_queue = queue.Queue()
+            if flag_all_break:
+                print("flag_all_break is True. Stopping threads.")
+                break
+            # 启动 YOLO 检测线程
+            yolo_thread = threading.Thread(target=yolo_run, args=(img, yolo_done))
+            yolo_thread.daemon = True
+            yolo_thread.start()
+
+            # 启动 MoveNet 推理线程
+            fastnet_thread = threading.Thread(target=fastnet_run, args=(img, keypoints_queue, fastnet_done))
+            fastnet_thread.daemon = True
+            fastnet_thread.start()
+
+            # 等待两个线程完成
+            yolo_done.wait()
+            fastnet_done.wait()
+
+            # 从队列获取关键点
+            if not keypoints_queue.empty():
+                keypoints_with_scores = keypoints_queue.get()
+                all_keypoints.append(keypoints_with_scores)
+
+            last_processed_img = img.copy()  # 保存处理后的图像
+
+        # 显示结果
+        if last_processed_img is not None:
+            cv2.imshow("MoveNet Lightning", last_processed_img)
+        else:
+            cv2.imshow("MoveNet Lightning", img)  # 如果没有处理结果，显示原始帧
+
+
+
+        if paizhao_voice_command:
+            photo_filename = f"/home/li/vosk-api/python/example/shot_and_recording/captured_image_{int(tt2)}.jpg"
+            cv2.imwrite(photo_filename, img)
+            # 使用cv2.imencode将图像转换为JPEG格式的字节流
+            retval, buffer = cv2.imencode('.jpg', img)
+            if retval:
+                # 将字节流转换为Base64字符串
+                photo_base64 = base64.b64encode(buffer).decode('utf-8')
+                time.sleep(0.1)
+                generate_photo_base64 = True
+                # print("send_generate_photo_base64:", generate_photo_base64)
+                # send_photo_request(photo_base64)
+                send_photo_thread = threading.Thread(target=send_photo_request, args=(photo_base64,))
+                send_photo_thread.start()
+
+                # device = get_usb_device()
+                # print(f"!!!!!!找到音频设备: {device}")
+                with threading.Lock():
+                    subprocess.run(
+                        ["aplay", "-D", "plughw:3,0", "-f", "S16_LE", "-r", "16000", "-c", "1", take_photo_file])
+                # send_photo_thread.join()
+        paizhao_voice_command = False
+
+        # if continue_shot_and_record and count%2==1:
+        if continue_shot_and_record:
+            if count == 1:
+                max_photo = 1
+            elif count > 1:
+                max_photo = 3
+            # print("shot!")
+            photo_filename = f"/home/li/vosk-api/python/example/shot_and_recording/continued_image_{int(tt2)}.jpg"
+            cv2.imwrite(photo_filename, img)
+            # 使用cv2.imencode将图像转换为JPEG格式的字节流
+            retval, buffer = cv2.imencode('.jpg', img)
+            if retval:
+                # 将字节流转换为Base64字符串
+                photo_base64 = base64.b64encode(buffer).decode('utf-8')
+                photo_base64_list.append(photo_base64)
+                time.sleep(0.01)
+                generate_photo_base64 = True
+                if len(photo_base64_list) > 10:
+                    print("len(photo_base64_list)>10!!!")
+                    cant_connect_flag = True
+
+                    print("cant_connect_flag:", cant_connect_flag)
+                    file_path = "/home/li/vosk-api/python/example/sleep_config.json"
+                    with open(file_path, 'r', encoding='utf-8') as file:
+                        try:
+                            data_local = json.load(file)  # 使用 json.load() 来解析文件内容
+                            print(data_local)  # 打印读取的 JSON 数据
+                        except json.JSONDecodeError as e:
+                            print(f"Error decoding JSON: {e}")
+                    # find_file_index
+                    result = find_file_index(sleep_voice_list, li_filename)
+
+                    if result:
+                        p, q = result
+                        print(f"File '{li_filename}' found at p={p}, q={q}")
+                        if p == 0:
+                            li_wait_time = 1.5
+                        if p == 1:
+                            li_wait_time = 2
+                        if p == 2 and (0 <= q <= 6 or 9 <= q <= 12):
+                            li_wait_time = 3
+                        if p == 2 and (7 <= q <= 8):
+                            li_wait_time = 8
+                        if p == 2 and (13 <= q):
+                            li_wait_time = 6
+                        if p == 3 and (0 <= q <= 2 or q == 5 or q > 9):
+                            li_wait_time = 8
+                        if p == 3 and (3 <= q <= 4 or 6 <= q <= 8):
+                            li_wait_time = 4
+                        if p == 4 or 5:
+                            li_wait_time = 8
+
+                        add_files_to_stack(sleep_voice_list, p, q)
+                        with open("li_scene_seq.txt", "w") as file_scene:
+                            file_scene.write(str(p + 1))
+                elif len(photo_base64_list) <= max_photo:
+                    print("len(photo_base64_list)<=3>!!!")
+                    cant_connect_flag = False
+                    if old_cant_connect_flag == True:
+                        reconnect_flag = True
+
+                print(f"Captured {len(photo_base64_list)} photo(s)")
+                print("send_generate_photo_base64:", generate_photo_base64)
+                old_cant_connect_flag = cant_connect_flag
+
+        if not ret:
+            print("无法读取视频流")
+            break
+
+        # 获取图像的宽度和高度
+        height, width, channels = img.shape
+        print(f"pic width: {width}, pic height: {height}")
+
+
+        frame_counter += 1
+
+        # 按 'q' 键退出
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+
+
+#########################################################################################################################
+
+##############################################################
+import time
+import Adafruit_ADS1x15
+import threading
+import RPi.GPIO as GPIO
+import math
+# 初始化ADS1115模块，选择I2C地址0x48（默认地址）
+adc = Adafruit_ADS1x15.ADS1115(address=0x48)
+
+# 设置增益（Gain）为1，适用于0-4.096V范围
+GAIN = 1
+
+# 采样率设置（单位：每秒样本数）
+SAMPLE_RATE = 1
+
+# 用于读取电流的转换关系，假设0-3V输出，0-2000mA电流
+VOLTAGE_TO_CURRENT_CONVERSION = 2000 / 3.0  # 每伏特对应的电流值（mA/V）
+
+# 设置GPIO模式
+GPIO.setmode(GPIO.BCM)
+
+# 定义控制电机的GPIO引脚
+# INA_PIN = 13  # 控制电机A的GPIO引脚
+# INB_PIN = 12  # 控制电机B的GPIO引脚
+
+INA_PIN = 6  # 控制电机A的GPIO引脚
+INB_PIN = 5  # 控制电机B的GPIO引脚
+
+# 设置引脚为输出
+GPIO.setup(INA_PIN, GPIO.OUT)
+GPIO.setup(INB_PIN, GPIO.OUT)
+
+# 设置PWM频率（一般直流电机使用频率50Hz ~ 100Hz比较合适）
+pwmINA = GPIO.PWM(INA_PIN, 100)  # 设置INA引脚为PWM输出，频率100Hz
+pwmINB = GPIO.PWM(INB_PIN, 100)  # 设置INB引脚为PWM输出，频率100Hz
+#
+# 启动PWM
+pwmINA.start(0)  # 初始占空比0，即停止
+pwmINB.start(0)  # 初始占空比0，即停止
+
+# 控制电机的函数
+def motor_forward(speed):
+    pwmINA.ChangeDutyCycle(speed)  # 设置电机A的占空比（控制电机正转速度）
+    pwmINB.ChangeDutyCycle(0)  # 电机B保持不动
+
+def motor_reverse(speed):
+    pwmINA.ChangeDutyCycle(0)  # 电机A保持不动
+    pwmINB.ChangeDutyCycle(speed)  # 设置电机B的占空比（控制电机反转速度）
+
+def motor_stop():
+    pwmINA.ChangeDutyCycle(0)  # 停止电机A
+    pwmINB.ChangeDutyCycle(0)  # 停止电机B
+
+# def motor_forward():
+#     GPIO.output(INA_PIN, GPIO.HIGH)  # 电机A正转
+#     GPIO.output(INB_PIN, GPIO.LOW)   # 电机B停止
+#
+# def motor_reverse():
+#     GPIO.output(INA_PIN, GPIO.LOW)   # 电机A停止
+#     GPIO.output(INB_PIN, GPIO.HIGH)  # 电机B反转
+#
+# def motor_stop():
+#     GPIO.output(INA_PIN, GPIO.LOW)   # 停止电机A
+#     GPIO.output(INB_PIN, GPIO.LOW)   # 停止电机B
+
+motor_degree=0
+angle_def=30
+motor_speed=100
+current_pos=0
+
+INA_PIN2 = 13  # 控制电机A的GPIO引脚
+INB_PIN2 = 12  # 控制电机B的GPIO引脚
+
+# INA_PIN = 6  # 控制电机A的GPIO引脚
+# INB_PIN = 5  # 控制电机B的GPIO引脚
+
+# 设置引脚为输出
+GPIO.setup(INA_PIN2, GPIO.OUT)
+GPIO.setup(INB_PIN2, GPIO.OUT)
+
+# 设置PWM频率（一般直流电机使用频率50Hz ~ 100Hz比较合适）
+pwmINA2 = GPIO.PWM(INA_PIN2, 100)  # 设置INA引脚为PWM输出，频率100Hz
+pwmINB2 = GPIO.PWM(INB_PIN2, 100)  # 设置INB引脚为PWM输出，频率100Hz
+
+# 启动PWM
+pwmINA2.start(0)  # 初始占空比0，即停止
+pwmINB2.start(0)  # 初始占空比0，即停止
+
+
+# 控制电机的函数
+def motor_forward2(speed):
+    pwmINA2.ChangeDutyCycle(speed)  # 设置电机A的占空比（控制电机正转速度）
+    pwmINB2.ChangeDutyCycle(0)  # 电机B保持不动
+    # GPIO.output(INA_PIN2, GPIO.HIGH)  # 电机A正转
+    # GPIO.output(INB_PIN2, GPIO.LOW)   # 电机B停止
+
+def motor_reverse2(speed):
+    pwmINA2.ChangeDutyCycle(0)  # 电机A保持不动
+    pwmINB2.ChangeDutyCycle(speed)  # 设置电机B的占空比（控制电机反转速度）
+    # GPIO.output(INA_PIN2, GPIO.LOW)  # 电机A停止
+    # GPIO.output(INB_PIN2, GPIO.HIGH)  # 电机B反转
+
+def motor_stop2():
+    pwmINA2.ChangeDutyCycle(0)  # 停止电机A
+    pwmINB2.ChangeDutyCycle(0)  # 停止电机B
+    # GPIO.output(INA_PIN2, GPIO.LOW)  # 停止电机A
+    # GPIO.output(INB_PIN2, GPIO.LOW)  # 停止电机B
+
+motor_degree=0
+angle_def2=30
+motor_speed2=100
+current_pos2=0
+last_angle1=10
+last_angle2=10
+roaming_stop_flag=False
+
+
+def check_body_keypoints(all_keypoints):
+    if not all_keypoints or not isinstance(all_keypoints[0], list):
+        print("Error: all_keypoints is empty or not in the expected format.")
+        return -1  # or handle as needed
+
+    # 定义需要检查的关键点名称
+    required_keypoints = [
+        # 'Nose', 'Left Eye', 'Right Eye', 'Left Ear', 'Right Ear',
+        'Left Shoulder', 'Right Shoulder', 'Left Elbow', 'Right Elbow',
+        'Left Wrist', 'Right Wrist', 'Left Hip', 'Right Hip',
+        'Left Knee', 'Right Knee', 'Left Ankle', 'Right Ankle'
+    ]
+
+    # 遍历 all_keypoints
+    for keypoint in all_keypoints[0]:  # 只处理列表中的第一项
+        keypoint_name, coords = keypoint
+        # 判断关键点是否在所需列表中
+        if keypoint_name in required_keypoints:
+            # 如果该关键点的坐标为 (None, None)
+            if coords == (None, None):
+                print(f"{keypoint_name} 坐标为 (None, None)")
+            else:
+                print(f"{keypoint_name} 坐标: {coords}")
+                # 如果有一个坐标不为 (None, None)，返回 1
+                return 1
+
+    # 如果所有关键点的坐标都为 (None, None)，返回 -1
+    return -1
+
+
+def check_head_keypoints(all_keypoints):
+    if not all_keypoints or not isinstance(all_keypoints[0], list):
+        print("Error: all_keypoints is empty or not in the expected format.")
+        return -1  # or handle as needed
+
+    # 定义需要检查的关键点名称
+    required_keypoints = ['Nose', 'Left Eye', 'Right Eye', 'Left Ear', 'Right Ear']
+
+    # 遍历 all_keypoints
+    for keypoint in all_keypoints[0]:  # 只处理列表中的第一项
+        keypoint_name, coords = keypoint
+        # 判断关键点是否在所需列表中
+        if keypoint_name in required_keypoints:
+            # 如果该关键点的坐标为 (None, None)
+            if coords == (None, None):
+                print(f"{keypoint_name} 坐标为 (None, None)")
+            else:
+                print(f"{keypoint_name} 坐标: {coords}")
+                # 如果有一个坐标不为 (None, None)，返回 1
+                return 1
+
+    # 如果所有关键点的坐标都为 (None, None)，返回 -1
+    return -1
+
+flag_all_break=False
+dump_fn=None
+def person_tracking_whole():
+    global x_diff,y_diff,all_keypoints,flag_all_break,strip,dump_fn,last_current_center
+    pid_x = PIDController(Kp=0.2, Ki=0, Kd=0)  # 水平方向的 PID 控制器
+    pid_y = PIDController(Kp=0.25, Ki=0, Kd=0)  # 竖直方向的 PID 控制器
+
+    x_adust_degree=0
+    y_adust_degree=0
+    count_within_scope=0
+    while True:
+
+        print("x_dif,y_difff:", x_diff, y_diff)
+        # diff_xy = sqrt(
+        #     (current_center[0] - last_current_center[0]) ** 2 + (current_center[1] - last_current_center[1]) ** 2)
+        # print("diff_xy:", diff_xy)
+        time.sleep(0.03)
+        if abs(x_diff)>15 or abs(y_diff)>15:
+            x_diff_div_20=int(x_diff / 10)
+            y_diff_div_20=int(y_diff / 9)
+            print("int(x_diff_div_20):",x_diff_div_20)
+            print("int(y_diff_div_20):",y_diff_div_20 )
+            # x_input = x_diff * (60 / 640)  # 像素到角度转换
+            # y_input = y_diff * (40 / 480)
+            x_adust_degree = pid_x.update(x_diff_div_20)
+            y_adust_degree = pid_y.update(y_diff_div_20)
+            print("@@@@@@@@@@@@@@@@@@@@@@@@")
+            print("@@@@x_adust_degree:",x_adust_degree)
+            print("@@@@y_adust_degree:", y_adust_degree)
+
+            person_tracking(int(y_adust_degree*2),-int(x_adust_degree*2),70)
+            print("int(y_adust_degree):",int(y_adust_degree))
+            print("-int(x_adust_degree):",-int(x_adust_degree))
+            # time.sleep(1)
+            if abs(x_diff)<50 and abs(y_diff)<50:
+                print("all_keypoints:", all_keypoints)
+                head_resl=check_head_keypoints(all_keypoints)
+                print("head_resl:",head_resl)
+                body_resl=check_body_keypoints(all_keypoints)
+                print("body_resl:", body_resl)
+                if head_resl==-1 and body_resl==1:
+                    print("detect body no head!!")
+                    person_tracking(-40, -int(x_adust_degree*2), 70)
+
+
+        elif x_diff<=15 and y_diff<=15:
+            count_within_scope += 1
+            print("target reached!")
+            time.sleep(0.1)
+            if count_within_scope >= 15:
+                print("count_within_scope>20!")
+                flag_all_break=True
+                print("enter next phase")
+                time.sleep(0.1)
+                # strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS,
+                #                           LED_CHANNEL)
+                # Intialize the library (must be called once before other functions).
+                # strip.begin()
+
+
+
+
+
+                try:
+                    # if args.samplerate is None:
+                    print(sd.query_devices())
+                    print("args.device:", args.device)
+                    device_info = sd.query_devices(args.device, "input")
+
+                    # soundfile expects an int, sounddevice provides a float:
+                    args.samplerate = int(device_info["default_samplerate"])
+                    # model = Model(lang="en-us")
+                    model = Model(model_path)
+                    if args.filename:
+                        dump_fn = open(args.filename, "wb")
+                    else:
+                        dump_fn = None
+                    # kaldi_thread=threading.Thread(target=kaldi_run)
+                    # kaldi_thread.start()
+
+                    key_thread = threading.Thread(target=listen_for_s_key)
+                    key_thread.daemon = True  # 将线程设为守护线程，这样程序退出时会自动结束线程
+                    key_thread.start()
+
+                    connection_thread = threading.Thread(target=create_connection_with_retries, args=(websocket_url,))
+                    connection_thread.start()
+
+                    start_threads_thread = threading.Thread(target=start_threads)
+                    start_threads_thread.start()
+
+                    kaldi2_thread = threading.Thread(target=kaldi_run2)
+                    kaldi2_thread.start()
+
+                    kaldi_listener_thread = threading.Thread(target=kaldi_listener)
+                    kaldi_listener_thread.start()
+
+                    timer_thread = threading.Thread(target=timer_check)
+                    timer_thread.start()
+                    draw_main()
+
+                    start_threads()
+
+                    running2 = True
+                    xiaoqi_detected = False
+                    print("break from while loop")
+                    time.sleep(1)
+                    # with 块结束，关闭当前流，重新启动一个带有 callback1 的 InputStream
+                    print("Switching to callback1")
+                    with sd.InputStream(samplerate=SAMPLERATE_ORIG2, blocksize=FRAME_SIZE,
+                                        device=find_device_index(), dtype="int16", channels=1,
+                                        callback=callback):
+                        print("#" * 80)
+                        print("Press Ctrl+C to stop the recording2")
+                        print("#" * 80)
+
+                except KeyboardInterrupt:
+                    print("\nDone")
+                    parser.exit(0)
+                except Exception as e:
+                    parser.exit(type(e).__name__ + ": " + str(e))
+
+            # break
+
+
+def person_tracking(angle1=angle_def, angle2=angle_def2, total_speed=motor_speed):
+    global current_pos, clog_flag, current_pos2, clog_flag2,person_found_flag,roaming_stop_flag,last_angle1,last_angle2
+
+    print("angle_def1:", angle1)
+    with open("motor_degree.txt", "r") as file_status:
+        current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+
+    print("angle_def2:", angle2)
+    with open("motor_degree2.txt", "r") as file_status:
+        current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+
+    # 计算勾股定理中的斜边长度
+    # hypotenuse = math.sqrt(angle1**2 + angle2**2)
+    #
+    # # 根据角度和勾股定理调整每个电机的速度
+    # speed1_adjusted = total_speed * (abs(angle1) / hypotenuse)  # 轴1的速度
+    # speed2_adjusted = total_speed * (abs(angle2) / hypotenuse)  # 轴2的速度
+    #
+    # print(f"Adjusted speeds -> motor1: {speed1_adjusted}, motor2: {speed2_adjusted}")
+
+    # 控制电机同时运动
+    for i in range(max(abs(angle1), abs(angle2))):  # 根据最大角度进行循环
+        print("i:",i)
+        time.sleep(0.05)
+        # print("person_found_flag2:", person_found_flag)
+        # if person_found_flag==True:
+        #     motor_stop()  # 停止第一个电机
+        #     motor_stop2()  # 停止第二个电机
+        #     time.sleep(0.1)
+        #     roaming_stop_flag=True
+        #     print("person found motor_forward_together2 break!")
+        #     last_angle1=angle1
+        #     last_angle2=angle2
+        #     person_found_flag=False
+        #     break
+        # 控制第一个电机
+        if angle1 > 0:
+            motor_forward(total_speed)  # 控制第一个电机正转
+        elif angle1 < 0:
+            motor_reverse(total_speed)  # 控制第一个电机反转
+
+        # 控制第二个电机
+        if angle2 > 0:
+            motor_forward2(total_speed)  # 控制第二个电机正转
+        elif angle2 < 0:
+            motor_reverse2(total_speed)  # 控制第二个电机反转
+
+        # 检查电机是否堵转
+        if clog_flag == True:
+            print("!!!!!!!!!!!!!!!!clog forward for motor 1!!!!!!!!!!!!!!")
+            motor_stop()  # 停止第一个电机
+            clog_flag = False
+            with open("motor_degree.txt", "w") as file_status:
+                file_status.write(str(0))  # 更新第一个电机的角度
+            time.sleep(0.1)
+            break
+
+        if clog_flag2 == True:
+            print("!!!!!!!!!!!!!!!!clog forward for motor 2!!!!!!!!!!!!!!")
+            motor_stop2()  # 停止第二个电机
+            clog_flag2 = False
+            with open("motor_degree2.txt", "w") as file_status:
+                file_status.write(str(0))  # 更新第二个电机的角度
+            time.sleep(0.1)
+            break
+
+        # 更新电机角度
+        # with open("motor_degree.txt", "w") as file_status:
+        #     current_pos = current_pos + 1
+        #     print("current_pos+:", current_pos)
+        #     file_status.write(str(current_pos))  # 更新第一个电机角度
+        #
+        # with open("motor_degree2.txt", "w") as file_status:
+        #     current_pos2 = current_pos2 + 1
+        #     print("current_pos2+:", current_pos2)
+        #     file_status.write(str(current_pos2))  # 更新第二个电机角度
+
+    print("电机forward停止")
+    motor_stop()  # 停止第一个电机
+    motor_stop2()  # 停止第二个电机
+    time.sleep(0.05)
+
+def motor_forward_together2(angle1=angle_def, angle2=angle_def2, total_speed=motor_speed):
+    global current_pos, clog_flag, current_pos2, clog_flag2,person_found_flag,roaming_stop_flag,last_angle1,last_angle2
+
+    print("angle_def1:", angle1)
+    with open("motor_degree.txt", "r") as file_status:
+        status = file_status.read().strip()
+        if status:  # Check if the status is not empty
+            current_pos = int(status)  # Convert to integer if not empty
+        else:
+            print("Error: File is empty or contains invalid data")
+            # Handle the error case, possibly set a default value for current_pos2
+            current_pos = 0
+
+    print("angle_def2:", angle2)
+    with open("motor_degree2.txt", "r") as file_status2:
+        status2 = file_status2.read().strip()
+        if status2:  # Check if the status is not empty
+            current_pos2 = int(status2)  # Convert to integer if not empty
+        else:
+            print("Error: File is empty or contains invalid data")
+            # Handle the error case, possibly set a default value for current_pos2
+            current_pos2 = 0
+
+    # 计算勾股定理中的斜边长度
+    hypotenuse = math.sqrt(angle1**2 + angle2**2)
+
+    # 根据角度和勾股定理调整每个电机的速度
+    speed1_adjusted = total_speed * (abs(angle1) / hypotenuse)  # 轴1的速度
+    speed2_adjusted = total_speed * (abs(angle2) / hypotenuse)  # 轴2的速度
+
+    print(f"Adjusted speeds -> motor1: {speed1_adjusted}, motor2: {speed2_adjusted}")
+
+    # 控制电机同时运动
+    for i in range(max(abs(angle1), abs(angle2))):  # 根据最大角度进行循环
+        time.sleep(0.3)
+        print("person_found_flag2:", person_found_flag)
+        if person_found_flag==True:
+            motor_stop()  # 停止第一个电机
+            motor_stop2()  # 停止第二个电机
+            time.sleep(0.1)
+            roaming_stop_flag=True
+            print("person found motor_forward_together2 break!")
+            last_angle1=angle1
+            last_angle2=angle2
+            break
+        # 控制第一个电机
+        if angle1 > 0:
+            motor_forward(total_speed)  # 控制第一个电机正转
+        elif angle1 < 0:
+            motor_reverse(total_speed)  # 控制第一个电机反转
+
+        # 控制第二个电机
+        if angle2 > 0:
+            motor_forward2(total_speed)  # 控制第二个电机正转
+        elif angle2 < 0:
+            motor_reverse2(total_speed)  # 控制第二个电机反转
+
+        # 检查电机是否堵转
+        if clog_flag == True:
+            print("!!!!!!!!!!!!!!!!clog forward for motor 1!!!!!!!!!!!!!!")
+            motor_stop()  # 停止第一个电机
+            clog_flag = False
+            with open("motor_degree.txt", "w") as file_status:
+                file_status.write(str(0))  # 更新第一个电机的角度
+            time.sleep(0.1)
+            break
+
+        if clog_flag2 == True:
+            print("!!!!!!!!!!!!!!!!clog forward for motor 2!!!!!!!!!!!!!!")
+            motor_stop2()  # 停止第二个电机
+            clog_flag2 = False
+            with open("motor_degree2.txt", "w") as file_status:
+                file_status.write(str(0))  # 更新第二个电机的角度
+            time.sleep(0.1)
+            break
+
+        # 更新电机角度
+        # with open("motor_degree.txt", "w") as file_status:
+        #     current_pos = current_pos + 1
+        #     print("current_pos+:", current_pos)
+        #     file_status.write(str(current_pos))  # 更新第一个电机角度
+        #
+        # with open("motor_degree2.txt", "w") as file_status:
+        #     current_pos2 = current_pos2 + 1
+        #     print("current_pos2+:", current_pos2)
+        #     file_status.write(str(current_pos2))  # 更新第二个电机角度
+
+    print("电机forward停止")
+    motor_stop()  # 停止第一个电机
+    motor_stop2()  # 停止第二个电机
+    time.sleep(0.1)
+
+def motor_forward_together2_no_break(angle1=angle_def, angle2=angle_def2, total_speed=motor_speed):
+    global current_pos, clog_flag, current_pos2, clog_flag2,person_found_flag,roaming_stop_flag,last_angle1,last_angle2
+
+    print("angle_def1:", angle1)
+    with open("motor_degree.txt", "r") as file_status:
+        current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+
+    print("angle_def2:", angle2)
+    with open("motor_degree2.txt", "r") as file_status:
+        current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+
+    # 计算勾股定理中的斜边长度
+    # hypotenuse = math.sqrt(angle1**2 + angle2**2)
+    #
+    # # 根据角度和勾股定理调整每个电机的速度
+    # speed1_adjusted = total_speed * (abs(angle1) / hypotenuse)  # 轴1的速度
+    # speed2_adjusted = total_speed * (abs(angle2) / hypotenuse)  # 轴2的速度
+    #
+    # print(f"Adjusted speeds -> motor1: {speed1_adjusted}, motor2: {speed2_adjusted}")
+
+    # 控制电机同时运动
+    for i in range(max(abs(angle1), abs(angle2))):  # 根据最大角度进行循环
+        time.sleep(0.1)
+        # print("person_found_flag2:", person_found_flag)
+        # if person_found_flag==True:
+        #     motor_stop()  # 停止第一个电机
+        #     motor_stop2()  # 停止第二个电机
+        #     time.sleep(0.1)
+        #     roaming_stop_flag=True
+        #     print("person found motor_forward_together2 break!")
+        #     last_angle1=angle1
+        #     last_angle2=angle2
+        #     break
+        # 控制第一个电机
+        if angle1 > 0:
+            motor_forward(total_speed)  # 控制第一个电机正转
+        elif angle1 < 0:
+            motor_reverse(total_speed)  # 控制第一个电机反转
+
+        # 控制第二个电机
+        if angle2 > 0:
+            motor_forward2(total_speed)  # 控制第二个电机正转
+        elif angle2 < 0:
+            motor_reverse2(total_speed)  # 控制第二个电机反转
+
+        # 检查电机是否堵转
+        if clog_flag == True:
+            print("!!!!!!!!!!!!!!!!clog forward for motor 1!!!!!!!!!!!!!!")
+            motor_stop()  # 停止第一个电机
+            clog_flag = False
+            with open("motor_degree.txt", "w") as file_status:
+                file_status.write(str(0))  # 更新第一个电机的角度
+            time.sleep(0.1)
+            break
+
+        if clog_flag2 == True:
+            print("!!!!!!!!!!!!!!!!clog forward for motor 2!!!!!!!!!!!!!!")
+            motor_stop2()  # 停止第二个电机
+            clog_flag2 = False
+            with open("motor_degree2.txt", "w") as file_status:
+                file_status.write(str(0))  # 更新第二个电机的角度
+            time.sleep(0.1)
+            break
+
+        # 更新电机角度
+        # with open("motor_degree.txt", "w") as file_status:
+        #     current_pos = current_pos + 1
+        #     print("current_pos+:", current_pos)
+        #     file_status.write(str(current_pos))  # 更新第一个电机角度
+        #
+        # with open("motor_degree2.txt", "w") as file_status:
+        #     current_pos2 = current_pos2 + 1
+        #     print("current_pos2+:", current_pos2)
+        #     file_status.write(str(current_pos2))  # 更新第二个电机角度
+
+    print("电机forward停止")
+    motor_stop()  # 停止第一个电机
+    motor_stop2()  # 停止第二个电机
+    time.sleep(0.1)
+
+# 运行电机
+
+# for i in range(3):
+#     motor_forward(motor_speed)  # 电机正转，速度50%
+#     time.sleep(3)
+#     motor_stop()  # 停止电机
+#     time.sleep(1)
+#     motor_reverse(motor_speed)
+#     time.sleep(3)
+#     motor_stop()  # 停止电机
+#     time.sleep(1)
+
+
+def motor_forward_angle(angle=angle_def,speed=motor_speed):
+    global current_pos,clog_flag
+    print("angle_def1:", angle)
+    with open("motor_degree.txt", "r") as file_status:
+        current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+    for i in range(angle):
+        time.sleep(0.2)
+        motor_forward(speed)  # 电机正转，速度50%
+        # print("clog_flag2:", clog_flag)
+        if clog_flag==True:
+            print("!!!!!!!!!!!!!!!!clog forward!!!!!!!!!!!!!!")
+            motor_stop()
+
+            clog_flag = False
+            with open("motor_degree.txt", "w") as file_status:
+                file_status.write(str(0))  # 更新文件
+            time.sleep(0.1)
+            break
+
+        with open("motor_degree.txt", "w") as file_status:
+
+            current_pos = current_pos +1
+            print("current_pos+:", current_pos)
+            file_status.write(str(current_pos))  # 更新文件
+
+
+
+    print("电机forward停止")
+    motor_stop()  # 停止电机
+    time.sleep(0.1)
+
+def motor_backward_angle(angle=angle_def,speed=motor_speed):
+    global current_pos,clog_flag
+    print("angle_def2:", angle)
+    with open("motor_degree.txt", "r") as file_status:
+        current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+    for i in range(angle):
+        time.sleep(0.2)
+        motor_reverse(speed)  # 电机反转，速度50%
+        # print("clog_flag3:", clog_flag)
+        if clog_flag == True:
+            print("!!!!!!!!!!!!!!!!clog backward!!!!!!!!!!!!!!")
+            motor_stop()
+
+            clog_flag=False
+
+
+            with open("motor_degree.txt", "w") as file_status:
+                file_status.write(str(0))  # 更新文件
+            time.sleep(0.1)
+            break
+        with open("motor_degree.txt", "w") as file_status:
+            current_pos = current_pos -1
+            print("current_pos-:", current_pos)
+            file_status.write(str(current_pos))  # 更新文件
+
+
+
+    print("电机backward停止")
+    motor_stop()  # 停止电机
+    time.sleep(0.1)
+def read_voltage():
+    # 读取 A0 引脚上的电压值，返回一个值范围在-32768 到 32767之间
+    value = adc.read_adc(2, gain=GAIN)
+
+    # 将读取的值转换为电压值（范围0-4.096V）
+    voltage = value * 4.096 / 32768.0
+
+    return voltage
+
+
+def motor_forward_angle2(angle=angle_def2,speed=motor_speed2):
+    global current_pos2,clog_flag2
+    print("angle_def1:", angle)
+    with open("motor_degree2.txt", "r") as file_status:
+        current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+    for i in range(angle):
+        time.sleep(0.2)
+        motor_forward2(speed)  # 电机正转，速度50%
+        # print("clog_flag2:", clog_flag2)
+        if clog_flag2==True:
+            print("!!!!!!!!!!!!!!!!clog forward!!!!!!!!!!!!!!")
+            motor_stop2()
+
+            clog_flag2 = False
+            with open("motor_degree2.txt", "w") as file_status:
+                file_status.write(str(0))  # 更新文件
+            time.sleep(0.1)
+            break
+
+        with open("motor_degree2.txt", "w") as file_status:
+
+            current_pos2 = current_pos2 +1
+            print("current_pos2+:", current_pos2)
+            file_status.write(str(current_pos2))  # 更新文件
+
+
+
+    print("电机forward停止")
+    motor_stop2()  # 停止电机
+    time.sleep(0.1)
+
+def motor_backward_angle2(angle=angle_def2,speed=motor_speed2):
+    global current_pos2,clog_flag2
+    print("angle_def2:", angle)
+    with open("motor_degree2.txt", "r") as file_status:
+        current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+    for i in range(angle):
+        time.sleep(0.2)
+        motor_reverse2(speed)  # 电机反转，速度50%
+        # print("clog_flag3:", clog_flag)
+        if clog_flag2 == True:
+            print("!!!!!!!!!!!!!!!!clog backward!!!!!!!!!!!!!!")
+            motor_stop2()
+
+            clog_flag2=False
+
+
+            with open("motor_degree2.txt", "w") as file_status:
+                file_status.write(str(0))  # 更新文件
+            time.sleep(0.1)
+            break
+        with open("motor_degree2.txt", "w") as file_status:
+            current_pos2 = current_pos2 -1
+            print("current_pos2-:", current_pos2)
+            file_status.write(str(current_pos2))  # 更新文件
+
+
+
+    print("电机backward停止")
+    motor_stop2()  # 停止电机
+    time.sleep(0.1)
+# def read_voltage():
+#     # 读取 A0 引脚上的电压值，返回一个值范围在-32768 到 32767之间
+#     value = adc.read_adc(2, gain=GAIN)
+#
+#     # 将读取的值转换为电压值（范围0-4.096V）
+#     voltage = value * 4.096 / 32768.0
+#
+#     return voltage
+
+
+def read_voltage2():
+    # 读取 A0 引脚上的电压值，返回一个值范围在-32768 到 32767之间
+    value = adc.read_adc(0, gain=GAIN)
+
+    # 将读取的值转换为电压值（范围0-4.096V）
+    voltage = value * 4.096 / 32768.0
+
+    return voltage
+
+
+
+
+
+
+
+def voltage_to_current(voltage):
+    # 将电压转换为电流（mA）
+    current = voltage * VOLTAGE_TO_CURRENT_CONVERSION
+    return current
+current=0
+
+clog_flag=False
+clog_flag2=False
+def read_adc():
+    global current, clog_flag,flag_all_break
+    current_values = []  # 用来存储电流值
+    start_time = time.time()  # 记录开始时间
+
+    try:
+        while True:
+            if flag_all_break==True:
+                break
+            # 读取电压值
+            voltage = read_voltage()
+
+            # 将电压转换为电流值
+            current = voltage_to_current(voltage)
+
+            # 添加当前电流值到列表
+            current_values.append(current)
+
+            # 打印电流值
+            # print(f"电压: {voltage:.2f} V, 电流: {current:.2f} mA")
+
+            # 每秒读取一次
+            if time.time() - start_time >= 0.8:
+                # 计算过去1秒的平均电流值
+                avg_current = sum(current_values) / len(current_values)
+                # print(f"avg_current: {avg_current:.2f} mA")
+
+                # 如果平均电流大于52mA，表示电机可能堵转
+                if avg_current > 42:
+                    clog_flag = True
+                    # print("clog_flag1:", clog_flag)
+                    print("get clogged!")
+                # else:
+                #     clog_flag = False
+
+
+
+                # 清空电流列表，为下一秒准备
+                current_values.clear()
+                start_time = time.time()  # 重置时间
+
+            time.sleep(0.05)  # 每50毫秒读取一次电流
+
+    except KeyboardInterrupt:
+        print("程序已中断")
+        # 在程序退出时可以检查最终的堵转标志
+        if clog_flag:
+            print("检测到电机堵转")
+        else:
+            print("电机未堵转")
+
+def read_adc2():
+    global current2, clog_flag2,flag_all_break
+    current_values = []  # 用来存储电流值
+    start_time = time.time()  # 记录开始时间
+
+    try:
+        while True:
+            if flag_all_break==True:
+                print("flag_all_break3!")
+                break
+            # 读取电压值
+            voltage = read_voltage2()
+
+            # 将电压转换为电流值
+            current2 = voltage_to_current(voltage)
+
+            # 添加当前电流值到列表
+            current_values.append(current2)
+
+            # 打印电流值
+            # print(f"电压2: {voltage:.2f} V, 电流2: {current2:.2f} mA")
+
+            # 每秒读取一次
+            if time.time() - start_time >= 0.8:
+                # 计算过去1秒的平均电流值
+                avg_current = sum(current_values) / len(current_values)
+                # print(f"avg_current: {avg_current:.2f} mA")
+
+                # 如果平均电流大于52mA，表示电机可能堵转
+                if avg_current > 42:
+                    clog_flag2 = True
+                    # print("clog_flag1:", clog_flag2)
+                    print("get clogged!")
+                # else:
+                #     clog_flag2 = False
+
+
+
+                # 清空电流列表，为下一秒准备
+                current_values.clear()
+                start_time = time.time()  # 重置时间
+
+            time.sleep(0.05)  # 每50毫秒读取一次电流
+
+    except KeyboardInterrupt:
+        print("程序已中断")
+        # 在程序退出时可以检查最终的堵转标志
+        if clog_flag2:
+            print("检测到电机堵转")
+        else:
+            print("电机未堵转")
+def find_zero_pos():
+    global current,clog_flag
+    for i in range(1):
+        print("enter find_zero_pos")
+        # motor_forward_angle(20,100)
+        # time.sleep(1)
+        # motor_forward_angle(80, 100)
+        # time.sleep(1)
+        motor_backward_angle(120, 100)
+
+
+
+def find_zero_pos2():
+    global current2,clog_flag2
+    for i in range(1):
+        print("enter find_zero_pos")
+        # motor_forward_angle(20,100)
+        # time.sleep(1)
+        # motor_forward_angle(80, 100)
+        # time.sleep(1)
+        motor_backward_angle2(120, 100)
+
+
+
+def find_person_roaming():
+    global roaming_stop_flag,last_angle1,last_angle2,flag_all_break
+    while True:
+        print("roaming_stop_flag:",roaming_stop_flag)
+        if flag_all_break==True:
+            print("flag_all_break2!")
+            break
+        if roaming_stop_flag == True:
+            motor_stop()  # 停止第一个电机
+            motor_stop2()  # 停止第二个电机
+            time.sleep(0.1)
+            print("enter find_person break1")
+            print("last_angle1,last_angle2:",last_angle1,last_angle2)
+            person_tracking_whole()
+            print("finish tracking!!!!")
+            break
+
+        motor_forward_together2(-25, -5, 50)
+        print("roaming_stop_flag:",roaming_stop_flag)
+        if roaming_stop_flag == True:
+            motor_stop()  # 停止第一个电机
+            motor_stop2()  # 停止第二个电机
+            time.sleep(0.1)
+            print("enter find_person break2")
+            print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            person_tracking_whole()
+            print("finish tracking!!!!")
+            break
+        time.sleep(0.8)
+        motor_forward_together2(25, -5, 50)
+        print("roaming_stop_flag:",roaming_stop_flag)
+        if roaming_stop_flag == True:
+            motor_stop()  # 停止第一个电机
+            motor_stop2()  # 停止第二个电机
+            time.sleep(0.1)
+            print("enter find_person break3")
+            print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            person_tracking_whole()
+            print("finish tracking!!!!")
+            break
+        time.sleep(0.8)
+        motor_forward_together2(-25, -5, 50)
+        print("roaming_stop_flag:",roaming_stop_flag)
+        if roaming_stop_flag == True:
+            motor_stop()  # 停止第一个电机
+            motor_stop2()  # 停止第二个电机
+            time.sleep(0.1)
+            print("enter find_person break4")
+            print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            person_tracking_whole()
+            print("finish tracking!!!!")
+            break
+        time.sleep(0.8)
+        motor_forward_together2(25, -5, 50)
+        print("roaming_stop_flag:",roaming_stop_flag)
+        if roaming_stop_flag == True:
+            motor_stop()  # 停止第一个电机
+            motor_stop2()  # 停止第二个电机
+            time.sleep(0.1)
+            print("enter find_person break5")
+            print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            person_tracking_whole()
+            print("finish tracking!!!!")
+            break
+        time.sleep(0.8)
+        motor_forward_together2(-25, -5, 50)
+        print("roaming_stop_flag:", roaming_stop_flag)
+        if roaming_stop_flag == True:
+            motor_stop()  # 停止第一个电机
+            motor_stop2()  # 停止第二个电机
+            time.sleep(0.1)
+            print("enter find_person break4")
+            print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            person_tracking_whole()
+            print("finish tracking!!!!")
+            break
+        time.sleep(0.8)
+        motor_forward_together2(25, -5, 50)
+        print("roaming_stop_flag:", roaming_stop_flag)
+        if roaming_stop_flag == True:
+            motor_stop()  # 停止第一个电机
+            motor_stop2()  # 停止第二个电机
+            time.sleep(0.1)
+            print("enter find_person break5")
+            print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            person_tracking_whole()
+            print("finish tracking!!!!")
+            break
+        time.sleep(0.8)
+        motor_forward_together2(-25, 5, 50)
+        print("roaming_stop_flag:",roaming_stop_flag)
+        if roaming_stop_flag == True:
+            motor_stop()  # 停止第一个电机
+            motor_stop2()  # 停止第二个电机
+            time.sleep(0.1)
+            print("enter find_person break6")
+            print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            person_tracking_whole()
+            print("finish tracking!!!!")
+            break
+        time.sleep(0.8)
+        motor_forward_together2(25, 5, 50)
+        print("roaming_stop_flag:",roaming_stop_flag)
+        if roaming_stop_flag == True:
+            motor_stop()  # 停止第一个电机
+            motor_stop2()  # 停止第二个电机
+            time.sleep(0.1)
+            print("enter find_person break7")
+            print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            person_tracking_whole()
+            print("finish tracking!!!!")
+            break
+        time.sleep(0.8)
+        motor_forward_together2(-25, 5, 50)
+        print("roaming_stop_flag:",roaming_stop_flag)
+        if roaming_stop_flag == True:
+            motor_stop()  # 停止第一个电机
+            motor_stop2()  # 停止第二个电机
+            time.sleep(0.1)
+            print("enter find_person break8")
+            print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            person_tracking_whole()
+            print("finish tracking!!!!")
+            break
+        time.sleep(0.8)
+        motor_forward_together2(25, 5, 50)
+        print("roaming_stop_flag:",roaming_stop_flag)
+        if roaming_stop_flag == True:
+            motor_stop()  # 停止第一个电机
+            motor_stop2()  # 停止第二个电机
+            time.sleep(0.1)
+            print("enter find_person break9")
+            print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            person_tracking_whole()
+            print("finish tracking!!!!")
+            break
+        time.sleep(0.8)
+        motor_forward_together2(-25, 5, 50)
+        print("roaming_stop_flag:", roaming_stop_flag)
+        if roaming_stop_flag == True:
+            motor_stop()  # 停止第一个电机
+            motor_stop2()  # 停止第二个电机
+            time.sleep(0.1)
+            print("enter find_person break8")
+            print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            person_tracking_whole()
+            print("finish tracking!!!!")
+            break
+        time.sleep(0.8)
+        motor_forward_together2(25, 5, 50)
+        print("roaming_stop_flag:", roaming_stop_flag)
+        if roaming_stop_flag == True:
+            motor_stop()  # 停止第一个电机
+            motor_stop2()  # 停止第二个电机
+            time.sleep(0.1)
+            print("enter find_person break9")
+            print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            person_tracking_whole()
+            print("finish tracking!!!!")
+            break
+        time.sleep(0.5)
+    # print("start tracking!!!!")
+    # motor_forward_together2(last_angle1,last_angle2, 70)
+    # print("start tracking!!!!")
+    # motor_forward_together2(last_angle1,last_angle2, 70)
 
 def face_detection_run1():
     global under_score_count, running2, face_detection_switch, paizhao_voice_command, photo_base64, generate_photo_base64, last_x, last_y, \
@@ -360,7 +1889,7 @@ def face_detection_run1():
     top = 0.0
     right = 0.0
     down = 0.0
-    print("face_detection_switch:", face_detection_switch)
+    # print("face_detection_switch:",face_detection_switch)
     # under_score_count=0
     # local_image_path="/home/li/vosk-api/python/example/guan1.jpg"
     max_photo = 0
@@ -375,8 +1904,8 @@ def face_detection_run1():
         # Grab a single frame of video
         success, img = video_capture.read()
         orin_img = img
-        print("!!!continue_shot_and_record:", continue_shot_and_record)
-        print("!!!count:", count)
+        # print("!!!continue_shot_and_record:",continue_shot_and_record)
+        # print("!!!count:",count)
 
         if paizhao_voice_command:
             photo_filename = f"/home/li/vosk-api/python/example/shot_and_recording/captured_image_{int(tt2)}.jpg"
@@ -388,7 +1917,7 @@ def face_detection_run1():
                 photo_base64 = base64.b64encode(buffer).decode('utf-8')
                 time.sleep(0.1)
                 generate_photo_base64 = True
-                print("send_generate_photo_base64:", generate_photo_base64)
+                # print("send_generate_photo_base64:", generate_photo_base64)
                 # send_photo_request(photo_base64)
                 send_photo_thread = threading.Thread(target=send_photo_request, args=(photo_base64,))
                 send_photo_thread.start()
@@ -397,7 +1926,7 @@ def face_detection_run1():
                 # print(f"!!!!!!找到音频设备: {device}")
                 with threading.Lock():
                     subprocess.run(
-                        ["aplay", "-D", "plughw:1,0", "-f", "S16_LE", "-r", "16000", "-c", "1", take_photo_file])
+                        ["aplay", "-D", "plughw:3,0", "-f", "S16_LE", "-r", "16000", "-c", "1", take_photo_file])
                 # send_photo_thread.join()
         paizhao_voice_command = False
 
@@ -406,8 +1935,8 @@ def face_detection_run1():
             if count == 1:
                 max_photo = 1
             elif count > 1:
-                max_photo = 2
-            print("shot!")
+                max_photo = 3
+            # print("shot!")
             photo_filename = f"/home/li/vosk-api/python/example/shot_and_recording/continued_image_{int(tt2)}.jpg"
             cv2.imwrite(photo_filename, img)
             # 使用cv2.imencode将图像转换为JPEG格式的字节流
@@ -568,7 +2097,7 @@ def face_detection_run1():
         # error_y = (position[0] - 110)
         error_x = (position[0] - 244)
         error_y = (position[1] - 122 - 35)
-        print("under_score_count2:", under_score_count)
+        # print("under_score_count2:",under_score_count)
         if under_score_count > 5:
             error_x = 0
             error_y = 0
@@ -589,63 +2118,63 @@ def face_detection_run1():
         # center_x_max = 644
         # center_y_min = 415
         # center_y_max = 455
-        if center_x_min <= x <= center_x_max and center_y_min <= y <= center_y_max:
-            # 中心区域
-            print("Center-Center")
-            flag_break = True
-            flag_break2 = True
-            speed_control(0, 0, 0)
-        elif x < center_x_min and center_y_min <= y <= center_y_max:
-            # 左边 & 垂直中心
-            print("Left-Center")
-            flag_break2 = True
-            speed_control(1.4 * abs(int(speed_h)), 0, 20)
-
-        elif x > center_x_max and center_y_min <= y <= center_y_max:
-            # 右边 & 垂直中心
-            print("Right-Center")
-            flag_break2 = True
-            speed_control(-1.4 * abs(int(speed_h)), 0, 20)
-
-        elif center_x_min <= x <= center_x_max and y < center_y_min:
-            # 水平中心 & 上
-            print("Center-Up")
-            flag_break = True
-            speed_control(0, -abs(int(speed_v * 1.2)), 20)
-
-        elif center_x_min <= x <= center_x_max and y > center_y_max:
-            # 水平中心 & 下
-            print("Center-Down")
-            flag_break = True
-            speed_control(0, abs(int(speed_v * 1.2)), 20)
+        # if center_x_min <= x <= center_x_max and center_y_min <= y <= center_y_max:
+        #     # 中心区域
+        #     # print("Center-Center")
+        #     flag_break = True
+        #     flag_break2 = True
+        #     speed_control(0, 0, 0)
+        # elif x < center_x_min and center_y_min <= y <= center_y_max:
+        #     # 左边 & 垂直中心
+        #     # print("Left-Center")
+        #     flag_break2 = True
+        #     speed_control(1.4 * abs(int(speed_h)), 0, 20)
         #
-        elif x < center_x_min and y < center_y_min:
-            # 左边 & 上
-            print("Left-Up")
-            speed_control(1.4 * abs(int(speed_h)), -abs(int(speed_v * 1.2)), 20)
-
-        elif x < center_x_min and y > center_y_max:
-            # 左边 & 下
-            print("Left-Down")
-            speed_control(1.4 * abs(int(speed_h)), abs(int(speed_v * 1.2)), 20)
-
-        elif x > center_x_max and y < center_y_min:
-            # 右边 & 上
-            print("Right-Up")
-            speed_control(-1.4 * abs(int(speed_h)), -abs(int(speed_v * 1.2)), 20)
-
-        elif x > center_x_max and y > center_y_max:
-            # 右边 & 下
-            print("Right-Down")
-            speed_control(-1.4 * abs(int(speed_h)), abs(int(speed_v * 1.2)), 20)
-        else:
-            print("Something else")
+        # elif x > center_x_max and center_y_min <= y <= center_y_max:
+        #     # 右边 & 垂直中心
+        #     # print("Right-Center")
+        #     flag_break2 = True
+        #     speed_control(-1.4 * abs(int(speed_h)), 0, 20)
+        #
+        # elif center_x_min <= x <= center_x_max and y < center_y_min:
+        #     # 水平中心 & 上
+        #     # print("Center-Up")
+        #     flag_break = True
+        #     speed_control(0, -abs(int(speed_v * 1.2)), 20)
+        #
+        # elif center_x_min <= x <= center_x_max and y > center_y_max:
+        #     # 水平中心 & 下
+        #     # print("Center-Down")
+        #     flag_break = True
+        #     speed_control(0, abs(int(speed_v * 1.2)), 20)
+        # #
+        # elif x < center_x_min and y < center_y_min:
+        #     # 左边 & 上
+        #     # print("Left-Up")
+        #     speed_control(1.4 * abs(int(speed_h)), -abs(int(speed_v * 1.2)), 20)
+        #
+        # elif x < center_x_min and y > center_y_max:
+        #     # 左边 & 下
+        #     # print("Left-Down")
+        #     speed_control(1.4 * abs(int(speed_h)), abs(int(speed_v * 1.2)), 20)
+        #
+        # elif x > center_x_max and y < center_y_min:
+        #     # 右边 & 上
+        #     # print("Right-Up")
+        #     speed_control(-1.4 * abs(int(speed_h)), -abs(int(speed_v * 1.2)), 20)
+        #
+        # elif x > center_x_max and y > center_y_max:
+        #     # 右边 & 下
+        #     # print("Right-Down")
+        #     speed_control(-1.4 * abs(int(speed_h)), abs(int(speed_v * 1.2)), 20)
+        # else:
+        #     print("Something else")
         t2 = time.time()
         d_t2 = t2 - t1
         d_t1 = t1 - t0
         last_x = x
         last_y = y
-        print("!!!last_x,last_y:", last_x, last_y)
+        # print("!!!last_x,last_y:", last_x, last_y)
         # print("d_t1:", d_t1)
         # print("d_t2:", d_t2)
         # cv2.imshow('Video', img)
@@ -654,7 +2183,7 @@ def face_detection_run1():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     # Release handle to the webcam
-    print("break from face_detection_run1!")
+    # print("break from face_detection_run1!")
     video_capture.release()
     cv2.destroyAllWindows()
 
@@ -748,7 +2277,9 @@ import collections
 import argparse
 import os
 
-os.environ["SDL_VIDEODRIVER"] = "dummy"
+# os.environ["SDL_VIDEODRIVER"] = "dummy"
+os.environ["SDL_VIDEODRIVER"] = "x11"
+os.environ["DISPLAY"] = ":0"
 import subprocess
 import websocket
 import json
@@ -767,7 +2298,7 @@ import pypinyin
 
 ###########drawing code
 
-print("AAA")
+# print("AAA")
 
 websocket_url = "ws://114.55.90.104:9001/ws"
 # ws=None
@@ -861,9 +2392,9 @@ thread_control_event.set()  # 初始状态为允许线程运行
 audio_thread_control_event = threading.Event()
 audio_thread_control_event.set()  # 初始状态为允许线程运行
 start_threads_control = threading.Event()  # 用于控制 start_threads 线程的启动和关闭
-print("CCC")
+# print("CCC")
 
-print("DDD")
+# print("DDD")
 xiaoqi_event = Event()
 recording_event = Event()
 output_file_stack = []
@@ -938,9 +2469,9 @@ def animation_logic():
 video_playing = False
 executed_once = False
 video_event = threading.Event()
-video_path = '/home/li/blink2.mp4'
-video_path2 = '/home/li/think.mp4'
-video_path3 = '/home/li/loading.mp4'
+video_path = '/home/li/listen2.mp4'
+video_path2 = '/home/li/think2.mp4'
+video_path3 = '/home/li/speak2_1.mp4'
 pygame.display.set_caption('Eye Animation')
 
 
@@ -1040,8 +2571,10 @@ def start_video_playback():
     # remove_window_decor(window_name)  # 去除窗口装饰
     # 循环读取和播放每一帧
     while video_playing:
+        time.sleep(0.01)
         cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  # 每次视频播放开始时将帧重置到 0
         while cap.isOpened():
+            time.sleep(0.01)
             if flag_think and not flag_think2 and current_video_path != video_path2:
                 print("Flag think is True, switching to video_path2.")
                 cap.release()  # 释放当前视频资源
@@ -1169,9 +2702,8 @@ output_file_name = None
 audio_file_stack_length = 0
 data_id1 = 0
 
-print("EEE")
 
-
+# print("EEE")
 def callback10(indata, frames, time1, status):
     global message_id
     audio_data_dic = (bytes(indata), message_id)
@@ -1253,8 +2785,14 @@ def get_message_id() -> str:
 
 ####时间戳生成
 def get_rfc3339_with_timezone():
-    tz = pytz.timezone('Asia/Shanghai')
-    return datetime.now(tz).isoformat()
+    # tz = pytz.timezone('Asia/Shanghai')
+    now2 = datetime.now()
+
+    # print("timezone_before:",now2.strftime("%Y-%m-%d %H:%M:%S"))
+    t2 = datetime.now().isoformat()
+    now2 = datetime.now()
+    # print("timezone_after:",now2.strftime("%Y-%m-%d %H:%M:%S"))
+    return t2
 
 
 last_t1 = 0
@@ -1314,25 +2852,33 @@ def send_photo_request(photo_base64_list):
             print(f"Retrying2 in {retry_interval} seconds...")
             time.sleep(retry_interval)
 
-
+last_send_time = 0
+send_interval = 0.4
 def continue_send_photo():
     global flag_error, audio_file_stack_length, paizhao_voice_command, \
         generate_photo_base64, nihao_detected, xiaoqi_detected, result_detected, \
         hello_detected, file_counter, message_id, resp_code_id, conversation_id, ws, \
-        shield_after_send, flag_think2, old_message_id, photo_base64_list, message_id2
+        shield_after_send, flag_think2, old_message_id, photo_base64_list, message_id2,last_send_time,send_interval
     # WebSocket 地址
     retries = 0
     max_retries = 10000
     retry_interval = 0.3
     c_count = 0
     while True:
+        # print("c_count:",c_count)
         c_count += 1
         time.sleep(0.01)
         if c_count == 1:
             max_photo = 1
         elif c_count > 1:
-            max_photo = 2
+            max_photo = 3
+        # print("max_photo:", max_photo)
+        current_time = time.time()
+        if current_time - last_send_time < send_interval:
+            # print("等待时间不够，跳过本次发送")
+            continue  # 跳过本次发送操作
         if len(photo_base64_list) >= max_photo:
+            last_send_time = current_time
             with open("li_scene_seq.txt", "r") as file_scene:
                 content = file_scene.read().strip()  # 读取并去除空白字符
                 if content == 'None' or content == '':
@@ -1356,7 +2902,7 @@ def continue_send_photo():
 
             message_id_orin2 = get_message_id()
             message_id2 = message_id_orin2
-            print("Sending 3 photos...")
+            print(f"Sending {len(photo_base64_list)} photos...")
             print("message_id2:", message_id2)
             print("continue_send_photo conversation_id:", conversation_id)
             request2 = {
@@ -1419,6 +2965,28 @@ qibaozaine_file = f"/home/li/vosk-api/python/example/qibaozaine.pcm"
 take_photo_file = f"/home/li/vosk-api/python/example/take_photo.pcm"
 play_haode_event = threading.Event()
 play_qibaozaina_event = threading.Event()
+enen_file = "/home/li/vosk-api/python/example/en.mp3"
+
+
+def voice_channel_play_function():
+    global play_haode, xiaoqi_detected, nihao_detected, output_file_stack, enen_file
+    while 1:
+        time.sleep(0.01)
+        if xiaoqi_detected:
+            print("xiaoqi_detected not response")
+        if not xiaoqi_detected:
+            if play_haode == True:
+                if has_added_sleep_mode_command == True:
+                    # output_file_stack.append(("voice-chat", 1, enen_file))
+                    # print("voice-chat append:",enen_file)
+                    temp_voice = pygame.mixer.Sound("/home/li/vosk-api/python/example/en.mp3")
+                    voice_channel = pygame.mixer.Channel(1)
+                    voice_channel.play(temp_voice)
+                    print("play en!")
+                    # while voice_channel.get_busy():  # 如果音频正在播放
+                    #    pygame.time.wait(20)
+                    play_haode = False
+                    play_haode_event.set()
 
 
 def play_haode_function():
@@ -1442,7 +3010,7 @@ def play_haode_function():
             index = random_number % 4
             with threading.Lock():
                 subprocess.run(
-                    ["aplay", "-D", "plughw:1,0", "-f", "S16_LE", "-r", "16000", "-c", "1", pcm_files[index]])
+                    ["aplay", "-D", "plughw:3,0", "-f", "S16_LE", "-r", "16000", "-c", "1", pcm_files[index]])
 
             play_haode = False
             # time.sleep(1)
@@ -1460,7 +3028,7 @@ def play_qibaozaine_function():
 
             with threading.Lock():
                 subprocess.run(
-                    ["aplay", "-D", "plughw:1,0", "-f", "S16_LE", "-r", "16000", "-c", "1", qibaozaine_file])
+                    ["aplay", "-D", "plughw:3,0", "-f", "S16_LE", "-r", "16000", "-c", "1", qibaozaine_file])
 
             play_qibaozaina = False
             # time.sleep(1)
@@ -1474,7 +3042,8 @@ bmg_file_name = '/home/li/vosk-api/python/example/sleep2.mp3'
 bmg_file_name_list = [
     "/home/li/vosk-api/python/example/sleep1.mp3",
     "/home/li/vosk-api/python/example/sleep2.mp3",
-    "/home/li/vosk-api/python/example/sleep3.mp3"
+    "/home/li/vosk-api/python/example/sleep3.mp3",
+    "/home/li/vosk-api/python/example/xinyexihan.mp3"
 ]
 
 li_scene_seq = None
@@ -1484,13 +3053,14 @@ interrupt_flag = False
 
 garbage_content_event = threading.Event()
 add_once_list_flag_with_sleep = False
+voice_channel = None
 
 
 def mix_play():
     global recording_event, nihao_detected, xiaoqi_detected, local_output_file_name_list, standup_flag, \
-        li_voices_list_len, play_status, interrupt_flag, li_wait_time, is_garbage_content, garbage_flag, resp_message_id, message_id
+        li_voices_list_len, play_status, interrupt_flag, li_wait_time, is_garbage_content, garbage_flag, resp_message_id, message_id, voice_channel
 
-    global qibao_sentence_complete, add_once_list_flag_with_sleep
+    global qibao_sentence_complete, add_once_list_flag_with_sleep, noise_break_flag
 
     while True:
         try:
@@ -1499,10 +3069,11 @@ def mix_play():
 
             if interrupt_flag:
                 print("Interrupt skipping")
-                time.sleep(0.1)
+                time.sleep(0.2)
                 continue
 
             command2, j2, local_output_file_name = play_queue.get()
+            print("Current contents of play_queue:", list(play_queue.queue))
             old_command2 = command2
             old_j2 = j2
             old_local_output_file_name = local_output_file_name
@@ -1560,7 +3131,7 @@ def mix_play():
                     # if not voice_channel:  # 如果没有空闲通道，就分配一个新的
                     #     voice_channel = pygame.mixer.Channel(1)
                     resp_message_id = message_id
-                    voice_channel.play(temp_voice)
+                    #                    voice_channel.play(temp_voice)
                     while voice_channel.get_busy():  # 如果音频正在播放
                         pygame.time.wait(20)
 
@@ -1578,13 +3149,15 @@ def mix_play():
                 #     file_status.write(str(play_status))  # 更新文件
                 # break
 
+                print("Now playing file ", local_output_file_name)
                 voice_channel.play(voice)
-
+                #                while voice_channel.get_busy():  # 如果音频正在播放
+                #                    pygame.time.wait(20)
                 temp_voice = voice
 
-                print("################")
-                print("command and j2", command2, j2)
-                print("####################")
+                # print("################")
+                # print("command and j2",command2,j2)
+                # print("####################")
                 if command2 == "voice-chat":
                     if j2 == -1:
                         qibao_sentence_complete = True
@@ -1611,9 +3184,8 @@ def mix_play():
 
                 print("wait end!!!")
                 while voice_channel.get_busy():
-                    if command2 == "execute-command":
-                        time.sleep(li_wait_time)
-                        # (pygame.time.get_ticks() - start_time < li_wait_time * 1000)
+
+                    # (pygame.time.get_ticks() - start_time < li_wait_time * 1000)
                     # current_position = (pygame.time.get_ticks() - start_time) / 1000.0
                     # print("current position:", current_position)
                     # if resp_message_id != message_id:
@@ -1629,15 +3201,22 @@ def mix_play():
                     #         file_status.write(str(play_status))  # 更新文件
                     #
                     #     break
-                    print("resp_message_id:", resp_message_id)
-                    print("message_id:", message_id)
+                    # print("resp_message_id:",resp_message_id)
+                    # print("message_id:",message_id)
                     if resp_message_id != message_id:
+                        print("resp_message_id:", resp_message_id)
+                        print("message_id:", message_id)
                         print("!resp_message_id != message_id break!")
+                        print("######################")
+                        # print("noise_break_flag", noise_break_flag)
+                        # noise_break_flag = False
                         voice_channel.stop()  # 停止语音播放
+
                         interrupt_flag = True
                         garbage_flag = 0
+                        play_queue.queue.clear()
                         # print('voice garbage', garbage_flag)
-                        time.sleep(0.1)
+                        time.sleep(0.05)
                         # interrupted_position = current_position
                         # print("interrupted_position:",interrupted_position)
                         play_status = "IN_PROGRESS"  # 播放状态更改为IN_PROGRESS
@@ -1679,7 +3258,7 @@ def mix_play():
                     if standup_flag:
                         print("standup_flag detected, breaking playback")
                         voice_channel.stop()  # 停止语音播放
-                        time.sleep(0.1)
+                        time.sleep(0.05)
                         play_status = "IN_PROGRESS"  # 播放状态更改为IN_PROGRESS
                         with open("play_status.txt", "w") as file_status:
                             file_status.write(str(play_status))  # 更新文件
@@ -1688,7 +3267,7 @@ def mix_play():
                     if recording_event.is_set() or nihao_detected or xiaoqi_detected:
                         print("!xiaoqi_detected break!")
                         voice_channel.stop()  # 停止语音播放
-                        time.sleep(0.1)
+                        time.sleep(0.05)
                         # 重置打断标志
                         nihao_detected = False
                         xiaoqi_detected = False
@@ -1696,10 +3275,12 @@ def mix_play():
                         with open("play_status.txt", "w") as file_status:
                             file_status.write(str(play_status))  # 更新文件
                         break
-                    print(f"语音 {local_output_file_name} 播放完毕")
-                    pygame.time.Clock().tick(10)
+                print(f"语音 {local_output_file_name} 播放完毕")
+                pygame.time.Clock().tick(10)
 
-
+                if command2 == "execute-command":
+                    print("execute-command sleep")
+                    time.sleep(li_wait_time)
 
 
             except pygame.error as e:
@@ -1714,8 +3295,9 @@ last_bgm_num = 0
 def combine_bgm_sound():
     global bmg_file_name_list, bmg_file_name, bgm_num, last_bgm_num, standup_flag
     os.environ["SDL_AUDIODRIVER"] = "alsa"
-    os.environ["AUDIODEV"] = "hw:1,0"
+    os.environ["AUDIODEV"] = "hw:3,0"
     while 1:
+        time.sleep(0.01)
         thread_control_event.wait()
         try:
             pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
@@ -1745,7 +3327,7 @@ def combine_bgm_sound():
                 if bgm_num == last_bgm_num:
                     continue
                 if bgm_num == 1:
-                    bmg_file_name = bmg_file_name_list[2]
+                    bmg_file_name = bmg_file_name_list[3]
                     pygame.mixer.music.load(bmg_file_name)
                     pygame.mixer.music.play(-1)
                     print(f"swtich to bgm {bmg_file_name}")
@@ -1836,10 +3418,17 @@ def send_audio_request(audio_data):
     # 加载音频文件并编码为 base64
     # with open(audio_file_path, "rb") as audio_file:
     #     audio_data = base64.b64encode(audio_file.read()).decode('utf-8')
+    now2 = datetime.now()
+    # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+    # print("soundbase64 start by choice: ", message_id)
     audio_data = base64.b64encode(audio_data).decode('utf-8')
+    now2 = datetime.now()
+    # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+    # print("soundbase64 end by choice: ", message_id)
     # audio_data = resample_audio1(audio_data, SAMPLERATE_ORIG, SAMPLERATE_TARGET)
     # 构建 JSON 请求
     print("$$$$$$$$$$$$$$$$message_id_send:", message_id)
+    print("request_before:", now2.strftime("%Y-%m-%d %H:%M:%S"))
     request = {
         "version": "1.0",
         "method": "voice-chat",
@@ -1857,23 +3446,35 @@ def send_audio_request(audio_data):
     retries = 0
     max_retries = 10000
     retry_interval = 0.3
+    print("request_after:", now2.strftime("%Y-%m-%d %H:%M:%S"))
     while True:  # 无限重连直到成功
         try:
+            now2 = datetime.now()
+            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+            # print("websocket start by choice: ", message_id)
             if ws is None or not ws.connected:
                 print("WebSocket not connected. Attempting to reconnect...")
                 ws = websocket.create_connection(websocket_url)
                 print("WebSocket reconnected successfully!")
                 # remote_host, remote_port = ws.sock.getpeername()
                 # print(f"Connected to host: {remote_host}, port: {remote_port}")
+            now2 = datetime.now()
+            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+            # print("websocket end by choice: ", message_id)
 
             # 发送照片数据
             qibao_sentence_complete = False
             garbage_flag = 2
-
+            now2 = datetime.now()
+            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+            # print("send audio start by choice: ", message_id)
             ws.send(json.dumps(request))
+            now2 = datetime.now()
+            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+            # print("send audio stop by choice: ", message_id)
             # remote_host, remote_port = ws.sock.getpeername()
             # print(f"Connected to host: {remote_host}, port: {remote_port}")
-            print("Photo data sent successfully.")
+            print("Audio data sent successfully.")
             break  # 成功后退出无限重连循环
 
         except (WebSocketException, BrokenPipeError, WebSocketConnectionClosedException) as e:
@@ -1896,6 +3497,7 @@ def send_audio_request(audio_data):
         finally:
             print("we closed!")
             pass
+        print("request_after2:", now2.strftime("%Y-%m-%d %H:%M:%S"))
 
 
 audio_data_queue = queue.Queue()
@@ -1916,10 +3518,11 @@ def receive_audio_request():
     retry_interval = 0.3
     mes2_id = None
     count_j = 0
+    response=None
     while True:
         print("receive_audio_request!")
         current_time_loop = datetime.now()
-        print("current time loop：", current_time_loop.strftime("%Y-%m-%d %H:%M:%S"))
+        # print("current time loop：", current_time_loop.strftime("%Y-%m-%d %H:%M:%S"))
         print("print receive_audio_request")
 
         time.sleep(0.005)
@@ -1927,14 +3530,14 @@ def receive_audio_request():
         t1 = time.time()
         # print("@@@@@@SReceive_break_send_audio:", break_send_audio)
         if nihao_detected or xiaoqi_detected or audio_file_stack_length > 1:
-            print("***************************")
-            print("***************************")
-
-            print("nihao_detected:", nihao_detected)
-            print("xiaoqi_detected:", xiaoqi_detected)
-            print("audio_file_stack_length > 1:", audio_file_stack_length > 1)
-            print("***************************")
-            print("***************************")
+            # print("***************************")
+            # print("***************************")
+            #
+            # print("nihao_detected:", nihao_detected)
+            # print("xiaoqi_detected:", xiaoqi_detected)
+            # print("audio_file_stack_length > 1:", audio_file_stack_length > 1)
+            # print("***************************")
+            # print("***************************")
             output_audio_stack.clear()
             print("Clear output_file_stack @@SReceive_break_send_audio")
 
@@ -1942,7 +3545,7 @@ def receive_audio_request():
             nihao_detected = False
             xiaoqi_detected = False
             break
-        print("Time_cycle:", t1 - last_t1)
+        # print("Time_cycle:", t1 - last_t1)
         # 等待响应
         # response = await websocket.recv()
         try:
@@ -1951,14 +3554,14 @@ def receive_audio_request():
                 if reconnect_flag == True:
                     print("write COMPLETED to play_status.txt")
                     play_queue.queue.clear()
-                    output_file_stack.clear()
+                    # output_file_stack.clear()
                     with open("play_status.txt", "w") as file_status:
                         file_status.write(str("COMPLETED"))
                     reconnect_flag = False
                 t1 = time.time()
                 response = ws.recv()
                 t2 = time.time()
-                print("Time_diff2:", t2 - t1)
+                # print("Time_diff2:", t2 - t1)
                 # remote_host, remote_port = ws.sock.getpeername()
                 # print(f"Connected to host: {remote_host}, port: {remote_port}")
                 # print("recv_message_id2:",message_id)
@@ -2009,6 +3612,7 @@ def receive_audio_request():
                             if resp_message_id != message_id or recording_event.is_set():  # and resp_message_id != old_message_id:
                                 print("resp_message_id!= message_id break2!!!!!!!!!!!!!!")
                                 recording_event.clear()
+                                play_queue.queue.clear()
                                 continue
                             interrupt_flag = True
                     # print("response_data:",response_data)
@@ -2072,10 +3676,12 @@ def deal_received_audio_request():
         , li_wait_time, scent_spray_flag, bgm_num, standup_flag, li_voices_list_len, li_scene_seq, \
         qibao_sentence_complete, li_voice, interrupt_flag, cant_connect_flag, li_filename, sleep_mode, play_enter_sleep_mode, has_added_sleep_mode_command
 
-    global add_once_list_flag_with_sleep
+    global add_once_list_flag_with_sleep, light_m
     li_voices_list = []
-
+    old_light_mode = ""
     while True:
+        now2 = datetime.now()
+        # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
         print("deal_received_audio_request!")
         time.sleep(0.003)
         print("audio_data_queue:", audio_data_queue)
@@ -2132,7 +3738,7 @@ def deal_received_audio_request():
 
                         print("li_scene_seq:", li_scene_seq)
                         now2 = datetime.now()
-                        print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+                        # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
                         print("***************************************")
                         print("***************************************")
 
@@ -2266,43 +3872,50 @@ def deal_received_audio_request():
                             light_mode = light["mode"]
                             print("light_mode:", light_mode)
                             if light_mode is not None:
-                                if str(light_mode) == "Off":
-                                    print("Off!!!")
-                                    turn_off()
-                                    # time.sleep(2)
-                                if str(light_mode) == "Shadowing":
-                                    print("Shadowing!!!")
-                                    turn_off()
-                                    time.sleep(0.1)
-                                    # theaterChaseRainbow(strip, wait_ms=50)
-                                    theaterChaseRainbow_thread = threading.Thread(target=theaterChaseRainbow,
-                                                                                  args=(strip, 50))
-                                    theaterChaseRainbow_thread.start()
-                                    # time.sleep(1)
-                                if str(light_mode) == "Breathing":
-                                    print("Breathing!!!")
-                                    turn_off()
-                                    time.sleep(0.1)
-                                    # wheel(100)
-                                    wheel_thread = threading.Thread(target=wheel, args=(100,))
-                                    wheel_thread.start()
-                                    # time.sleep(1)
-                                if str(light_mode) == "Gradient":
-                                    print("Gradient!!!")
-                                    turn_off()
-                                    time.sleep(0.1)
-                                    # colorWipe_single(strip,  color=Color(0, 255, 0),wait_ms=50)
-                                    colorWipe_single_thread = threading.Thread(target=breath)
-                                    colorWipe_single_thread.start()
-                                    # time.sleep(1)
-                                if str(light_mode) == "Static":
-                                    print("Static!!!")
-                                    turn_off()
-                                    time.sleep(0.1)
-                                    # rainbow(strip, wait_ms=30)
-                                    rainbow_thread = threading.Thread(target=const_color, args=(r, g, b,))
-                                    rainbow_thread.start()
-                                    # time.sleep(1)
+                                # print("---- old_light_mode by choice", old_light_mode, light_mode)
+                                if old_light_mode != light_mode:
+                                    #                                    light_m = light_mode
+                                    #                                     print("---- light_m by choice", light_m)
+                                    if str(light_mode) == "Off":
+                                        print("Off!!!")
+                                        turn_off()
+                                        # time.sleep(2)
+                                    if str(light_mode) == "Shadowing":
+                                        print("Shadowing!!!")
+                                        turn_off()
+                                        time.sleep(0.1)
+                                        # theaterChaseRainbow(strip, wait_ms=50)
+                                        theaterChaseRainbow_thread = threading.Thread(target=colorWipe2,
+                                                                                      args=(strip, Color(r, g, b), 50))
+                                        theaterChaseRainbow_thread.start()
+                                        # time.sleep(1)
+                                    if str(light_mode) == "Breathing":
+                                        print("Breathing!!!")
+                                        turn_off()
+                                        time.sleep(0.1)
+                                        # wheel(100)
+                                        wheel_thread = threading.Thread(target=wheel, args=(100,))
+                                        wheel_thread.start()
+                                        # time.sleep(1)
+                                    if str(light_mode) == "Gradient":
+                                        print("Gradient!!!")
+                                        turn_off()
+                                        time.sleep(0.1)
+                                        light_m = "breath"
+                                        # colorWipe_single(strip,  color=Color(0, 255, 0),wait_ms=50)
+                                        colorWipe_single_thread = threading.Thread(target=breath, args=(r, g, b,))
+                                        colorWipe_single_thread.start()
+                                        # time.sleep(1)
+                                    if str(light_mode) == "Static":
+                                        print("Static!!!")
+                                        turn_off()
+                                        time.sleep(0.1)
+                                        light_m = "const_color"
+                                        # rainbow(strip, wait_ms=30)
+                                        rainbow_thread = threading.Thread(target=const_color, args=(r, g, b,))
+                                        rainbow_thread.start()
+                                        # time.sleep(1)
+                                    old_light_mode = light_mode
 
                         fragrance = response_data["data"]["actions"]["fragrance"]
                         print("fragrance:", fragrance)
@@ -2325,7 +3938,6 @@ def deal_received_audio_request():
                 if is_garbage_content == False:
                     if response_data['data']['text'] is not None and response_data["data"]["stream_seq"] is not None and \
                             response_data["data"]["stream_seq"] == 1:
-                        print("garbage")
                         response_text = response_data['message_id']
                         print("gar response_text:", response_text)
                         play_queue.queue.clear()
@@ -2343,7 +3955,7 @@ def deal_received_audio_request():
                         # print("qibao_sentence_complete:", qibao_sentence_complete)
                         print("sleep_mode:", sleep_mode)
                         if sleep_mode == True:
-                            time.sleep(10)
+                            time.sleep(9)
                             output_file_stack.append(
                                 ("execute-command", 1, f"/home/li/vosk-api/python/example/lahuisixu2.mp3"))
                             time.sleep(3)
@@ -2398,7 +4010,7 @@ def deal_received_audio_request():
                         paizhao_voice_command = True
 
                     elif response_action == "sleep_assistant":
-                        print("sleep_assistant")
+                        print("sleep_assistant: ", resp_message_id)
                         response_text = response_data['message_id']
                         print("sleep_assistant response_text:", response_text)
                         play_queue.queue.clear()
@@ -2410,6 +4022,9 @@ def deal_received_audio_request():
                         print("web ask to sleep assistant.")
                         continue_shot_and_record = True
                         play_enter_sleep_mode = True
+                        continue_send_photo_thread = threading.Thread(target=continue_send_photo)
+                        continue_send_photo_thread.daemon = True  # 设置为守护线程，这样程序退出时线程会自动退出
+                        continue_send_photo_thread.start()
                         if play_enter_sleep_mode and not has_added_sleep_mode_command:
                             output_file_stack.append(
                                 ("execute-command", 1, f"/home/li/vosk-api/python/example/enter_sleep_mode.mp3"))
@@ -2453,12 +4068,13 @@ def deal_received_audio_request():
                         # nihao_detected = False
                         # xiaoqi_detected = False
                         # break
-                        file_counter += 1  # 递增文件计数器
+                        # file_counter += 1  # 递增文件计数器
+                        file_counter = random.randint(100000, 999999)
                         flag_think2 = False
                         if str(resp_fomat) == 'mp3':
                             if resp_message_id != message_id or recording_event.is_set():  # and resp_message_id != old_message_id:
                                 print("resp_message_id!= message_id break1!!!!!!!!!!!!!!")
-
+                                play_queue.queue.clear()
                                 recording_event.clear()
                                 continue
 
@@ -2481,6 +4097,7 @@ def deal_received_audio_request():
             interrupt_flag = False
 
 
+import random
 # 判断是否有语音活动
 import webrtcvad
 
@@ -2605,7 +4222,9 @@ def callback(indata, frames, time1, status):
     """每次接收音频数据时调用"""
     global t_play_haode, output_file_name, recording, silence_counter, output_pcm_file, pre_buffer, audio_file_stack, \
         noise_break_flag, silent_start_time, silent_end_time, pop_swtich, message_id, start_record_time, play_haode, \
-        is_silent_flag, recording_event, flag_think, old_message_id, last_message_id, not_send_flag, play_qibaozaina, audio_memory
+        is_silent_flag, recording_event, flag_think, old_message_id, last_message_id, not_send_flag, play_qibaozaina, \
+        audio_memory, voice_channel,qibao_sentence_complete,interrupt_flag
+
     denoise_output_file_name = f"/home/li/vosk-api/python/example/send_pcm_folder/denoise_output{message_id}.pcm"
     if status:
         print(status, file=sys.stderr)
@@ -2624,6 +4243,11 @@ def callback(indata, frames, time1, status):
 
             if not recording:
                 print("@@@@@@@@@@@@开始录音......")
+                voice_channel = pygame.mixer.Channel(1)
+                voice_channel.stop()
+                time.sleep(0.1)
+                qibao_sentence_complete = False
+                interrupt_flag = True
                 recording = True
                 print("audio_data_queue_size:", audio_data_queue.qsize())
                 while not audio_data_queue.empty():
@@ -2695,7 +4319,12 @@ def callback(indata, frames, time1, status):
                         # print("!!!!!!!!!!!!!!!Send_play_haode:", play_haode)
                         if not_send_flag == False:
                             # play_qibaozaina = True
+                            now2 = datetime.now()
+                            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+                            # print("append to stack by choice")
                             audio_file_stack.append(audio_data)
+                            now2 = datetime.now()
+                            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
                         else:
                             play_haode = True
                         last_message_id = message_id
@@ -2977,6 +4606,9 @@ def audio_run():
     print("audio_run")
     audio_file_stack.clear()
     time.sleep(0.005)  # 保证事件循环可以调度其他任务
+    now2 = datetime.now()
+    # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+    # print("running2 and time by choice", running2)
     if running2:
         audio_thread_control_event.wait()
         thread_control_event.wait()
@@ -2984,18 +4616,24 @@ def audio_run():
         # time.sleep(0.01)
     # time.sleep(0.1)
     con_num = 0
+    now2 = datetime.now()
+    # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+    # print("running2 end and time by choice", running2)
     while running2:
+        now2 = datetime.now()
+        # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+        # print("running2 loop and time by choice", running2)
         con_num += 1
         # print("flag_think:",flag_think)
         # print("network audio_run!!!")
         audio_thread_control_event.wait()
         thread_control_event.wait()
         flag_len = len(audio_file_stack)
-        # print("!!!!!!!!!!!!!!!len(audio_file_stack):",len(audio_file_stack))
+        # print("!!!!!!!!!!!!!!!len(audio_file_stack):",flag_len)
         time.sleep(0.005)  # 确保事件循环可以调度其他任务
         # print("Entering while循环")
         # print("发送栈length:", flag_len)
-        # if conversion_success==True:
+        # if conversion_succss==True:
         #     send_audio_request(audio_file_path)
         # if generate_photo_base64:
         #     send_audio_request(audio_file_path)
@@ -3018,9 +4656,13 @@ def audio_run():
             #         continue
             # audio_file_path = os.path.join("/home/orangepi/vosk-api/python/example", audio_file_path)
             # print(f"audio file_full: {audio_file_path}")
-
-            print("send_audio_request")
+            now2 = datetime.now()
+            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+            # print("send_audio_request by choice")
             send_audio_request(audio_data)
+            now2 = datetime.now()
+            # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+            # print("send_audio_request end by choice")
 
             # run_async(send_audio_request, audio_file_path)
             # success =send_audio_request(audio_file_path)
@@ -3033,6 +4675,9 @@ def audio_run():
         #     print("No more audio files to send.")
         #     print("No more audio files to send.")
         # break  # 如果栈空则退出
+        now2 = datetime.now()
+        # print(now2.strftime("%Y-%m-%d %H:%M:%S"))
+        # print("running2 loop end and time by choice", running2)
     print("break from audio_run!")
 
 
@@ -3095,15 +4740,12 @@ def start_threads():
         # record_2s_thread.start()
         combine_bgm_sound_thread = threading.Thread(target=combine_bgm_sound)
         combine_bgm_sound_thread.start()
-        continue_send_photo_thread = threading.Thread(target=continue_send_photo)
-        continue_send_photo_thread.daemon = True  # 设置为守护线程，这样程序退出时线程会自动退出
-        continue_send_photo_thread.start()
 
         LED_thread = threading.Thread(target=breath)
         LED_thread.start()
         scent_spray_thread = threading.Thread(target=scent_spray)
         scent_spray_thread.start()
-        face_detection_run_thread = threading.Thread(target=face_detection_run1)
+        # face_detection_run_thread = threading.Thread(target=face_detection_run1)
         heartbeat_thread = threading.Thread(target=send_heartbeat, daemon=True)
         audio_processing_thread = threading.Thread(target=audio_run)
         # logic_thread = threading.Thread(target=animation_logic)
@@ -3113,6 +4755,8 @@ def start_threads():
         # receive_audio_request2_thread.start()
         deal_received_audio_request_thread = threading.Thread(target=deal_received_audio_request)
         deal_received_audio_request_thread.start()
+        voice_channel_play_function_thread = threading.Thread(target=voice_channel_play_function)
+        voice_channel_play_function_thread.start()
 
         # playhaode_thread_instance = threading.Thread(target=play_haode_function, daemon=True)
         # playhaode_thread_instance.start()
@@ -3121,7 +4765,7 @@ def start_threads():
         # check_thread = threading.Thread(target=check_audio_file_stack)
         # check_thread.start()
         # thread_draw.start()
-        face_detection_run_thread.start()
+        # face_detection_run_thread.start()
         heartbeat_thread.start()
         audio_processing_thread.start()
         # logic_thread.start()
@@ -3250,13 +4894,13 @@ not_send_flag = False
 def kaldi_listener():
     global count2, silent_start_time, silent_end_time, xiaoqi_detected, running2, running, paizhao_voice_command, \
         message_id_get, data_id_no_send, nihao_detected, result_detected, hello_detected, keywords, sleep_detected, \
-        nihao_event, is_silent_flag, xiaoqi_event, continue_shot_and_record
-    args.samplerate = SAMPLERATE_ORIG
+        nihao_event, is_silent_flag, xiaoqi_event, continue_shot_and_record,dump_fn
+    # args.samplerate = SAMPLERATE_ORIG
 
     rec = KaldiRecognizer(model, SAMPLERATE_ORIG, keywords)
     rec.SetSpkModel(spk_model)
     # rec2 = KaldiRecognizer(model, 44100)
-    with sd.InputStream(samplerate=args.samplerate, blocksize=8000, device=find_device_index(),
+    with sd.InputStream(samplerate=SAMPLERATE_ORIG, blocksize=8000, device=find_device_index(),
                         dtype="int16", channels=1, callback=main_callback):
         print("#" * 80)
         print("Press Ctrl+C to stop the recording1")
@@ -3404,7 +5048,7 @@ from rpi_ws281x import *
 import argparse
 
 # LED strip configuration:
-LED_COUNT = 50  # Number of LED pixels.
+LED_COUNT = 120  # Number of LED pixels.
 LED_PIN = 18  # 18      # GPIO pin connected to the pixels (18 uses PWM!).
 # LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -3412,6 +5056,8 @@ LED_DMA = 10  # DMA channel to use for generating signal (try 10)
 LED_BRIGHTNESS = 64  # Set to 0 for darkest and 255 for brightest
 LED_INVERT = False  # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL = 0  # set to '1' for GPIOs 13, 19, 41, 45 or 53
+
+light_m = "breath"
 
 
 def colorWipe2(strip, color, wait_ms=100):
@@ -3504,33 +5150,111 @@ def theaterChaseRainbow(strip, wait_ms=50):
                 strip.setPixelColor(i + q, 0)
 
 
-def breath():
+# def breath():
+#     # print("breath act.")
+#     for j in range(255, -1, -1):
+#         for i in range(strip.numPixels()):
+#             strip.setPixelColor(i, Color(j, 255 - j, 0))
+#             # print("j:", j)
+#         strip.show()
+#         time.sleep(0.01)
+#     time.sleep(2)
+#     for j in range(255):
+#         for i in range(strip.numPixels()):
+#             strip.setPixelColor(i, Color(0, 255, j))
+#             # print("j:", j)
+#         strip.show()
+#         time.sleep(0.01)
+#     time.sleep(2)
+
+def breath(r=0, g=0, b=255, waittime=0.01):
+    global light_m
     # print("breath act.")
-    for j in range(255, -1, -1):
-        for i in range(strip.numPixels()):
-            strip.setPixelColor(i, Color(j, 255 - j, 0))
-            # print("j:", j)
-        strip.show()
+    # for j in range(255, -1, -1):
+    #     for i in range(strip.numPixels()):
+    #         strip.setPixelColor(i, Color(j, 255 - j, 0))
+    #         # print("j:", j)
+    #     strip.show()
+    #     time.sleep(0.01)
+    # time.sleep(2)
+    # for j in range(255):
+    #     for i in range(strip.numPixels()):
+    #         strip.setPixelColor(i, Color(0, 255, j))
+    #         # print("j:", j)
+    #     strip.show()
+    #     time.sleep(0.01)
+    # time.sleep(2)
+    print("------ breath 1", light_m)
+
+    # r = 25
+    # g = 12
+    # b = 12
+    m = max(r, g, b)
+    r1 = r
+    g1 = g
+    b1 = b
+    inter = 1
+    for t in range(1000):
         time.sleep(0.01)
-    time.sleep(2)
-    for j in range(255):
-        for i in range(strip.numPixels()):
-            strip.setPixelColor(i, Color(0, 255, j))
-            # print("j:", j)
-        strip.show()
-        time.sleep(0.01)
-    time.sleep(2)
+        print("------ breath light_m", light_m)
+        if light_m != "breath":
+            break
+        for i in range(m):
+            if light_m != "breath":
+                break
+            if r1 > inter:
+                r1 = r1 - inter
+            else:
+                r1 = 0
+            if g1 > inter:
+                g1 = g1 - inter
+            else:
+                g1 = 0
+            if b1 > inter:
+                b1 = b1 - inter
+            else:
+                b1 = 0
+            for i in range(strip.numPixels()):
+                strip.setPixelColor(i, Color(r1, g1, b1))
+            # print("r1,g1,b1:", r1, g1, b1)
+            strip.show()
+            #            time.sleep(waittime)
+            if r1 == 0 and g1 == 0 and b1 == 0:
+                break
+
+        for i in range(m):
+            if light_m != "breath":
+                break
+            if r1 < r:
+                r1 = r1 + inter
+            else:
+                r1 = r
+            if g1 < g:
+                g1 = g1 + inter
+            else:
+                g1 = g
+            if b1 < b:
+                b1 = b1 + inter
+            else:
+                b1 = b
+            for i in range(strip.numPixels()):
+                strip.setPixelColor(i, Color(r1, g1, b1))
+            # print("r1,g1,b12:", r1, g1, b1)
+            strip.show()
+            #            time.sleep(waittime)
+            if r1 == r and g1 == g and b1 == b:
+                break
 
 
 def const_color(r, g, b):
     print("r,g,b:", r, g, b)
-    for j in range(255):
-        for i in range(strip.numPixels()):
-            strip.setPixelColor(i, Color(r, g, b))
-            # print("j:", j)
-        strip.show()
-        time.sleep(0.01)
-    time.sleep(2)
+    # for j in range(255):
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, Color(r, g, b))
+        # print("j:", j)
+    strip.show()
+    # time.sleep(0.01)
+    # time.sleep(2)
 
 
 def turn_off():
@@ -3676,13 +5400,13 @@ def scent_spray():
             continue
         if scent_spray_flag == True:
             for j in range(30):
-                time.sleep(5)
                 for i in range(6):
                     GPIO.output(22, GPIO.HIGH)
-                    time.sleep(0.1)
+                    time.sleep(0.3)
                     GPIO.output(22, GPIO.LOW)
                     print("GPIO.HIGH!")
                     time.sleep(7.9)
+                # time.sleep(5)
         if scent_spray_flag == False:
             GPIO.output(22, GPIO.LOW)
             print("GPIO.LOW!")
@@ -3716,6 +5440,54 @@ def listen_for_s_key():
 if __name__ == "__main__":
     # shape_change2()
     # turn_off scent
+    motor_forward_together2_no_break(50, 120, 100)
+    # time.sleep(1)
+    find_zero_pos()
+    motor_forward_together2_no_break(60, 0, 100)
+
+
+    with open("motor_degree2.txt", "w") as file_status:
+        file_status.write("0")  # 直接写入 0
+    with open("motor_degree.txt", "w") as file_status:
+        file_status.write("0")  # 直接写入 0
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--imgpath', type=str, default='/home/li/Downloads/YOLOv5-Lite/python_demo/onnxruntime/bus.jpg', help="image path")
+    parser.add_argument('--modelpath', type=str, default='/home/li/Downloads/YOLOv5-Lite/models/v5lite-e.onnx', help="onnx filepath")
+    parser.add_argument('--classfile', type=str, default='coco.names', help="classname filepath")
+    parser.add_argument('--confThreshold', default=0.5, type=float, help='class confidence')
+    parser.add_argument('--nmsThreshold', default=0.6, type=float, help='nms iou thresh')
+    args2 = parser.parse_args()
+    cap = cv2.VideoCapture(0)  # 摄像头索引，0表示默认摄像头
+
+
+    run_keypoint_main_thread= threading.Thread(target=run_keypoint_main)
+    run_keypoint_main_thread.start()
+    read_adc2_thread = threading.Thread(target=read_adc2)
+    read_adc2_thread.start()
+    read_adc_thread = threading.Thread(target=read_adc)
+    read_adc_thread.start()
+    find_person_roaming_thread = threading.Thread(target=find_person_roaming)
+    find_person_roaming_thread.start()
+    # motor_forward_together2_no_break(20, 15, 100)
+    # time.sleep(1)
+    # find_zero_pos()
+    # motor_forward_together2_no_break(15, 0, 100)
+    # Open webcam
+    # motor_reverse()
+    # time.sleep(4)
+    # motor_forward()
+    # time.sleep(4)
+    #
+    # motor_reverse2()
+    # time.sleep(4)
+    # motor_forward2()
+    # time.sleep(4)
+    with open("motor_degree.txt", "w") as file_status:
+        file_status.write(str(1))  # 更新第一个电机的角度
+    with open("motor_degree2.txt", "w") as file_status:
+        file_status.write(str(1))  # 更新第二个电机的角度
+
+
     print("ABC")
     with open("li_scene_seq.txt", "w") as file_scene:
         file_scene.write(str(0))  # 将li_scene_seq写入文件，确保是数字序号的字符串格式
@@ -3723,93 +5495,99 @@ if __name__ == "__main__":
     GPIO.output(22, GPIO.LOW)
     print("GPIO.LOW!")
 
-    pwm = PCA9685(0x40, debug=False)
-    pwm.setPWMFreq(60)
+    # pwm = PCA9685(0x40, debug=False)
+    # pwm.setPWMFreq(60)
     model_file = "opencv_face_detector_uint8.pb"
     config_file = "opencv_face_detector.pbtxt"
     net = cv2.dnn.readNetFromTensorflow(model_file, config_file)
     threshold = 0.7
     freq = cv2.getTickFrequency()  # 系统频率
     # face_detection_run1()
-    init()
+    # init()
     message_id = str(datetime.now().strftime('%Y%m%d-%H%M%S-%f')[:-8] + 'start')
     message_id2 = str(datetime.now().strftime('%Y%m%d-%H%M%S-%f')[:-8] + 'start')
-    # time.sleep(10)
-
     strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
-    # Intialize the library (must be called once before other functions).
     strip.begin()
-
+    os.environ["SDL_AUDIODRIVER"] = "alsa"
+    os.environ["AUDIODEV"] = "hw:3,0"
+    pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
+    pygame.mixer.music.set_volume(1.0)
     turn_off()
-
-    try:
-        if args.samplerate is None:
-            print("1111")
-            print(sd.query_devices())
-            print("args.device:", args.device)
-            device_info = sd.query_devices(args.device, "input")
-            print("1112")
-            # soundfile expects an int, sounddevice provides a float:
-            args.samplerate = int(device_info["default_samplerate"])
-            print("1113")
-        if args.model is None:
-            print("2222")
-            # model = Model(lang="en-us")
-            model = Model(model_path)
-        else:
-            print("3333")
-            # model = Model(lang=args.model)
-            model = Model(model_path)
-
-        if args.filename:
-            print("4444")
-            dump_fn = open(args.filename, "wb")
-        else:
-            print("5555")
-            dump_fn = None
-        # kaldi_thread=threading.Thread(target=kaldi_run)
-        # kaldi_thread.start()
-
-        key_thread = threading.Thread(target=listen_for_s_key)
-        key_thread.daemon = True  # 将线程设为守护线程，这样程序退出时会自动结束线程
-        key_thread.start()
-
-        connection_thread = threading.Thread(target=create_connection_with_retries, args=(websocket_url,))
-        connection_thread.start()
-
-        start_threads_thread = threading.Thread(target=start_threads)
-        start_threads_thread.start()
-
-        kaldi2_thread = threading.Thread(target=kaldi_run2)
-        kaldi2_thread.start()
-
-        kaldi_listener_thread = threading.Thread(target=kaldi_listener)
-        kaldi_listener_thread.start()
-
-        timer_thread = threading.Thread(target=timer_check)
-        timer_thread.start()
-        draw_main()
-
-        # start_threads()
-
-        # running2=True
-        # xiaoqi_detected = False
-        # print("break from while loop")
-        # time.sleep(1)
-        # with 块结束，关闭当前流，重新启动一个带有 callback1 的 InputStream
-        # print("Switching to callback1")
-        # with sd.InputStream(samplerate=SAMPLERATE_ORIG2, blocksize=FRAME_SIZE,
-        #                     device=find_device_index(), dtype="int16", channels=1,
-        #                     callback=callback):
-        #     print("#" * 80)
-        #     print("Press Ctrl+C to stop the recording2")
-        #     print("#" * 80)
-
-    except KeyboardInterrupt:
-        print("\nDone")
-        parser.exit(0)
-    except Exception as e:
-        parser.exit(type(e).__name__ + ": " + str(e))
+    # time.sleep(10)
+    # if flag_all_break==True:
+    #     print("enter next phase")
+    #     time.sleep(1)
+        # strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
+        # # Intialize the library (must be called once before other functions).
+        # strip.begin()
+        #
+        # turn_off()
+        #
+        # os.environ["SDL_AUDIODRIVER"] = "alsa"
+        # os.environ["AUDIODEV"] = "hw:3,0"
+        # pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
+        # pygame.mixer.music.set_volume(1.0)
+        #
+        # try:
+        #     # if args.samplerate is None:
+        #     print(sd.query_devices())
+        #     print("args.device:", args.device)
+        #     device_info = sd.query_devices(args.device, "input")
+        #
+        #     # soundfile expects an int, sounddevice provides a float:
+        #     args.samplerate = int(device_info["default_samplerate"])
+        #     # model = Model(lang="en-us")
+        #     model = Model(model_path)
+        #     if args.filename:
+        #         dump_fn = open(args.filename, "wb")
+        #     else:
+        #         dump_fn = None
+        #     # kaldi_thread=threading.Thread(target=kaldi_run)
+        #     # kaldi_thread.start()
+        #
+        #     key_thread = threading.Thread(target=listen_for_s_key)
+        #     key_thread.daemon = True  # 将线程设为守护线程，这样程序退出时会自动结束线程
+        #     key_thread.start()
+        #
+        #     connection_thread = threading.Thread(target=create_connection_with_retries, args=(websocket_url,))
+        #     connection_thread.start()
+        #
+        #     start_threads_thread = threading.Thread(target=start_threads)
+        #     start_threads_thread.start()
+        #
+        #     kaldi2_thread = threading.Thread(target=kaldi_run2)
+        #     kaldi2_thread.start()
+        #
+        #     kaldi_listener_thread = threading.Thread(target=kaldi_listener)
+        #     kaldi_listener_thread.start()
+        #
+        #     timer_thread = threading.Thread(target=timer_check)
+        #     timer_thread.start()
+        #     draw_main()
+        #
+        #
+        #
+        #
+        #     start_threads()
+        #
+        #     running2=True
+        #     xiaoqi_detected = False
+        #     print("break from while loop")
+        #     time.sleep(1)
+        #     # with 块结束，关闭当前流，重新启动一个带有 callback1 的 InputStream
+        #     print("Switching to callback1")
+        #     with sd.InputStream(samplerate=SAMPLERATE_ORIG2, blocksize=FRAME_SIZE,
+        #                         device=find_device_index(), dtype="int16", channels=1,
+        #                         callback=callback):
+        #         print("#" * 80)
+        #         print("Press Ctrl+C to stop the recording2")
+        #         print("#" * 80)
+        #
+        # except KeyboardInterrupt:
+        #     print("\nDone")
+        #     parser.exit(0)
+        # except Exception as e:
+        #     parser.exit(type(e).__name__ + ": " + str(e))
 
 
 
