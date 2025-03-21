@@ -42,7 +42,7 @@ class Light:
         self.curr_light_buffer = []
 
         self.sector_flow_mode_colors = {
-            "1": [
+            "colorful": [
                 [255, 0, 0],
                 [255, 3, 255],
                 [15, 122, 255],
@@ -52,7 +52,7 @@ class Light:
                 [255, 192, 0],
                 [255, 96, 0]
             ],
-            "2": [
+            "star": [
                 [255, 176, 1],
                 [1, 23, 61],
                 [182, 11, 188],
@@ -61,6 +61,16 @@ class Light:
                 [0, 0, 48],
                 [223, 255, 255],
                 [0, 32, 65],
+            ],
+            "jellyfish": [
+                [0, 107, 239],
+                [2, 224, 255],
+                [0, 1, 26],
+                [3, 100, 247],
+                [0, 47, 212],
+                [0, 0, 48],
+                [3, 85, 255],
+                [64, 224, 255],
             ]
         }
 
@@ -91,7 +101,7 @@ class Light:
                 if "mode" in params:
                     mode = params["mode"]
                 else:
-                    mode = 1
+                    mode = "colorful"
                 self.sector_flowing(mode)
             elif light_mode == Code.LIGHT_MODE_STATIC:
                 self.Static(r, g, b)
