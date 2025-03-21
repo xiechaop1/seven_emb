@@ -740,11 +740,11 @@ class Light:
         gt = g
         bt = b
         for i in range(num):
-            if i + start < 40:
+            if i + start < self.light_nums[0]:
                 # 最外圈变暗
-                r = int(rt / 2)
-                g = int(gt / 2)
-                b = int(bt / 2)
+                r = int(rt / 10)
+                g = int(gt / 10)
+                b = int(bt / 10)
             else:
                 r = rt
                 g = gt
@@ -766,11 +766,11 @@ class Light:
         gt = g
         bt = b
         for i in range(num):
-            if i + start < 40:
+            if i + start < self.light_nums[0]:
                 # 最外圈变暗
-                r = int(rt / 2)
-                g = int(gt / 2)
-                b = int(bt / 2)
+                r = int(rt / 10)
+                g = int(gt / 10)
+                b = int(bt / 10)
             else:
                 r = rt
                 g = gt

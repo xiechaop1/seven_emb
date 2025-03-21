@@ -25,13 +25,16 @@ class Screen:
             "video_path": video_path,
             "times": times
         })
+        logging.info(f"Added video {video_path}")
 
     def clear_list(self):
         self.play_list = []
+        logging.info(f"Clear video list")
 
     def stop(self):
         self.screen.stop()
         self.interrupt_event.clear()
+        logging.info(f"Stopped video list")
 
     def daemon(self):
         while True:
@@ -39,8 +42,10 @@ class Screen:
 
             play_video = self.play_list.pop(0)
             if play_video is None:
+                logging.warning("No video")
                 ThreadingEvent.screen_daemon_event.clear()
                 continue
+            logging.info("Getting video %s", play_video["video_path"])
             video_path = play_video["video_path"]
             times = play_video["times"]
 
@@ -94,7 +99,7 @@ class Screen:
                 pygame.display.flip()
 
                 # 每帧等待 40ms，相当于25帧/秒
-                clock.tick(30)
+                clock.tick(60)
                 # pygame.time.delay(1)
 
         cap.release()
