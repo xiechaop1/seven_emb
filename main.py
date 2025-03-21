@@ -7,6 +7,7 @@ import logging
 from base.ws import WebSocketClient
 from base.mic import Mic
 from base.audio_player import AudioPlayer
+from base.screen import Screen
 from config.config import Config
 if not Config.IS_DEBUG:
     from base.light import Light
@@ -18,8 +19,8 @@ from threading import Event
 import threading
 from common.threading_event import ThreadingEvent
 from model.recv import Recv
-from common.code import Code
 from model.daemon import Daemon
+from common.code import Code
 from model.undertake_callback import UndertakeCallback
 import asyncio
 
@@ -39,6 +40,10 @@ from model.execute_command import ExecuteCommand
 if Config.IS_DEBUG == False:
     os.environ["SDL_AUDIODRIVER"] = "alsa"
     os.environ["AUDIODEV"] = "hw:3,0"
+
+os.environ["SDL_VIDEODRIVER"] = "x11"  ########screen_modified by lixiaolin ###
+# os.environ["SDL_VIDEODRIVER"] = "quartz"
+os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
 
 if __name__ == "__main__":
     # on_start()
@@ -95,6 +100,9 @@ if __name__ == "__main__":
     audio_play_thread = threading.Thread(target=audio_instance.audio_play_event_daemon)
     audio_play_thread.start()
     logging.info("audio is ready")
+
+    screen = Screen()
+    screen.display("resources/video/speak_modify2.mp4")
 
     mic_instance = Mic(client, audio_instance, light_instance)
     kaldi_thread = threading.Thread(target=mic_instance.kaldi_listener)
