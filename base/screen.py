@@ -1,3 +1,4 @@
+import logging
 import os
 
 import threading
@@ -26,6 +27,10 @@ class Screen:
 
     def display(self, video_path, times = 3):
         cap = cv2.VideoCapture(video_path)
+        logging.info(f"Screen display start, filename: {video_path}, times: {times}, isOpened: {cap.isOpened()}")
+
+        if not cap.isOpened():
+            return False
 
         if times == -1:
             times = 10000000
@@ -47,7 +52,7 @@ class Screen:
                 pygame.display.flip()
 
                 # 每帧等待 40ms，相当于25帧/秒
-                pygame.time.delay(5)
+                pygame.time.delay(1)
 
         cap.release()
 

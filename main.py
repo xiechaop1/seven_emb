@@ -41,9 +41,10 @@ if Config.IS_DEBUG == False:
     os.environ["SDL_AUDIODRIVER"] = "alsa"
     os.environ["AUDIODEV"] = "hw:3,0"
 
-os.environ["SDL_VIDEODRIVER"] = "x11"  ########screen_modified by lixiaolin ###
-# os.environ["SDL_VIDEODRIVER"] = "quartz"
-os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
+    os.environ["SDL_VIDEODRIVER"] = "x11"  ########screen_modified by lixiaolin ###
+    # os.environ["SDL_VIDEODRIVER"] = "quartz"
+    os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
+    os.environ["XDG_RUNTIME_DIR"] = "/run/user/1000"
 
 if __name__ == "__main__":
     # on_start()
@@ -102,7 +103,7 @@ if __name__ == "__main__":
     logging.info("audio is ready")
 
     screen = Screen()
-    screen.display("resources/video/speak_modify2.mp4")
+    screen.display("resources/video/think.mp4")
 
     mic_instance = Mic(client, audio_instance, light_instance)
     kaldi_thread = threading.Thread(target=mic_instance.kaldi_listener)
