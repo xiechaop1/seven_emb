@@ -51,7 +51,7 @@ class Daemon:
 		self.audio_player.clear_list()
 		if Config.IS_DEBUG == False:
 			self.light.turn_off()
-			self.spray.stop()
+			self.spray.turn_off()
 
 		ThreadingEvent.wakeup_event.clear()
 
