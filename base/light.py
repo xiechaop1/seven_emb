@@ -41,6 +41,29 @@ class Light:
         self.current_colors = []
         self.curr_light_buffer = []
 
+        self.sector_flow_mode_colors = {
+            "1": [
+                [255, 0, 0],
+                [255, 3, 255],
+                [15, 122, 255],
+                [0, 222, 255],
+                [3, 255, 3],
+                [246, 255, 0],
+                [255, 192, 0],
+                [255, 96, 0]
+            ],
+            "2": [
+                [255, 176, 1],
+                [1, 23, 61],
+                [182, 11, 188],
+                [127, 196, 255],
+                [235, 113, 66],
+                [0, 0, 48],
+                [223, 255, 255],
+                [0, 32, 65],
+            ]
+        }
+
         # 把颜色填充
         for i in range(112):
             self.curr_light_buffer.append(Color(0,0,0))
@@ -65,7 +88,11 @@ class Light:
                 steps = params["steps"]
 
             if light_mode == Code.LIGHT_MODE_SECTOR_FLOWING:
-                self.sector_flowing()
+                if "mode" in params:
+                    mode = params["mode"]
+                else:
+                    mode = 1
+                self.sector_flowing(mode)
             elif light_mode == Code.LIGHT_MODE_STATIC:
                 self.Static(r, g, b)
             elif light_mode == Code.LIGHT_MODE_GRADIENT:
@@ -215,19 +242,21 @@ class Light:
             self.current_colors.append(color)
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
 
-    def sector_flowing(self):
+    def sector_flowing(self, color_mode):
         time_duration = 50           # ms
         sector_num = 8
-        colors = [
-            [255, 0, 0],
-            [255, 3, 255],
-            [15, 122, 255],
-            [0, 222, 255],
-            [3, 255, 3],
-            [246, 255, 0],
-            [255, 192, 0],
-            [255, 96, 0]
-        ]
+
+        colors = self.sector_flow_mode_colors[color_mode]
+        # colors = [
+        #     [255, 0, 0],
+        #     [255, 3, 255],
+        #     [15, 122, 255],
+        #     [0, 222, 255],
+        #     [3, 255, 3],
+        #     [246, 255, 0],
+        #     [255, 192, 0],
+        #     [255, 96, 0]
+        # ]
 
         sector_color_old = []
         # sector_buffer = []
