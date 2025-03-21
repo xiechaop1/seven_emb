@@ -102,8 +102,12 @@ if __name__ == "__main__":
     audio_play_thread.start()
     logging.info("audio is ready")
 
-    screen = Screen()
-    screen.display("resources/video/think.mp4")
+    screen_instance = Screen()
+    screen_instance.add("resources/video/think.mp4", 3)
+    screen_thread = threading.Thread(target=screen_instance.daemon)
+
+    # screen = Screen()
+    # screen.display("resources/video/think.mp4")
 
     mic_instance = Mic(client, audio_instance, light_instance)
     kaldi_thread = threading.Thread(target=mic_instance.kaldi_listener)

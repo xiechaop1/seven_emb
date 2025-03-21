@@ -4,6 +4,7 @@ import os
 import threading
 import pygame
 import cv2
+from common.threading_event import ThreadingEvent
 # from screeninfo import get_monitors
 
 class Screen:
@@ -14,20 +15,61 @@ class Screen:
         # self.screen = pygame.display.set_mode((640, 480))
         self.screen_width, self.screen_height = self.screen.get_size()
 
-        video_playing=False
-        executed_once = False
-        video_event = threading.Event()
-        # video_path = '/home/li/listen2.mp4'
-        video_path2 = '/home/li/speak_modify2.mp4'         ########screen_modified by lixiaolin ###
-        # video_path2 = '/home/li/think2.mp4'
-        video_path = '/home/li/breath_modify.mp4'            ########screen_modified by lixiaolin ###
-        video_path3 = '/home/li/jelly_modify2.mp4'              ########screen_modified by lixiaolin ###
-        # pygame.display.set_caption('Eye Animation')
-        start_video_playback_flag=False
+        self.current_video = None
+        self.play_list = []
+        self.fade_out_step = 0
+        self.interrupt_event = threading.Event()
+
+    def add(self, video_path, times):
+        self.play_list.append({
+            "video_path": video_path,
+            "times": times
+        })
+
+    def clear_list(self):
+        self.play_list = []
+
+    def stop(self):
+        self.screen.stop()
+        self.interrupt_event.clear()
+
+    def daemon(self):
+        while True:
+            ThreadingEvent.screen_daemon_event.wait()
+
+            play_video = self.play_list.pop(0)
+            if play_video is None:
+                ThreadingEvent.screen_daemon_event.clear()
+                continue
+            video_path = play_video["video_path"]
+            times = play_video["times"]
+
+            self.interrupt_event.wait()
+            self.display(video_path, times)
+            # self.play()
+
+    def playlist(self):
+        self.interrupt_event.set()
+    # def playlist(self):
+    #     for _, play_video in enumerate(self.play_list):
+    #
+    #         video_path = play_video["video_path"]
+    #         times = play_video["times"]
+    #
+    #         self.interrupt_event.wait()
+    #         self.display(video_path, times)
+
+    def play(self):
+        ThreadingEvent.screen_daemon_event.set()
+        self.interrupt_event.set()
+
 
     def display(self, video_path, times = 3):
         cap = cv2.VideoCapture(video_path)
         logging.info(f"Screen display start, filename: {video_path}, times: {times}, isOpened: {cap.isOpened()}")
+
+        clock = pygame.time.Clock()
+        alpha = 255
 
         if not cap.isOpened():
             return False
@@ -39,7 +81,7 @@ class Screen:
                 ret, frame = cap.read()  # 读取一帧
                 if not ret:  # 如果没有读取到帧，视频结束
                     print("End of video.")
-                    return
+                    break
                 # 将 OpenCV 的帧转换为 pygame 可用的格式
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # 转换颜色格式
                 frame = pygame.surfarray.make_surface(frame)  # 转换为pygame surface
@@ -52,7 +94,8 @@ class Screen:
                 pygame.display.flip()
 
                 # 每帧等待 40ms，相当于25帧/秒
-                pygame.time.delay(1)
+                clock.tick(30)
+                # pygame.time.delay(1)
 
         cap.release()
 

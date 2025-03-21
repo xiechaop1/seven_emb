@@ -735,21 +735,13 @@ class Light:
 
         return
 
-    def show_color_by_start_range(self, r, g, b, starts = [], nums = []):
-        if len(starts) == 0:
-            return
-
-        for idx, start in enumerate(starts):
-            num = nums[idx]
-
-            for i in range(num):
-                self.show_color(r, g, b, start, num)
-
-        self.strip.show()
-        return
-
     def save_color_to_buffer(self, r, g, b, start, num):
         for i in range(num):
+            if i + start < 40:
+                # 最外圈变暗
+                r = int(r / 2)
+                g = int(g / 2)
+                b = int(b / 2)
             self.curr_light_buffer[i + start] = Color(r, g, b)
 
     def show_color_by_buffer(self):
@@ -764,6 +756,11 @@ class Light:
             num = self.strip.numPixels()
 
         for i in range(num):
+            if i + start < 40:
+                # 最外圈变暗
+                r = int(r / 2)
+                g = int(g / 2)
+                b = int(b / 2)
             self.strip.setPixelColor(i + start, Color(r, g, b))
             # print("j:", j)
         self.strip.show()
