@@ -280,7 +280,7 @@ class Light:
             self.current_colors.append(color)
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
 
-    def random_point(self, fore_color, back_color = None, rand_num_per_group = 4, group_num = 3, times = 3, duration = 1000):
+    def random_point(self, fore_color, back_color = None, rand_num_per_group = 4, group_num = 3, times = 3, duration = 5000):
         # fore_r, fore_g, fore_b = fore_color
         # self.Gradient(fore_r, fore_g, fore_b)
 
@@ -303,16 +303,16 @@ class Light:
                 rgb2 = []
                 nums = []
 
-                pre_time = random.randint(0, 1000)
+                pre_time = random.randint(0, duration)
                 time.sleep(int(pre_time // 1000))
                 for j in range(rand_num_per_group):
-                    point_starts.append(random.randint(0, self.LED_COUNT - 1))
+                    point_starts.append([random.randint(0, self.LED_COUNT - 1)])
                     rgb1.append(fore_color)
                     rgb2.append(back_color)
                     nums.append(1)
-                threading.Thread(target=self.random_point_exec, args=(rgb1, rgb2, [point_starts], nums, duration, pre_time)).start()
+                threading.Thread(target=self.random_point_exec, args=(rgb1, rgb2, point_starts, nums, duration, pre_time)).start()
 
-    def random_point_exec(self, rgb1, rgb2, point_starts, nums, duration = 1000, pre_time = 0):
+    def random_point_exec(self, rgb1, rgb2, point_starts, nums, duration = 5000, pre_time = 0):
         self.fade_total_by_range(rgb1, rgb2, point_starts, nums)
         time.sleep(int(duration // 1000))
         self.fade_total_by_range(rgb2, rgb1, point_starts, nums)
