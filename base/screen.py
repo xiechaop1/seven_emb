@@ -85,10 +85,12 @@ class Screen:
             container.seek(0)
             for frame in container.decode(stream):
                 img = frame.to_ndarray(format="bgr24")
+                img_resized = cv2.resize(img, (self.screen_width, self.screen_height))
                 surf = pygame.surfarray.make_surface(img.swapaxes(0, 1))
                 self.screen.blit(surf, (0, 0))
                 pygame.display.flip()
                 clock.tick(30)
+        container.close()
 
         # pygame.quit()
 
