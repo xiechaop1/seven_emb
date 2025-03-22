@@ -14,7 +14,7 @@ if not Config.IS_DEBUG:
 class Light:
 
     # LED strip configuration:
-    LED_COUNT = 200  # Number of LED pixels.
+    LED_COUNT = 112  # Number of LED pixels.
     LED_PIN = 18  # 18      # GPIO pin connected to the pixels (18 uses PWM!).
     # LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
     LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -103,6 +103,34 @@ class Light:
                 else:
                     mode = "colorful"
                 self.sector_flowing(mode)
+            elif light_mode == Code.LIGHT_MODE_RANDOM_POINT:
+                if "fore_color" in params:
+                    fore_color = params["fore_color"]
+                else:
+                    fore_color = [255, 255, 255]
+
+                if "back_color" in params:
+                    back_color = params["back_color"]
+                else:
+                    back_color = [0, 0, 0]
+
+                if "rand_num_per_group" in params:
+                    rand_num_per_group = params["rand_num_per_group"]
+                else:
+                    rand_num_per_group = 4
+
+                if "group_num" in params:
+                    group_num = params["group_num"]
+                else:
+                    group_num = 4
+
+                if "times" in params:
+                    times = params["times"]
+                else:
+                    times = 100
+
+                self.random_point(fore_color, back_color, rand_num_per_group, group_num, times)
+
             elif light_mode == Code.LIGHT_MODE_STATIC:
                 self.Static(r, g, b)
             elif light_mode == Code.LIGHT_MODE_GRADIENT:
@@ -251,6 +279,46 @@ class Light:
         else:
             self.current_colors.append(color)
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
+
+    def random_point(self, fore_color, back_color = None, rand_num_per_group = 4, group_num = 3, times = 3, duration = 1000):
+        # fore_r, fore_g, fore_b = fore_color
+        # self.Gradient(fore_r, fore_g, fore_b)
+
+        if back_color is None:
+            back_color = [0, 0, 0]
+
+        back_r, back_g, back_b = back_color
+        self.Gradient(back_r, back_g, back_b)
+
+        if times == -1:
+            times = 1000000000
+
+        for i in range(times):
+            if self.light_mode != Code.LIGHT_MODE_CIRCLE_RAINBOW or self.ts > self.run_ts:
+                break
+
+            point_starts = []
+            rgb1 = []
+            rgb2 = []
+            nums = []
+            for group_idx in range(group_num):
+                pre_time = random.randint(0, 1000)
+                for j in range(rand_num_per_group):
+                    point_starts.append(random.randint(0, self.LED_COUNT))
+                    rgb1.append(fore_color)
+                    rgb2.append(back_color)
+                    nums.append(1)
+                threading.Thread(target=self.random_point_exec, args=(rgb1, rgb2, point_starts, nums, duration, pre_time)).start()
+
+
+    def random_point_exec(self, rgb1, rgb2, point_starts, nums, duration = 1000, pre_time = 0):
+        time.sleep(int(pre_time // 1000))
+        self.fade_total_by_range(rgb1, rgb2, point_starts, nums)
+        time.sleep(int(duration // 1000))
+        self.fade_total_by_range(rgb2, rgb1, point_starts, nums)
+
+
+
 
     def sector_flowing(self, color_mode):
         time_duration = 50           # ms
@@ -475,7 +543,6 @@ class Light:
 
             color_idx = random.randint(0, len(colors) - 1)
             color = colors[color_idx]
-
 
 
 
