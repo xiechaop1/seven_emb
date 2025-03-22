@@ -40,7 +40,9 @@ class Screen:
         while True:
             ThreadingEvent.screen_daemon_event.wait()
 
-            play_video = self.play_list.pop(0)
+            play_video = None
+            if len(self.play_list) > 0:
+                play_video = self.play_list.pop(0)
             if play_video is None:
                 logging.warning("No video")
                 ThreadingEvent.screen_daemon_event.clear()
@@ -82,6 +84,7 @@ class Screen:
         if times == -1:
             times = 10000000
         for i in range(times):
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
             while cap.isOpened():
                 ret, frame = cap.read()  # 读取一帧
                 if not ret:  # 如果没有读取到帧，视频结束
