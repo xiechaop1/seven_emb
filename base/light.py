@@ -294,7 +294,7 @@ class Light:
             times = 1000000000
 
         for i in range(times):
-            if self.light_mode != Code.LIGHT_MODE_CIRCLE_RAINBOW or self.ts > self.run_ts:
+            if self.light_mode != Code.LIGHT_MODE_RANDOM_POINT or self.ts > self.run_ts:
                 break
 
             point_starts = []
