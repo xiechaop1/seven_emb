@@ -525,6 +525,7 @@ class Light:
             }
 
         self.fade(old_color['r'], old_color['g'], old_color['b'], r, g, b)
+        self.fill_light_buffer(r, g, b)
 
         return
 
@@ -844,6 +845,10 @@ class Light:
                 self.save_color_to_buffer(r, g, b, start, num)
 
         return
+
+    def fill_light_buffer(self, r, g, b):
+        for i in range(self.LED_COUNT):
+            self.curr_light_buffer[i] = Color(r, g, b)
 
     def save_color_to_buffer(self, r, g, b, start, num):
         rt = r
