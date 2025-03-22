@@ -852,9 +852,9 @@ class Light:
         bt = b
         for i in range(self.LED_COUNT):
             if i < self.light_nums[0]:
-                r = rt / 10
-                g = gt / 10
-                b = bt / 10
+                r = int(rt / 10)
+                g = int(gt / 10)
+                b = int(bt / 10)
             else:
                 r = rt
                 g = gt
