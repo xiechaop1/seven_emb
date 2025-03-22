@@ -82,6 +82,7 @@ class Screen:
         stream = next(s for s in container.streams if s.type == 'video')
         for i in range(times):
 
+            container.seek(0)
             for frame in container.decode(stream):
                 img = frame.to_ndarray(format="bgr24")
                 surf = pygame.surfarray.make_surface(img.swapaxes(0, 1))
