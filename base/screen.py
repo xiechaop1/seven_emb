@@ -2,8 +2,11 @@ import logging
 import os
 
 import threading
+from operator import contains
+
 import pygame
 import cv2
+import av
 from common.threading_event import ThreadingEvent
 # from screeninfo import get_monitors
 
@@ -70,8 +73,26 @@ class Screen:
         ThreadingEvent.screen_daemon_event.set()
         self.interrupt_event.set()
 
+    def display(self, video_path, times):
+        clock = pygame.time.Clock()
 
-    def display(self, video_path, times = 3):
+        container = av.open(video_path)
+        if times == -1:
+            times = 10000000
+        stream = next(s for s in container.streams if s.type == 'video')
+        for i in range(times):
+
+            for frame in container.decode(stream):
+                img = frame.to_ndarray(format="bgr24")
+                surf = pygame.surfarray.make_surface(img.swapaxes(0, 1))
+                self.screen.blit(surf, (0, 0))
+                pygame.display.flip()
+                clock.tick(30)
+
+        # pygame.quit()
+
+
+    def displayX11(self, video_path, times = 3):
         cap = cv2.VideoCapture(video_path)
         logging.info(f"Screen display start, filename: {video_path}, times: {times}, isOpened: {cap.isOpened()}")
 
