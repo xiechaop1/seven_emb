@@ -847,7 +847,18 @@ class Light:
         return
 
     def fill_light_buffer(self, r, g, b):
+        rt = r
+        gt = g
+        bt = b
         for i in range(self.LED_COUNT):
+            if i < self.light_nums[0]:
+                r = rt / 10
+                g = gt / 10
+                b = bt / 10
+            else:
+                r = rt
+                g = gt
+                b = bt
             self.curr_light_buffer[i] = Color(r, g, b)
 
     def save_color_to_buffer(self, r, g, b, start, num):
