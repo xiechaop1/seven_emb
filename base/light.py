@@ -519,6 +519,12 @@ class Light:
     def Gradient(self, r, g, b):
 
         old_color = self.get_color()
+        if old_color is None:
+            old_color = {
+                "r": 0,
+                "g": 0,
+                "b": 0,
+            }
 
         self.fade(old_color['r'], old_color['g'], old_color['b'], r, g, b)
 
