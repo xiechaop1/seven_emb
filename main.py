@@ -83,7 +83,7 @@ if __name__ == "__main__":
         # light_instance.start(Code.LIGHT_MODE_BREATHING, {"r":0, "g":0, "b":255, "steps": 200})
         # light_instance.start(Code.LIGHT_MODE_CIRCLE, {"r1": 0, "g1": 0, "b1": 255, "r2": 0, "g2": 255, "b2": 0, "time_duration": 100, "times": -1})
         # light_instance.start(Code.LIGHT_MODE_SECTOR_FLOWING, {"mode": "star"})
-        light_instance.start(Code.LIGHT_MODE_SECTOR_FLOWING, {"fore_color": [255, 255, 255]})
+        light_instance.start(Code.LIGHT_MODE_RANDOM_POINT, {"fore_color": [255, 255, 255]})
         logging.info("light initialized")
     else:
         spray_instance = ""
@@ -103,10 +103,10 @@ if __name__ == "__main__":
     audio_play_thread.start()
     logging.info("audio is ready")
 
-    screen_instance = Screen()
-    screen_instance.add("resources/video/think.mp4", 3)
-    screen_thread = threading.Thread(target=screen_instance.daemon)
-    screen_instance.play()
+    # screen_instance = Screen()
+    # screen_instance.add("resources/video/think.mp4", 3)
+    # screen_thread = threading.Thread(target=screen_instance.daemon)
+    # screen_instance.play()
 
     # screen = Screen()
     # screen.display("resources/video/think.mp4")
