@@ -14,8 +14,8 @@ class Screen:
 
     def __init__(self):
 
-        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-        # self.screen = pygame.display.set_mode((640, 480))
+        # self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((640, 480))
         self.screen_width, self.screen_height = self.screen.get_size()
 
         self.current_video = None
