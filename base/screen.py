@@ -35,7 +35,7 @@ class Screen:
         logging.info(f"Clear video list")
 
     def stop(self):
-        self.screen.stop()
+        # self.screen.stop()
         self.interrupt_event.clear()
         logging.info(f"Stopped video list")
 
@@ -81,9 +81,13 @@ class Screen:
             times = 10000000
         stream = next(s for s in container.streams if s.type == 'video')
         for i in range(times):
+            if not self.interrupt_event.is_set():
+                break
 
             container.seek(0)
             for frame in container.decode(stream):
+                if not self.interrupt_event.is_set():
+                    break
                 img = frame.to_ndarray(format="bgr24")
                 img_resized = cv2.resize(img, (self.screen_width, self.screen_height))
                 surf = pygame.surfarray.make_surface(img_resized.swapaxes(0, 1))
