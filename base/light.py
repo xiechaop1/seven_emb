@@ -297,11 +297,12 @@ class Light:
             if self.light_mode != Code.LIGHT_MODE_RANDOM_POINT or self.ts > self.run_ts:
                 break
 
-            point_starts = []
-            rgb1 = []
-            rgb2 = []
-            nums = []
             for group_idx in range(group_num):
+                point_starts = []
+                rgb1 = []
+                rgb2 = []
+                nums = []
+
                 pre_time = random.randint(0, 1000)
                 time.sleep(int(pre_time // 1000))
                 for j in range(rand_num_per_group):
@@ -315,8 +316,6 @@ class Light:
         self.fade_total_by_range(rgb1, rgb2, point_starts, nums)
         time.sleep(int(duration // 1000))
         self.fade_total_by_range(rgb2, rgb1, point_starts, nums)
-
-
 
 
     def sector_flowing(self, color_mode):
