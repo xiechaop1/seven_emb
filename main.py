@@ -104,7 +104,7 @@ if __name__ == "__main__":
     logging.info("audio is ready")
 
     screen_instance = Screen()
-    screen_instance.add("resources/video/think.mp4", 3)
+    screen_instance.add("resources/video/blink.mp4", 100)
     screen_thread = threading.Thread(target=screen_instance.daemon)
     screen_thread.start()
     screen_instance.play()
