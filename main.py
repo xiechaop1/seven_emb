@@ -83,7 +83,7 @@ if __name__ == "__main__":
         # light_instance.start(Code.LIGHT_MODE_BREATHING, {"r":0, "g":0, "b":255, "steps": 200})
         # light_instance.start(Code.LIGHT_MODE_CIRCLE, {"r1": 0, "g1": 0, "b1": 255, "r2": 0, "g2": 255, "b2": 0, "time_duration": 100, "times": -1})
         # light_instance.start(Code.LIGHT_MODE_SECTOR_FLOWING, {"mode": "star"})
-        light_instance.start(Code.LIGHT_MODE_RANDOM_POINT, {"fore_color": [255, 255, 255], "back_color": [4, 0, 20], "group_num": 1, "rand_num_per_group": 1, "times": 10})
+        light_instance.start(Code.LIGHT_MODE_RANDOM_POINT, {"fore_color": [0, 255, 0], "back_color": [4, 0, 20], "group_num": 1, "rand_num_per_group": 1, "times": 100})
         logging.info("light initialized")
     else:
         spray_instance = ""
