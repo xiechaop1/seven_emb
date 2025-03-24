@@ -337,6 +337,7 @@ class Light:
                     rgb2.append(back_color)
                     nums.append(1)
                 threading.Thread(target=self.random_point_exec, args=(rgb1, rgb2, point_starts, nums, duration, pre_time)).start()
+            time.sleep(duration / 1000 * 5)
 
     def random_point_exec(self, rgb1, rgb2, point_starts, nums, duration = 5000, pre_time = 0):
         self.fade_total_by_range(rgb1, rgb2, point_starts, nums)
