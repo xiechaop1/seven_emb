@@ -149,7 +149,13 @@ class Light:
                 else:
                     times = 100
 
-                self.random_point(fore_color, back_color, rand_num_per_group, group_num, times)
+                if "duration" in params:
+                    duration = params["duration"]
+                else:
+                    duration = 1000
+
+
+                self.random_point(fore_color, back_color, rand_num_per_group, group_num, times, duration)
 
             elif light_mode == Code.LIGHT_MODE_STATIC:
                 self.Static(r, g, b)
@@ -300,7 +306,7 @@ class Light:
             self.current_colors.append(color)
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
 
-    def random_point(self, fore_color, back_color = None, rand_num_per_group = 4, group_num = 3, times = 3, duration = 5000):
+    def random_point(self, fore_color, back_color = None, rand_num_per_group = 4, group_num = 3, times = 3, duration = 1000):
         # fore_r, fore_g, fore_b = fore_color
         # self.Gradient(fore_r, fore_g, fore_b)
 
