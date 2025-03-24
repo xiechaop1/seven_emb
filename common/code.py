@@ -15,6 +15,7 @@ class Code:
 	LIGHT_MODE_CIRCLE = "Circle"
 	LIGHT_MODE_CIRCLE_RAINBOW = "CircleRainbow"
 	LIGHT_MODE_SECTOR_FLOWING = "SectorFlowing"
+	LIGHT_MODE_RANDOM_POINT = "RandomPoint"
 	LIGHT_MODE_STATIC = "Static"
 
 	@staticmethod
@@ -25,5 +26,6 @@ class Code:
 			"Circle": Code.LIGHT_MODE_CIRCLE,
 			"CircleRainbow": Code.LIGHT_MODE_CIRCLE_RAINBOW,
 			"SectorFlowing": Code.LIGHT_MODE_SECTOR_FLOWING,
+			"RandomPoint": Code.LIGHT_MODE_RANDOM_POINT,
 		}
 		

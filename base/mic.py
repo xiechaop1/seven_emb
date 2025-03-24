@@ -123,6 +123,7 @@ class Mic:
         self.rec.SetSpkModel(self.spk_model)
         self.voice_buffer = None
         self.buffer_size = 4096
+        self.sd_blocksize = 6000
         self.speech_buffer_size = self.sample_rate * self.frame_duration // 1000
         self.audio_memory = io.BytesIO()
         self.start_time = time.time()
@@ -136,7 +137,7 @@ class Mic:
                 else:
                     device_idx = self.find_device_index()
 
-                with sd.InputStream(samplerate=self.sample_rate, blocksize=4000, device=device_idx,
+                with sd.InputStream(samplerate=self.sample_rate, blocksize=self.sd_blocksize, device=device_idx,
                                     dtype="int16", channels=1, callback=self.main_callback):
                     while True:
                         pass
@@ -619,7 +620,8 @@ class Mic:
                 frame = frame_data["data"]
                 ts = frame_data["ts"]
                 now_time = time.time()
-                if now_time - ts > 0.4:
+                if now_time - ts > 1:
+                    # 把1s以内的声音也放进来
                     continue
                 self.audio_memory.write(frame)
             self.frames = []

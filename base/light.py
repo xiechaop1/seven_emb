@@ -14,7 +14,7 @@ if not Config.IS_DEBUG:
 class Light:
 
     # LED strip configuration:
-    LED_COUNT = 200  # Number of LED pixels.
+    LED_COUNT = 112  # Number of LED pixels.
     LED_PIN = 18  # 18      # GPIO pin connected to the pixels (18 uses PWM!).
     # LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
     LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -41,6 +41,59 @@ class Light:
         self.current_colors = []
         self.curr_light_buffer = []
 
+        self.sector_flow_mode_colors = {
+            "colorful": [
+                [255, 0, 0],
+                [255, 3, 255],
+                [15, 122, 255],
+                [0, 222, 255],
+                [3, 255, 3],
+                [246, 255, 0],
+                [255, 192, 0],
+                [255, 96, 0]
+            ],
+            "star1": [
+                [255, 176, 1],
+                [1, 23, 61],
+                [182, 11, 188],
+                [127, 196, 255],
+                [235, 113, 66],
+                [0, 0, 48],
+                [223, 255, 255],
+                [0, 32, 65],
+            ],
+            "star2": [
+                [124, 211, 255],
+                [41, 0, 206],
+                [255, 255, 255],
+                [41, 0, 206],
+                [124, 211, 255],
+                [255, 255, 255],
+                [41, 0, 206],
+                [255, 255, 255],
+            ],
+            "star": [
+                [0, 0, 0],
+                [255, 255, 255],
+                [0, 0, 0],
+                [255, 255, 255],
+                [0, 0, 0],
+                [255, 255, 255],
+                [0, 0, 0],
+                [255, 255, 255],
+            ],
+            "jellyfish": [
+                [0, 107, 239],
+                [2, 224, 255],
+                [0, 1, 26],
+                [3, 100, 247],
+                [0, 47, 212],
+                [0, 0, 48],
+                [3, 85, 255],
+                [64, 224, 255],
+            ]
+        }
+
         # 把颜色填充
         for i in range(112):
             self.curr_light_buffer.append(Color(0,0,0))
@@ -65,7 +118,39 @@ class Light:
                 steps = params["steps"]
 
             if light_mode == Code.LIGHT_MODE_SECTOR_FLOWING:
-                self.sector_flowing()
+                if "mode" in params:
+                    mode = params["mode"]
+                else:
+                    mode = "colorful"
+                self.sector_flowing(mode)
+            elif light_mode == Code.LIGHT_MODE_RANDOM_POINT:
+                if "fore_color" in params:
+                    fore_color = params["fore_color"]
+                else:
+                    fore_color = [255, 255, 255]
+
+                if "back_color" in params:
+                    back_color = params["back_color"]
+                else:
+                    back_color = [0, 0, 0]
+
+                if "rand_num_per_group" in params:
+                    rand_num_per_group = params["rand_num_per_group"]
+                else:
+                    rand_num_per_group = 4
+
+                if "group_num" in params:
+                    group_num = params["group_num"]
+                else:
+                    group_num = 4
+
+                if "times" in params:
+                    times = params["times"]
+                else:
+                    times = 100
+
+                self.random_point(fore_color, back_color, rand_num_per_group, group_num, times)
+
             elif light_mode == Code.LIGHT_MODE_STATIC:
                 self.Static(r, g, b)
             elif light_mode == Code.LIGHT_MODE_GRADIENT:
@@ -215,19 +300,59 @@ class Light:
             self.current_colors.append(color)
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
 
-    def sector_flowing(self):
+    def random_point(self, fore_color, back_color = None, rand_num_per_group = 4, group_num = 3, times = 3, duration = 5000):
+        # fore_r, fore_g, fore_b = fore_color
+        # self.Gradient(fore_r, fore_g, fore_b)
+
+        if back_color is None:
+            back_color = [0, 0, 0]
+
+        back_r, back_g, back_b = back_color
+        self.Gradient(back_r, back_g, back_b)
+
+        if times == -1:
+            times = 1000000000
+
+        for i in range(times):
+            if self.light_mode != Code.LIGHT_MODE_RANDOM_POINT or self.ts > self.run_ts:
+                break
+
+            for group_idx in range(group_num):
+                point_starts = []
+                rgb1 = []
+                rgb2 = []
+                nums = []
+
+                pre_time = random.randint(0, duration)
+                time.sleep(int(pre_time // 1000))
+                for j in range(rand_num_per_group):
+                    point_starts.append([random.randint(0, self.LED_COUNT - 1)])
+                    rgb1.append(fore_color)
+                    rgb2.append(back_color)
+                    nums.append(1)
+                threading.Thread(target=self.random_point_exec, args=(rgb1, rgb2, point_starts, nums, duration, pre_time)).start()
+
+    def random_point_exec(self, rgb1, rgb2, point_starts, nums, duration = 5000, pre_time = 0):
+        self.fade_total_by_range(rgb1, rgb2, point_starts, nums)
+        time.sleep(int(duration // 1000))
+        self.fade_total_by_range(rgb2, rgb1, point_starts, nums)
+
+
+    def sector_flowing(self, color_mode):
         time_duration = 50           # ms
         sector_num = 8
-        colors = [
-            [255, 0, 0],
-            [255, 3, 255],
-            [15, 122, 255],
-            [0, 222, 255],
-            [3, 255, 3],
-            [246, 255, 0],
-            [255, 192, 0],
-            [255, 96, 0]
-        ]
+
+        colors = self.sector_flow_mode_colors[color_mode]
+        # colors = [
+        #     [255, 0, 0],
+        #     [255, 3, 255],
+        #     [15, 122, 255],
+        #     [0, 222, 255],
+        #     [3, 255, 3],
+        #     [246, 255, 0],
+        #     [255, 192, 0],
+        #     [255, 96, 0]
+        # ]
 
         sector_color_old = []
         # sector_buffer = []
@@ -412,8 +537,15 @@ class Light:
     def Gradient(self, r, g, b):
 
         old_color = self.get_color()
+        if old_color is None:
+            old_color = {
+                "r": 0,
+                "g": 0,
+                "b": 0,
+            }
 
         self.fade(old_color['r'], old_color['g'], old_color['b'], r, g, b)
+        self.fill_light_buffer(r, g, b)
 
         return
 
@@ -436,7 +568,6 @@ class Light:
 
             color_idx = random.randint(0, len(colors) - 1)
             color = colors[color_idx]
-
 
 
 
@@ -735,21 +866,35 @@ class Light:
 
         return
 
-    def show_color_by_start_range(self, r, g, b, starts = [], nums = []):
-        if len(starts) == 0:
-            return
-
-        for idx, start in enumerate(starts):
-            num = nums[idx]
-
-            for i in range(num):
-                self.show_color(r, g, b, start, num)
-
-        self.strip.show()
-        return
+    def fill_light_buffer(self, r, g, b):
+        rt = r
+        gt = g
+        bt = b
+        for i in range(self.LED_COUNT):
+            if i < self.light_nums[0]:
+                r = int(rt / 10)
+                g = int(gt / 10)
+                b = int(bt / 10)
+            else:
+                r = rt
+                g = gt
+                b = bt
+            self.curr_light_buffer[i] = Color(r, g, b)
 
     def save_color_to_buffer(self, r, g, b, start, num):
+        rt = r
+        gt = g
+        bt = b
         for i in range(num):
+            if i + start < self.light_nums[0]:
+                # 最外圈变暗
+                r = int(rt / 10)
+                g = int(gt / 10)
+                b = int(bt / 10)
+            else:
+                r = rt
+                g = gt
+                b = bt
             self.curr_light_buffer[i + start] = Color(r, g, b)
 
     def show_color_by_buffer(self):
@@ -763,7 +908,19 @@ class Light:
         if num == 0:
             num = self.strip.numPixels()
 
+        rt = r
+        gt = g
+        bt = b
         for i in range(num):
+            if i + start < self.light_nums[0]:
+                # 最外圈变暗
+                r = int(rt / 10)
+                g = int(gt / 10)
+                b = int(bt / 10)
+            else:
+                r = rt
+                g = gt
+                b = bt
             self.strip.setPixelColor(i + start, Color(r, g, b))
             # print("j:", j)
         self.strip.show()

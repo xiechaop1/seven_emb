@@ -11,7 +11,7 @@ import time
 
 class Daemon:
 
-	TURN_OFF_DURATION = 600   # (s)
+	TURN_OFF_DURATION = 300   # (s)
 
 	def __init__(self, audio_ins, light_ins, spray_ins):
 		self.light = light_ins
@@ -51,7 +51,7 @@ class Daemon:
 		self.audio_player.clear_list()
 		if Config.IS_DEBUG == False:
 			self.light.turn_off()
-			self.spray.stop()
+			self.spray.turn_off()
 
 		ThreadingEvent.wakeup_event.clear()
 
