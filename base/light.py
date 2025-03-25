@@ -189,7 +189,7 @@ class Light:
                 if "mode" in params:
                     mode = params["mode"]
                 else:
-                    mode = ""
+                    mode = None
 
 
                 self.random_point(mode, fore_colors, back_colors, rand_num_per_groups, group_num, times, duration)
@@ -347,7 +347,7 @@ class Light:
         # fore_r, fore_g, fore_b = fore_color
         # self.Gradient(fore_r, fore_g, fore_b)
 
-        if mode in self.random_point_mode_colors:
+        if mode is not None:
             if "fore_colors" in self.random_point_mode_colors[mode]:
                 fore_colors = self.random_point_mode_colors[mode]["fore_colors"]
             else:
