@@ -69,7 +69,7 @@ class Light:
                     1
                 ],
                 "times": 100,
-                "duration": 1000,
+                "duration": 500,
             }
         }
 
@@ -824,6 +824,19 @@ class Light:
                 time.sleep(wait_time)
 
     def Breathing(self, r, g, b, steps = 200, wait_ms = 200):
+        start = 0
+        for idx, num in enumerate(self.light_nums):
+            start += num
+            self.fade(0, 0, 0, r, g, b, start, num)
+        time.sleep(wait_ms/1000.0)
+        for idx, num in enumerate(self.light_nums[::-1]):
+            if idx > len(self.light_nums) - 2:
+                continue
+            start += num
+            self.fade(0, 0, 0, r, g, b, start, num)
+        time.sleep(wait_ms/1000.0)
+
+    def BreathingOld(self, r, g, b, steps = 200, wait_ms = 200):
         """ 计算两个颜色之间的渐变值 """
         # step_r = (color2[0] - color1[0]) / steps
         # step_g = (color2[1] - color1[1]) / steps
@@ -840,7 +853,6 @@ class Light:
             step_r = rt / steps
             step_g = gt / steps
             step_b = bt / steps
-
 
             # gradient = []
             for i in range(steps + 1):
