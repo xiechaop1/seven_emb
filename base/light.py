@@ -41,6 +41,38 @@ class Light:
         self.current_colors = []
         self.curr_light_buffer = []
 
+        self.random_point_mode_colors = {
+            "star": {
+                "fore_colors": [
+                    [0, 255, 0],
+                ],
+                "back_colors": [[4, 0, 20]],
+                "group_num": 1,
+                "rand_num_per_group": [
+                    2,
+                ],
+                "times": 100,
+                "duration": 1000,
+            },
+            "fire": {
+                "fore_colors": [
+                    [255, 0, 0],
+                    [128, 128, 128]
+                ],
+                "back_colors": [
+                    [4, 0, 20],
+                    [255, 0, 0]
+                ],
+                "group_num": 1,
+                "rand_num_per_group": [
+                    2,
+                    1
+                ],
+                "times": 100,
+                "duration": 1000,
+            }
+        },
+
         self.sector_flow_mode_colors = {
             "colorful": [
                 [255, 0, 0],
@@ -124,20 +156,20 @@ class Light:
                     mode = "colorful"
                 self.sector_flowing(mode)
             elif light_mode == Code.LIGHT_MODE_RANDOM_POINT:
-                if "fore_color" in params:
-                    fore_color = params["fore_color"]
+                if "fore_colors" in params:
+                    fore_colors = params["fore_colors"]
                 else:
-                    fore_color = [255, 255, 255]
+                    fore_colors = [[255, 255, 255]]
 
                 if "back_color" in params:
-                    back_color = params["back_color"]
+                    back_colors = params["back_colors"]
                 else:
-                    back_color = [0, 0, 0]
+                    back_colors = [[0, 0, 0]]
 
                 if "rand_num_per_group" in params:
-                    rand_num_per_group = params["rand_num_per_group"]
+                    rand_num_per_groups = params["rand_num_per_groups"]
                 else:
-                    rand_num_per_group = 4
+                    rand_num_per_groups = [1]
 
                 if "group_num" in params:
                     group_num = params["group_num"]
@@ -154,8 +186,13 @@ class Light:
                 else:
                     duration = 1000
 
+                if "mode" in params:
+                    mode = params["mode"]
+                else:
+                    mode = ""
 
-                self.random_point(fore_color, back_color, rand_num_per_group, group_num, times, duration)
+
+                self.random_point(mode, fore_colors, back_colors, rand_num_per_groups, group_num, times, duration)
 
             elif light_mode == Code.LIGHT_MODE_STATIC:
                 self.Static(r, g, b)
@@ -306,15 +343,67 @@ class Light:
             self.current_colors.append(color)
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
 
-    def random_point(self, fore_color, back_color = None, rand_num_per_group = 4, group_num = 3, times = 3, duration = 1000):
+    def random_point(self, mode, fore_colors, back_color = None, rand_num_per_groups = [], group_num = 3, times = 3, duration = 1000):
         # fore_r, fore_g, fore_b = fore_color
         # self.Gradient(fore_r, fore_g, fore_b)
+
+        if mode in self.random_point_mode_colors:
+            if "fore_colors" in self.random_point_mode_colors[mode]:
+                fore_colors = self.random_point_mode_colors[mode]["fore_colors"]
+            else:
+                fore_colors = [[255,255,255]]
+
+            if "back_colors" in self.random_point_mode_colors[mode]:
+                back_colors = self.random_point_mode_colors[mode]["back_colors"]
+            else:
+                back_colors = [[0,0,0]]
+
+            # back_color = self.random_point_mode_colors[mode]["back_colors"]
+            if "rand_num_per_groups" in self.random_point_mode_colors[mode]:
+                rand_num_per_groups = self.random_point_mode_colors[mode]["rand_num_per_groups"]
+            else:
+                rand_num_per_groups = [3]
+
+            if "group_num" in self.random_point_mode_colors[mode]:
+                group_num = self.random_point_mode_colors[mode]["group_num"]
+            else:
+                group_num = 1
+
+            if "times" in self.random_point_mode_colors[mode]:
+                times = self.random_point_mode_colors[mode]["times"]
+            else:
+                times = 10
+
+            if "duration" in self.random_point_mode_colors[mode]:
+                duration = self.random_point_mode_colors[mode]["duration"]
+            else:
+                duration = 1000
+
+            # rand_num_per_groups = self.random_point_mode_colors[mode]["rand_num_per_groups"]
+            # group_num = self.random_point_mode_colors[mode]["group_num"]
+            # times = self.random_point_mode_colors[mode]["times"]
+            # duration = self.random_point_mode_colors[mode]["duration"]
+
+        back_color = back_colors[0]
 
         if back_color is None:
             back_color = [0, 0, 0]
 
         back_r, back_g, back_b = back_color
         self.Gradient(back_r, back_g, back_b)
+
+        if len(back_colors) > 1:
+            bottem_layer = [
+                [16, 9],
+                [54, 5]
+            ]
+            bottom_starts = []
+            bottom_nums = []
+            for _, bottom_pos in enumerate(bottem_layer):
+                start, num = bottom_pos
+                bottom_starts.append(start)
+                bottom_nums.append(num)
+            self.fade_total_by_range(back_colors[1], back_color, bottom_starts, bottom_nums)
 
         if times == -1:
             times = 1000000000
@@ -331,13 +420,15 @@ class Light:
 
                 pre_time = random.randint(0, duration)
                 time.sleep(int(pre_time // 1000))
-                for j in range(rand_num_per_group):
-                    point_starts.append([random.randint(0, self.LED_COUNT - 1)])
-                    rgb1.append(fore_color)
-                    rgb2.append(back_color)
-                    nums.append(1)
+                for fore_idx, fore_color in enumerate(fore_colors):
+                    rand_num_per_group = rand_num_per_groups[fore_idx]
+                    for j in range(rand_num_per_group):
+                        point_starts.append([random.randint(0, self.LED_COUNT - 1)])
+                        rgb1.append(fore_color)
+                        rgb2.append(back_color)
+                        nums.append(1)
                 threading.Thread(target=self.random_point_exec, args=(rgb1, rgb2, point_starts, nums, duration, pre_time)).start()
-            time.sleep(duration / 1000 * 1)
+            time.sleep(duration / 1000 * 2)
 
     def random_point_exec(self, rgb1, rgb2, point_starts, nums, duration = 5000, pre_time = 0):
         self.fade_total_by_range(rgb1, rgb2, point_starts, nums)
