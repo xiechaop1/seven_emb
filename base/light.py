@@ -825,21 +825,27 @@ class Light:
 
     def Breathing(self, r, g, b, steps = 200, wait_ms = 200):
         start = self.LED_COUNT
+        start_idx = 0
         while True:
             if self.light_mode != Code.LIGHT_MODE_BREATHING or self.ts > self.run_ts:
                 break
 
             for idx, num in enumerate(self.light_nums[::-1]):
-                start -= num
+                if idx < start_idx:
+                    start -= num
+                    continue
                 self.fade(0, 0, 0, r, g, b, start, num, 50)
+                start -= num
             time.sleep(wait_ms/1000.0)
             start = 0
             for idx, num in enumerate(self.light_nums):
                 if idx > len(self.light_nums) - 2:
+                    start += num
                     continue
                 self.fade(r, g, b, 0, 0, 0, start, num, 50)
                 start += num
             time.sleep(wait_ms/1000.0)
+            start_idx = 1
 
     def BreathingOld(self, r, g, b, steps = 200, wait_ms = 200):
         """ 计算两个颜色之间的渐变值 """
