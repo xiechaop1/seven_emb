@@ -826,7 +826,7 @@ class Light:
     def Breathing(self, r, g, b, steps = 200, wait_ms = 200):
         start = self.LED_COUNT
         for idx, num in enumerate(self.light_nums[::-1]):
-            start += num
+            start -= num
             self.fade(0, 0, 0, r, g, b, start, num)
         time.sleep(wait_ms/1000.0)
         start = 0
