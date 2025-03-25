@@ -824,12 +824,13 @@ class Light:
                 time.sleep(wait_time)
 
     def Breathing(self, r, g, b, steps = 200, wait_ms = 200):
-        start = 0
-        for idx, num in enumerate(self.light_nums):
+        start = self.LED_COUNT
+        for idx, num in enumerate(self.light_nums[::-1]):
             start += num
             self.fade(0, 0, 0, r, g, b, start, num)
         time.sleep(wait_ms/1000.0)
-        for idx, num in enumerate(self.light_nums[::-1]):
+        start = 0
+        for idx, num in enumerate(self.light_nums):
             if idx > len(self.light_nums) - 2:
                 continue
             start += num
