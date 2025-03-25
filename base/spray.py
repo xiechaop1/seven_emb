@@ -41,9 +41,9 @@ class Spray:
 
     def shoot(self, times = 3, wait_time = 30):
         for i in range(times):
-            for j in range(15):
+            for j in range(12):
                 GPIO.output(22, GPIO.HIGH)
-                time.sleep(0.01)
+                time.sleep(0.03)
                 GPIO.output(22, GPIO.LOW)
                 time.sleep(0.05)
             print("GPIO.HIGH!")

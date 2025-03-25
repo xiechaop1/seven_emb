@@ -343,6 +343,94 @@ class Light:
             self.current_colors.append(color)
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
 
+
+    def wave(self, fore_color, back_color = None, max_wave_num = 3):
+        if back_color is None:
+            back_color = [0, 0, 0]
+
+        start = 0
+        quarter_line = []
+        last_buffer = []
+
+        fore_r, fore_g, fore_b = fore_color
+        back_r, back_g, back_b = back_color
+
+        init_color_buffer = []
+        init_color2_buffer = []
+        init_start_buffer = []
+        init_num_buffer = []
+        for idx, light_num in enumerate(self.light_nums):
+            quarter_num = light_num / 4
+            half_num = light_num / 2
+
+            quarter_line_r = start + quarter_num
+            quarter_line.append(quarter_line_r)
+
+            init_color_buffer.append(fore_color)
+            init_start_buffer.append(start)
+            init_num_buffer.append(quarter_num)
+
+            init_color_buffer.append(back_color)
+            init_start_buffer.append(quarter_line_r)
+            init_num_buffer.append(half_num)
+
+            start += light_num
+            last_buffer.append({
+                "add_num": 0,
+                "color": None
+            })
+
+        start = 0
+        for idx, light_num in enumerate(self.light_nums):
+            quarter_num = light_num / 4
+            half_num = light_num / 2
+
+            quarter_line_l = start + quarter_num + half_num
+            quarter_line.append(quarter_line_l)
+
+            init_color_buffer.append(fore_color)
+            init_start_buffer.append(quarter_line_l)
+            init_num_buffer.append(quarter_num)
+
+            last_buffer.append({
+                "add_num": 0,
+                "color": None
+            })
+
+            start += light_num
+
+        self.fade_total_by_range(init_color_buffer, init_color2_buffer, init_start_buffer, init_num_buffer)
+
+        add_tag = 1
+        for idx, start_line in enumerate(quarter_line):
+            if idx > 0:
+                last_buff = last_buffer[idx - 1]
+                buff = last_buff["add_num"]
+                curr_color = last_buff["color"]
+            else:
+                last_buff = last_buffer[0]
+                buff = last_buff["add_num"]
+                if buff < max_wave_num:
+                    buff += add_tag
+                    curr_color = back_color
+                else:
+                    buff -= add_tag
+                    curr_color = fore_color
+
+            r, g, b = curr_color
+            
+            self.show_color_by_range()
+
+
+
+
+
+        # back_r, back_g, back_b = back_color
+        # self.Gradient(back_r, back_g, back_b)
+
+
+
+
     def random_point(self, mode, fore_colors, back_colors = None, rand_num_per_groups = [], group_num = 3, times = 3, duration = 1000):
         # fore_r, fore_g, fore_b = fore_color
         # self.Gradient(fore_r, fore_g, fore_b)
