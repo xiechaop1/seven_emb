@@ -161,7 +161,7 @@ class Light:
                 else:
                     fore_colors = [[255, 255, 255]]
 
-                if "back_color" in params:
+                if "back_colors" in params:
                     back_colors = params["back_colors"]
                 else:
                     back_colors = [[0, 0, 0]]
