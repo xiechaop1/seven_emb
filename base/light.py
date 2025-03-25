@@ -343,7 +343,7 @@ class Light:
             self.current_colors.append(color)
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
 
-    def random_point(self, mode, fore_colors, back_color = None, rand_num_per_groups = [], group_num = 3, times = 3, duration = 1000):
+    def random_point(self, mode, fore_colors, back_colors = None, rand_num_per_groups = [], group_num = 3, times = 3, duration = 1000):
         # fore_r, fore_g, fore_b = fore_color
         # self.Gradient(fore_r, fore_g, fore_b)
 
