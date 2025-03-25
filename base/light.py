@@ -57,14 +57,14 @@ class Light:
             "fire": {
                 "fore_colors": [
                     [255, 0, 0],
-                    [128, 128, 128]
+                    [255, 96, 0]
                 ],
                 "back_colors": [
                     [4, 0, 20],
                     [255, 0, 0]
                 ],
                 "group_num": 1,
-                "rand_num_per_group": [
+                "rand_num_per_groups": [
                     2,
                     1
                 ],
@@ -403,7 +403,7 @@ class Light:
                 start, num = bottom_pos
                 bottom_starts.append(start)
                 bottom_nums.append(num)
-            self.fade_total_by_range([back_colors[1]], [back_color], bottom_starts, bottom_nums)
+            self.fade_total_by_range([back_colors[1]], [back_color], [bottom_starts], bottom_nums)
 
         if times == -1:
             times = 1000000000
