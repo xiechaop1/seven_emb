@@ -831,11 +831,10 @@ class Light:
                 break
 
             for idx, num in enumerate(self.light_nums[::-1]):
+                start -= num
                 if idx < start_idx:
-                    start -= num
                     continue
                 self.fade(0, 0, 0, r, g, b, start, num, 50)
-                start -= num
             time.sleep(wait_ms/1000.0)
             start = 0
             for idx, num in enumerate(self.light_nums):
