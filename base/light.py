@@ -423,7 +423,9 @@ class Light:
                 for fore_idx, fore_color in enumerate(fore_colors):
                     rand_num_per_group = rand_num_per_groups[fore_idx]
                     for j in range(rand_num_per_group):
-                        point_starts.append([random.randint(0, self.LED_COUNT - 1)])
+                        # 最内两圈灯珠一共40个
+                        rand_pos = random.randint(self.LED_COUNT - 40, self.LED_COUNT - 1)
+                        point_starts.append([rand_pos])
                         rgb1.append(fore_color)
                         rgb2.append(back_color)
                         nums.append(1)
