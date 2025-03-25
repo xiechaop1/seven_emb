@@ -418,7 +418,7 @@ class Light:
                     curr_color = fore_color
 
             r, g, b = curr_color
-            
+
             self.show_color_by_range()
 
 
