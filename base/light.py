@@ -57,16 +57,16 @@ class Light:
             "fire": {
                 "fore_colors": [
                     [255, 0, 0],
-                    [253, 192, 77]
+                    [255, 177, 25]
                 ],
                 "back_colors": [
-                    [4, 0, 20],
+                    [0, 0, 0],
                     [255, 0, 0]
                 ],
                 "group_num": 1,
                 "rand_num_per_groups": [
                     2,
-                    1
+                    2
                 ],
                 "times": 100,
                 "duration": 500,
