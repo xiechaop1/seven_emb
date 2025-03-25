@@ -57,7 +57,7 @@ class Light:
             "fire": {
                 "fore_colors": [
                     [255, 0, 0],
-                    [255, 96, 0]
+                    [253, 192, 77]
                 ],
                 "back_colors": [
                     [4, 0, 20],
