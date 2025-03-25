@@ -833,7 +833,7 @@ class Light:
             if idx > len(self.light_nums) - 2:
                 continue
             start += num
-            self.fade(0, 0, 0, r, g, b, start, num)
+            self.fade(r, g, b, 0, 0, 0, start, num)
         time.sleep(wait_ms/1000.0)
 
     def BreathingOld(self, r, g, b, steps = 200, wait_ms = 200):
