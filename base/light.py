@@ -71,7 +71,7 @@ class Light:
                 "times": 100,
                 "duration": 1000,
             }
-        },
+        }
 
         self.sector_flow_mode_colors = {
             "colorful": [
@@ -393,17 +393,17 @@ class Light:
         self.Gradient(back_r, back_g, back_b)
 
         if len(back_colors) > 1:
-            bottem_layer = [
+            bottem_layer = [[
                 [16, 9],
                 [54, 5]
-            ]
+            ]]
             bottom_starts = []
             bottom_nums = []
-            for _, bottom_pos in enumerate(bottem_layer):
+            for _, bottom_pos in enumerate(bottem_layer[0]):
                 start, num = bottom_pos
                 bottom_starts.append(start)
                 bottom_nums.append(num)
-            self.fade_total_by_range(back_colors[1], back_color, bottom_starts, bottom_nums)
+            self.fade_total_by_range([back_colors[1]], [back_color], bottom_starts, bottom_nums)
 
         if times == -1:
             times = 1000000000
