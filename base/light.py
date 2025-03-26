@@ -382,8 +382,8 @@ class Light:
         init_start_buffer = []
         init_num_buffer = []
         for idx, light_num in enumerate(self.light_nums):
-            quarter_num = light_num / 4
-            half_num = light_num / 2
+            quarter_num = int(light_num / 4)
+            half_num = int(light_num / 2)
 
             quarter_line_r = start + quarter_num
             quarter_line.append(quarter_line_r)
@@ -404,8 +404,8 @@ class Light:
 
         start = 0
         for idx, light_num in enumerate(self.light_nums):
-            quarter_num = light_num / 4
-            half_num = light_num / 2
+            quarter_num = int(light_num / 4)
+            half_num = int(light_num / 2)
 
             quarter_line_l = start + quarter_num + half_num
             quarter_line.append(quarter_line_l)
