@@ -388,13 +388,13 @@ class Light:
             quarter_line_r = start + quarter_num
             quarter_line.append(quarter_line_r)
 
-            init_color_buffer.append(fore_color)
+            init_color_buffer.append(back_color)
             init_start_buffer.append([start])
             init_num_buffer.append(quarter_num)
             init_color2_buffer.append([0, 0, 0])
 
-            init_color_buffer.append(back_color)
-            init_start_buffer.append([quarter_line_r])
+            init_color_buffer.append(fore_color)
+            init_start_buffer.append([quarter_line_r + 1])
             init_num_buffer.append(half_num)
             init_color2_buffer.append([0, 0, 0])
 
@@ -409,17 +409,17 @@ class Light:
             quarter_num = int(light_num / 4)
             half_num = int(light_num / 2)
 
-            quarter_line_l = start + quarter_num + half_num
+            quarter_line_l = start + quarter_num + half_num + 1
             quarter_line.append(quarter_line_l)
 
-            init_color_buffer.append(fore_color)
+            init_color_buffer.append(back_color)
             init_start_buffer.append([quarter_line_l])
             init_num_buffer.append(quarter_num)
             init_color2_buffer.append([0, 0, 0])
 
             last_buffer.append({
                 "add_num": 0,
-                "color": fore_color
+                "color": back_color
             })
 
             start += light_num
