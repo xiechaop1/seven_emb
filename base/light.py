@@ -399,7 +399,7 @@ class Light:
             start += light_num
             last_buffer.append({
                 "add_num": 0,
-                "color": None
+                "color": back_color
             })
 
         start = 0
@@ -416,7 +416,7 @@ class Light:
 
             last_buffer.append({
                 "add_num": 0,
-                "color": None
+                "color": fore_color
             })
 
             start += light_num
