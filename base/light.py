@@ -507,7 +507,7 @@ class Light:
 
                 # duration = wait_ms / 1000
             if buff == max_wave_num or buff == (-1 * max_wave_num):
-                break
+                continue
 
             self.show_color_by_range(params)
             last_buffer = last_buffer_temp
