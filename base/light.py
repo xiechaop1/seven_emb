@@ -404,9 +404,6 @@ class Light:
             quarter_line_r = start + quarter_num
             quarter_line.append(quarter_line_r)
 
-            self.show_color_by_range_buffer(r, g, b, starts[idx], nums)
-
-
             init_color_buffer.append(back_color)
             init_start_buffer.append(start)
             init_num_buffer.append(quarter_num)
