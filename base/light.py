@@ -1137,7 +1137,11 @@ class Light:
         gt = g
         bt = b
         for i in range(num):
-            if i + start < self.light_nums[0]:
+            pos = i + start
+            if pos >= self.LED_COUNT:
+                pos = self.LED_COUNT - 1
+
+            if pos < self.light_nums[0]:
                 # 最外圈变暗
                 r = int(rt / 10)
                 g = int(gt / 10)
@@ -1146,7 +1150,7 @@ class Light:
                 r = rt
                 g = gt
                 b = bt
-            self.curr_light_buffer[i + start] = Color(r, g, b)
+            self.curr_light_buffer[pos] = Color(r, g, b)
 
     def show_color_by_buffer(self):
         for idx, color in enumerate(self.curr_light_buffer):
