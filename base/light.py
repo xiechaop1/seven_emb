@@ -410,7 +410,7 @@ class Light:
             init_color2_buffer.append([0, 0, 0])
 
             init_color_buffer.append(fore_color)
-            init_start_buffer.append([quarter_line_r + 1])
+            init_start_buffer.append([quarter_line_r])
             init_num_buffer.append([half_num + 1])
             init_color2_buffer.append([0, 0, 0])
 
