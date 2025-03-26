@@ -405,14 +405,14 @@ class Light:
             quarter_line.append(quarter_line_r)
 
             init_color_buffer.append(back_color)
-            init_start_buffer.append(start)
-            init_num_buffer.append(quarter_num)
+            init_start_buffer.append([start])
+            init_num_buffer.append([quarter_num])
             init_color2_buffer.append([0, 0, 0])
 
-            # init_color_buffer.append(fore_color)
-            init_start_buffer.append(quarter_line_r + 1)
-            init_num_buffer.append(half_num)
-            # init_color2_buffer.append([0, 0, 0])
+            init_color_buffer.append(fore_color)
+            init_start_buffer.append([quarter_line_r + 1])
+            init_num_buffer.append([half_num])
+            init_color2_buffer.append([0, 0, 0])
 
             start += light_num
             last_buffer.append({
@@ -428,10 +428,10 @@ class Light:
             quarter_line_l = start + quarter_num + half_num + 1
             quarter_line.append(quarter_line_l)
 
-            # init_color_buffer.append(back_color)
-            init_start_buffer.append(quarter_line_l)
-            init_num_buffer.append(quarter_num)
-            # init_color2_buffer.append([0, 0, 0])
+            init_color_buffer.append(back_color)
+            init_start_buffer.append([quarter_line_l])
+            init_num_buffer.append([quarter_num])
+            init_color2_buffer.append([0, 0, 0])
 
             last_buffer.append({
                 "add_num": 0,
