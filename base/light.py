@@ -344,7 +344,7 @@ class Light:
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
 
 
-    def wave(self, fore_color, back_color = None, max_wave_num = 3):
+    def wave(self, fore_color, back_color = None, max_wave_num = 3, wait_ms = 1000):
         if back_color is None:
             back_color = [0, 0, 0]
 
@@ -419,7 +419,22 @@ class Light:
 
             r, g, b = curr_color
 
-            self.show_color_by_range()
+            start = start_line + buff
+
+            params = {
+                "r": r,
+                "g": g,
+                "b": b,
+                "start": start,
+                "num": 1
+            }
+
+            # duration = wait_ms / 1000
+
+            self.show_color_by_range(params)
+
+        duration = wait_ms / 1000
+        time.sleep(duration)
 
 
 
