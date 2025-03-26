@@ -465,7 +465,7 @@ class Light:
                 else:
                     last_buff = last_buffer[0]
                     buff = last_buff["add_num"]
-                    curr_color = back_colorga
+                    curr_color = back_color
 
                 if buff < max_wave_num:
                     buff += add_tag
