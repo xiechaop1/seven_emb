@@ -474,8 +474,8 @@ class Light:
 
                     buff += add_tag
 
-                    if buff == max_wave_num or buff == (-1 * max_wave_num):
-                        break
+                    # if buff == max_wave_num or buff == (-1 * max_wave_num):
+                    #     break
 
                     if add_tag > 0:
                         curr_color = back_color
@@ -506,11 +506,11 @@ class Light:
                 )
 
                 # duration = wait_ms / 1000
+            last_buffer = last_buffer_temp
             if buff == max_wave_num or buff == (-1 * max_wave_num):
                 continue
 
             self.show_color_by_range(params)
-            last_buffer = last_buffer_temp
 
             duration = wait_ms / 1000
             time.sleep(duration)
