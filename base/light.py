@@ -474,7 +474,7 @@ class Light:
 
                     buff += add_tag
 
-                    if buff > 0:
+                    if add_tag > 0:
                         curr_color = back_color
                     else:
                         curr_color = fore_color
