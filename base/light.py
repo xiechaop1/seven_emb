@@ -461,15 +461,18 @@ class Light:
                     last_buff = last_buffer[idx - 1]
                     buff = last_buff["add_num"]
                     curr_color = last_buff["color"]
+
                 else:
                     last_buff = last_buffer[0]
                     buff = last_buff["add_num"]
-                    if buff < max_wave_num:
-                        buff += add_tag
-                        curr_color = back_color
-                    else:
-                        buff -= add_tag
-                        curr_color = fore_color
+                    curr_color = back_colorga
+
+                if buff < max_wave_num:
+                    buff += add_tag
+                    # curr_color = back_color
+                else:
+                    buff -= add_tag
+                    # curr_color = fore_color
 
                 r, g, b = curr_color
 
