@@ -463,6 +463,8 @@ class Light:
                     last_buff = last_buffer[idx - 1]
                     buff = last_buff["add_num"]
                     curr_color = last_buff["color"]
+                    if buff == max_wave_num or buff == (-1 * max_wave_num):
+                        continue
 
                 else:
                     last_buff = last_buffer[0]
