@@ -379,14 +379,14 @@ class Light:
 
         init_color_buffer = []
         init_color2_buffer = []
-        init_start_buffer = {
-            "fore": [],
-            "back": [],
-        }
-        init_num_buffer = {
-            "fore": [],
-            "back": [],
-        }
+        # init_start_buffer = {
+        #     "fore": [],
+        #     "back": [],
+        # }
+        # init_num_buffer = {
+        #     "fore": [],
+        #     "back": [],
+        # }
 
         init_start_buffer = []
         init_num_buffer = []
@@ -411,7 +411,7 @@ class Light:
 
             init_color_buffer.append(fore_color)
             init_start_buffer.append([quarter_line_r + 1])
-            init_num_buffer.append([half_num])
+            init_num_buffer.append([half_num + 1])
             init_color2_buffer.append([0, 0, 0])
 
             start += light_num
@@ -429,7 +429,7 @@ class Light:
             quarter_line.append(quarter_line_l)
 
             init_color_buffer.append(back_color)
-            init_start_buffer.append([quarter_line_l])
+            init_start_buffer.append([quarter_line_l + 1])
             init_num_buffer.append([quarter_num])
             init_color2_buffer.append([0, 0, 0])
 
@@ -452,39 +452,43 @@ class Light:
 
         add_tag = 1
         params = []
-        for idx, start_line in enumerate(quarter_line):
-            if idx > 0:
-                last_buff = last_buffer[idx - 1]
-                buff = last_buff["add_num"]
-                curr_color = last_buff["color"]
-            else:
-                last_buff = last_buffer[0]
-                buff = last_buff["add_num"]
-                if buff < max_wave_num:
-                    buff += add_tag
-                    curr_color = back_color
+        while True:
+            if self.light_mode != Code.LIGHT_MODE_WAVE or self.ts > self.run_ts:
+                break
+
+            for idx, start_line in enumerate(quarter_line):
+                if idx > 0:
+                    last_buff = last_buffer[idx - 1]
+                    buff = last_buff["add_num"]
+                    curr_color = last_buff["color"]
                 else:
-                    buff -= add_tag
-                    curr_color = fore_color
+                    last_buff = last_buffer[0]
+                    buff = last_buff["add_num"]
+                    if buff < max_wave_num:
+                        buff += add_tag
+                        curr_color = back_color
+                    else:
+                        buff -= add_tag
+                        curr_color = fore_color
 
-            r, g, b = curr_color
+                r, g, b = curr_color
 
-            start = start_line + buff
+                start = start_line + buff
 
-            params.append({
-                "r": r,
-                "g": g,
-                "b": b,
-                "start": start,
-                "num": 1
-            })
+                params.append({
+                    "r": r,
+                    "g": g,
+                    "b": b,
+                    "start": start,
+                    "num": 1
+                })
 
-            # duration = wait_ms / 1000
+                # duration = wait_ms / 1000
 
-        self.show_color_by_range(params)
+            self.show_color_by_range(params)
 
-        duration = wait_ms / 1000
-        time.sleep(duration)
+            duration = wait_ms / 1000
+            time.sleep(duration)
 
 
 
