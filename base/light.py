@@ -379,8 +379,21 @@ class Light:
 
         init_color_buffer = []
         init_color2_buffer = []
-        init_start_buffer = []
-        init_num_buffer = []
+        init_start_buffer = {
+            "fore": [],
+            "back": [],
+        }
+        init_num_buffer = {
+            "fore": [],
+            "back": [],
+        }
+
+        init_color_buffer.append(fore_color)
+        init_color_buffer.append(back_color)
+
+        init_color2_buffer.append([0, 0, 0])
+        init_color2_buffer.append([0, 0, 0])
+
         for idx, light_num in enumerate(self.light_nums):
             quarter_num = int(light_num / 4)
             half_num = int(light_num / 2)
@@ -388,15 +401,15 @@ class Light:
             quarter_line_r = start + quarter_num
             quarter_line.append(quarter_line_r)
 
-            init_color_buffer.append(back_color)
-            init_start_buffer.append([start])
-            init_num_buffer.append([quarter_num])
-            init_color2_buffer.append([0, 0, 0])
+            # init_color_buffer.append(back_color)
+            init_start_buffer["back"].append(start)
+            init_num_buffer["back"].append(quarter_num)
+            # init_color2_buffer.append([0, 0, 0])
 
-            init_color_buffer.append(fore_color)
-            init_start_buffer.append([quarter_line_r + 1])
-            init_num_buffer.append([half_num])
-            init_color2_buffer.append([0, 0, 0])
+            # init_color_buffer.append(fore_color)
+            init_start_buffer["fore"].append([quarter_line_r + 1])
+            init_num_buffer["fore"].append(half_num)
+            # init_color2_buffer.append([0, 0, 0])
 
             start += light_num
             last_buffer.append({
@@ -412,10 +425,10 @@ class Light:
             quarter_line_l = start + quarter_num + half_num + 1
             quarter_line.append(quarter_line_l)
 
-            init_color_buffer.append(back_color)
-            init_start_buffer.append([quarter_line_l])
-            init_num_buffer.append([quarter_num])
-            init_color2_buffer.append([0, 0, 0])
+            # init_color_buffer.append(back_color)
+            init_start_buffer["back"].append([quarter_line_l])
+            init_num_buffer["back"].append(quarter_num)
+            # init_color2_buffer.append([0, 0, 0])
 
             last_buffer.append({
                 "add_num": 0,
@@ -424,7 +437,15 @@ class Light:
 
             start += light_num
 
-        self.fade_total_by_range(init_color_buffer, init_color2_buffer, init_start_buffer, init_num_buffer)
+        start_buffer = []
+        start_buffer.append(init_start_buffer["fore"])
+        start_buffer.append(init_start_buffer["back"])
+
+        num_buffer = []
+        num_buffer.append(init_num_buffer["fore"])
+        num_buffer.append(init_num_buffer["back"])
+
+        self.fade_total_by_range(init_color_buffer, init_color2_buffer, start_buffer, num_buffer)
 
         add_tag = 1
         params = []
