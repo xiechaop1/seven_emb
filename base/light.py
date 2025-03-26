@@ -451,11 +451,13 @@ class Light:
         self.fade_total_by_range(init_color_buffer, init_color2_buffer, init_start_buffer, init_num_buffer)
 
         add_tag = 1
-        params = []
+        # params = []
         while True:
             if self.light_mode != Code.LIGHT_MODE_WAVE or self.ts > self.run_ts:
                 break
 
+            params = []
+            last_buffer_temp = []
             for idx, start_line in enumerate(quarter_line):
                 if idx > 0:
                     last_buff = last_buffer[idx - 1]
@@ -465,18 +467,26 @@ class Light:
                 else:
                     last_buff = last_buffer[0]
                     buff = last_buff["add_num"]
-                    curr_color = back_color
-
-                if buff < max_wave_num:
-                    buff += add_tag
                     # curr_color = back_color
+
+                    if buff == max_wave_num or buff == (-1 * max_wave_num):
+                        add_tag = (-1) * add_tag
+
+                    buff += add_tag
+
+                    if buff > 0:
+                        curr_color = back_color
+                    else:
+                        curr_color = fore_color
+
+                if start_line < int(self.LED_COUNT / 2):
+                    start = start_line + buff
                 else:
-                    buff -= add_tag
-                    # curr_color = fore_color
+                    start = start_line - buff
 
                 r, g, b = curr_color
 
-                start = start_line + buff
+                # start = start_line + buff
 
                 params.append({
                     "r": r,
@@ -486,9 +496,16 @@ class Light:
                     "num": 1
                 })
 
+                last_buffer_temp.append({
+                        "add_num": buff,
+                        "color": curr_color
+                    }
+                )
+
                 # duration = wait_ms / 1000
 
             self.show_color_by_range(params)
+            last_buffer = last_buffer_temp
 
             duration = wait_ms / 1000
             time.sleep(duration)
