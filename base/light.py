@@ -193,6 +193,28 @@ class Light:
 
 
                 self.random_point(mode, fore_colors, back_colors, rand_num_per_groups, group_num, times, duration)
+            elif light_mode == Code.LIGHT_MODE_WAVE:
+                if "fore_color" in params:
+                    fore_color = params["fore_color"]
+                else:
+                    fore_color = [255, 255, 255]
+
+                if "back_color" in params:
+                    back_color = params["back_color"]
+                else:
+                    back_color = None
+
+                if "max_wave_num" in params:
+                    max_wave_num = params["max_wave_num"]
+                else:
+                    max_wave_num = 3
+
+                if "wait_ms" in params:
+                    wait_ms = params["wait_ms"]
+                else:
+                    wait_ms = 1000
+
+                self.wave(fore_color, back_color, max_wave_num, wait_ms)
 
             elif light_mode == Code.LIGHT_MODE_STATIC:
                 self.Static(r, g, b)

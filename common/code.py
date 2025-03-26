@@ -17,6 +17,7 @@ class Code:
 	LIGHT_MODE_SECTOR_FLOWING = "SectorFlowing"
 	LIGHT_MODE_RANDOM_POINT = "RandomPoint"
 	LIGHT_MODE_STATIC = "Static"
+	LIGHT_MODE_WAVE = "Wave"
 
 	@staticmethod
 	def lightModelMap():
@@ -27,5 +28,6 @@ class Code:
 			"CircleRainbow": Code.LIGHT_MODE_CIRCLE_RAINBOW,
 			"SectorFlowing": Code.LIGHT_MODE_SECTOR_FLOWING,
 			"RandomPoint": Code.LIGHT_MODE_RANDOM_POINT,
+			"Wave": Code.LIGHT_MODE_WAVE,
 		}
 		
