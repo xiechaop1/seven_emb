@@ -366,7 +366,7 @@ class Light:
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
 
 
-    def wave(self, fore_color, back_color = None, max_wave_num = 3, wait_ms = 1000):
+    def wave(self, fore_color, back_color = None, max_wave_num = 2, wait_ms = 1000):
         if back_color is None:
             back_color = [0, 0, 0]
 
@@ -465,7 +465,6 @@ class Light:
                     curr_color = last_buff["color"]
                     if buff == max_wave_num or buff == (-1 * max_wave_num):
                         continue
-
                 else:
                     last_buff = last_buffer[0]
                     buff = last_buff["add_num"]
@@ -473,6 +472,7 @@ class Light:
 
                     if buff == max_wave_num or buff == (-1 * max_wave_num):
                         add_tag = (-1) * add_tag
+                        continue
 
                     buff += add_tag
 
