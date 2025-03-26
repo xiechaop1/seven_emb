@@ -424,6 +424,7 @@ class Light:
         self.fade_total_by_range(init_color_buffer, init_color2_buffer, init_start_buffer, init_num_buffer)
 
         add_tag = 1
+        params = []
         for idx, start_line in enumerate(quarter_line):
             if idx > 0:
                 last_buff = last_buffer[idx - 1]
@@ -443,17 +444,17 @@ class Light:
 
             start = start_line + buff
 
-            params = {
+            params.append({
                 "r": r,
                 "g": g,
                 "b": b,
                 "start": start,
                 "num": 1
-            }
+            })
 
             # duration = wait_ms / 1000
 
-            self.show_color_by_range(params)
+        self.show_color_by_range(params)
 
         duration = wait_ms / 1000
         time.sleep(duration)
