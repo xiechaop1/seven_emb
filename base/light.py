@@ -388,11 +388,14 @@ class Light:
             "back": [],
         }
 
-        init_color_buffer.append(fore_color)
-        init_color_buffer.append(back_color)
+        init_start_buffer = []
+        init_num_buffer = []
 
-        init_color2_buffer.append([0, 0, 0])
-        init_color2_buffer.append([0, 0, 0])
+        # init_color_buffer.append(fore_color)
+        # init_color_buffer.append(back_color)
+        #
+        # init_color2_buffer.append([0, 0, 0])
+        # init_color2_buffer.append([0, 0, 0])
 
         for idx, light_num in enumerate(self.light_nums):
             quarter_num = int(light_num / 4)
@@ -401,14 +404,17 @@ class Light:
             quarter_line_r = start + quarter_num
             quarter_line.append(quarter_line_r)
 
-            # init_color_buffer.append(back_color)
-            init_start_buffer["back"].append(start)
-            init_num_buffer["back"].append(quarter_num)
-            # init_color2_buffer.append([0, 0, 0])
+            self.show_color_by_range_buffer(r, g, b, starts[idx], nums)
+
+
+            init_color_buffer.append(back_color)
+            init_start_buffer.append(start)
+            init_num_buffer.append(quarter_num)
+            init_color2_buffer.append([0, 0, 0])
 
             # init_color_buffer.append(fore_color)
-            init_start_buffer["fore"].append(quarter_line_r + 1)
-            init_num_buffer["fore"].append(half_num)
+            init_start_buffer.append(quarter_line_r + 1)
+            init_num_buffer.append(half_num)
             # init_color2_buffer.append([0, 0, 0])
 
             start += light_num
@@ -426,8 +432,8 @@ class Light:
             quarter_line.append(quarter_line_l)
 
             # init_color_buffer.append(back_color)
-            init_start_buffer["back"].append(quarter_line_l)
-            init_num_buffer["back"].append(quarter_num)
+            init_start_buffer.append(quarter_line_l)
+            init_num_buffer.append(quarter_num)
             # init_color2_buffer.append([0, 0, 0])
 
             last_buffer.append({
@@ -437,15 +443,15 @@ class Light:
 
             start += light_num
 
-        start_buffer = []
-        start_buffer.append(init_start_buffer["fore"])
-        start_buffer.append(init_start_buffer["back"])
+        # start_buffer = []
+        # start_buffer.append(init_start_buffer["fore"])
+        # start_buffer.append(init_start_buffer["back"])
+        #
+        # num_buffer = []
+        # num_buffer.append(init_num_buffer["fore"])
+        # num_buffer.append(init_num_buffer["back"])
 
-        num_buffer = []
-        num_buffer.append(init_num_buffer["fore"])
-        num_buffer.append(init_num_buffer["back"])
-
-        self.fade_total_by_range(init_color_buffer, init_color2_buffer, start_buffer, num_buffer)
+        self.fade_total_by_range(init_color_buffer, init_color2_buffer, init_start_buffer, init_num_buffer)
 
         add_tag = 1
         params = []
@@ -553,7 +559,7 @@ class Light:
                 start, num = bottom_pos
                 bottom_starts.append(start)
                 bottom_nums.append(num)
-            self.fade_total_by_range([back_colors[1]], [back_color], [bottom_starts], bottom_nums)
+            self.fade_total_by_range([back_colors[1]], [back_color], [bottom_starts], [bottom_nums])
 
         if times == -1:
             times = 1000000000
@@ -564,22 +570,24 @@ class Light:
 
             for group_idx in range(group_num):
                 point_starts = []
+                point_nums = []
                 rgb1 = []
                 rgb2 = []
-                nums = []
 
                 pre_time = random.randint(0, duration)
                 time.sleep(int(pre_time // 1000))
                 for fore_idx, fore_color in enumerate(fore_colors):
                     rand_num_per_group = rand_num_per_groups[fore_idx]
                     for j in range(rand_num_per_group):
+                        nums = []
                         # 最内两圈灯珠一共40个
                         rand_pos = random.randint(self.LED_COUNT - 40, self.LED_COUNT - 1)
                         point_starts.append([rand_pos])
                         rgb1.append(fore_color)
                         rgb2.append(back_color)
                         nums.append(1)
-                threading.Thread(target=self.random_point_exec, args=(rgb1, rgb2, point_starts, nums, duration, pre_time)).start()
+                        point_nums.append(nums)
+                threading.Thread(target=self.random_point_exec, args=(rgb1, rgb2, point_starts, point_nums, duration, pre_time)).start()
             time.sleep(duration / 1000 * 2)
 
     def random_point_exec(self, rgb1, rgb2, point_starts, nums, duration = 5000, pre_time = 0):
@@ -608,6 +616,7 @@ class Light:
         # sector_buffer = []
         line_num = 4
         sector_area = []
+        sector_step = []
         for idx in range(sector_num):
             sector_buffer = []
             first_num = 0
@@ -624,6 +633,7 @@ class Light:
 
                 sector_buffer.append(sector_start)
             sector_area.append(sector_buffer)
+            sector_step.append(self.light_sector_step)
 
         steps = 0
         sector_pos = 0
@@ -668,7 +678,7 @@ class Light:
                 #     # for one_idx in range(sector_one - 1):
                 #     threading.Thread(target=self.fade_by_rage, args=(color, old_color, sector_one, self.light_sector_step[one_idx])).start()
 
-            self.fade_total_by_range(curr_colors, sector_color_old, sector_area, self.light_sector_step)
+            self.fade_total_by_range(curr_colors, sector_color_old, sector_area, sector_step)
             sector_color_old = curr_colors
             steps += 1
 
@@ -844,7 +854,7 @@ class Light:
                 r = int(r2 + step_r * i)
                 g = int(g2 + step_g * i)
                 b = int(b2 + step_b * i)
-                self.show_color_by_range_buffer(r, g, b, starts[idx], nums)
+                self.show_color_by_range_buffer(r, g, b, starts[idx], nums[idx])
             self.show_color_by_buffer()
 
         return
@@ -1125,6 +1135,11 @@ class Light:
                 time.sleep(time_duration)
 
         return
+
+    def show_color_with_rgb_by_range_buffer(self, rgb, start, num):
+        r, g, b = rgb
+
+        self.save_color_to_buffer(r, g, b, start, num)
 
     def show_color_by_range_buffer(self, r, g, b, starts = [], nums = []):
         if len(starts) == 0:
