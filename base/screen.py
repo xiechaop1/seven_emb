@@ -28,7 +28,7 @@ class Screen:
         self.fade_out_step = 0
         self.interrupt_event = threading.Event()
         self.clock = pygame.time.Clock()
-        self.time_delta = self.clock.tick(60)
+        self.time_delta = self.clock.tick(30)
         self.running = True
 
     def add(self, video_path, times):
@@ -96,7 +96,7 @@ class Screen:
         #     text="",
         #     manager=self.manager
         # )
-        container = av.open(video_path)
+        container = av.open(video_path, options={'hwaccel': 'v4l2'})
         if times == -1:
             times = 10000000
         stream = next(s for s in container.streams if s.type == 'video')
