@@ -22,13 +22,14 @@ class Recv:
 
 	REC_ACTION_SLEEP_ASSISTANT = "sleep_assistant"
 
-	def __init__(self, ws, wsClient, audioPlayerIns, lightIns, cv2Ins):
+	def __init__(self, ws, wsClient, audioPlayerIns, lightIns, cv2Ins, screenIns):
 		self.ws = ws
 		self.wsClient = wsClient
 		self.recv_daemon = True
 		self.audio_player = audioPlayerIns
 		self.light = lightIns
 		self.cv2 = cv2Ins
+		self.screen = screenIns
 		self.undertake = False
 
 	def daemon(self):
@@ -61,6 +62,8 @@ class Recv:
 			# print(resp)
 
 			if resp is not None:
+				self.screen.add("resources/video/main.mp4", 100)
+				self.screen.play()
 				if resp["code"] == self.EMPTY_SOUND_CODE:
 					print("Received empty sound code")
 					self.audio_player.clear_interrupt()
