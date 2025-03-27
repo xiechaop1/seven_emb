@@ -434,7 +434,8 @@ class Light:
             init_color2_buffer.append([0, 0, 0])
 
             last_buffer.append({
-                "add_num": 0,
+                "buff": 0,
+                "add_tag": 1,
                 "color": back_color
             })
 
