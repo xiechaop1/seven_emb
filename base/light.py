@@ -397,12 +397,14 @@ class Light:
         # init_color2_buffer.append([0, 0, 0])
         # init_color2_buffer.append([0, 0, 0])
 
+        right_line = []
         for idx, light_num in enumerate(self.light_nums):
             quarter_num = int(light_num / 4)
             half_num = int(light_num / 2)
 
             quarter_line_r = start + quarter_num
             quarter_line.append(quarter_line_r)
+            right_line.append(quarter_line_r)
 
             init_color_buffer.append(back_color)
             init_start_buffer.append([start])
@@ -494,7 +496,7 @@ class Light:
                     else:
                         curr_color = fore_color
 
-                if start_line < int(self.LED_COUNT / 2):
+                if start_line in right_line:
                     start = start_line + buff
                 else:
                     start = start_line - buff
