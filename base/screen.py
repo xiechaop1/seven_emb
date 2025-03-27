@@ -82,7 +82,12 @@ class Screen:
 
     def timer_dis(self):
         clock = pygame.time.Clock()
-        clock_label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect(500, 360, 600, 480), text="", manager=self.manager)
+        # clock_label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect(500, 360, 600, 480), text="", manager=self.manager)
+        clock_label = pygame_gui.elements.UILabel(
+            relative_rect=pygame.Rect((self.screen_width // 2 - 100, 20), (200, 50)),
+            text="",
+            manager=self.manager
+        )
 
         while True:
             # time_delta = self.clock.tick(30) / 1000.0
@@ -93,7 +98,7 @@ class Screen:
             # 更新 Pygame GUI
             self.manager.update(self.time_delta)
             self.manager.draw_ui(self.screen)
-            pygame.display.update()
+            pygame.display.update(self.time_delta)
 
             # 刷新显示
             pygame.display.flip()
@@ -102,24 +107,57 @@ class Screen:
 
     def display(self, video_path, times):
 
+        clock_label = pygame_gui.elements.UILabel(
+            relative_rect=pygame.Rect((self.screen_width // 2 - 100, 20), (200, 50)),
+            text="",
+            manager=self.manager
+        )
         container = av.open(video_path)
         if times == -1:
             times = 10000000
         stream = next(s for s in container.streams if s.type == 'video')
-        for i in range(times):
+        # for i in range(times):
+        running = True
+        frame_generator = container.decode(stream)
+        curr_times = 0
+        while running:
             if not self.interrupt_event.is_set():
                 break
 
-            container.seek(0)
-            for frame in container.decode(stream):
-                if not self.interrupt_event.is_set():
-                    break
+            try:
+                frame = next(frame_generator)
                 img = frame.to_ndarray(format="bgr24")
-                img_resized = cv2.resize(img, (self.screen_width, self.screen_height))
-                surf = pygame.surfarray.make_surface(img_resized.swapaxes(0, 1))
-                self.screen.blit(surf, (0, 0))
-                pygame.display.flip()
-                clock.tick(30)
+                img = pygame.surfarray.make_surface(img.swapaxes(0, 1))
+                img = pygame.transform.scale(img, (self.screen_width, self.screen_height))
+                self.screen.blit(img, (0, 0))
+            except StopIteration:
+                curr_times += 1
+                if curr_times > times:
+                    break
+                # 视频播放结束后重新播放
+                container.seek(0)
+                frame_generator = container.decode(stream)
+
+            # 更新时钟
+            current_time = datetime.datetime.now().strftime("%H:%M:%S")
+            clock_label.set_text(current_time)
+
+            # 更新 Pygame GUI
+            self.manager.update(self.time_delta)
+            self.manager.draw_ui(self.screen)
+
+            # 刷新显示
+            pygame.display.flip()
+            # container.seek(0)
+            # for frame in container.decode(stream):
+            #     if not self.interrupt_event.is_set():
+            #         break
+            #     img = frame.to_ndarray(format="bgr24")
+            #     img_resized = cv2.resize(img, (self.screen_width, self.screen_height))
+            #     surf = pygame.surfarray.make_surface(img_resized.swapaxes(0, 1))
+            #     self.screen.blit(surf, (0, 0))
+            #     pygame.display.flip()
+                # clock.tick(30)
         container.close()
 
         # pygame.quit()
