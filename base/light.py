@@ -529,8 +529,8 @@ class Light:
             # if buff == max_wave_num or buff == (-1 * max_wave_num):
             #     continue
 
-            print("params: ", params)
-            print("last:", last_buffer)
+            # print("params: ", params)
+            # print("last:", last_buffer)
             self.show_color_by_range(params)
 
             duration = wait_ms / 1000
