@@ -207,7 +207,7 @@ class Light:
                 if "max_wave_num" in params:
                     max_wave_num = params["max_wave_num"]
                 else:
-                    max_wave_num = 3
+                    max_wave_num = 2
 
                 if "wait_ms" in params:
                     wait_ms = params["wait_ms"]
@@ -424,7 +424,7 @@ class Light:
             })
 
         start = 0
-        for idx, light_num in enumerate(reversed(self.light_nums)):
+        for idx, light_num in enumerate(self.light_nums[::-1]):
             quarter_num = int(light_num / 4)
             half_num = int(light_num / 2)
 
