@@ -416,7 +416,8 @@ class Light:
 
             start += light_num
             last_buffer.append({
-                "add_num": 0,
+                "buff": 0,
+                "add_tag": 1,
                 "color": back_color
             })
 
@@ -521,6 +522,8 @@ class Light:
             # if buff == max_wave_num or buff == (-1 * max_wave_num):
             #     continue
 
+            print("params: ", params)
+            print("last:", last_buffer)
             self.show_color_by_range(params)
 
             duration = wait_ms / 1000
