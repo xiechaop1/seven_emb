@@ -453,6 +453,7 @@ class Light:
         self.fade_total_by_range(init_color_buffer, init_color2_buffer, init_start_buffer, init_num_buffer)
 
         add_tag = 1
+        add_num_buffer = 1
         add_num = 1
         # params = []
         while True:
@@ -474,13 +475,13 @@ class Light:
                     # curr_color = back_color
 
                     if buff == max_wave_num or buff == (-1 * max_wave_num):
-                        if add_num == 1:
-                            add_num = 0
+                        if add_num_buffer == 1:
+                            add_num_buffer = 0
                             add_tag = (-1) * add_tag
                         else:
-                            add_num = 1
+                            add_num_buffer = 1
 
-                        add_num = add_num * add_tag
+                        add_num = add_num_buffer * add_tag
 
 
                     buff += add_num
