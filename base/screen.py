@@ -108,7 +108,7 @@ class Screen:
     def display(self, video_path, times):
 
         font_path = "/usr/local/lib/python3.9/dist-packages/pygame_gui/data/NotoSans-Regular.ttf"
-        font = pygame.font.Font(font_path, 80)
+        # font = pygame.font.Font(font_path, 80)
         # clock_label = pygame_gui.elements.UILabel(
         #     relative_rect=pygame.Rect((self.screen_width // 2 - 200, self.screen_height - 120), (120, 100)),
         #     text="",
@@ -122,6 +122,8 @@ class Screen:
         running = True
         frame_generator = container.decode(stream)
         curr_times = 0
+        font_large = pygame.font.Font(font_path, 80)  # 第一行：时间
+        font_small = pygame.font.Font(font_path, 50)  # 第二行：日期
         while running:
             if not self.interrupt_event.is_set():
                 break
@@ -141,11 +143,23 @@ class Screen:
                 frame_generator = container.decode(stream)
 
             # 更新时钟
-            current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            text_surface = font.render(current_time, True, (255, 255, 255))  # 白色字体
-            text_rect = text_surface.get_rect(center=(self.screen_width // 2, self.screen_height - 50))  # 居中
+            # current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # text_surface = font.render(current_time, True, (255, 255, 255))  # 白色字体
+            # text_rect = text_surface.get_rect(center=(self.screen_width // 2, self.screen_height - 50))  # 居中
+            now = datetime.datetime.now()
+            time_text = now.strftime("%H:%M")  # 小时:分钟
+            date_text = now.strftime("%m-%d %A")  # 月-日 星期
+
+            # 渲染时间（第一行）
+            time_surface = font_large.render(time_text, True, (255, 255, 255))  # 白色
+            time_rect = time_surface.get_rect(center=(self.screen_width // 2, self.screen_height - 150))
+            self.screen.blit(time_surface, time_rect)
+
+            # 渲染日期（第二行）
+            date_surface = font_small.render(date_text, True, (255, 255, 255))  # 白色
+            date_rect = date_surface.get_rect(center=(self.screen_height // 2, self.screen_height - 80))
             # clock_label.set_text(current_time)
-            self.screen.blit(text_surface, text_rect)
+            self.screen.blit(date_surface, date_rect)
 
             # 更新 Pygame GUI
             self.manager.update(self.time_delta)
