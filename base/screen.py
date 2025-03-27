@@ -15,6 +15,9 @@ from common.threading_event import ThreadingEvent
 
 class Screen:
 
+    # HARD_ACC = 'v4l2'
+    HARD_ACC = 'omx'
+
     def __init__(self):
 
         # self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -96,7 +99,7 @@ class Screen:
         #     text="",
         #     manager=self.manager
         # )
-        container = av.open(video_path, options={'hwaccel': 'v4l2'})
+        container = av.open(video_path, options={'hwaccel': self.HARD_ACC})
         if times == -1:
             times = 10000000
         stream = next(s for s in container.streams if s.type == 'video')
