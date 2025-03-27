@@ -83,6 +83,7 @@ class Screen:
         self.stop()
         ThreadingEvent.screen_daemon_event.set()
         self.interrupt_event.set()
+        self.running = True
 
     def display(self, video_path, times):
 

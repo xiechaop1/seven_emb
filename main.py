@@ -117,7 +117,7 @@ if __name__ == "__main__":
         screen_instance.add("resources/video/main.mp4", 100)
         screen_thread = threading.Thread(target=screen_instance.daemon)
         screen_thread.start()
-        # screen_instance.play()
+        screen_instance.play()
 
     # screen = Screen()
     # screen.display("resources/video/think.mp4")
