@@ -212,7 +212,7 @@ class Light:
                 if "wait_ms" in params:
                     wait_ms = params["wait_ms"]
                 else:
-                    wait_ms = 1000
+                    wait_ms = 100
 
                 self.wave(fore_color, back_color, max_wave_num, wait_ms)
 
@@ -366,7 +366,7 @@ class Light:
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
 
 
-    def wave(self, fore_color, back_color = None, max_wave_num = 2, wait_ms = 1000):
+    def wave(self, fore_color, back_color = None, max_wave_num = 2, wait_ms = 100):
         if back_color is None:
             back_color = [0, 0, 0]
 
