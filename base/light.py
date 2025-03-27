@@ -424,7 +424,7 @@ class Light:
             })
 
         start = 0
-        for idx, light_num in enumerate(self.light_nums):
+        for idx, light_num in enumerate(reversed(self.light_nums)):
             quarter_num = int(light_num / 4)
             half_num = int(light_num / 2)
 
