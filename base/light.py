@@ -424,17 +424,22 @@ class Light:
             })
 
         start = 0
-        for idx, light_num in enumerate(self.light_nums[::-1]):
+        left_line = []
+        for idx, light_num in enumerate(self.light_nums):
             quarter_num = int(light_num / 4)
             half_num = int(light_num / 2)
 
             quarter_line_l = start + quarter_num + half_num + 1
-            quarter_line.append(quarter_line_l)
+            left_line.append(quarter_line_l)
 
             init_color_buffer.append(back_color)
             init_start_buffer.append([quarter_line_l + 1])
             init_num_buffer.append([quarter_num])
             init_color2_buffer.append([0, 0, 0])
+            start += light_num
+
+        for idx, quarter_line_l in enumerate(left_line[::-1]):
+            quarter_line.append(quarter_line_l)
 
             last_buffer.append({
                 "buff": 0,
@@ -442,7 +447,6 @@ class Light:
                 "color": back_color
             })
 
-            start += light_num
 
         # start_buffer = []
         # start_buffer.append(init_start_buffer["fore"])
