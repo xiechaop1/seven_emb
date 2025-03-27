@@ -27,6 +27,8 @@ class Screen:
         self.play_list = []
         self.fade_out_step = 0
         self.interrupt_event = threading.Event()
+        self.clock = pygame.time.Clock()
+        self.time_delta = self.clock.tick(60)
 
     def add(self, video_path, times):
         self.play_list.append({
@@ -83,13 +85,13 @@ class Screen:
         clock_label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect(500, 360, 600, 480), text="", manager=self.manager)
 
         while True:
-            time_delta = clock.tick(30) / 1000.0
+            # time_delta = self.clock.tick(30) / 1000.0
 
             current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             clock_label.set_text(current_time)
 
             # 更新 Pygame GUI
-            self.manager.update(time_delta)
+            self.manager.update(self.time_delta)
             self.manager.draw_ui(self.screen)
             pygame.display.update()
 
@@ -99,7 +101,6 @@ class Screen:
 
 
     def display(self, video_path, times):
-        clock = pygame.time.Clock()
 
         container = av.open(video_path)
         if times == -1:
@@ -155,7 +156,7 @@ class Screen:
                 pygame.display.flip()
 
                 # 每帧等待 40ms，相当于25帧/秒
-                clock.tick(60)
+                # self.clock.tick(60)
                 # pygame.time.delay(1)
 
         cap.release()
