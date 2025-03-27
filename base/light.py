@@ -462,13 +462,13 @@ class Light:
             for idx, start_line in enumerate(quarter_line):
                 if idx > 0:
                     last_buff = last_buffer[idx - 1]
-                    buff = last_buff["add_num"]
+                    buff = last_buff["buff"]
                     curr_color = last_buff["color"]
                     # if buff == max_wave_num or buff == (-1 * max_wave_num):
                     #     continue
                 else:
                     last_buff = last_buffer[0]
-                    buff = last_buff["add_num"]
+                    buff = last_buff["buff"]
                     # curr_color = back_color
 
                     if buff == max_wave_num or buff == (-1 * max_wave_num):
@@ -509,15 +509,16 @@ class Light:
                 })
 
                 last_buffer_temp.append({
-                        "add_num": buff,
+                        "buff": buff,
+                        "add_tag": add_tag,
                         "color": curr_color
                     }
                 )
 
                 # duration = wait_ms / 1000
             last_buffer = last_buffer_temp
-            if buff == max_wave_num or buff == (-1 * max_wave_num):
-                continue
+            # if buff == max_wave_num or buff == (-1 * max_wave_num):
+            #     continue
 
             self.show_color_by_range(params)
 
