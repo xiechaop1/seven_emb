@@ -420,7 +420,7 @@ class Light:
             last_buffer.append({
                 "buff": 0,
                 "add_tag": 1,
-                "color": back_color
+                "color": fore_color
             })
 
         start = 0
