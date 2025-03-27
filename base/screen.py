@@ -141,7 +141,7 @@ class Screen:
                 frame_generator = container.decode(stream)
 
             # 更新时钟
-            current_time = datetime.datetime.now().strftime("%H:%M:%S")
+            current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             text_surface = font.render(current_time, True, (255, 255, 255))  # 白色字体
             text_rect = text_surface.get_rect(center=(self.screen_width // 2, self.screen_height - 50))  # 居中
             # clock_label.set_text(current_time)
