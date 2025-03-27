@@ -29,6 +29,7 @@ class Screen:
         self.interrupt_event = threading.Event()
         self.clock = pygame.time.Clock()
         self.time_delta = self.clock.tick(60)
+        self.running = True
 
     def add(self, video_path, times):
         self.play_list.append({
@@ -44,6 +45,7 @@ class Screen:
     def stop(self):
         # self.screen.stop()
         self.interrupt_event.clear()
+        self.running = False
         logging.info(f"Stopped video list")
 
     def daemon(self):
@@ -66,6 +68,7 @@ class Screen:
             # self.play()
 
     def playlist(self):
+        self.stop()
         self.interrupt_event.set()
     # def playlist(self):
     #     for _, play_video in enumerate(self.play_list):
@@ -77,33 +80,9 @@ class Screen:
     #         self.display(video_path, times)
 
     def play(self):
+        self.stop()
         ThreadingEvent.screen_daemon_event.set()
         self.interrupt_event.set()
-
-    def timer_dis(self):
-        clock = pygame.time.Clock()
-        # clock_label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect(500, 360, 600, 480), text="", manager=self.manager)
-        clock_label = pygame_gui.elements.UILabel(
-            relative_rect=pygame.Rect((self.screen_width // 2 - 100, 20), (200, 50)),
-            text="",
-            manager=self.manager
-        )
-
-        while True:
-            # time_delta = self.clock.tick(30) / 1000.0
-
-            current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            clock_label.set_text(current_time)
-
-            # 更新 Pygame GUI
-            self.manager.update(self.time_delta)
-            self.manager.draw_ui(self.screen)
-            pygame.display.update(self.time_delta)
-
-            # 刷新显示
-            pygame.display.flip()
-
-
 
     def display(self, video_path, times):
 
@@ -119,12 +98,11 @@ class Screen:
             times = 10000000
         stream = next(s for s in container.streams if s.type == 'video')
         # for i in range(times):
-        running = True
         frame_generator = container.decode(stream)
         curr_times = 0
         font_large = pygame.font.Font(font_path, 50)  # 第一行：时间
         font_small = pygame.font.Font(font_path, 50)  # 第二行：日期
-        while running:
+        while self.running:
             if not self.interrupt_event.is_set():
                 break
 

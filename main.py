@@ -22,6 +22,7 @@ from model.recv import Recv
 from model.daemon import Daemon
 from common.code import Code
 import pygame
+import sys
 from model.undertake_callback import UndertakeCallback
 import asyncio
 
@@ -37,6 +38,10 @@ from model.execute_command import ExecuteCommand
 #     ws = await client.create_websocket_client(websocket_url)  # ✅ 连接 WebSocket
 #     if ws:  # 连接成功
 #         return ws
+exec_tag = None
+if len(sys.argv) > 1:
+    exec_tag = sys.argv[1]
+
 
 if Config.IS_DEBUG == False:
     os.environ["SDL_AUDIODRIVER"] = "alsa"
@@ -107,13 +112,13 @@ if __name__ == "__main__":
     audio_play_thread.start()
     logging.info("audio is ready")
 
-    screen_instance = Screen()
-    screen_instance.add("resources/video/main.mp4", 100)
-    screen_thread = threading.Thread(target=screen_instance.daemon)
-    screen_thread.start()
-    screen_instance.play()
-    # screen_instance.timer_dis()
-
+    if exec_tag != "demo":
+        screen_instance = Screen()
+        screen_instance.add("resources/video/main.mp4", 100)
+        screen_thread = threading.Thread(target=screen_instance.daemon)
+        screen_thread.start()
+        screen_instance.play()
+    
     # screen = Screen()
     # screen.display("resources/video/think.mp4")
 
