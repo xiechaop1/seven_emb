@@ -46,6 +46,7 @@ class Screen:
         # self.screen.stop()
         self.interrupt_event.clear()
         self.running = False
+        time.sleep(0.5)
         logging.info(f"Stopped video list")
 
     def daemon(self):
@@ -70,6 +71,7 @@ class Screen:
     def playlist(self):
         self.stop()
         self.interrupt_event.set()
+        self.running = True
     # def playlist(self):
     #     for _, play_video in enumerate(self.play_list):
     #
