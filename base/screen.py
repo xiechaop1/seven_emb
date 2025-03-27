@@ -5,8 +5,11 @@ import threading
 from operator import contains
 
 import pygame
+import pygame_gui
 import cv2
 import av
+import datetime
+import time
 from common.threading_event import ThreadingEvent
 # from screeninfo import get_monitors
 
@@ -16,6 +19,8 @@ class Screen:
 
         # self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         self.screen = pygame.display.set_mode((640, 480))
+        self.manager = pygame_gui.UIManager((640, 480))
+
         self.screen_width, self.screen_height = self.screen.get_size()
 
         self.current_video = None
@@ -72,6 +77,21 @@ class Screen:
     def play(self):
         ThreadingEvent.screen_daemon_event.set()
         self.interrupt_event.set()
+
+    def timer_dis(self):
+        curr_time = datetime.datetime.now()
+        label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect(500, 360, 600, 480), text=curr_time, manager=self.manager)
+
+        while True:
+            curr_time = datetime.datetime.now()
+            label.set_text(curr_time)
+            # self.manager.process_events()
+            self.manager.update(curr_time)
+            self.manager.draw_ui(self.screen)
+            pygame.display.update()
+            time.sleep(1)
+
+
 
     def display(self, video_path, times):
         clock = pygame.time.Clock()
