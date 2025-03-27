@@ -62,8 +62,9 @@ class Recv:
 			# print(resp)
 
 			if resp is not None:
-				self.screen.add("resources/video/main.mp4", 100)
-				self.screen.play()
+				if self.screen is not None:
+					self.screen.add("resources/video/main.mp4", 100)
+					self.screen.play()
 				if resp["code"] == self.EMPTY_SOUND_CODE:
 					print("Received empty sound code")
 					self.audio_player.clear_interrupt()

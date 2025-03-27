@@ -52,6 +52,7 @@ if Config.IS_DEBUG == False:
     os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
     os.environ["XDG_RUNTIME_DIR"] = "/run/user/1000"
 
+
 if __name__ == "__main__":
     # on_start()
     # L.debug(f"API Listen {settings.LISTEN_IP}:{settings.PORT}")
@@ -118,6 +119,8 @@ if __name__ == "__main__":
         screen_thread = threading.Thread(target=screen_instance.daemon)
         screen_thread.start()
         screen_instance.play()
+    else:
+        screen_instance = None
 
     # screen = Screen()
     # screen.display("resources/video/think.mp4")
