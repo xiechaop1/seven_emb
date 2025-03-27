@@ -107,8 +107,10 @@ class Screen:
 
     def display(self, video_path, times):
 
+        font_path = "NotoSans-Regular.ttf"
+        font = pygame.font.Font(font_path, 80)
         clock_label = pygame_gui.elements.UILabel(
-            relative_rect=pygame.Rect((self.screen_width // 2 - 100, 20), (200, 50)),
+            relative_rect=pygame.Rect((self.screen_width // 2 - 200, self.screen_height - 120), (120, 100)),
             text="",
             manager=self.manager
         )
@@ -140,6 +142,9 @@ class Screen:
 
             # 更新时钟
             current_time = datetime.datetime.now().strftime("%H:%M:%S")
+            text_surface = font.render(current_time, True, (255, 255, 255))  # 白色字体
+            text_rect = text_surface.get_rect(center=(self.screen_width // 2, 50))  # 居中
+            self.screen.blit(text_surface, text_rect)
             clock_label.set_text(current_time)
 
             # 更新 Pygame GUI
