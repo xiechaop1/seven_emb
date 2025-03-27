@@ -633,6 +633,7 @@ class Mic:
         # print(time_duration, self.has_interrupt)
         if time_duration > 0.4 and self.has_interrupt == False:
             self.screen.add("resources/video/main1.mp4", 100)
+            self.screen.play()
             self.audio_player.interrupt()
             self.audio_player.stop_audio()
             ThreadingEvent.recv_execute_command_event.clear()
