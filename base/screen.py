@@ -159,6 +159,7 @@ class Screen:
             #     pygame.display.flip()
                 # clock.tick(30)
         container.close()
+        logging.info(f"Finished video {video_path}")
 
         # pygame.quit()
 
