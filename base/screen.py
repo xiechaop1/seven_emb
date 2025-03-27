@@ -107,7 +107,7 @@ class Screen:
 
     def display(self, video_path, times):
 
-        font_path = "NotoSans-Regular.ttf"
+        font_path = "/usr/local/lib/python3.9/dist-packages/pygame_gui/data/NotoSans-Regular.ttf"
         font = pygame.font.Font(font_path, 80)
         clock_label = pygame_gui.elements.UILabel(
             relative_rect=pygame.Rect((self.screen_width // 2 - 200, self.screen_height - 120), (120, 100)),
