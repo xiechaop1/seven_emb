@@ -79,17 +79,22 @@ class Screen:
         self.interrupt_event.set()
 
     def timer_dis(self):
-        curr_time = datetime.datetime.now()
-        label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect(500, 360, 600, 480), text=curr_time, manager=self.manager)
+        clock = pygame.time.Clock()
+        clock_label = pygame_gui.elements.UILabel(relative_rect=pygame.Rect(500, 360, 600, 480), text="", manager=self.manager)
 
         while True:
-            curr_time = datetime.datetime.now()
-            label.set_text(curr_time)
-            # self.manager.process_events()
-            self.manager.update(curr_time)
+            time_delta = clock.tick(30) / 1000.0
+
+            current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            clock_label.set_text(current_time)
+
+            # 更新 Pygame GUI
+            self.manager.update(time_delta)
             self.manager.draw_ui(self.screen)
             pygame.display.update()
-            time.sleep(1)
+
+            # 刷新显示
+            pygame.display.flip()
 
 
 

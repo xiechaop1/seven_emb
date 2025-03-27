@@ -21,6 +21,7 @@ from common.threading_event import ThreadingEvent
 from model.recv import Recv
 from model.daemon import Daemon
 from common.code import Code
+import pygame
 from model.undertake_callback import UndertakeCallback
 import asyncio
 
@@ -55,6 +56,7 @@ if __name__ == "__main__":
     client = WebSocketClient(websocket_url)
     # client.set_callback(UndertakeCallback.undertake)
     ws_cli = client.connect()
+    pygame.init()
     # exit(0)
     #ws_cli = WebSocketClient.create_websocket_client(websocket_url)
     # ws_instance = WebSocketClient()
