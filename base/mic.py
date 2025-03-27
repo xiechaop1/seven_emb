@@ -58,7 +58,7 @@ class Mic:
     # SPK_MODEL_PATH = "/home/li/vosk-api/python/example/vosk-model-spk-0.4"
     # model_path = "/home/li/vosk-model-small-cn-0.22"
 
-    def __init__(self, ws, audio_player, light, threshold=800, timeout=30, sample_rate=16000, frame_duration=30):
+    def __init__(self, ws, audio_player, light, screen, threshold=800, timeout=30, sample_rate=16000, frame_duration=30):
         """
         初始化麦克风参数
         :param threshold: 静音检测阈值（音频幅度超过该值视为非静音）
@@ -89,6 +89,7 @@ class Mic:
         self.ws = ws
         self.audio_player = audio_player
         self.light = light
+        self.screen = screen
         # self.req_send_time = 0
 
         self.spk_li_1 = [-0.626114, 0.430365, 0.564255, -0.182698, 0.537145, 0.044097, 0.564515, 0.666896, 1.085733,
@@ -631,6 +632,7 @@ class Mic:
         time_duration = time.time() - self.start_time
         # print(time_duration, self.has_interrupt)
         if time_duration > 0.4 and self.has_interrupt == False:
+            self.screen.add("resources/video/main1.mp4", 100)
             self.audio_player.interrupt()
             self.audio_player.stop_audio()
             ThreadingEvent.recv_execute_command_event.clear()
