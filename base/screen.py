@@ -10,6 +10,7 @@ import cv2
 import av
 import datetime
 import time
+import mpv
 from common.threading_event import ThreadingEvent
 # from screeninfo import get_monitors
 
@@ -33,6 +34,11 @@ class Screen:
         self.clock = pygame.time.Clock()
         self.time_delta = self.clock.tick(30)
         self.running = True
+        self.mpv_player = mpv.MPV(log_handler=print)
+        self.mpv_player.vo = "gpu"
+        self.mpv_player.hwdec = "auto"
+        self.mpv_player.fullscreen = False
+
 
     def add(self, video_path, times):
         self.play_list.append({
@@ -112,19 +118,21 @@ class Screen:
             if not self.interrupt_event.is_set():
                 break
 
-            try:
-                frame = next(frame_generator)
-                img = frame.to_ndarray(format="bgr24")
-                img = pygame.surfarray.make_surface(img.swapaxes(0, 1))
-                img = pygame.transform.scale(img, (self.screen_width, self.screen_height))
-                self.screen.blit(img, (0, 0))
-            except StopIteration:
-                curr_times += 1
-                if curr_times > times:
-                    break
-                # 视频播放结束后重新播放
-                container.seek(0)
-                frame_generator = container.decode(stream)
+            # try:
+            #     frame = next(frame_generator)
+            #     img = frame.to_ndarray(format="bgr24")
+            #     img = pygame.surfarray.make_surface(img.swapaxes(0, 1))
+            #     img = pygame.transform.scale(img, (self.screen_width, self.screen_height))
+            #     self.screen.blit(img, (0, 0))
+            # except StopIteration:
+            #     curr_times += 1
+            #     if curr_times > times:
+            #         break
+            #     # 视频播放结束后重新播放
+            #     container.seek(0)
+            #     frame_generator = container.decode(stream)
+
+            self.mpv_player.play(video_path)
 
             # 更新时钟
             # current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
