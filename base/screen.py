@@ -17,6 +17,7 @@ from common.threading_event import ThreadingEvent
 class Screen:
 
     HARD_ACC = 'v4l2'
+    # HARD_ACC = 'v4l2_request'
     # HARD_ACC = 'omx'
 
     def __init__(self):
