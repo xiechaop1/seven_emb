@@ -70,6 +70,9 @@ class Screen:
         logging.info(f"Stopped video list")
 
     def daemon(self):
+        clock_thread = threading.Thread(target=self.update_clock, daemon=True)
+        clock_thread.start()
+
         while True:
             ThreadingEvent.screen_daemon_event.wait()
 
@@ -109,6 +112,20 @@ class Screen:
         self.interrupt_event.set()
         self.running = True
 
+    def update_clock(self):
+        pygame.freetype.init()
+        font = pygame.freetype.SysFont("Arial", 80)
+        font_color = (255, 255, 255)
+        while True:
+            self.screen.fill((0, 0, 0, 0))  # ????
+            now = datetime.now()
+            time_text = now.strftime("%H:%M")  # ??:??
+            date_text = now.strftime("%m-%d %A")  # ?-? ???
+            font.render_to(self.screen, (self.screen_width // 3, self.screen_height // 3), time_text, font_color)
+            font.render_to(self.screen, (self.screen_width // 3, self.screen_height // 3 + 100), date_text, font_color)
+            pygame.display.update()  # ????
+            time.sleep(1)
+
     def display(self, video_path, times):
 
         font_path = "/usr/local/lib/python3.9/dist-packages/pygame_gui/data/NotoSans-Regular.ttf"
@@ -135,64 +152,66 @@ class Screen:
         if Config.OS is not None:
             if Config.OS == "pi5":
                 self.mpv_player.play(video_path)
-        while self.running:
-            if not self.interrupt_event.is_set():
-                break
 
-            if Config.OS is None:
-                try:
-                    frame = next(frame_generator)
-                    img = frame.to_ndarray(format="bgr24")
-                    img = pygame.surfarray.make_surface(img.swapaxes(0, 1))
-                    img = pygame.transform.scale(img, (self.screen_width, self.screen_height))
-                    self.screen.blit(img, (0, 0))
-                except StopIteration:
-                    curr_times += 1
-                    if curr_times > times:
-                        break
-                    # 视频播放结束后重新播放
-                    container.seek(0)
-                    frame_generator = container.decode(stream)
-            # else:
-            #     self.mpv_player.play(video_path)
+        else:
+            while self.running:
+                if not self.interrupt_event.is_set():
+                    break
 
-            # 更新时钟
-            # current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            # text_surface = font.render(current_time, True, (255, 255, 255))  # 白色字体
-            # text_rect = text_surface.get_rect(center=(self.screen_width // 2, self.screen_height - 50))  # 居中
-            now = datetime.datetime.now()
-            time_text = now.strftime("%H:%M")  # 小时:分钟
-            date_text = now.strftime("%m-%d %a")  # 月-日 星期
+                if Config.OS is None:
+                    try:
+                        frame = next(frame_generator)
+                        img = frame.to_ndarray(format="bgr24")
+                        img = pygame.surfarray.make_surface(img.swapaxes(0, 1))
+                        img = pygame.transform.scale(img, (self.screen_width, self.screen_height))
+                        self.screen.blit(img, (0, 0))
+                    except StopIteration:
+                        curr_times += 1
+                        if curr_times > times:
+                            break
+                        # 视频播放结束后重新播放
+                        container.seek(0)
+                        frame_generator = container.decode(stream)
+                # else:
+                #     self.mpv_player.play(video_path)
 
-            # 渲染时间（第一行）
-            time_surface = font_large.render(time_text, True, (255, 255, 255))  # 白色
-            time_rect = time_surface.get_rect(center=(self.screen_width // 2, self.screen_height - 150))
-            self.screen.blit(time_surface, time_rect)
+                # 更新时钟
+                # current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                # text_surface = font.render(current_time, True, (255, 255, 255))  # 白色字体
+                # text_rect = text_surface.get_rect(center=(self.screen_width // 2, self.screen_height - 50))  # 居中
+                now = datetime.datetime.now()
+                time_text = now.strftime("%H:%M")  # 小时:分钟
+                date_text = now.strftime("%m-%d %a")  # 月-日 星期
 
-            # 渲染日期（第二行）
-            date_surface = font_small.render(date_text, True, (255, 255, 255))  # 白色
-            date_rect = date_surface.get_rect(center=(self.screen_width // 2, self.screen_height - 80))
-            # clock_label.set_text(current_time)
-            self.screen.blit(date_surface, date_rect)
+                # 渲染时间（第一行）
+                time_surface = font_large.render(time_text, True, (255, 255, 255))  # 白色
+                time_rect = time_surface.get_rect(center=(self.screen_width // 2, self.screen_height - 150))
+                self.screen.blit(time_surface, time_rect)
 
-            # 更新 Pygame GUI
-            self.manager.update(self.time_delta)
-            self.manager.draw_ui(self.screen)
+                # 渲染日期（第二行）
+                date_surface = font_small.render(date_text, True, (255, 255, 255))  # 白色
+                date_rect = date_surface.get_rect(center=(self.screen_width // 2, self.screen_height - 80))
+                # clock_label.set_text(current_time)
+                self.screen.blit(date_surface, date_rect)
 
-            # 刷新显示
-            pygame.display.flip()
-            # container.seek(0)
-            # for frame in container.decode(stream):
-            #     if not self.interrupt_event.is_set():
-            #         break
-            #     img = frame.to_ndarray(format="bgr24")
-            #     img_resized = cv2.resize(img, (self.screen_width, self.screen_height))
-            #     surf = pygame.surfarray.make_surface(img_resized.swapaxes(0, 1))
-            #     self.screen.blit(surf, (0, 0))
-            #     pygame.display.flip()
-                # clock.tick(30)
-        container.close()
-        logging.info(f"Finished video {video_path}")
+                # 更新 Pygame GUI
+                self.manager.update(self.time_delta)
+                self.manager.draw_ui(self.screen)
+
+                # 刷新显示
+                pygame.display.flip()
+                # container.seek(0)
+                # for frame in container.decode(stream):
+                #     if not self.interrupt_event.is_set():
+                #         break
+                #     img = frame.to_ndarray(format="bgr24")
+                #     img_resized = cv2.resize(img, (self.screen_width, self.screen_height))
+                #     surf = pygame.surfarray.make_surface(img_resized.swapaxes(0, 1))
+                #     self.screen.blit(surf, (0, 0))
+                #     pygame.display.flip()
+                    # clock.tick(30)
+            container.close()
+            logging.info(f"Finished video {video_path}")
 
         # pygame.quit()
 
