@@ -8,6 +8,8 @@ from common.threading_event import ThreadingEvent
 class Spray:
     # 延时函数
 
+    SPRAY_PIN = 22
+
     def __init__(self):
 
         # # 设置GPIO模式
@@ -29,7 +31,7 @@ class Spray:
 
         # def scent_spray(scent_spray_flag):
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(22, GPIO.OUT)
+        GPIO.setup(self.SPRAY_PIN, GPIO.OUT)
 
         # self.gpio = GPIO
 
@@ -37,14 +39,14 @@ class Spray:
         time.sleep(ms / 1000.0)  # 转换为秒
 
     def turn_off(self):
-        GPIO.output(22, GPIO.LOW)
+        GPIO.output(self.SPRAY_PIN, GPIO.LOW)
 
     def shoot(self, times = 3, wait_time = 30):
         for i in range(times):
             for j in range(3):
-                GPIO.output(22, GPIO.HIGH)
+                GPIO.output(self.SPRAY_PIN, GPIO.HIGH)
                 time.sleep(0.08)
-                GPIO.output(22, GPIO.LOW)
+                GPIO.output(self.SPRAY_PIN, GPIO.LOW)
                 time.sleep(0.05)
             print("GPIO.HIGH!")
             time.sleep(wait_time)
