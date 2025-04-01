@@ -71,7 +71,7 @@ class Motor:
         'Left Knee', 'Right Knee', 'Left Ankle', 'Right Ankle'
     ]
 
-    def __init__(self, pin, channel):
+    def __init__(self):
         # 初始化ADS1115模块，选择I2C地址0x48（默认地址）
         self.adc = Adafruit_ADS1x15.ADS1115(address=0x48)
 
