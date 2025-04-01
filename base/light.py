@@ -7,12 +7,12 @@ from common.threading_event import ThreadingEvent
 from config.config import Config
 import random
 
+from rpi_ws281x import *
 if not Config.IS_DEBUG:
     if Config.OS is not None:
         if Config.OS == "pi5":
             from rpi_ws281x import PixelStrip, Color
 
-    from rpi_ws281x import *
 
 # from adafruit_circuitpython_neopixel import NeoPixel
 
@@ -36,11 +36,11 @@ class Light:
 
         if Config.OS is not None:
             if Config.OS == "pi5":
-                self.strip = Adafruit_NeoPixel(self.LED_COUNT, self.LED_PIN, self.LED_FREQ_HZ, self.LED_DMA, self.LED_INVERT, self.LED_BRIGHTNESS, self.LED_CHANNEL)
+                self.strip = PixelStrip(self.LED_COUNT, self.LED_PIN, self.LED_FREQ_HZ, self.LED_DMA, self.LED_INVERT,
+                                        self.LED_BRIGHTNESS, self.LED_CHANNEL)
         if self.strip is None:
-            self.strip = PixelStrip(self.LED_COUNT, self.LED_PIN, self.LED_FREQ_HZ, self.LED_DMA, self.LED_INVERT,
-                                    self.LED_BRIGHTNESS, self.LED_CHANNEL)
-
+            self.strip = Adafruit_NeoPixel(self.LED_COUNT, self.LED_PIN, self.LED_FREQ_HZ, self.LED_DMA,
+                                           self.LED_INVERT, self.LED_BRIGHTNESS, self.LED_CHANNEL)
         self.strip.begin()
         self.light_mode = None
         self.last_light_mode = None
