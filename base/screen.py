@@ -26,9 +26,10 @@ class Screen:
 
     def __init__(self):
 
-        # self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-        self.screen = pygame.display.set_mode((640, 480))
-        self.manager = pygame_gui.UIManager((640, 480))
+        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        # self.screen = pygame.display.set_mode((640, 480))
+        # self.manager = pygame_gui.UIManager((640, 480))
+        self.manager = pygame_gui.UIManager(0,0)
 
         self.screen_width, self.screen_height = self.screen.get_size()
 
