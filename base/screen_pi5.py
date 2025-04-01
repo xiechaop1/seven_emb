@@ -118,7 +118,7 @@ class Screen:
         font_color = (255, 255, 255)
         while True:
             self.screen.fill((0, 0, 0, 0))  # ????
-            now = datetime.now()
+            now = datetime.datetime.now()
             time_text = now.strftime("%H:%M")  # ??:??
             date_text = now.strftime("%m-%d %A")  # ?-? ???
             font.render_to(self.screen, (self.screen_width // 3, self.screen_height // 3), time_text, font_color)
