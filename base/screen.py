@@ -126,6 +126,7 @@ class Screen:
         font_small = pygame.font.Font(font_path, 50)  # 第二行：日期
         if Config.OS is not None:
             if Config.OS == "pi5":
+                self.mpv_player.loop = times
                 self.mpv_player.play(video_path)
         while self.running:
             if not self.interrupt_event.is_set():
