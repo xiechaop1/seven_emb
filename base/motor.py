@@ -28,6 +28,9 @@ last_angle1 = 10
 last_angle2 = 10
 roaming_stop_flag = False
 
+# 保存所有循环的坐标列表
+all_keypoints = []
+
 class Motor:
     INA_PIN = 6  # 控制电机A的GPIO引脚
     INB_PIN = 5  # 控制电机B的GPIO引脚
@@ -68,22 +71,18 @@ class Motor:
         'Left Knee', 'Right Knee', 'Left Ankle', 'Right Ankle'
     ]
 
-    # 保存所有循环的坐标列表
-
-    all_keypoints = []
-
     def __init__(self, pin, channel):
         # 初始化ADS1115模块，选择I2C地址0x48（默认地址）
-        adc = Adafruit_ADS1x15.ADS1115(address=0x48)
+        self.adc = Adafruit_ADS1x15.ADS1115(address=0x48)
 
         # 设置增益（Gain）为1，适用于0-4.096V范围
-        GAIN = 1
+        self.GAIN = 1
 
         # 采样率设置（单位：每秒样本数）
-        SAMPLE_RATE = 1
+        self.SAMPLE_RATE = 1
 
         # 用于读取电流的转换关系，假设0-3V输出，0-2000mA电流
-        VOLTAGE_TO_CURRENT_CONVERSION = 2000 / 3.0  # 每伏特对应的电流值（mA/V）
+        self.VOLTAGE_TO_CURRENT_CONVERSION = 2000 / 3.0  # 每伏特对应的电流值（mA/V）
 
         # 设置GPIO模式
         GPIO.setmode(GPIO.BCM)
