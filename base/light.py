@@ -7,8 +7,11 @@ from common.threading_event import ThreadingEvent
 from config.config import Config
 import random
 
-if not Config.IS_DEBUG:
-    from rpi_ws281x import *
+# if not Config.IS_DEBUG:
+#     from rpi_ws281x import *
+
+# from adafruit_circuitpython_neopixel import NeoPixel
+from rpi_ws281x import PixelStrip, Color
 
 
 class Light:
@@ -25,7 +28,8 @@ class Light:
 
     def __init__(self):
         # self.light_mode = ""
-        self.strip = Adafruit_NeoPixel(self.LED_COUNT, self.LED_PIN, self.LED_FREQ_HZ, self.LED_DMA, self.LED_INVERT, self.LED_BRIGHTNESS, self.LED_CHANNEL)
+        # self.strip = Adafruit_NeoPixel(self.LED_COUNT, self.LED_PIN, self.LED_FREQ_HZ, self.LED_DMA, self.LED_INVERT, self.LED_BRIGHTNESS, self.LED_CHANNEL)
+        self.strip = PixelStrip(self.LED_COUNT, self.LED_PIN, self.LED_FREQ_HZ, self.LED_DMA, self.LED_INVERT,self.LED_BRIGHTNESS, self.LED_CHANNEL)
         self.strip.begin()
         self.light_mode = None
         self.last_light_mode = None
