@@ -12,10 +12,10 @@ if not Config.IS_DEBUG:
     from base.light import Light
     from base.spray import Spray
 
+from base.screen import Screen
 if Config.OS is not None:
-    from base.screen_pi5 import Screen
-else:
-    from base.screen import Screen
+    if Config.OS == "pi5":
+        from base.screen_pi5 import Screen
 
 
 import os
