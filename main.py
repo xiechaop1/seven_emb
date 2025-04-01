@@ -46,6 +46,9 @@ if len(sys.argv) > 1:
 if Config.IS_DEBUG == False:
     os.environ["SDL_AUDIODRIVER"] = "alsa"
     os.environ["AUDIODEV"] = "hw:3,0"
+    if Config.OS is not None:
+        if Config.OS == "pi5":
+            os.environ["AUDIODEV"] = "hw:2,0"
 
     os.environ["SDL_VIDEODRIVER"] = "x11"  ########screen_modified by lixiaolin ###
     # os.environ["SDL_VIDEODRIVER"] = "quartz"

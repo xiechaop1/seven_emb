@@ -10,7 +10,11 @@ import cv2
 import av
 import datetime
 import time
-import mpv
+from config.config import Config
+
+if Config.OS is not None:
+    if Config.OS == "pi5":
+        import mpv
 from common.threading_event import ThreadingEvent
 # from screeninfo import get_monitors
 
@@ -100,13 +104,16 @@ class Screen:
     def display(self, video_path, times):
 
         font_path = "/usr/local/lib/python3.9/dist-packages/pygame_gui/data/NotoSans-Regular.ttf"
+        if Config.OS is not None:
+            if Config.OS == "pi5":
+                font_path = "/usr/local/lib/python3.11/dist-packages/pygame_gui/data/NotoSans-Regular.ttf"
         # font = pygame.font.Font(font_path, 80)
         # clock_label = pygame_gui.elements.UILabel(
         #     relative_rect=pygame.Rect((self.screen_width // 2 - 200, self.screen_height - 120), (120, 100)),
         #     text="",
         #     manager=self.manager
         # )
-        container = av.open(video_path, options={'hwaccel': self.HARD_ACC})
+        # container = av.open(video_path, options={'hwaccel': self.HARD_ACC})
         if times == -1:
             times = 10000000
         # stream = next(s for s in container.streams if s.type == 'video')
