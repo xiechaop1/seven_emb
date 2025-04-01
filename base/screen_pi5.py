@@ -43,8 +43,8 @@ class Screen:
             if Config.OS == "pi5":
                 self.mpv_player = mpv.MPV(log_handler=print)
                 self.mpv_player.vo = "gpu"
-                self.mpv_player.hwdec = "v4l2m2m"
-                self.mpv_player.fps=30
+                self.mpv_player.hwdec = "auto"
+                self.mpv_player.fps = 30
                 self.mpv_player.fullscreen = False
 
 
