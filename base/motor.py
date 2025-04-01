@@ -117,6 +117,8 @@ class Motor:
         self.last_angle2 = 10
         self.roaming_stop_flag = False
 
+        self.clog_flag = False
+        self.clog_flag2 = False
 
         # INA_PIN = 6  # 控制电机A的GPIO引脚
         # INB_PIN = 5  # 控制电机B的GPIO引脚
@@ -489,7 +491,7 @@ class Motor:
                 # break
 
     def person_tracking(self, angle1=angle_def, angle2=angle_def2, total_speed=motor_speed):
-        global current_pos, clog_flag, current_pos2, clog_flag2, person_found_flag, roaming_stop_flag, last_angle1, last_angle2
+        global current_pos,  current_pos2,  person_found_flag, roaming_stop_flag, last_angle1, last_angle2
 
         print("angle_def1:", angle1)
         with open("motor_degree.txt", "r") as file_status:
@@ -536,19 +538,19 @@ class Motor:
                 self.motor_reverse2(total_speed)  # 控制第二个电机反转
 
             # 检查电机是否堵转
-            if clog_flag == True:
+            if self.clog_flag == True:
                 print("!!!!!!!!!!!!!!!!clog forward for motor 1!!!!!!!!!!!!!!")
                 self.motor_stop()  # 停止第一个电机
-                clog_flag = False
+                self.clog_flag = False
                 with open("motor_degree.txt", "w") as file_status:
                     file_status.write(str(0))  # 更新第一个电机的角度
                 time.sleep(0.1)
                 break
 
-            if clog_flag2 == True:
+            if self.clog_flag2 == True:
                 print("!!!!!!!!!!!!!!!!clog forward for motor 2!!!!!!!!!!!!!!")
                 self.motor_stop2()  # 停止第二个电机
-                clog_flag2 = False
+                self.clog_flag2 = False
                 with open("motor_degree2.txt", "w") as file_status:
                     file_status.write(str(0))  # 更新第二个电机的角度
                 time.sleep(0.1)
@@ -571,7 +573,7 @@ class Motor:
         time.sleep(0.05)
 
     # def motor_forward_together2(angle1=angle_def, angle2=angle_def2, total_speed=motor_speed):
-    #     global current_pos, clog_flag, current_pos2, clog_flag2, person_found_flag, roaming_stop_flag, last_angle1, last_angle2
+    #     global current_pos,  current_pos2,  person_found_flag, roaming_stop_flag, last_angle1, last_angle2
     #
     #     print("angle_def1:", angle1)
     #     with open("motor_degree.txt", "r") as file_status:
@@ -668,19 +670,19 @@ class Motor:
     #             break
     #
     #         # 检查电机堵转
-    #         if clog_flag:
+    #         if self.clog_flag:
     #             print("!!!!!!!!!!!!!!!!clog forward for motor 1!!!!!!!!!!!!!!")
     #             motor_stop()
-    #             clog_flag = False
+    #             self.clog_flag = False
     #             with open("motor_degree.txt", "w") as file_status:
     #                 file_status.write(str(0))
     #             time.sleep(0.1)
     #             break
     #
-    #         if clog_flag2:
+    #         if self.clog_flag2:
     #             print("!!!!!!!!!!!!!!!!clog forward for motor 2!!!!!!!!!!!!!!")
     #             motor_stop2()
-    #             clog_flag2 = False
+    #             self.clog_flag2 = False
     #             with open("motor_degree2.txt", "w") as file_status:
     #                 file_status.write(str(0))
     #             time.sleep(0.1)
@@ -699,7 +701,7 @@ class Motor:
     #     time.sleep(0.1)
 
     def motor_forward_together2(self, angle1=angle_def, angle2=angle_def2, total_speed=motor_speed):
-        global current_pos, clog_flag, current_pos2, clog_flag2, person_found_flag, roaming_stop_flag, last_angle1, last_angle2
+        global current_pos,  current_pos2,  person_found_flag, roaming_stop_flag, last_angle1, last_angle2
 
         print("angle_def1:", angle1)
         with open("motor_degree.txt", "r") as file_status:
@@ -744,19 +746,19 @@ class Motor:
                 self.motor_reverse2(total_speed)  # 控制第二个电机反转
 
             # 检查电机是否堵转
-            if clog_flag == True:
+            if self.clog_flag == True:
                 print("!!!!!!!!!!!!!!!!clog forward for motor 1!!!!!!!!!!!!!!")
                 self.motor_stop()  # 停止第一个电机
-                clog_flag = False
+                self.clog_flag = False
                 with open("motor_degree.txt", "w") as file_status:
                     file_status.write(str(0))  # 更新第一个电机的角度
                 time.sleep(0.1)
                 break
 
-            if clog_flag2 == True:
+            if self.clog_flag2 == True:
                 print("!!!!!!!!!!!!!!!!clog forward for motor 2!!!!!!!!!!!!!!")
                 self.motor_stop2()  # 停止第二个电机
-                clog_flag2 = False
+                self.clog_flag2 = False
                 with open("motor_degree2.txt", "w") as file_status:
                     file_status.write(str(0))  # 更新第二个电机的角度
                 time.sleep(0.1)
@@ -779,7 +781,7 @@ class Motor:
         time.sleep(0.1)
 
     def motor_forward_together2_no_break(self, angle1=angle_def, angle2=angle_def2, total_speed=motor_speed):
-        global current_pos, clog_flag, current_pos2, clog_flag2, person_found_flag, roaming_stop_flag, last_angle1, last_angle2
+        global current_pos,  current_pos2,  person_found_flag, roaming_stop_flag, last_angle1, last_angle2
 
         print("angle_def1:", angle1)
         try:
@@ -830,19 +832,19 @@ class Motor:
                 self.motor_reverse2(total_speed)  # 控制第二个电机反转
 
             # 检查电机是否堵转
-            if clog_flag == True:
+            if self.clog_flag == True:
                 print("!!!!!!!!!!!!!!!!clog forward for motor 1!!!!!!!!!!!!!!")
                 self.motor_stop()  # 停止第一个电机
-                clog_flag = False
+                self.clog_flag = False
                 with open("motor_degree.txt", "w") as file_status:
                     file_status.write(str(0))  # 更新第一个电机的角度
                 time.sleep(0.1)
                 break
 
-            if clog_flag2 == True:
+            if self.clog_flag2 == True:
                 print("!!!!!!!!!!!!!!!!clog forward for motor 2!!!!!!!!!!!!!!")
                 self.motor_stop2()  # 停止第二个电机
-                clog_flag2 = False
+                self.clog_flag2 = False
                 with open("motor_degree2.txt", "w") as file_status:
                     file_status.write(str(0))  # 更新第二个电机的角度
                 time.sleep(0.1)
@@ -877,19 +879,19 @@ class Motor:
     #     time.sleep(1)
 
     def motor_forward_angle(self, angle=angle_def, speed=motor_speed):
-        global current_pos, clog_flag
+        global current_pos
         print("angle_def1:", angle)
         with open("motor_degree.txt", "r") as file_status:
             current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
         for i in range(angle):
             time.sleep(0.2)
             self.motor_forward(speed)  # 电机正转，速度50%
-            # print("clog_flag2:", clog_flag)
-            if clog_flag == True:
+            # print("self.clog_flag2:", self.clog_flag)
+            if self.clog_flag == True:
                 print("!!!!!!!!!!!!!!!!clog forward!!!!!!!!!!!!!!")
                 self.motor_stop()
 
-                clog_flag = False
+                self.clog_flag = False
                 with open("motor_degree.txt", "w") as file_status:
                     file_status.write(str(0))  # 更新文件
                 time.sleep(0.1)
@@ -906,19 +908,19 @@ class Motor:
         time.sleep(0.1)
 
     def motor_backward_angle(self, angle=angle_def, speed=motor_speed):
-        global current_pos, clog_flag
+        global current_pos
         print("angle_def2:", angle)
         with open("motor_degree.txt", "r") as file_status:
             current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
         for i in range(angle):
             time.sleep(0.2)
             self.motor_reverse(speed)  # 电机反转，速度50%
-            # print("clog_flag3:", clog_flag)
-            if clog_flag == True:
+            # print("self.clog_flag3:", self.clog_flag)
+            if self.clog_flag == True:
                 print("!!!!!!!!!!!!!!!!clog backward!!!!!!!!!!!!!!")
                 self.motor_stop()
 
-                clog_flag = False
+                self.clog_flag = False
 
                 with open("motor_degree.txt", "w") as file_status:
                     file_status.write(str(0))  # 更新文件
@@ -943,19 +945,19 @@ class Motor:
         return voltage
 
     def motor_forward_angle2(self, angle=angle_def2, speed=motor_speed2):
-        global current_pos2, clog_flag2
+        global current_pos2
         print("angle_def1:", angle)
         with open("motor_degree2.txt", "r") as file_status:
             current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
         for i in range(angle):
             time.sleep(0.2)
             self.motor_forward2(speed)  # 电机正转，速度50%
-            # print("clog_flag2:", clog_flag2)
-            if clog_flag2 == True:
+            # print("self.clog_flag2:", self.clog_flag2)
+            if self.clog_flag2 == True:
                 print("!!!!!!!!!!!!!!!!clog forward!!!!!!!!!!!!!!")
                 self.motor_stop2()
 
-                clog_flag2 = False
+                self.clog_flag2 = False
                 with open("motor_degree2.txt", "w") as file_status:
                     file_status.write(str(0))  # 更新文件
                 time.sleep(0.1)
@@ -972,19 +974,19 @@ class Motor:
         time.sleep(0.1)
 
     def motor_backward_angle2(self, angle=angle_def2, speed=motor_speed2):
-        global current_pos2, clog_flag2
+        global current_pos2
         print("angle_def2:", angle)
         with open("motor_degree2.txt", "r") as file_status:
             current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
         for i in range(angle):
             time.sleep(0.2)
             self.motor_reverse2(speed)  # 电机反转，速度50%
-            # print("clog_flag3:", clog_flag)
-            if clog_flag2 == True:
+            # print("self.clog_flag3:", self.clog_flag)
+            if self.clog_flag2 == True:
                 print("!!!!!!!!!!!!!!!!clog backward!!!!!!!!!!!!!!")
                 self.motor_stop2()
 
-                clog_flag2 = False
+                self.clog_flag2 = False
 
                 with open("motor_degree2.txt", "w") as file_status:
                     file_status.write(str(0))  # 更新文件
@@ -1024,11 +1026,8 @@ class Motor:
 
     current = 0
 
-    clog_flag = False
-    clog_flag2 = False
-
     def read_adc(self):
-        global current, clog_flag
+        global current
         current_values = []  # 用来存储电流值
         start_time = time.time()  # 记录开始时间
 
@@ -1054,11 +1053,11 @@ class Motor:
 
                     # 如果平均电流大于52mA，表示电机可能堵转
                     if avg_current > 42:
-                        clog_flag = True
-                        # print("clog_flag1:", clog_flag)
+                        self.clog_flag = True
+                        # print("self.clog_flag1:", self.clog_flag)
                         print("get clogged!")
                     # else:
-                    #     clog_flag = False
+                    #     self.clog_flag = False
 
                     # 清空电流列表，为下一秒准备
                     current_values.clear()
@@ -1069,13 +1068,13 @@ class Motor:
         except KeyboardInterrupt:
             print("程序已中断")
             # 在程序退出时可以检查最终的堵转标志
-            if clog_flag:
+            if self.clog_flag:
                 print("检测到电机堵转")
             else:
                 print("电机未堵转")
 
     def read_adc2(self):
-        global current2, clog_flag2
+        global current2
         current_values = []  # 用来存储电流值
         start_time = time.time()  # 记录开始时间
 
@@ -1101,11 +1100,11 @@ class Motor:
 
                     # 如果平均电流大于52mA，表示电机可能堵转
                     if avg_current > 42:
-                        clog_flag2 = True
-                        # print("clog_flag1:", clog_flag2)
+                        self.clog_flag2 = True
+                        # print("self.clog_flag1:", self.clog_flag2)
                         print("get clogged!")
                     # else:
-                    #     clog_flag2 = False
+                    #     self.clog_flag2 = False
 
                     # 清空电流列表，为下一秒准备
                     current_values.clear()
@@ -1116,13 +1115,13 @@ class Motor:
         except KeyboardInterrupt:
             print("程序已中断")
             # 在程序退出时可以检查最终的堵转标志
-            if clog_flag2:
+            if self.clog_flag2:
                 print("检测到电机堵转")
             else:
                 print("电机未堵转")
 
     def find_zero_pos(self):
-        global current, clog_flag
+        global current
         for i in range(1):
             print("enter find_zero_pos")
             # motor_forward_angle(20,100)
@@ -1132,7 +1131,7 @@ class Motor:
             self.motor_backward_angle(120, 100)
 
     def find_zero_pos2(self):
-        global current2, clog_flag2
+        global current2
         for i in range(1):
             print("enter find_zero_pos")
             # motor_forward_angle(20,100)
