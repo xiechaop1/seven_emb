@@ -7,11 +7,16 @@ import logging
 from base.ws import WebSocketClient
 from base.mic import Mic
 from base.audio_player import AudioPlayer
-from base.screen import Screen
 from config.config import Config
 if not Config.IS_DEBUG:
     from base.light import Light
     from base.spray import Spray
+
+if Config.OS is not None:
+    from base.screen_pi5 import Screen
+else:
+    from base.screen import Screen
+
 
 import os
 import cv2

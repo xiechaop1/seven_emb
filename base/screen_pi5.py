@@ -39,10 +39,13 @@ class Screen:
         self.clock = pygame.time.Clock()
         self.time_delta = self.clock.tick(30)
         self.running = True
-        self.mpv_player = mpv.MPV(log_handler=print)
-        self.mpv_player.vo = "gpu"
-        self.mpv_player.hwdec = "auto"
-        self.mpv_player.fullscreen = False
+        if Config.OS is not None:
+            if Config.OS == "pi5":
+                self.mpv_player = mpv.MPV(log_handler=print)
+                self.mpv_player.vo = "gpu"
+                self.mpv_player.hwdec = "v4l2m2m"
+                self.mpv_player.fps=30
+                self.mpv_player.fullscreen = False
 
 
     def add(self, video_path, times):
@@ -51,6 +54,9 @@ class Screen:
             "times": times
         })
         logging.info(f"Added video {video_path}")
+
+    def pause(self):
+        self.mpv_player.pause = True
 
     def clear_list(self):
         self.play_list = []
@@ -86,6 +92,7 @@ class Screen:
         self.stop()
         self.interrupt_event.set()
         self.running = True
+        self.play()
     # def playlist(self):
     #     for _, play_video in enumerate(self.play_list):
     #
@@ -97,6 +104,7 @@ class Screen:
 
     def play(self):
         self.stop()
+        self.mpv_player.pause = False
         ThreadingEvent.screen_daemon_event.set()
         self.interrupt_event.set()
         self.running = True
