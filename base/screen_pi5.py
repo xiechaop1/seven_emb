@@ -27,7 +27,7 @@ class Screen:
     def __init__(self):
 
         # self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-        self.screen = pygame.display.set_mode((640, 480))
+        self.screen = pygame.display.set_mode((640, 480), pygame.SCALED)
         self.manager = pygame_gui.UIManager((640, 480))
 
         self.screen_width, self.screen_height = self.screen.get_size()
@@ -43,7 +43,7 @@ class Screen:
             if Config.OS == "pi5":
                 self.mpv_player = mpv.MPV(log_handler=print)
                 self.mpv_player.vo = "gpu"
-                self.mpv_player.hwdec = "auto"
+                self.mpv_player.hwdec = "drm"
                 self.mpv_player.fps = 30
                 self.mpv_player.fullscreen = False
 
@@ -117,13 +117,13 @@ class Screen:
         font = pygame.freetype.SysFont("Arial", 80)
         font_color = (255, 255, 255)
         while True:
-            self.screen.fill((0, 0, 0, 0))  # ????
+            self.screen.fill((0, 0, 0, 0))
             now = datetime.datetime.now()
-            time_text = now.strftime("%H:%M")  # ??:??
-            date_text = now.strftime("%m-%d %A")  # ?-? ???
+            time_text = now.strftime("%H:%M")
+            date_text = now.strftime("%m-%d %A")
             font.render_to(self.screen, (self.screen_width // 3, self.screen_height // 3), time_text, font_color)
             font.render_to(self.screen, (self.screen_width // 3, self.screen_height // 3 + 100), date_text, font_color)
-            pygame.display.update()  # ????
+            pygame.display.update()
             time.sleep(1)
 
     def display(self, video_path, times):
