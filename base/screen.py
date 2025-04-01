@@ -39,10 +39,10 @@ class Screen:
         self.clock = pygame.time.Clock()
         self.time_delta = self.clock.tick(30)
         self.running = True
-        self.mpv_player = mpv.MPV(log_handler=print)
-        self.mpv_player.vo = "gpu"
-        self.mpv_player.hwdec = "auto"
-        self.mpv_player.fullscreen = False
+        # self.mpv_player = mpv.MPV(log_handler=print)
+        # self.mpv_player.vo = "gpu"
+        # self.mpv_player.hwdec = "auto"
+        # self.mpv_player.fullscreen = False
 
 
     def add(self, video_path, times):
@@ -124,10 +124,10 @@ class Screen:
         curr_times = 0
         font_large = pygame.font.Font(font_path, 50)  # 第一行：时间
         font_small = pygame.font.Font(font_path, 50)  # 第二行：日期
-        if Config.OS is not None:
-            if Config.OS == "pi5":
-                self.mpv_player.loop = times
-                self.mpv_player.play(video_path)
+        # if Config.OS is not None:
+        #     if Config.OS == "pi5":
+        #         self.mpv_player.loop = times
+        #         self.mpv_player.play(video_path)
         while self.running:
             if not self.interrupt_event.is_set():
                 break

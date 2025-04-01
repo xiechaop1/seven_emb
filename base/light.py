@@ -33,7 +33,7 @@ class Light:
     def __init__(self):
         # self.light_mode = ""
 
-
+        self.strip = None
         if Config.OS is not None:
             if Config.OS == "pi5":
                 self.strip = PixelStrip(self.LED_COUNT, self.LED_PIN, self.LED_FREQ_HZ, self.LED_DMA, self.LED_INVERT,
