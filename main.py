@@ -51,7 +51,7 @@ if len(sys.argv) > 1:
 
 if Config.IS_DEBUG == False:
     os.environ["SDL_AUDIODRIVER"] = "alsa"
-    os.environ["AUDIODEV"] = "hw:3,0"
+    os.environ["AUDIODEV"] = "hw:1,0"
     if Config.OS is not None:
         if Config.OS == "pi5":
             os.environ["AUDIODEV"] = "hw:2,0"
