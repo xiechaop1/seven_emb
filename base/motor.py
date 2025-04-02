@@ -1077,8 +1077,6 @@ class Motor:
                 # 添加当前电流值到列表
                 current_values.append(current)
 
-                # 打印电流值
-                print(f"电压: {voltage:.2f} V, 电流: {current:.2f} mA")
 
                 # 每秒读取一次
                 if time.time() - start_time >= 0.8:
@@ -1088,6 +1086,8 @@ class Motor:
 
                     # 如果平均电流大于52mA，表示电机可能堵转
                     if avg_current > self.BLOCK_ROTATION:
+                        # 打印电流值
+                        print(f"电压: {voltage:.2f} V, 电流: {current:.2f} mA")
                         self.clog_flag = True
                         # print("self.clog_flag1:", self.clog_flag)
                         print("get clogged!")
@@ -1124,9 +1124,6 @@ class Motor:
                 # 添加当前电流值到列表
                 current_values.append(current2)
 
-                # 打印电流值
-                print(f"电压2: {voltage:.2f} V, 电流2: {current2:.2f} mA")
-
                 # 每秒读取一次
                 if time.time() - start_time >= 0.8:
                     # 计算过去1秒的平均电流值
@@ -1135,6 +1132,8 @@ class Motor:
 
                     # 如果平均电流大于52mA，表示电机可能堵转
                     if avg_current > self.BLOCK_ROTATION:
+                        # 打印电流值
+                        print(f"电压2: {voltage:.2f} V, 电流2: {current2:.2f} mA")
                         self.clog_flag2 = True
                         # print("self.clog_flag1:", self.clog_flag2)
                         print("get clogged!")
