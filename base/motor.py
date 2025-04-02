@@ -14,6 +14,12 @@ import argparse
 from base.yolov5_lite import yolov5_lite
 import queue
 
+import adafruit ads1x15.ads1115 as ADS
+from adafruit ads1x15.analog in import AnalogIn
+import board
+import busio
+
+
 from common.threading_event import ThreadingEvent
 
 angle_def = 30
@@ -74,6 +80,8 @@ class Motor:
 
     def __init__(self):
         # 初始化ADS1115模块，选择I2C地址0x48（默认地址）
+        i2c = busio.I2C(board.SCL, board.SDA)
+        self.ads = ADS.ADS1115(i2c)
         self.adc = Adafruit_ADS1x15.ADS1115(address=0x48)
 
         # 设置增益（Gain）为1，适用于0-4.096V范围
@@ -139,6 +147,8 @@ class Motor:
         self.current_pos = 0
         self.current_pos2 = 0
 
+        self.motor_stop()
+        self.motor_stop2()
 
         # self.motor_forward_together2_no_break(50, 120, 100)
         # time.sleep(1)
@@ -978,6 +988,9 @@ class Motor:
 
         # 将读取的值转换为电压值（范围0-4.096V）
         voltage = value * 4.096 / 32768.0
+
+        chan = AnalogIn(self.ads, ADS.P0)
+        print(chan)
 
         return voltage
 
