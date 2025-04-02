@@ -38,6 +38,7 @@ class Motor:
     INA_PIN2 = 13  # 控制电机A的GPIO引脚
     INB_PIN2 = 12  # 控制电机B的GPIO引脚
 
+    BLOCK_ROTATION = 250        #(mA)
     # 延时函数
 
 
@@ -138,10 +139,15 @@ class Motor:
         self.current_pos = 0
         self.current_pos2 = 0
 
-        self.motor_forward_together2_no_break(50, 120, 100)
+        read_adc2_thread = threading.Thread(target=self.read_adc2)
+        read_adc2_thread.start()
+        read_adc_thread = threading.Thread(target=self.read_adc)
+        read_adc_thread.start()
+
+        # self.motor_forward_together2_no_break(50, 120, 100)
         # time.sleep(1)
         self.find_zero_pos()
-        self.motor_forward_together2_no_break(60, 0, 100)
+        # self.motor_forward_together2_no_break(60, 0, 100)
 
         parser = argparse.ArgumentParser()
         parser.add_argument('--imgpath', type=str,
@@ -187,10 +193,7 @@ class Motor:
     def start(self):
         run_keypoint_main_thread = threading.Thread(target=self.run_keypoint_main)
         run_keypoint_main_thread.start()
-        read_adc2_thread = threading.Thread(target=self.read_adc2)
-        read_adc2_thread.start()
-        read_adc_thread = threading.Thread(target=self.read_adc)
-        read_adc_thread.start()
+
         # find_zero_pos()
         # person_tracking(5,0,100)
         # time.sleep(10)
@@ -1083,7 +1086,7 @@ class Motor:
                     # print(f"avg_current: {avg_current:.2f} mA")
 
                     # 如果平均电流大于52mA，表示电机可能堵转
-                    if avg_current > 42:
+                    if avg_current > self.BLOCK_ROTATION:
                         self.clog_flag = True
                         # print("self.clog_flag1:", self.clog_flag)
                         print("get clogged!")
