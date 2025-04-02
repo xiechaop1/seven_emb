@@ -14,8 +14,8 @@ import argparse
 from base.yolov5_lite import yolov5_lite
 import queue
 
-import adafruit ads1x15.ads1115 as ADS
-from adafruit ads1x15.analog in import AnalogIn
+import adafruit_ads1x15.ads1115 as ADS
+from adafruit_ads1x15.analog_in import AnalogIn
 import board
 import busio
 
@@ -989,8 +989,7 @@ class Motor:
         # 将读取的值转换为电压值（范围0-4.096V）
         voltage = value * 4.096 / 32768.0
 
-        chan = AnalogIn(self.ads, ADS.P0)
-        print(chan)
+        print("{:>5}it{:>5.3f}".format(self.chan.value, self.chan.voltage))
 
         return voltage
 
@@ -1083,6 +1082,8 @@ class Motor:
         global current
         current_values = []  # 用来存储电流值
         start_time = time.time()  # 记录开始时间
+
+        self.chan = AnalogIn(self.ads, ADS.P0)
 
         try:
             while True:
