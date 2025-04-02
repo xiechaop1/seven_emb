@@ -135,6 +135,9 @@ class Motor:
         self.pwmINA2.start(0)  # 初始占空比0，即停止
         self.pwmINB2.start(0)  # 初始占空比0，即停止
 
+        self.current_pos = 0
+        self.current_pos2 = 0
+
         self.motor_forward_together2_no_break(50, 120, 100)
         # time.sleep(1)
         self.find_zero_pos()
@@ -165,10 +168,10 @@ class Motor:
         # time.sleep(4)
         # motor_forward2()
         # time.sleep(4)
-        with open("motor_degree.txt", "w") as file_status:
-            file_status.write(str(0))  # 更新第一个电机的角度
-        with open("motor_degree2.txt", "w") as file_status:
-            file_status.write(str(0))  # 更新第二个电机的角度
+        # with open("motor_degree.txt", "w") as file_status:
+        #     file_status.write(str(0))  # 更新第一个电机的角度
+        # with open("motor_degree2.txt", "w") as file_status:
+        #     file_status.write(str(0))  # 更新第二个电机的角度
 
         self.net = yolov5_lite(self, args.modelpath, args.classfile, confThreshold=args.confThreshold,
                           nmsThreshold=args.nmsThreshold)
@@ -218,12 +221,12 @@ class Motor:
 
     # 控制电机的函数
     def motor_forward(self, speed):
-        print("motor_forward")
+        # print("motor_forward")
         self.pwmINA.ChangeDutyCycle(speed)  # 设置电机A的占空比（控制电机正转速度）
         self.pwmINB.ChangeDutyCycle(0)  # 电机B保持不动
 
     def motor_reverse(self, speed):
-        print("motor_reverse")
+        # print("motor_reverse")
         self.pwmINA.ChangeDutyCycle(0)  # 电机A保持不动
         self.pwmINB.ChangeDutyCycle(speed)  # 设置电机B的占空比（控制电机反转速度）
 
@@ -233,14 +236,14 @@ class Motor:
 
     # 控制电机的函数
     def motor_forward2(self, speed):
-        print("motor_forward2")
+        # print("motor_forward2")
         self.pwmINA2.ChangeDutyCycle(speed)  # 设置电机A的占空比（控制电机正转速度）
         self.pwmINB2.ChangeDutyCycle(0)  # 电机B保持不动
         # GPIO.output(INA_PIN2, GPIO.HIGH)  # 电机A正转
         # GPIO.output(INB_PIN2, GPIO.LOW)   # 电机B停止
 
     def motor_reverse2(self, speed):
-        print("motor_reverse2")
+        # print("motor_reverse2")
         self.pwmINA2.ChangeDutyCycle(0)  # 电机A保持不动
         self.pwmINB2.ChangeDutyCycle(speed)  # 设置电机B的占空比（控制电机反转速度）
         # GPIO.output(INA_PIN2, GPIO.LOW)  # 电机A停止
@@ -499,12 +502,12 @@ class Motor:
         global current_pos,  current_pos2,  person_found_flag, roaming_stop_flag, last_angle1, last_angle2
 
         print("angle_def1:", angle1)
-        with open("motor_degree.txt", "r") as file_status:
-            current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
-
-        print("angle_def2:", angle2)
-        with open("motor_degree2.txt", "r") as file_status:
-            current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+        # with open("motor_degree.txt", "r") as file_status:
+        #     current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+        #
+        # print("angle_def2:", angle2)
+        # with open("motor_degree2.txt", "r") as file_status:
+        #     current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
 
         # 计算勾股定理中的斜边长度
         # hypotenuse = math.sqrt(angle1**2 + angle2**2)
@@ -547,8 +550,9 @@ class Motor:
                 print("!!!!!!!!!!!!!!!!clog forward for motor 1!!!!!!!!!!!!!!")
                 self.motor_stop()  # 停止第一个电机
                 self.clog_flag = False
-                with open("motor_degree.txt", "w") as file_status:
-                    file_status.write(str(0))  # 更新第一个电机的角度
+                self.current_pos = 0
+                # with open("motor_degree.txt", "w") as file_status:
+                #     file_status.write(str(0))  # 更新第一个电机的角度
                 time.sleep(0.1)
                 break
 
@@ -556,21 +560,24 @@ class Motor:
                 print("!!!!!!!!!!!!!!!!clog forward for motor 2!!!!!!!!!!!!!!")
                 self.motor_stop2()  # 停止第二个电机
                 self.clog_flag2 = False
-                with open("motor_degree2.txt", "w") as file_status:
-                    file_status.write(str(0))  # 更新第二个电机的角度
+                self.current_pos2 = 0
+                # with open("motor_degree2.txt", "w") as file_status:
+                #     file_status.write(str(0))  # 更新第二个电机的角度
                 time.sleep(0.1)
                 break
 
             # 更新电机角度
-            with open("motor_degree.txt", "w") as file_status:
-                current_pos = current_pos + 1
-                print("current_pos+:", current_pos)
-                file_status.write(str(current_pos))  # 更新第一个电机角度
-
-            with open("motor_degree2.txt", "w") as file_status:
-                current_pos2 = current_pos2 + 1
-                print("current_pos2+:", current_pos2)
-                file_status.write(str(current_pos2))  # 更新第二个电机角度
+            self.current_pos = self.current_pos + 1
+            self.current_pos2= self.current_pos2 + 1
+            # with open("motor_degree.txt", "w") as file_status:
+            #     current_pos = current_pos + 1
+            #     print("current_pos+:", current_pos)
+            #     file_status.write(str(current_pos))  # 更新第一个电机角度
+            #
+            # with open("motor_degree2.txt", "w") as file_status:
+            #     current_pos2 = current_pos2 + 1
+            #     print("current_pos2+:", current_pos2)
+            #     file_status.write(str(current_pos2))  # 更新第二个电机角度
 
         print("电机forward停止")
         self.motor_stop()  # 停止第一个电机
@@ -709,12 +716,12 @@ class Motor:
         global current_pos,  current_pos2,  person_found_flag, roaming_stop_flag, last_angle1, last_angle2
 
         print("angle_def1:", angle1)
-        with open("motor_degree.txt", "r") as file_status:
-            current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+        # with open("motor_degree.txt", "r") as file_status:
+        #     current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
 
         print("angle_def2:", angle2)
-        with open("motor_degree2.txt", "r") as file_status:
-            current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+        # with open("motor_degree2.txt", "r") as file_status:
+        #     current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
 
         # 计算勾股定理中的斜边长度
         hypotenuse = math.sqrt(angle1 ** 2 + angle2 ** 2)
@@ -755,8 +762,9 @@ class Motor:
                 print("!!!!!!!!!!!!!!!!clog forward for motor 1!!!!!!!!!!!!!!")
                 self.motor_stop()  # 停止第一个电机
                 self.clog_flag = False
-                with open("motor_degree.txt", "w") as file_status:
-                    file_status.write(str(0))  # 更新第一个电机的角度
+                self.current_pos = 0
+                # with open("motor_degree.txt", "w") as file_status:
+                #     file_status.write(str(0))  # 更新第一个电机的角度
                 time.sleep(0.1)
                 break
 
@@ -764,21 +772,24 @@ class Motor:
                 print("!!!!!!!!!!!!!!!!clog forward for motor 2!!!!!!!!!!!!!!")
                 self.motor_stop2()  # 停止第二个电机
                 self.clog_flag2 = False
-                with open("motor_degree2.txt", "w") as file_status:
-                    file_status.write(str(0))  # 更新第二个电机的角度
+                self.current_pos2 = 0
+                # with open("motor_degree2.txt", "w") as file_status:
+                #     file_status.write(str(0))  # 更新第二个电机的角度
                 time.sleep(0.1)
                 break
 
             # 更新电机角度
-            with open("motor_degree.txt", "w") as file_status:
-                current_pos = current_pos + 1
-                print("current_pos+:", current_pos)
-                file_status.write(str(current_pos))  # 更新第一个电机角度
-
-            with open("motor_degree2.txt", "w") as file_status:
-                current_pos2 = current_pos2 + 1
-                print("current_pos2+:", current_pos2)
-                file_status.write(str(current_pos2))  # 更新第二个电机角度
+            self.current_pos = self.current_pos + 1
+            self.current_pos2 = self.current_pos2 + 1
+            # with open("motor_degree.txt", "w") as file_status:
+            #     current_pos = current_pos + 1
+            #     print("current_pos+:", current_pos)
+            #     file_status.write(str(current_pos))  # 更新第一个电机角度
+            #
+            # with open("motor_degree2.txt", "w") as file_status:
+            #     current_pos2 = current_pos2 + 1
+            #     print("current_pos2+:", current_pos2)
+            #     file_status.write(str(current_pos2))  # 更新第二个电机角度
 
         print("电机forward停止")
         self.motor_stop()  # 停止第一个电机
@@ -790,19 +801,22 @@ class Motor:
 
         print("init no break")
         print("angle_def1:", angle1)
-        try:
-            with open("motor_degree.txt", "r") as file_status:
-                current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
-                current_pos = int(current_pos) if current_pos else 0  # 若为空，则默认赋值为 0
-        except (ValueError, FileNotFoundError):
-            current_pos = 0  #
-        print("angle_def2:", angle2)
-        try:
-            with open("motor_degree2.txt", "r") as file_status2:
-                current_pos2 = int(file_status2.read().strip())  # 读取并去除任何多余的空白字符
-                current_pos2 = int(current_pos2) if current_pos2 else 0  # 若为空，则默认赋值为 0
-        except (ValueError, FileNotFoundError):
-            current_pos2 = 0  #
+        # try:
+        #     with open("motor_degree.txt", "r") as file_status:
+        #         current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+        #         current_pos = int(current_pos) if current_pos else 0  # 若为空，则默认赋值为 0
+        # except (ValueError, FileNotFoundError):
+        #     current_pos = 0  #
+        # print("angle_def2:", angle2)
+        # try:
+        #     with open("motor_degree2.txt", "r") as file_status2:
+        #         current_pos2 = int(file_status2.read().strip())  # 读取并去除任何多余的空白字符
+        #         current_pos2 = int(current_pos2) if current_pos2 else 0  # 若为空，则默认赋值为 0
+        # except (ValueError, FileNotFoundError):
+        #     current_pos2 = 0
+        #
+
+        #     #
         # 计算勾股定理中的斜边长度
         # hypotenuse = math.sqrt(angle1**2 + angle2**2)
         #
@@ -842,8 +856,9 @@ class Motor:
                 print("!!!!!!!!!!!!!!!!clog forward for motor 1!!!!!!!!!!!!!!")
                 self.motor_stop()  # 停止第一个电机
                 self.clog_flag = False
-                with open("motor_degree.txt", "w") as file_status:
-                    file_status.write(str(0))  # 更新第一个电机的角度
+                # with open("motor_degree.txt", "w") as file_status:
+                #     file_status.write(str(0))  # 更新第一个电机的角度
+                self.current_pos = 0
                 time.sleep(0.1)
                 break
 
@@ -851,21 +866,24 @@ class Motor:
                 print("!!!!!!!!!!!!!!!!clog forward for motor 2!!!!!!!!!!!!!!")
                 self.motor_stop2()  # 停止第二个电机
                 self.clog_flag2 = False
-                with open("motor_degree2.txt", "w") as file_status:
-                    file_status.write(str(0))  # 更新第二个电机的角度
+                # with open("motor_degree2.txt", "w") as file_status:
+                #     file_status.write(str(0))  # 更新第二个电机的角度
+                self.current_pos2 = 0
                 time.sleep(0.1)
                 break
 
             # 更新电机角度
-            with open("motor_degree.txt", "w") as file_status:
-                current_pos = current_pos + 1
+            self.current_pos = self.current_pos + 1
+            self.current_pos2 = self.current_pos2 + 1
+            # with open("motor_degree.txt", "w") as file_status:
+                # current_pos = current_pos + 1
                 # print("current_pos+:", current_pos)
-                file_status.write(str(current_pos))  # 更新第一个电机角度
+                # file_status.write(str(current_pos))  # 更新第一个电机角度
 
-            with open("motor_degree2.txt", "w") as file_status:
-                current_pos2 = current_pos2 + 1
-                # print("current_pos2+:", current_pos2)
-                file_status.write(str(current_pos2))  # 更新第二个电机角度
+            # with open("motor_degree2.txt", "w") as file_status:
+            #     current_pos2 = current_pos2 + 1
+            #     # print("current_pos2+:", current_pos2)
+            #     file_status.write(str(current_pos2))  # 更新第二个电机角度
 
         print("电机forward停止")
         self.motor_stop()  # 停止第一个电机
@@ -887,8 +905,8 @@ class Motor:
     def motor_forward_angle(self, angle=angle_def, speed=motor_speed):
         global current_pos
         print("angle_def1:", angle)
-        with open("motor_degree.txt", "r") as file_status:
-            current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+        # with open("motor_degree.txt", "r") as file_status:
+        #     current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
         for i in range(angle):
             time.sleep(0.2)
             self.motor_forward(speed)  # 电机正转，速度50%
@@ -898,16 +916,19 @@ class Motor:
                 self.motor_stop()
 
                 self.clog_flag = False
-                with open("motor_degree.txt", "w") as file_status:
-                    file_status.write(str(0))  # 更新文件
+                self.current_pos = 0
+                # with open("motor_degree.txt", "w") as file_status:
+                #     file_status.write(str(0))  # 更新文件
                 time.sleep(0.1)
                 break
 
-            with open("motor_degree.txt", "w") as file_status:
-
-                current_pos = current_pos + 1
-                print("current_pos+:", current_pos)
-                file_status.write(str(current_pos))  # 更新文件
+            self.current_pos = self.current_pos + 1
+            self.current_pos2 = self.current_pos2 + 1
+            # with open("motor_degree.txt", "w") as file_status:
+            #
+            #     current_pos = current_pos + 1
+            #     # print("current_pos+:", current_pos)
+            #     file_status.write(str(current_pos))  # 更新文件
 
         print("电机forward停止")
         self.motor_stop()  # 停止电机
@@ -916,8 +937,8 @@ class Motor:
     def motor_backward_angle(self, angle=angle_def, speed=motor_speed):
         global current_pos
         print("angle_def2:", angle)
-        with open("motor_degree.txt", "r") as file_status:
-            current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+        # with open("motor_degree.txt", "r") as file_status:
+        #     current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
         for i in range(angle):
             time.sleep(0.2)
             self.motor_reverse(speed)  # 电机反转，速度50%
@@ -927,15 +948,16 @@ class Motor:
                 self.motor_stop()
 
                 self.clog_flag = False
-
-                with open("motor_degree.txt", "w") as file_status:
-                    file_status.write(str(0))  # 更新文件
+                self.current_pos = 0
+                # with open("motor_degree.txt", "w") as file_status:
+                #     file_status.write(str(0))  # 更新文件
                 time.sleep(0.1)
                 break
-            with open("motor_degree.txt", "w") as file_status:
-                current_pos = current_pos - 1
-                print("current_pos-:", current_pos)
-                file_status.write(str(current_pos))  # 更新文件
+            self.current_pos = self.current_pos - 1
+            # with open("motor_degree.txt", "w") as file_status:
+            #     current_pos = current_pos - 1
+            #     # print("current_pos-:", current_pos)
+            #     file_status.write(str(current_pos))  # 更新文件
 
         print("电机backward停止")
         self.motor_stop()  # 停止电机
@@ -953,8 +975,8 @@ class Motor:
     def motor_forward_angle2(self, angle=angle_def2, speed=motor_speed2):
         global current_pos2
         print("angle_def1:", angle)
-        with open("motor_degree2.txt", "r") as file_status:
-            current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+        # with open("motor_degree2.txt", "r") as file_status:
+        #     current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
         for i in range(angle):
             time.sleep(0.2)
             self.motor_forward2(speed)  # 电机正转，速度50%
@@ -964,16 +986,17 @@ class Motor:
                 self.motor_stop2()
 
                 self.clog_flag2 = False
-                with open("motor_degree2.txt", "w") as file_status:
-                    file_status.write(str(0))  # 更新文件
+                self.current_pos2 = 0
+                # with open("motor_degree2.txt", "w") as file_status:
+                #     file_status.write(str(0))  # 更新文件
                 time.sleep(0.1)
                 break
-
-            with open("motor_degree2.txt", "w") as file_status:
-
-                current_pos2 = current_pos2 + 1
-                print("current_pos2+:", current_pos2)
-                file_status.write(str(current_pos2))  # 更新文件
+            self.current_pos2 = self.current_pos2 + 1
+            # with open("motor_degree2.txt", "w") as file_status:
+            #
+            #     current_pos2 = current_pos2 + 1
+            #     print("current_pos2+:", current_pos2)
+            #     file_status.write(str(current_pos2))  # 更新文件
 
         print("电机forward停止")
         self.motor_stop2()  # 停止电机
@@ -982,8 +1005,8 @@ class Motor:
     def motor_backward_angle2(self, angle=angle_def2, speed=motor_speed2):
         global current_pos2
         print("angle_def2:", angle)
-        with open("motor_degree2.txt", "r") as file_status:
-            current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+        # with open("motor_degree2.txt", "r") as file_status:
+        #     current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
         for i in range(angle):
             time.sleep(0.2)
             self.motor_reverse2(speed)  # 电机反转，速度50%
@@ -993,15 +1016,17 @@ class Motor:
                 self.motor_stop2()
 
                 self.clog_flag2 = False
+                self.current_pos2 = 0
 
-                with open("motor_degree2.txt", "w") as file_status:
-                    file_status.write(str(0))  # 更新文件
+                # with open("motor_degree2.txt", "w") as file_status:
+                #     file_status.write(str(0))  # 更新文件
                 time.sleep(0.1)
                 break
-            with open("motor_degree2.txt", "w") as file_status:
-                current_pos2 = current_pos2 - 1
-                print("current_pos2-:", current_pos2)
-                file_status.write(str(current_pos2))  # 更新文件
+            self.current_pos2 = self.current_pos2 - 1
+            # with open("motor_degree2.txt", "w") as file_status:
+            #     current_pos2 = current_pos2 - 1
+            #     print("current_pos2-:", current_pos2)
+            #     file_status.write(str(current_pos2))  # 更新文件
 
         print("电机backward停止")
         self.motor_stop2()  # 停止电机
