@@ -38,7 +38,7 @@ class Motor:
     INA_PIN2 = 13  # 控制电机A的GPIO引脚
     INB_PIN2 = 12  # 控制电机B的GPIO引脚
 
-    BLOCK_ROTATION = 250        #(mA)
+    BLOCK_ROTATION = 360        #(mA)
     # 延时函数
 
 
@@ -145,15 +145,20 @@ class Motor:
         self.find_zero_pos()
         # self.motor_forward_together2_no_break(60, 0, 100)
 
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--imgpath', type=str,
-                            default='utils/YOLOv5-Lite/python_demo/onnxruntime/bus.jpg', help="image path")
-        parser.add_argument('--modelpath', type=str, default='utils/YOLOv5-Lite/models/v5lite-e.onnx',
-                            help="onnx filepath")
-        parser.add_argument('--classfile', type=str, default='coco.names', help="classname filepath")
-        parser.add_argument('--confThreshold', default=0.5, type=float, help='class confidence')
-        parser.add_argument('--nmsThreshold', default=0.6, type=float, help='nms iou thresh')
-        args = parser.parse_args()
+        # parser = argparse.ArgumentParser()
+        # parser.add_argument('--imgpath', type=str,
+        #                     default='../utils/YOLOv5-Lite/python_demo/onnxruntime/bus.jpg', help="image path")
+        # parser.add_argument('--modelpath', type=str, default='../utils/YOLOv5-Lite/models/v5lite-e.onnx',
+        #                     help="onnx filepath")
+        # parser.add_argument('--classfile', type=str, default='coco.names', help="classname filepath")
+        # parser.add_argument('--confThreshold', default=0.5, type=float, help='class confidence')
+        # parser.add_argument('--nmsThreshold', default=0.6, type=float, help='nms iou thresh')
+        # args = parser.parse_args()
+        modelpath = "utils/YOLOv5-Lite/models/v5lite-e.onnx"
+        classfile = "coco.names"
+        confThreshold = 0.5
+        nmsThreshold = 0.6
+        imgpath = "utils/YOLOv5-Lite/python_demo/onnxruntime/bus.jpg"
 
         read_adc2_thread = threading.Thread(target=self.read_adc2)
         read_adc2_thread.start()
@@ -180,8 +185,8 @@ class Motor:
         # with open("motor_degree2.txt", "w") as file_status:
         #     file_status.write(str(0))  # 更新第二个电机的角度
 
-        self.net = yolov5_lite(self, args.modelpath, args.classfile, confThreshold=args.confThreshold,
-                          nmsThreshold=args.nmsThreshold)
+        self.net = yolov5_lite(self, modelpath, classfile, confThreshold=confThreshold,
+                          nmsThreshold=nmsThreshold)
 
         # 载入 MoveNet 模型
         # model_path = '/home/li/Downloads/Pose-detection/lite-model_movenet_singlepose_lightning_3.tflite'
