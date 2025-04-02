@@ -142,6 +142,11 @@ class Motor:
 
         # self.motor_forward_together2_no_break(50, 120, 100)
         # time.sleep(1)
+        read_adc2_thread = threading.Thread(target=self.read_adc2)
+        read_adc2_thread.start()
+        read_adc_thread = threading.Thread(target=self.read_adc)
+        read_adc_thread.start()
+
         self.find_zero_pos()
         # self.motor_forward_together2_no_break(60, 0, 100)
 
@@ -159,11 +164,6 @@ class Motor:
         confThreshold = 0.5
         nmsThreshold = 0.6
         imgpath = "utils/YOLOv5-Lite/python_demo/onnxruntime/bus.jpg"
-
-        read_adc2_thread = threading.Thread(target=self.read_adc2)
-        read_adc2_thread.start()
-        read_adc_thread = threading.Thread(target=self.read_adc)
-        read_adc_thread.start()
 
         # motor_forward_together2_no_break(30, 0, 100)
         # print("f1")
