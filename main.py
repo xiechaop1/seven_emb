@@ -29,6 +29,7 @@ from model.daemon import Daemon
 from common.code import Code
 import pygame
 import sys
+import argparse
 from model.undertake_callback import UndertakeCallback
 import asyncio
 
@@ -44,9 +45,14 @@ from model.execute_command import ExecuteCommand
 #     ws = await client.create_websocket_client(websocket_url)  # ✅ 连接 WebSocket
 #     if ws:  # 连接成功
 #         return ws
-exec_tag = None
-if len(sys.argv) > 1:
-    exec_tag = sys.argv[1]
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--mode', default="", type=str, help='demo mode without screen')
+args = parser.parse_args()
+
+# exec_tag = None
+# if len(sys.argv) > 1:
+#     exec_tag = sys.argv[1]
 
 
 if Config.IS_DEBUG == False:
@@ -122,7 +128,7 @@ if __name__ == "__main__":
     audio_play_thread.start()
     logging.info("audio is ready")
 
-    if exec_tag != "demo":
+    if args.mode != "demo":
         screen_instance = Screen()
         screen_instance.add("resources/video/main.mp4", 100)
         screen_thread = threading.Thread(target=screen_instance.daemon)
