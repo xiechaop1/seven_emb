@@ -989,7 +989,10 @@ class Motor:
         # 将读取的值转换为电压值（范围0-4.096V）
         voltage = value * 4.096 / 32768.0
 
-        print("{:>5}it{:>5.3f}".format(self.chan.value, self.chan.voltage))
+        # print("{:>5}it{:>5.3f}".format(self.chan.value, self.chan.voltage))
+        diff = self.ads.read_adc_difference(2, gain=self.GAIN)
+
+        print("diff:", diff)
 
         return voltage
 
