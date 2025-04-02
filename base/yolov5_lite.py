@@ -5,7 +5,7 @@ import onnxruntime as ort
 import math
 
 class yolov5_lite():
-    def __init__(self, model_pb_path, label_path, confThreshold=0.5, nmsThreshold=0.5,objThreshold=0.5):
+    def __init__(self, moter_handler, model_pb_path, label_path, confThreshold=0.5, nmsThreshold=0.5,objThreshold=0.5):
         so = ort.SessionOptions()
         so.log_severity_level = 3
         self.net = ort.InferenceSession(model_pb_path, so)
@@ -22,6 +22,9 @@ class yolov5_lite():
         self.nmsThreshold = nmsThreshold
         self.objThreshold = objThreshold
         self.input_shape = (self.net.get_inputs()[0].shape[2], self.net.get_inputs()[0].shape[3])
+
+        self.MAX_DISTANCE = 60
+        self.moter_handler = moter_handler
 
     def letterBox(self, srcimg, keep_ratio=True):
         top, left, newh, neww = 0, 0, self.input_shape[0], self.input_shape[1]
@@ -114,7 +117,7 @@ class yolov5_lite():
                         print(
                             f"delta_x: {abs(current_center[0] - prev_center[0])}, delta_y: {abs(current_center[1] - prev_center[1])}, distance: {distance}")
 
-                        if distance < MAX_DISTANCE:  # 如果两个人的距离小于阈值
+                        if distance < self.MAX_DISTANCE:  # 如果两个人的距离小于阈值
                             matched = True
                             break
 
@@ -129,8 +132,8 @@ class yolov5_lite():
                     area = width * height
                     print(f"Person {person_count} Area: {area} pixels")
                     print("person_found_flag:",person_found_flag)
-                    motor_stop()  # 停止第一个电机
-                    motor_stop2()  # 停止第二个电机
+                    self.moter_handler.motor_stop()  # 停止第一个电机
+                    self.moter_handler.motor_stop2()  # 停止第二个电机
                     time.sleep(0.05)
                     roaming_stop_flag = True
                     if area>0:

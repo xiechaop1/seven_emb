@@ -142,8 +142,8 @@ class Motor:
 
         parser = argparse.ArgumentParser()
         parser.add_argument('--imgpath', type=str,
-                            default='resource/motorarm/YOLOv5-Lite/python_demo/onnxruntime/bus.jpg', help="image path")
-        parser.add_argument('--modelpath', type=str, default='resource/motorarm/YOLOv5-Lite/models/v5lite-e.onnx',
+                            default='utils/YOLOv5-Lite/python_demo/onnxruntime/bus.jpg', help="image path")
+        parser.add_argument('--modelpath', type=str, default='utils/YOLOv5-Lite/models/v5lite-e.onnx',
                             help="onnx filepath")
         parser.add_argument('--classfile', type=str, default='coco.names', help="classname filepath")
         parser.add_argument('--confThreshold', default=0.5, type=float, help='class confidence')
@@ -170,7 +170,7 @@ class Motor:
         with open("motor_degree2.txt", "w") as file_status:
             file_status.write(str(0))  # 更新第二个电机的角度
 
-        self.net = yolov5_lite(args.modelpath, args.classfile, confThreshold=args.confThreshold,
+        self.net = yolov5_lite(self, args.modelpath, args.classfile, confThreshold=args.confThreshold,
                           nmsThreshold=args.nmsThreshold)
 
         # 载入 MoveNet 模型
@@ -303,7 +303,7 @@ class Motor:
         img_resized = cv2.resize(img, (192, 192))
         img_resized = np.expand_dims(img_resized, axis=0)
         input_image = tf.cast(img_resized, dtype=tf.float32)
-        model_path = 'resource/motorarm/Pose-detection/lite-model_movenet_singlepose_lightning_3.tflite'
+        model_path = 'utils/Pose-detection/lite-model_movenet_singlepose_lightning_3.tflite'
         interpreter = tf.lite.Interpreter(model_path=model_path)
         interpreter.allocate_tensors()
         # 执行推理
