@@ -139,10 +139,6 @@ class Motor:
         self.current_pos = 0
         self.current_pos2 = 0
 
-        read_adc2_thread = threading.Thread(target=self.read_adc2)
-        read_adc2_thread.start()
-        read_adc_thread = threading.Thread(target=self.read_adc)
-        read_adc_thread.start()
 
         # self.motor_forward_together2_no_break(50, 120, 100)
         # time.sleep(1)
@@ -159,6 +155,11 @@ class Motor:
         parser.add_argument('--nmsThreshold', default=0.6, type=float, help='nms iou thresh')
         args = parser.parse_args()
 
+        read_adc2_thread = threading.Thread(target=self.read_adc2)
+        read_adc2_thread.start()
+        read_adc_thread = threading.Thread(target=self.read_adc)
+        read_adc_thread.start()
+g
         # motor_forward_together2_no_break(30, 0, 100)
         # print("f1")
         # motor_forward_together2_no_break(0, -20, 100)
