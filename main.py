@@ -132,6 +132,7 @@ if __name__ == "__main__":
         screen_instance = None
 
     motor_instance = Motor()
+    motor_instance.start()
 
     # screen = Screen()
     # screen.display("resources/video/think.mp4")

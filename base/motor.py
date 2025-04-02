@@ -181,6 +181,7 @@ class Motor:
         # 打开摄像头
         self.cap = cv2.VideoCapture(0)  # 摄像头索引，0表示默认摄像头
 
+    def start(self):
         run_keypoint_main_thread = threading.Thread(target=self.run_keypoint_main)
         run_keypoint_main_thread.start()
         read_adc2_thread = threading.Thread(target=self.read_adc2)
@@ -217,10 +218,12 @@ class Motor:
 
     # 控制电机的函数
     def motor_forward(self, speed):
+        print("motor_forward")
         self.pwmINA.ChangeDutyCycle(speed)  # 设置电机A的占空比（控制电机正转速度）
         self.pwmINB.ChangeDutyCycle(0)  # 电机B保持不动
 
     def motor_reverse(self, speed):
+        print("motor_reverse")
         self.pwmINA.ChangeDutyCycle(0)  # 电机A保持不动
         self.pwmINB.ChangeDutyCycle(speed)  # 设置电机B的占空比（控制电机反转速度）
 
@@ -230,12 +233,14 @@ class Motor:
 
     # 控制电机的函数
     def motor_forward2(self, speed):
+        print("motor_forward2")
         self.pwmINA2.ChangeDutyCycle(speed)  # 设置电机A的占空比（控制电机正转速度）
         self.pwmINB2.ChangeDutyCycle(0)  # 电机B保持不动
         # GPIO.output(INA_PIN2, GPIO.HIGH)  # 电机A正转
         # GPIO.output(INB_PIN2, GPIO.LOW)   # 电机B停止
 
     def motor_reverse2(self, speed):
+        print("motor_reverse2")
         self.pwmINA2.ChangeDutyCycle(0)  # 电机A保持不动
         self.pwmINB2.ChangeDutyCycle(speed)  # 设置电机B的占空比（控制电机反转速度）
         # GPIO.output(INA_PIN2, GPIO.LOW)  # 电机A停止
@@ -783,6 +788,7 @@ class Motor:
     def motor_forward_together2_no_break(self, angle1=angle_def, angle2=angle_def2, total_speed=motor_speed):
         global current_pos,  current_pos2,  person_found_flag, roaming_stop_flag, last_angle1, last_angle2
 
+        print("init no break")
         print("angle_def1:", angle1)
         try:
             with open("motor_degree.txt", "r") as file_status:
@@ -853,12 +859,12 @@ class Motor:
             # 更新电机角度
             with open("motor_degree.txt", "w") as file_status:
                 current_pos = current_pos + 1
-                print("current_pos+:", current_pos)
+                # print("current_pos+:", current_pos)
                 file_status.write(str(current_pos))  # 更新第一个电机角度
 
             with open("motor_degree2.txt", "w") as file_status:
                 current_pos2 = current_pos2 + 1
-                print("current_pos2+:", current_pos2)
+                # print("current_pos2+:", current_pos2)
                 file_status.write(str(current_pos2))  # 更新第二个电机角度
 
         print("电机forward停止")
