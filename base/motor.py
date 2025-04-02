@@ -44,7 +44,7 @@ class Motor:
     INA_PIN2 = 13  # 控制电机A的GPIO引脚
     INB_PIN2 = 12  # 控制电机B的GPIO引脚
 
-    BLOCK_ROTATION = 360        #(mA)
+    BLOCK_ROTATION = 3600        #(mA)
     # 延时函数
 
 
@@ -149,6 +149,7 @@ class Motor:
 
         self.motor_stop()
         self.motor_stop2()
+        print("stoping motor")
 
         # self.motor_forward_together2_no_break(50, 120, 100)
         # time.sleep(1)
@@ -157,6 +158,10 @@ class Motor:
         read_adc_thread = threading.Thread(target=self.read_adc)
         read_adc_thread.start()
 
+        self.motor_forward_together2_no_break(0, -120, 100)
+        self.motor_stop2()
+        print("stop2")
+        time.sleep(100)
         self.find_zero_pos()
         # self.motor_forward_together2_no_break(60, 0, 100)
 
