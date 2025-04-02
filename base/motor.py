@@ -1134,7 +1134,7 @@ class Motor:
                     # print(f"avg_current: {avg_current:.2f} mA")
 
                     # 如果平均电流大于52mA，表示电机可能堵转
-                    if avg_current > 42:
+                    if avg_current > self.BLOCK_ROTATION:
                         self.clog_flag2 = True
                         # print("self.clog_flag1:", self.clog_flag2)
                         print("get clogged!")
