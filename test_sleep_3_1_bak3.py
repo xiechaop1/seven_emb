@@ -1612,7 +1612,8 @@ def motor_backward_angle(angle=angle_def,speed=motor_speed):
     time.sleep(0.1)
 def read_voltage():
     # 读取 A0 引脚上的电压值，返回一个值范围在-32768 到 32767之间
-    value = adc.read_adc(2, gain=GAIN)
+    value = adc.read_adc(0, gain=GAIN)
+    # value = adc.read_adc(2, gain=GAIN)
 
     # 将读取的值转换为电压值（范围0-4.096V）
     voltage = value * 4.096 / 32768.0
@@ -1693,7 +1694,8 @@ def motor_backward_angle2(angle=angle_def2,speed=motor_speed2):
 
 def read_voltage2():
     # 读取 A0 引脚上的电压值，返回一个值范围在-32768 到 32767之间
-    value = adc.read_adc(0, gain=GAIN)
+    value = adc.read_adc(1, gain=GAIN)
+    # value = adc.read_adc(0, gain=GAIN)
 
     # 将读取的值转换为电压值（范围0-4.096V）
     voltage = value * 4.096 / 32768.0

@@ -1103,7 +1103,7 @@ class Motor:
                     current_values.clear()
                     start_time = time.time()  # 重置时间
 
-                time.sleep(0.05)  # 每50毫秒读取一次电流
+                time.sleep(0.02)  # 每50毫秒读取一次电流
 
         except KeyboardInterrupt:
             print("程序已中断")
@@ -1149,7 +1149,7 @@ class Motor:
                     current_values.clear()
                     start_time = time.time()  # 重置时间
 
-                time.sleep(0.05)  # 每50毫秒读取一次电流
+                time.sleep(0.02)  # 每50毫秒读取一次电流
 
         except KeyboardInterrupt:
             print("程序已中断")
