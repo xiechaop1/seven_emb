@@ -41,7 +41,7 @@ class Spray:
     def turn_off(self):
         GPIO.output(self.SPRAY_PIN, GPIO.LOW)
 
-    def shoot(self, times = 3, wait_time = 30):
+    def shoot(self, times = 4, wait_time = 30):
         for i in range(times):
             for j in range(3):
                 GPIO.output(self.SPRAY_PIN, GPIO.HIGH)
