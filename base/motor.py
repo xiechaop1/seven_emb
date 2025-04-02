@@ -160,7 +160,7 @@ class Motor:
         # parser.add_argument('--nmsThreshold', default=0.6, type=float, help='nms iou thresh')
         # args = parser.parse_args()
         modelpath = "utils/YOLOv5-Lite/models/v5lite-e.onnx"
-        classfile = "coco.names"
+        classfile = "utils/YOLOv5-Lite/python_demo/onnxruntime/coco.names"
         confThreshold = 0.5
         nmsThreshold = 0.6
         imgpath = "utils/YOLOv5-Lite/python_demo/onnxruntime/bus.jpg"
@@ -309,7 +309,7 @@ class Motor:
     img_share = None
 
     def yolo_run(self, img, done_event):
-        global person_found_flag
+        # global person_found_flag
         # 直接在 img 上绘制 YOLO 检测结果（假设 net.detect 返回绘制了人体框的图像）
         img[:] = self.net.detect(img)  # 注意：net.detect 需要直接修改 img
         done_event.set()  # 标记 YOLO 处理完成
@@ -342,7 +342,7 @@ class Motor:
         done_event.set()  # 标记 MoveNet 处理完成
 
     def run_keypoint_main(self):
-        global person_found_flag, all_keypoints
+        global all_keypoints
 
         if not self.cap.isOpened():
             print("无法打开摄像头")
@@ -508,7 +508,7 @@ class Motor:
                 # break
 
     def person_tracking(self, angle1=angle_def, angle2=angle_def2, total_speed=motor_speed):
-        global current_pos,  current_pos2,  person_found_flag, roaming_stop_flag, last_angle1, last_angle2
+        global current_pos,  current_pos2,  roaming_stop_flag, last_angle1, last_angle2
 
         print("angle_def1:", angle1)
         # with open("motor_degree.txt", "r") as file_status:
@@ -722,7 +722,7 @@ class Motor:
     #     time.sleep(0.1)
 
     def motor_forward_together2(self, angle1=angle_def, angle2=angle_def2, total_speed=motor_speed):
-        global current_pos,  current_pos2,  person_found_flag, roaming_stop_flag, last_angle1, last_angle2
+        global current_pos,  current_pos2,  roaming_stop_flag, last_angle1, last_angle2
 
         print("angle_def1:", angle1)
         # with open("motor_degree.txt", "r") as file_status:
@@ -744,8 +744,8 @@ class Motor:
         # 控制电机同时运动
         for i in range(max(abs(angle1), abs(angle2))):  # 根据最大角度进行循环
             time.sleep(0.1)
-            print("person_found_flag2:", person_found_flag)
-            if person_found_flag == True:
+            print("person_found_flag2:", self.net.person_found_flag)
+            if self.net.person_found_flag == True:
                 self.motor_stop()  # 停止第一个电机
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
@@ -806,7 +806,7 @@ class Motor:
         time.sleep(0.1)
 
     def motor_forward_together2_no_break(self, angle1=angle_def, angle2=angle_def2, total_speed=motor_speed):
-        global current_pos,  current_pos2,  person_found_flag, roaming_stop_flag, last_angle1, last_angle2
+        global current_pos,  current_pos2,  roaming_stop_flag, last_angle1, last_angle2
 
         print("init no break")
         print("angle_def1:", angle1)

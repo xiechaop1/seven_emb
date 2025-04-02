@@ -26,6 +26,8 @@ class yolov5_lite():
         self.MAX_DISTANCE = 60
         self.moter_handler = moter_handler
 
+        self.person_found_flag = False
+
     def letterBox(self, srcimg, keep_ratio=True):
         top, left, newh, neww = 0, 0, self.input_shape[0], self.input_shape[1]
         if keep_ratio and srcimg.shape[0] != srcimg.shape[1]:
@@ -68,7 +70,7 @@ class yolov5_lite():
         return math.sqrt((center1[0] - center2[0]) ** 2 + (center1[1] - center2[1]) ** 2)
 
     def postprocess(self, frame, outs, pad_hw):
-        global person_found_flag,x_diff,y_diff,roaming_stop_flag
+        global x_diff,y_diff,roaming_stop_flag
         # person_found_flag=False
         newh, neww, padh, padw = pad_hw
         frameHeight = frame.shape[0]
@@ -131,13 +133,13 @@ class yolov5_lite():
                     prev_person_centers.append(current_center)
                     area = width * height
                     print(f"Person {person_count} Area: {area} pixels")
-                    print("person_found_flag:",person_found_flag)
+                    print("person_found_flag:", self.person_found_flag)
                     self.moter_handler.motor_stop()  # 停止第一个电机
                     self.moter_handler.motor_stop2()  # 停止第二个电机
                     time.sleep(0.05)
                     roaming_stop_flag = True
                     if area>0:
-                        person_found_flag=True
+                        self.person_found_flag=True
                         print("Person current_center:",current_center)
                         x_diff=current_center[0]-320
                         y_diff=current_center[1]-240-10
