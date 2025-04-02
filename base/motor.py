@@ -159,7 +159,7 @@ class Motor:
         read_adc2_thread.start()
         read_adc_thread = threading.Thread(target=self.read_adc)
         read_adc_thread.start()
-g
+
         # motor_forward_together2_no_break(30, 0, 100)
         # print("f1")
         # motor_forward_together2_no_break(0, -20, 100)
