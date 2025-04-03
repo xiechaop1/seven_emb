@@ -27,6 +27,7 @@ from common.threading_event import ThreadingEvent
 from model.recv import Recv
 from model.daemon import Daemon
 from common.code import Code
+from common.common import Common
 import pygame
 import sys
 import argparse
@@ -57,7 +58,8 @@ args = parser.parse_args()
 
 if Config.IS_DEBUG == False:
     os.environ["SDL_AUDIODRIVER"] = "alsa"
-    os.environ["AUDIODEV"] = "hw:3,0"
+    hw = Common.find_audio_hw()
+    os.environ["AUDIODEV"] = f"hw:{hw},0"
     if Config.OS is not None:
         if Config.OS == "pi5":
             os.environ["AUDIODEV"] = "hw:2,0"
