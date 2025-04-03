@@ -85,6 +85,8 @@ if __name__ == "__main__":
 
     # ws_cli = ws_instance.get_client()
 
+    cv2_instance = cv2.VideoCapture(0)
+
     if not Config.IS_DEBUG:
         # 暂时去掉，等上板子再试
         # spray_instance = ""
@@ -114,7 +116,6 @@ if __name__ == "__main__":
         spray_instance = ""
         light_instance = ""
 
-    cv2_instance = cv2.VideoCapture(0)
         # light_instance.set_mode(Code.LIGHT_MODE_BREATHING)
 
     # Intialize the library (must be called once before other functions).
@@ -137,7 +138,7 @@ if __name__ == "__main__":
     else:
         screen_instance = None
 
-    motor_instance = Motor()
+    motor_instance = Motor(cv2_instance)
     motor_instance.start()
 
     # screen = Screen()

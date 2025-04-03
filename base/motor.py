@@ -78,7 +78,7 @@ class Motor:
         'Left Knee', 'Right Knee', 'Left Ankle', 'Right Ankle'
     ]
 
-    def __init__(self):
+    def __init__(self, cv2):
         # 初始化ADS1115模块，选择I2C地址0x48（默认地址）
         i2c = busio.I2C(board.SCL, board.SDA)
         self.ads = ADS.ADS1115(i2c)
@@ -153,6 +153,8 @@ class Motor:
         self.motor_stop()
         self.motor_stop2()
         # print("stoping motor")
+        # 打开摄像头
+        # self.cap = cv2.VideoCapture(0)  # 摄像头索引，0表示默认摄像头
 
         # self.motor_forward_together2_no_break(50, 120, 100)
         # time.sleep(1)
@@ -210,9 +212,7 @@ class Motor:
         # model_path = '/home/li/Downloads/Pose-detection/lite-model_movenet_singlepose_lightning_3.tflite'
         # interpreter = tf.lite.Interpreter(model_path=model_path)
         # interpreter.allocate_tensors()
-
-        # 打开摄像头
-        self.cap = cv2.VideoCapture(14)  # 摄像头索引，0表示默认摄像头
+        self.cap = cv2
 
     def start(self):
         run_keypoint_main_thread = threading.Thread(target=self.run_keypoint_main)
