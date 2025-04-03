@@ -552,7 +552,7 @@ class Motor:
         # print(f"Adjusted speeds -> motor1: {speed1_adjusted}, motor2: {speed2_adjusted}")
 
         # 控制电机同时运动
-        if not self.cap.isOpene():
+        if not self.cap.isOpened():
             return
         for i in range(max(abs(angle1), abs(angle2))):  # 根据最大角度进行循环
             print("i:", i)
@@ -768,7 +768,7 @@ class Motor:
         print(f"Adjusted speeds -> motor1: {speed1_adjusted}, motor2: {speed2_adjusted}")
 
         # 控制电机同时运动
-        if not self.cap.isOpene():
+        if not self.cap.isOpened():
             return
         for i in range(max(abs(angle1), abs(angle2))):  # 根据最大角度进行循环
             time.sleep(0.1)
@@ -1216,7 +1216,7 @@ class Motor:
 
     def find_person_roaming(self):
         global roaming_stop_flag, last_angle1, last_angle2
-        if not self.cap.isOpene():
+        if not self.cap.isOpened():
             return
         while True:
             print("roaming_stop_flag:", roaming_stop_flag)
