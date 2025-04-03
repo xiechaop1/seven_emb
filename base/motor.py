@@ -212,7 +212,7 @@ class Motor:
         # interpreter.allocate_tensors()
 
         # 打开摄像头
-        self.cap = cv2.VideoCapture(0)  # 摄像头索引，0表示默认摄像头
+        self.cap = cv2.VideoCapture(14)  # 摄像头索引，0表示默认摄像头
 
     def start(self):
         run_keypoint_main_thread = threading.Thread(target=self.run_keypoint_main)
