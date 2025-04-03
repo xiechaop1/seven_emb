@@ -552,6 +552,8 @@ class Motor:
         # print(f"Adjusted speeds -> motor1: {speed1_adjusted}, motor2: {speed2_adjusted}")
 
         # 控制电机同时运动
+        if not self.cap.isOpene():
+            return
         for i in range(max(abs(angle1), abs(angle2))):  # 根据最大角度进行循环
             print("i:", i)
             # time.sleep(0.1)
@@ -766,6 +768,8 @@ class Motor:
         print(f"Adjusted speeds -> motor1: {speed1_adjusted}, motor2: {speed2_adjusted}")
 
         # 控制电机同时运动
+        if not self.cap.isOpene():
+            return
         for i in range(max(abs(angle1), abs(angle2))):  # 根据最大角度进行循环
             time.sleep(0.1)
             print("person_found_flag2:", self.net.person_found_flag)
@@ -1115,7 +1119,7 @@ class Motor:
 
 
                 # 每秒读取一次
-                if time.time() - start_time >= 0.8:
+                if time.time() - start_time >= 1.5:
                     # 计算过去1秒的平均电流值
                     avg_current = sum(current_values) / len(current_values)
                     # print(f"avg_current: {avg_current:.2f} mA")
@@ -1161,7 +1165,7 @@ class Motor:
                 current_values.append(current2)
 
                 # 每秒读取一次
-                if time.time() - start_time >= 0.8:
+                if time.time() - start_time >= 1.5:
                     # 计算过去1秒的平均电流值
                     avg_current = sum(current_values) / len(current_values)
                     # print(f"avg_current: {avg_current:.2f} mA")
@@ -1172,7 +1176,7 @@ class Motor:
                         print(f"电压2: {voltage:.2f} V, 电流2: {current2:.2f} mA")
                         self.clog_flag2 = True
                         # print("self.clog_flag1:", self.clog_flag2)
-                        print("get clogged!")
+                        print("get clogged2!")
                     # else:
                     #     self.clog_flag2 = False
 
@@ -1212,6 +1216,8 @@ class Motor:
 
     def find_person_roaming(self):
         global roaming_stop_flag, last_angle1, last_angle2
+        if not self.cap.isOpene():
+            return
         while True:
             print("roaming_stop_flag:", roaming_stop_flag)
             if roaming_stop_flag == True:
