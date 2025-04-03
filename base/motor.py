@@ -44,7 +44,7 @@ class Motor:
     INA_PIN2 = 13  # 控制电机A的GPIO引脚
     INB_PIN2 = 12  # 控制电机B的GPIO引脚
 
-    BLOCK_ROTATION = 3600        #(mA)
+    BLOCK_ROTATION = 30        #(mA)
     # 延时函数
 
 
@@ -126,6 +126,9 @@ class Motor:
         self.last_angle2 = 10
         self.roaming_stop_flag = False
 
+        self.move_flag = False
+        self.move_flag2 = False
+
         self.clog_flag = False
         self.clog_flag2 = False
 
@@ -149,7 +152,7 @@ class Motor:
 
         self.motor_stop()
         self.motor_stop2()
-        print("stoping motor")
+        # print("stoping motor")
 
         # self.motor_forward_together2_no_break(50, 120, 100)
         # time.sleep(1)
@@ -158,10 +161,10 @@ class Motor:
         read_adc_thread = threading.Thread(target=self.read_adc)
         read_adc_thread.start()
 
-        self.motor_forward_together2_no_break(0, -120, 100)
-        self.motor_stop2()
-        print("stop2")
-        time.sleep(100)
+        # self.motor_forward_together2_no_break(0, -120, 100)
+        # self.motor_stop2()
+        # print("stop2")
+        # time.sleep(100)
         self.find_zero_pos()
         # self.motor_forward_together2_no_break(60, 0, 100)
 
@@ -246,21 +249,25 @@ class Motor:
     # 控制电机的函数
     def motor_forward(self, speed):
         # print("motor_forward")
+        self.move_flag = True
         self.pwmINA.ChangeDutyCycle(speed)  # 设置电机A的占空比（控制电机正转速度）
         self.pwmINB.ChangeDutyCycle(0)  # 电机B保持不动
 
     def motor_reverse(self, speed):
         # print("motor_reverse")
+        self.move_flag = True
         self.pwmINA.ChangeDutyCycle(0)  # 电机A保持不动
         self.pwmINB.ChangeDutyCycle(speed)  # 设置电机B的占空比（控制电机反转速度）
 
     def motor_stop(self):
+        self.move_flag = False
         self.pwmINA.ChangeDutyCycle(0)  # 停止电机A
         self.pwmINB.ChangeDutyCycle(0)  # 停止电机B
 
     # 控制电机的函数
     def motor_forward2(self, speed):
         # print("motor_forward2")
+        self.move_flag2 = True
         self.pwmINA2.ChangeDutyCycle(speed)  # 设置电机A的占空比（控制电机正转速度）
         self.pwmINB2.ChangeDutyCycle(0)  # 电机B保持不动
         # GPIO.output(INA_PIN2, GPIO.HIGH)  # 电机A正转
@@ -268,12 +275,14 @@ class Motor:
 
     def motor_reverse2(self, speed):
         # print("motor_reverse2")
+        self.move_flag2 = True
         self.pwmINA2.ChangeDutyCycle(0)  # 电机A保持不动
         self.pwmINB2.ChangeDutyCycle(speed)  # 设置电机B的占空比（控制电机反转速度）
         # GPIO.output(INA_PIN2, GPIO.LOW)  # 电机A停止
         # GPIO.output(INB_PIN2, GPIO.HIGH)  # 电机B反转
 
     def motor_stop2(self):
+        self.move_flag2 = False
         self.pwmINA2.ChangeDutyCycle(0)  # 停止电机A
         self.pwmINB2.ChangeDutyCycle(0)  # 停止电机B
         # GPIO.output(INA_PIN2, GPIO.LOW)  # 停止电机A
@@ -1091,7 +1100,7 @@ class Motor:
         current_values = []  # 用来存储电流值
         start_time = time.time()  # 记录开始时间
 
-        self.chan = AnalogIn(self.ads, ADS.P0)
+        # self.chan = AnalogIn(self.ads, ADS.P0)
 
         try:
             while True:
@@ -1112,7 +1121,7 @@ class Motor:
                     # print(f"avg_current: {avg_current:.2f} mA")
 
                     # 如果平均电流大于52mA，表示电机可能堵转
-                    if avg_current > self.BLOCK_ROTATION:
+                    if self.move_flag and avg_current < self.BLOCK_ROTATION:
                         # 打印电流值
                         print(f"电压: {voltage:.2f} V, 电流: {current:.2f} mA")
                         self.clog_flag = True
@@ -1158,7 +1167,7 @@ class Motor:
                     # print(f"avg_current: {avg_current:.2f} mA")
 
                     # 如果平均电流大于52mA，表示电机可能堵转
-                    if avg_current > self.BLOCK_ROTATION:
+                    if self.move_flag2 and avg_current < self.BLOCK_ROTATION:
                         # 打印电流值
                         print(f"电压2: {voltage:.2f} V, 电流2: {current2:.2f} mA")
                         self.clog_flag2 = True
