@@ -1218,7 +1218,7 @@ class Motor:
         with open("motor_degree.txt", "r") as md_file:
             tmp = md_file.read().strip()  # 读取并去除任何多余的空白字符
             if "," in tmp:
-                self.current_pos, self.current_pos2 = map(str, tmp.split(','))
+                self.current_pos, self.current_pos2 = map(int, tmp.split(','))
             else:
                 self.current_pos, self.current_pos2 = 0, 0
         md_file.close()
