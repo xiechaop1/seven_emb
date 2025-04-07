@@ -33,7 +33,7 @@ import sys
 import argparse
 from model.undertake_callback import UndertakeCallback
 import asyncio
-from pynput import keyboard
+# from pynput import keyboard
 
 #from base.spary import Spray
 from model.execute_command import ExecuteCommand
