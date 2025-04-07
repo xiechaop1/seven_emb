@@ -1262,10 +1262,10 @@ class Motor:
         if not self.cap.isOpened():
             return
         ang_map = [
-            [0, -50],
-            [0, 50],
-            [0, 50],
-            [0, -50]
+            [0, -120],
+            [0, 120],
+            [0, 120],
+            [0, -120]
         ]
         while True:
             print("roaming_stop_flag:", self.roaming_stop_flag)
