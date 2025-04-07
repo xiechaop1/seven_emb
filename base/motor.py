@@ -1244,10 +1244,10 @@ class Motor:
         #     # self.motor_backward_angle(120, 100)
         #     self.motor_forward_together2_no_break(move_pos, move_pos2, 100)
         move_pos = 0
-        move_pos2 = 300
+        move_pos2 = 600
         self.motor_forward_together2_no_break(move_pos, move_pos2, 100)
         move_pos = 0
-        move_pos2 = -180
+        move_pos2 = -300
         self.motor_forward_together2_no_break(move_pos, move_pos2, 100)
         self.current_pos = self.current_pos2 = 0
         with open("motor_degree.txt", "w") as md_file:
@@ -1269,10 +1269,10 @@ class Motor:
         if not self.cap.isOpened():
             return
         ang_map = [
-            [0, -200],
-            [0, 200],
-            [0, 200],
-            [0, -200]
+            [0, -400],
+            [0, 400],
+            [0, 400],
+            [0, -400]
         ]
         while True:
             print("roaming_stop_flag:", self.roaming_stop_flag)

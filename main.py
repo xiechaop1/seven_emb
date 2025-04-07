@@ -33,7 +33,7 @@ import sys
 import argparse
 from model.undertake_callback import UndertakeCallback
 import asyncio
-import keyboard
+from pynput import keyboard
 
 #from base.spary import Spray
 from model.execute_command import ExecuteCommand
@@ -55,14 +55,26 @@ args = parser.parse_args()
 # if len(sys.argv) > 1:
 #     exec_tag = sys.argv[1]
 
+def on_press(key):
+    try:
+        print(f'{key.char} key pressed')
+    except AttributeError:
+        print(f'{key} key pressed')
+
+def on_release(key):
+    print(f'{key} key released')
+    if key == keyboard.Key.esc or key == "c":
+        motor_instance.motor_stop()
+        motor_instance.motor_stop2()
+        return False  # 停止监听
 
 if Config.IS_DEBUG == False:
     os.environ["SDL_AUDIODRIVER"] = "alsa"
     hw = Common.find_audio_hw()
     os.environ["AUDIODEV"] = f"hw:{hw}"
-    if Config.OS is not None:
-        if Config.OS == "pi5":
-            os.environ["AUDIODEV"] = "hw:2,0"
+    # if Config.OS is not None:
+    #     if Config.OS == "pi5":
+    #         os.environ["AUDIODEV"] = "hw:2,0"
 
     os.environ["SDL_VIDEODRIVER"] = "x11"  ########screen_modified by lixiaolin ###
     # os.environ["SDL_VIDEODRIVER"] = "quartz"
@@ -168,6 +180,11 @@ if __name__ == "__main__":
 
  #    kaldi_listener_thread = threading.Thread(target=kaldi_listener)
 	# kaldi_listener_thread.start()
+    with keyboard.Listener(
+            on_press=on_press,
+            on_release=on_release) as listener:
+        listener.join()
+
 
 
 
