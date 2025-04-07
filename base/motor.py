@@ -489,7 +489,7 @@ class Motor:
         return -1
 
     def person_tracking_whole(self):
-        global x_diff, y_diff, all_keypoints
+        # global x_diff, y_diff, all_keypoints
         pid_x = PIDController(Kp=0.3, Ki=0, Kd=0)  # 水平方向的 PID 控制器
         pid_y = PIDController(Kp=0.4, Ki=0, Kd=0)  # 竖直方向的 PID 控制器
 
@@ -497,6 +497,8 @@ class Motor:
         y_adust_degree = 0
 
         while True:
+            x_diff = self.net.x_diff
+            y_diff = self.net.y_diff
             print("x_dif,y_difff:", x_diff, y_diff)
             if abs(x_diff) > 13 or abs(y_diff) > 13:
                 x_diff_div_20 = int(x_diff / 10)

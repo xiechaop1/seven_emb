@@ -70,7 +70,7 @@ class yolov5_lite():
         return math.sqrt((center1[0] - center2[0]) ** 2 + (center1[1] - center2[1]) ** 2)
 
     def postprocess(self, frame, outs, pad_hw):
-        global x_diff,y_diff,roaming_stop_flag
+        global roaming_stop_flag
         # person_found_flag=False
         newh, neww, padh, padw = pad_hw
         frameHeight = frame.shape[0]
@@ -141,8 +141,8 @@ class yolov5_lite():
                     if area>0:
                         self.person_found_flag=True
                         print("Person current_center:",current_center)
-                        x_diff=current_center[0]-320
-                        y_diff=current_center[1]-240-10
+                        self.x_diff = current_center[0]-320
+                        self.y_diff = current_center[1]-240-10
 
                         # 更新上一帧的person中心坐标
                     # prev_person_centers.append(current_center)
