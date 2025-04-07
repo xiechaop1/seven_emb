@@ -573,14 +573,18 @@ class Motor:
             # 控制第一个电机
             if angle1 > 0:
                 self.motor_forward(total_speed)  # 控制第一个电机正转
+                self.current_pos = self.current_pos + 1
             elif angle1 < 0:
                 self.motor_reverse(total_speed)  # 控制第一个电机反转
+                self.current_pos = self.current_pos - 1
 
             # 控制第二个电机
             if angle2 > 0:
                 self.motor_forward2(total_speed)  # 控制第二个电机正转
+                self.current_pos2 = self.current_pos2 + 1
             elif angle2 < 0:
                 self.motor_reverse2(total_speed)  # 控制第二个电机反转
+                self.current_pos2 = self.current_pos2 - 1
 
             # 检查电机是否堵转
             if self.clog_flag == True:
@@ -604,8 +608,8 @@ class Motor:
                 break
 
             # 更新电机角度
-            self.current_pos = self.current_pos + 1
-            self.current_pos2= self.current_pos2 + 1
+            # self.current_pos = self.current_pos + 1
+            # self.current_pos2= self.current_pos2 + 1
             # with open("motor_degree.txt", "w") as file_status:
             #     current_pos = current_pos + 1
             #     print("current_pos+:", current_pos)
@@ -887,14 +891,18 @@ class Motor:
             # 控制第一个电机
             if angle1 > 0:
                 self.motor_forward(total_speed)  # 控制第一个电机正转
+                self.current_pos = self.current_pos + 1
             elif angle1 < 0:
                 self.motor_reverse(total_speed)  # 控制第一个电机反转
+                self.current_pos = self.current_pos - 1
 
             # 控制第二个电机
             if angle2 > 0:
                 self.motor_forward2(total_speed)  # 控制第二个电机正转
+                self.current_pos2 = self.current_pos2 + 1
             elif angle2 < 0:
                 self.motor_reverse2(total_speed)  # 控制第二个电机反转
+                self.current_pos2 = self.current_pos2 - 1
 
             # 检查电机是否堵转
             if self.clog_flag == True:
@@ -918,8 +926,8 @@ class Motor:
                 break
 
             # 更新电机角度
-            self.current_pos = self.current_pos + 1
-            self.current_pos2 = self.current_pos2 + 1
+            # self.current_pos = self.current_pos + 1
+            # self.current_pos2 = self.current_pos2 + 1
             # with open("motor_degree.txt", "w") as file_status:
                 # current_pos = current_pos + 1
                 # print("current_pos+:", current_pos)
@@ -971,7 +979,7 @@ class Motor:
                 break
 
             self.current_pos = self.current_pos + 1
-            self.current_pos2 = self.current_pos2 + 1
+            # self.current_pos2 = self.current_pos2 + 1
             # with open("motor_degree.txt", "w") as file_status:
             #
             #     current_pos = current_pos + 1
