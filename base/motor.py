@@ -18,6 +18,7 @@ import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 import board
 import busio
+import sys
 
 
 from common.threading_event import ThreadingEvent
@@ -1268,10 +1269,10 @@ class Motor:
         if not self.cap.isOpened():
             return
         ang_map = [
-            [0, -120],
-            [0, 120],
-            [0, 120],
-            [0, -120]
+            [0, -200],
+            [0, 200],
+            [0, 200],
+            [0, -200]
         ]
         while True:
             print("roaming_stop_flag:", self.roaming_stop_flag)
