@@ -1243,6 +1243,9 @@ class Motor:
             # self.motor_backward_angle(120, 100)
             self.motor_forward_together2_no_break(move_pos, move_pos2, 100)
         self.current_pos = self.current_pos2 = 0
+        with open("motor_degree.txt", "w") as md_file:
+            md_file.write(str(f"{self.current_pos},{self.current_pos2}"))
+        md_file.close()
 
     def find_zero_pos2(self):
         global current2
