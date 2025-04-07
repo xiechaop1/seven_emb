@@ -557,7 +557,7 @@ class Motor:
         if not self.cap.isOpened():
             return
         for i in range(max(abs(angle1), abs(angle2))):  # 根据最大角度进行循环
-            print("i:", i)
+            # print("i:", i)
             # time.sleep(0.1)
             # print("person_found_flag2:", person_found_flag)
             # if person_found_flag==True:
@@ -753,7 +753,7 @@ class Motor:
     #     time.sleep(0.1)
 
     def motor_forward_together2(self, angle1=angle_def, angle2=angle_def2, total_speed=motor_speed):
-        global current_pos,  current_pos2,  roaming_stop_flag, last_angle1, last_angle2
+        global current_pos,  current_pos2, last_angle1, last_angle2
 
         print("angle_def1:", angle1)
         # with open("motor_degree.txt", "r") as file_status:
@@ -782,7 +782,7 @@ class Motor:
                 self.motor_stop()  # 停止第一个电机
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
-                roaming_stop_flag = True
+                self.roaming_stop_flag = True
                 print("person found motor_forward_together2 break!")
                 last_angle1 = angle1
                 last_angle2 = angle2
@@ -842,7 +842,7 @@ class Motor:
         time.sleep(0.1)
 
     def motor_forward_together2_no_break(self, angle1=angle_def, angle2=angle_def2, total_speed=motor_speed):
-        global current_pos,  current_pos2,  roaming_stop_flag, last_angle1, last_angle2
+        global current_pos,  current_pos2,  last_angle1, last_angle2
 
         print("init no break")
         print("angle_def1:", angle1)
@@ -1247,12 +1247,12 @@ class Motor:
             self.motor_backward_angle2(120, 100)
 
     def find_person_roaming(self):
-        global roaming_stop_flag, last_angle1, last_angle2
+        global last_angle1, last_angle2
         if not self.cap.isOpened():
             return
         while True:
-            print("roaming_stop_flag:", roaming_stop_flag)
-            if roaming_stop_flag == True:
+            print("roaming_stop_flag:", self.roaming_stop_flag)
+            if self.roaming_stop_flag == True:
                 self.motor_stop()  # 停止第一个电机
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
@@ -1263,8 +1263,8 @@ class Motor:
                 break
 
             self.motor_forward_together2(-25, -18, 100)
-            print("roaming_stop_flag:", roaming_stop_flag)
-            if roaming_stop_flag == True:
+            print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            if self.roaming_stop_flag == True:
                 self.motor_stop()  # 停止第一个电机
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
@@ -1275,8 +1275,8 @@ class Motor:
                 break
             time.sleep(0.8)
             self.motor_forward_together2(25, -18, 100)
-            print("roaming_stop_flag:", roaming_stop_flag)
-            if roaming_stop_flag == True:
+            print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            if self.roaming_stop_flag == True:
                 self.motor_stop()  # 停止第一个电机
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
@@ -1287,8 +1287,8 @@ class Motor:
                 break
             time.sleep(0.8)
             self.motor_forward_together2(-25, -18, 100)
-            print("roaming_stop_flag:", roaming_stop_flag)
-            if roaming_stop_flag == True:
+            print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            if self.roaming_stop_flag == True:
                 self.motor_stop()  # 停止第一个电机
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
@@ -1299,8 +1299,8 @@ class Motor:
                 break
             time.sleep(0.8)
             self.motor_forward_together2(25, -18, 100)
-            print("roaming_stop_flag:", roaming_stop_flag)
-            if roaming_stop_flag == True:
+            print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            if self.roaming_stop_flag == True:
                 self.motor_stop()  # 停止第一个电机
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
@@ -1311,8 +1311,8 @@ class Motor:
                 break
             time.sleep(0.8)
             self.motor_forward_together2(-25, -18, 100)
-            print("roaming_stop_flag:", roaming_stop_flag)
-            if roaming_stop_flag == True:
+            print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            if self.roaming_stop_flag == True:
                 self.motor_stop()  # 停止第一个电机
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
@@ -1323,8 +1323,8 @@ class Motor:
                 break
             time.sleep(0.8)
             self.motor_forward_together2(25, -18, 100)
-            print("roaming_stop_flag:", roaming_stop_flag)
-            if roaming_stop_flag == True:
+            print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            if self.roaming_stop_flag == True:
                 self.motor_stop()  # 停止第一个电机
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
@@ -1335,8 +1335,8 @@ class Motor:
                 break
             time.sleep(0.8)
             self.motor_forward_together2(-25, 18, 100)
-            print("roaming_stop_flag:", roaming_stop_flag)
-            if roaming_stop_flag == True:
+            print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            if self.roaming_stop_flag == True:
                 self.motor_stop()  # 停止第一个电机
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
@@ -1347,8 +1347,8 @@ class Motor:
                 break
             time.sleep(0.8)
             self.motor_forward_together2(25, 18, 100)
-            print("roaming_stop_flag:", roaming_stop_flag)
-            if roaming_stop_flag == True:
+            print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            if self.roaming_stop_flag == True:
                 self.motor_stop()  # 停止第一个电机
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
@@ -1359,8 +1359,8 @@ class Motor:
                 break
             time.sleep(0.8)
             self.motor_forward_together2(-25, 18, 100)
-            print("roaming_stop_flag:", roaming_stop_flag)
-            if roaming_stop_flag == True:
+            print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            if self.roaming_stop_flag == True:
                 self.motor_stop()  # 停止第一个电机
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
@@ -1371,8 +1371,8 @@ class Motor:
                 break
             time.sleep(0.8)
             self.motor_forward_together2(25, 18, 100)
-            print("roaming_stop_flag:", roaming_stop_flag)
-            if roaming_stop_flag == True:
+            print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            if self.roaming_stop_flag == True:
                 self.motor_stop()  # 停止第一个电机
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
@@ -1383,8 +1383,8 @@ class Motor:
                 break
             time.sleep(0.8)
             self.motor_forward_together2(-25, 18, 100)
-            print("roaming_stop_flag:", roaming_stop_flag)
-            if roaming_stop_flag == True:
+            print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            if self.roaming_stop_flag == True:
                 self.motor_stop()  # 停止第一个电机
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
@@ -1395,8 +1395,8 @@ class Motor:
                 break
             time.sleep(0.8)
             self.motor_forward_together2(25, 18, 100)
-            print("roaming_stop_flag:", roaming_stop_flag)
-            if roaming_stop_flag == True:
+            print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            if self.roaming_stop_flag == True:
                 self.motor_stop()  # 停止第一个电机
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
