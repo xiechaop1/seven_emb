@@ -33,7 +33,7 @@ import sys
 import argparse
 from model.undertake_callback import UndertakeCallback
 import asyncio
-
+import keyboard
 
 #from base.spary import Spray
 from model.execute_command import ExecuteCommand
@@ -165,10 +165,20 @@ if __name__ == "__main__":
     daemon_thread.start()
     # 通过实例调用 create_websocket_client 方法
     # ws_cli = ws_instance.create_websocket_client(websocket_url)
+    quit_thread = threading.Thread(target=quit, args=(motor_instance,))
+    quit_thread.start()
 
  #    kaldi_listener_thread = threading.Thread(target=kaldi_listener)
 	# kaldi_listener_thread.start()
 
-	
+def quit(motor):
+    print("按下 q 退出程序...")
+    while True:
+        if keyboard.is_pressed("c"):
+            print("退出程序")
+            motor.motor_stop()
+            motor.motor_stop2()
+            break
+
 
 
