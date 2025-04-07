@@ -1243,10 +1243,10 @@ class Motor:
         #     move_pos2 = (-1) * self.current_pos2
         #     # self.motor_backward_angle(120, 100)
         #     self.motor_forward_together2_no_break(move_pos, move_pos2, 100)
-        move_pos = 0
+        move_pos = 150
         move_pos2 = 600
         self.motor_forward_together2_no_break(move_pos, move_pos2, 100)
-        move_pos = 0
+        move_pos = -120
         move_pos2 = -300
         self.motor_forward_together2_no_break(move_pos, move_pos2, 100)
         self.current_pos = self.current_pos2 = 0
