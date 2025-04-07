@@ -784,8 +784,8 @@ class Motor:
                 time.sleep(0.1)
                 self.roaming_stop_flag = True
                 print("person found motor_forward_together2 break!")
-                last_angle1 = angle1
-                last_angle2 = angle2
+                self.last_angle1 = angle1
+                self.last_angle2 = angle2
                 break
             # 控制第一个电机
             if angle1 > 0:
@@ -1250,6 +1250,12 @@ class Motor:
         global last_angle1, last_angle2
         if not self.cap.isOpened():
             return
+        ang_map = [
+            [0, -50],
+            [0, 50],
+            [0, 50],
+            [0, -50]
+        ]
         while True:
             print("roaming_stop_flag:", self.roaming_stop_flag)
             if self.roaming_stop_flag == True:
@@ -1257,155 +1263,171 @@ class Motor:
                 self.motor_stop2()  # 停止第二个电机
                 time.sleep(0.1)
                 print("enter find_person break1")
-                print("last_angle1,last_angle2:", last_angle1, last_angle2)
+                print("last_angle1,last_angle2:", self.last_angle1, self.last_angle2)
                 self.person_tracking_whole()
                 print("finish tracking!!!!")
                 break
 
-            self.motor_forward_together2(-25, -18, 100)
-            print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            for angles in ang_map:
+                self.motor_forward_together2(angles[0], angles[1], 100)
+                if self.roaming_stop_flag == True:
+                    self.motor_stop()  # 停止第一个电机
+                    self.motor_stop2()  # 停止第二个电机
+                    time.sleep(0.1)
+                    print("enter find_person break2")
+                    print("last_angle1,last_angle2:", self.last_angle1, self.last_angle2)
+                    self.person_tracking_whole()
+                    print("finish tracking!!!!")
+                    break
+                time.sleep(0.5)
             if self.roaming_stop_flag == True:
-                self.motor_stop()  # 停止第一个电机
-                self.motor_stop2()  # 停止第二个电机
-                time.sleep(0.1)
-                print("enter find_person break2")
-                print("last_angle1,last_angle2:", last_angle1, last_angle2)
-                self.person_tracking_whole()
-                print("finish tracking!!!!")
                 break
-            time.sleep(0.8)
-            self.motor_forward_together2(25, -18, 100)
-            print("self.roaming_stop_flag:", self.roaming_stop_flag)
-            if self.roaming_stop_flag == True:
-                self.motor_stop()  # 停止第一个电机
-                self.motor_stop2()  # 停止第二个电机
-                time.sleep(0.1)
-                print("enter find_person break3")
-                print("last_angle1,last_angle2:", last_angle1, last_angle2)
-                self.person_tracking_whole()
-                print("finish tracking!!!!")
-                break
-            time.sleep(0.8)
-            self.motor_forward_together2(-25, -18, 100)
-            print("self.roaming_stop_flag:", self.roaming_stop_flag)
-            if self.roaming_stop_flag == True:
-                self.motor_stop()  # 停止第一个电机
-                self.motor_stop2()  # 停止第二个电机
-                time.sleep(0.1)
-                print("enter find_person break4")
-                print("last_angle1,last_angle2:", last_angle1, last_angle2)
-                self.person_tracking_whole()
-                print("finish tracking!!!!")
-                break
-            time.sleep(0.8)
-            self.motor_forward_together2(25, -18, 100)
-            print("self.roaming_stop_flag:", self.roaming_stop_flag)
-            if self.roaming_stop_flag == True:
-                self.motor_stop()  # 停止第一个电机
-                self.motor_stop2()  # 停止第二个电机
-                time.sleep(0.1)
-                print("enter find_person break5")
-                print("last_angle1,last_angle2:", last_angle1, last_angle2)
-                self.person_tracking_whole()
-                print("finish tracking!!!!")
-                break
-            time.sleep(0.8)
-            self.motor_forward_together2(-25, -18, 100)
-            print("self.roaming_stop_flag:", self.roaming_stop_flag)
-            if self.roaming_stop_flag == True:
-                self.motor_stop()  # 停止第一个电机
-                self.motor_stop2()  # 停止第二个电机
-                time.sleep(0.1)
-                print("enter find_person break4")
-                print("last_angle1,last_angle2:", last_angle1, last_angle2)
-                self.person_tracking_whole()
-                print("finish tracking!!!!")
-                break
-            time.sleep(0.8)
-            self.motor_forward_together2(25, -18, 100)
-            print("self.roaming_stop_flag:", self.roaming_stop_flag)
-            if self.roaming_stop_flag == True:
-                self.motor_stop()  # 停止第一个电机
-                self.motor_stop2()  # 停止第二个电机
-                time.sleep(0.1)
-                print("enter find_person break5")
-                print("last_angle1,last_angle2:", last_angle1, last_angle2)
-                self.person_tracking_whole()
-                print("finish tracking!!!!")
-                break
-            time.sleep(0.8)
-            self.motor_forward_together2(-25, 18, 100)
-            print("self.roaming_stop_flag:", self.roaming_stop_flag)
-            if self.roaming_stop_flag == True:
-                self.motor_stop()  # 停止第一个电机
-                self.motor_stop2()  # 停止第二个电机
-                time.sleep(0.1)
-                print("enter find_person break6")
-                print("last_angle1,last_angle2:", last_angle1, last_angle2)
-                self.person_tracking_whole()
-                print("finish tracking!!!!")
-                break
-            time.sleep(0.8)
-            self.motor_forward_together2(25, 18, 100)
-            print("self.roaming_stop_flag:", self.roaming_stop_flag)
-            if self.roaming_stop_flag == True:
-                self.motor_stop()  # 停止第一个电机
-                self.motor_stop2()  # 停止第二个电机
-                time.sleep(0.1)
-                print("enter find_person break7")
-                print("last_angle1,last_angle2:", last_angle1, last_angle2)
-                self.person_tracking_whole()
-                print("finish tracking!!!!")
-                break
-            time.sleep(0.8)
-            self.motor_forward_together2(-25, 18, 100)
-            print("self.roaming_stop_flag:", self.roaming_stop_flag)
-            if self.roaming_stop_flag == True:
-                self.motor_stop()  # 停止第一个电机
-                self.motor_stop2()  # 停止第二个电机
-                time.sleep(0.1)
-                print("enter find_person break8")
-                print("last_angle1,last_angle2:", last_angle1, last_angle2)
-                self.person_tracking_whole()
-                print("finish tracking!!!!")
-                break
-            time.sleep(0.8)
-            self.motor_forward_together2(25, 18, 100)
-            print("self.roaming_stop_flag:", self.roaming_stop_flag)
-            if self.roaming_stop_flag == True:
-                self.motor_stop()  # 停止第一个电机
-                self.motor_stop2()  # 停止第二个电机
-                time.sleep(0.1)
-                print("enter find_person break9")
-                print("last_angle1,last_angle2:", last_angle1, last_angle2)
-                self.person_tracking_whole()
-                print("finish tracking!!!!")
-                break
-            time.sleep(0.8)
-            self.motor_forward_together2(-25, 18, 100)
-            print("self.roaming_stop_flag:", self.roaming_stop_flag)
-            if self.roaming_stop_flag == True:
-                self.motor_stop()  # 停止第一个电机
-                self.motor_stop2()  # 停止第二个电机
-                time.sleep(0.1)
-                print("enter find_person break8")
-                print("last_angle1,last_angle2:", last_angle1, last_angle2)
-                self.person_tracking_whole()
-                print("finish tracking!!!!")
-                break
-            time.sleep(0.8)
-            self.motor_forward_together2(25, 18, 100)
-            print("self.roaming_stop_flag:", self.roaming_stop_flag)
-            if self.roaming_stop_flag == True:
-                self.motor_stop()  # 停止第一个电机
-                self.motor_stop2()  # 停止第二个电机
-                time.sleep(0.1)
-                print("enter find_person break9")
-                print("last_angle1,last_angle2:", last_angle1, last_angle2)
-                self.person_tracking_whole()
-                print("finish tracking!!!!")
-                break
-            time.sleep(0.5)
+            time.sleep(0.3)
+
+            # self.motor_forward_together2(-25, -18, 100)
+            # print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            # if self.roaming_stop_flag == True:
+            #     self.motor_stop()  # 停止第一个电机
+            #     self.motor_stop2()  # 停止第二个电机
+            #     time.sleep(0.1)
+            #     print("enter find_person break2")
+            #     print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            #     self.person_tracking_whole()
+            #     print("finish tracking!!!!")
+            #     break
+            # time.sleep(0.8)
+            # self.motor_forward_together2(25, -18, 100)
+            # print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            # if self.roaming_stop_flag == True:
+            #     self.motor_stop()  # 停止第一个电机
+            #     self.motor_stop2()  # 停止第二个电机
+            #     time.sleep(0.1)
+            #     print("enter find_person break3")
+            #     print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            #     self.person_tracking_whole()
+            #     print("finish tracking!!!!")
+            #     break
+            # time.sleep(0.8)
+            # self.motor_forward_together2(-25, -18, 100)
+            # print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            # if self.roaming_stop_flag == True:
+            #     self.motor_stop()  # 停止第一个电机
+            #     self.motor_stop2()  # 停止第二个电机
+            #     time.sleep(0.1)
+            #     print("enter find_person break4")
+            #     print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            #     self.person_tracking_whole()
+            #     print("finish tracking!!!!")
+            #     break
+            # time.sleep(0.8)
+            # self.motor_forward_together2(25, -18, 100)
+            # print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            # if self.roaming_stop_flag == True:
+            #     self.motor_stop()  # 停止第一个电机
+            #     self.motor_stop2()  # 停止第二个电机
+            #     time.sleep(0.1)
+            #     print("enter find_person break5")
+            #     print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            #     self.person_tracking_whole()
+            #     print("finish tracking!!!!")
+            #     break
+            # time.sleep(0.8)
+            # self.motor_forward_together2(-25, -18, 100)
+            # print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            # if self.roaming_stop_flag == True:
+            #     self.motor_stop()  # 停止第一个电机
+            #     self.motor_stop2()  # 停止第二个电机
+            #     time.sleep(0.1)
+            #     print("enter find_person break4")
+            #     print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            #     self.person_tracking_whole()
+            #     print("finish tracking!!!!")
+            #     break
+            # time.sleep(0.8)
+            # self.motor_forward_together2(25, -18, 100)
+            # print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            # if self.roaming_stop_flag == True:
+            #     self.motor_stop()  # 停止第一个电机
+            #     self.motor_stop2()  # 停止第二个电机
+            #     time.sleep(0.1)
+            #     print("enter find_person break5")
+            #     print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            #     self.person_tracking_whole()
+            #     print("finish tracking!!!!")
+            #     break
+            # time.sleep(0.8)
+            # self.motor_forward_together2(-25, 18, 100)
+            # print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            # if self.roaming_stop_flag == True:
+            #     self.motor_stop()  # 停止第一个电机
+            #     self.motor_stop2()  # 停止第二个电机
+            #     time.sleep(0.1)
+            #     print("enter find_person break6")
+            #     print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            #     self.person_tracking_whole()
+            #     print("finish tracking!!!!")
+            #     break
+            # time.sleep(0.8)
+            # self.motor_forward_together2(25, 18, 100)
+            # print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            # if self.roaming_stop_flag == True:
+            #     self.motor_stop()  # 停止第一个电机
+            #     self.motor_stop2()  # 停止第二个电机
+            #     time.sleep(0.1)
+            #     print("enter find_person break7")
+            #     print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            #     self.person_tracking_whole()
+            #     print("finish tracking!!!!")
+            #     break
+            # time.sleep(0.8)
+            # self.motor_forward_together2(-25, 18, 100)
+            # print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            # if self.roaming_stop_flag == True:
+            #     self.motor_stop()  # 停止第一个电机
+            #     self.motor_stop2()  # 停止第二个电机
+            #     time.sleep(0.1)
+            #     print("enter find_person break8")
+            #     print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            #     self.person_tracking_whole()
+            #     print("finish tracking!!!!")
+            #     break
+            # time.sleep(0.8)
+            # self.motor_forward_together2(25, 18, 100)
+            # print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            # if self.roaming_stop_flag == True:
+            #     self.motor_stop()  # 停止第一个电机
+            #     self.motor_stop2()  # 停止第二个电机
+            #     time.sleep(0.1)
+            #     print("enter find_person break9")
+            #     print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            #     self.person_tracking_whole()
+            #     print("finish tracking!!!!")
+            #     break
+            # time.sleep(0.8)
+            # self.motor_forward_together2(-25, 18, 100)
+            # print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            # if self.roaming_stop_flag == True:
+            #     self.motor_stop()  # 停止第一个电机
+            #     self.motor_stop2()  # 停止第二个电机
+            #     time.sleep(0.1)
+            #     print("enter find_person break8")
+            #     print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            #     self.person_tracking_whole()
+            #     print("finish tracking!!!!")
+            #     break
+            # time.sleep(0.8)
+            # self.motor_forward_together2(25, 18, 100)
+            # print("self.roaming_stop_flag:", self.roaming_stop_flag)
+            # if self.roaming_stop_flag == True:
+            #     self.motor_stop()  # 停止第一个电机
+            #     self.motor_stop2()  # 停止第二个电机
+            #     time.sleep(0.1)
+            #     print("enter find_person break9")
+            #     print("last_angle1,last_angle2:", last_angle1, last_angle2)
+            #     self.person_tracking_whole()
+            #     print("finish tracking!!!!")
+            #     break
+            # time.sleep(0.5)
         # print("start tracking!!!!")
         # motor_forward_together2(last_angle1,last_angle2, 70)
 
