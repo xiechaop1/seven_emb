@@ -1217,7 +1217,10 @@ class Motor:
         global current
         with open("motor_degree.txt", "r") as md_file:
             tmp = md_file.read().strip()  # 读取并去除任何多余的空白字符
-            self.current_pos, self.current_pos2 = map(str, tmp.split(','))
+            if tmp is not None:
+                self.current_pos, self.current_pos2 = map(str, tmp.split(','))
+            else:
+                self.current_pos, self.current_pos2 = 0, 0
         md_file.close()
         for i in range(1):
             print("enter find_zero_pos")
