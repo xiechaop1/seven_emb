@@ -51,6 +51,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--mode', default="", type=str, help='demo mode without screen')
 args = parser.parse_args()
 
+if args.mode == "zero":
+    cv2_instance = cv2.VideoCapture(0)
+    motor_instance = Motor(cv2_instance)
+    motor_instance.find_zero_pos()
+    sys.exit(0)
+
 # exec_tag = None
 # if len(sys.argv) > 1:
 #     exec_tag = sys.argv[1]

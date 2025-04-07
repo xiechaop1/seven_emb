@@ -168,7 +168,7 @@ class Motor:
         # self.motor_stop2()
         # print("stop2")
         # time.sleep(100)
-        self.find_zero_pos()
+        # self.find_zero_pos()
         # self.motor_forward_together2_no_break(60, 0, 100)
 
         # parser = argparse.ArgumentParser()
@@ -216,6 +216,9 @@ class Motor:
         self.cap = cv2
 
     def start(self):
+
+        self.find_zero_pos()
+
         run_keypoint_main_thread = threading.Thread(target=self.run_keypoint_main)
         run_keypoint_main_thread.start()
 
