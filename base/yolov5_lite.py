@@ -26,7 +26,7 @@ class yolov5_lite():
         self.MAX_DISTANCE = 60
         self.moter_handler = moter_handler
 
-        # self.person_found_flag = False
+        self.person_found_flag = False
 
     def letterBox(self, srcimg, keep_ratio=True):
         top, left, newh, neww = 0, 0, self.input_shape[0], self.input_shape[1]
