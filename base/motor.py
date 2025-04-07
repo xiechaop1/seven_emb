@@ -1225,23 +1225,29 @@ class Motor:
 
     def find_zero_pos(self):
         global current
-        with open("motor_degree.txt", "r") as md_file:
-            tmp = md_file.read().strip()  # 读取并去除任何多余的空白字符
-            if "," in tmp:
-                self.current_pos, self.current_pos2 = map(int, tmp.split(','))
-            else:
-                self.current_pos, self.current_pos2 = 0, 0
-        md_file.close()
-        for i in range(1):
-            print("enter find_zero_pos")
-            # motor_forward_angle(20,100)
-            # time.sleep(1)
-            # motor_forward_angle(80, 100)
-            # time.sleep(1)
-            move_pos = (-1) * self.current_pos
-            move_pos2 = (-1) * self.current_pos2
-            # self.motor_backward_angle(120, 100)
-            self.motor_forward_together2_no_break(move_pos, move_pos2, 100)
+        # with open("motor_degree.txt", "r") as md_file:
+        #     tmp = md_file.read().strip()  # 读取并去除任何多余的空白字符
+        #     if "," in tmp:
+        #         self.current_pos, self.current_pos2 = map(int, tmp.split(','))
+        #     else:
+        #         self.current_pos, self.current_pos2 = 0, 0
+        # md_file.close()
+        # for i in range(1):
+        #     print("enter find_zero_pos")
+        #     # motor_forward_angle(20,100)
+        #     # time.sleep(1)
+        #     # motor_forward_angle(80, 100)
+        #     # time.sleep(1)
+        #     move_pos = (-1) * self.current_pos
+        #     move_pos2 = (-1) * self.current_pos2
+        #     # self.motor_backward_angle(120, 100)
+        #     self.motor_forward_together2_no_break(move_pos, move_pos2, 100)
+        move_pos = 0
+        move_pos2 = 300
+        self.motor_forward_together2_no_break(move_pos, move_pos2, 100)
+        move_pos = 0
+        move_pos2 = -180
+        self.motor_forward_together2_no_break(move_pos, move_pos2, 100)
         self.current_pos = self.current_pos2 = 0
         with open("motor_degree.txt", "w") as md_file:
             md_file.write(str(f"{self.current_pos},{self.current_pos2}"))
