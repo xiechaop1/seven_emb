@@ -59,7 +59,7 @@ args = parser.parse_args()
 if Config.IS_DEBUG == False:
     os.environ["SDL_AUDIODRIVER"] = "alsa"
     hw = Common.find_audio_hw()
-    os.environ["AUDIODEV"] = f"hw:{hw},0"
+    os.environ["AUDIODEV"] = f"hw:{hw}"
     if Config.OS is not None:
         if Config.OS == "pi5":
             os.environ["AUDIODEV"] = "hw:2,0"

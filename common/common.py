@@ -26,16 +26,18 @@ class Common:
 
 	@staticmethod
 	def find_audio_hw(device_name = "Yundea 1076"):
-		hw_idx = None
+		hw = None
 		# 遍历设备列表查找设备索引
 		for i, device in enumerate(sd.query_devices()):
 			if device_name in device['name'] and device['max_input_channels'] > 0:
 				tmp = device['name']
-				hw_idx = re.match(r"\(hw:(\d+)\)", tmp).group(1)
+				hw_idx = re.findall(r"\(hw:(\d+,\d+)", tmp)
+				if hw_idx is not None:
+					hw = hw_idx[0]
+				print(f"找到索引: {hw} - {device_name}")
 				break
 
 
-		if hw_idx is None:
-			raise ValueError(f"找不到匹配的设备 '{device_name}'")
-		print(f"找到索引: {hw_idx} - {device_name}")
-		return hw_idx
+		if hw is None:
+			hw = "1,0"
+		return hw
