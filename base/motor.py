@@ -10,7 +10,6 @@ import threading
 import RPi.GPIO as GPIO
 import math
 from base.PIDController import PIDController
-import argparse
 from base.yolov5_lite import yolov5_lite
 import queue
 
@@ -253,17 +252,22 @@ class Motor:
     # 控制电机的函数
     def motor_forward(self, speed):
         # print("motor_forward")
+        return          # 临时取消掉，上下电机卡头有点问题
+        ThreadingEvent.motor_running_event.wait()
         self.move_flag = True
         self.pwmINA.ChangeDutyCycle(speed)  # 设置电机A的占空比（控制电机正转速度）
         self.pwmINB.ChangeDutyCycle(0)  # 电机B保持不动
 
     def motor_reverse(self, speed):
         # print("motor_reverse")
+        return          # 临时取消掉，上下电机卡头有点问题
+        ThreadingEvent.motor_running_event.wait()
         self.move_flag = True
         self.pwmINA.ChangeDutyCycle(0)  # 电机A保持不动
         self.pwmINB.ChangeDutyCycle(speed)  # 设置电机B的占空比（控制电机反转速度）
 
     def motor_stop(self):
+        ThreadingEvent.motor_running_event.clear()
         self.move_flag = False
         self.pwmINA.ChangeDutyCycle(0)  # 停止电机A
         self.pwmINB.ChangeDutyCycle(0)  # 停止电机B
@@ -271,6 +275,7 @@ class Motor:
     # 控制电机的函数
     def motor_forward2(self, speed):
         # print("motor_forward2")
+        ThreadingEvent.motor_running_event.wait()
         self.move_flag2 = True
         self.pwmINA2.ChangeDutyCycle(speed)  # 设置电机A的占空比（控制电机正转速度）
         self.pwmINB2.ChangeDutyCycle(0)  # 电机B保持不动
@@ -279,6 +284,7 @@ class Motor:
 
     def motor_reverse2(self, speed):
         # print("motor_reverse2")
+        ThreadingEvent.motor_running_event.wait()
         self.move_flag2 = True
         self.pwmINA2.ChangeDutyCycle(0)  # 电机A保持不动
         self.pwmINB2.ChangeDutyCycle(speed)  # 设置电机B的占空比（控制电机反转速度）
@@ -286,6 +292,7 @@ class Motor:
         # GPIO.output(INB_PIN2, GPIO.HIGH)  # 电机B反转
 
     def motor_stop2(self):
+        ThreadingEvent.motor_running_event.clear()
         self.move_flag2 = False
         self.pwmINA2.ChangeDutyCycle(0)  # 停止电机A
         self.pwmINB2.ChangeDutyCycle(0)  # 停止电机B
@@ -560,6 +567,7 @@ class Motor:
         # 控制电机同时运动
         if not self.cap.isOpened():
             return
+        ThreadingEvent.motor_running_event.set()
         for i in range(max(abs(angle1), abs(angle2))):  # 根据最大角度进行循环
             # print("i:", i)
             # time.sleep(0.1)
@@ -783,6 +791,7 @@ class Motor:
         # 控制电机同时运动
         if not self.cap.isOpened():
             return
+        ThreadingEvent.motor_running_event.set()
         for i in range(max(abs(angle1), abs(angle2))):  # 根据最大角度进行循环
             time.sleep(0.1)
             print("person_found_flag2:", self.net.person_found_flag)
@@ -798,14 +807,18 @@ class Motor:
             # 控制第一个电机
             if angle1 > 0:
                 self.motor_forward(total_speed)  # 控制第一个电机正转
+                self.current_pos = self.current_pos + 1
             elif angle1 < 0:
                 self.motor_reverse(total_speed)  # 控制第一个电机反转
+                self.current_pos = self.current_pos - 1
 
             # 控制第二个电机
             if angle2 > 0:
                 self.motor_forward2(total_speed)  # 控制第二个电机正转
+                self.current_pos2 = self.current_pos2 + 1
             elif angle2 < 0:
                 self.motor_reverse2(total_speed)  # 控制第二个电机反转
+                self.current_pos2 = self.current_pos2 - 1
 
             # 检查电机是否堵转
             if self.clog_flag == True:
@@ -829,8 +842,8 @@ class Motor:
                 break
 
             # 更新电机角度
-            self.current_pos = self.current_pos + 1
-            self.current_pos2 = self.current_pos2 + 1
+            # self.current_pos = self.current_pos + 1
+            # self.current_pos2 = self.current_pos2 + 1
             # with open("motor_degree.txt", "w") as file_status:
             #     current_pos = current_pos + 1
             #     print("current_pos+:", current_pos)
@@ -854,6 +867,7 @@ class Motor:
 
         print("init no break")
         print("angle_def1:", angle1)
+        print("angle_def2:", angle2)
         # try:
         #     with open("motor_degree.txt", "r") as file_status:
         #         current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
@@ -880,8 +894,9 @@ class Motor:
         # print(f"Adjusted speeds -> motor1: {speed1_adjusted}, motor2: {speed2_adjusted}")
 
         # 控制电机同时运动
+        ThreadingEvent.motor_running_event.set()
         for i in range(max(abs(angle1), abs(angle2))):  # 根据最大角度进行循环
-            time.sleep(0.05)
+            # time.sleep(0.05)
             # print("person_found_flag2:", person_found_flag)
             # if person_found_flag==True:
             #     motor_stop()  # 停止第一个电机
@@ -967,6 +982,7 @@ class Motor:
         print("angle_def1:", angle)
         # with open("motor_degree.txt", "r") as file_status:
         #     current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+        ThreadingEvent.motor_running_event.set()
         for i in range(angle):
             time.sleep(0.2)
             self.motor_forward(speed)  # 电机正转，速度50%
@@ -1002,6 +1018,7 @@ class Motor:
         print("angle_def2:", angle)
         # with open("motor_degree.txt", "r") as file_status:
         #     current_pos = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+        ThreadingEvent.motor_running_event.set()
         for i in range(angle):
             time.sleep(0.2)
             self.motor_reverse(speed)  # 电机反转，速度50%
@@ -1048,6 +1065,7 @@ class Motor:
         print("angle_def1:", angle)
         # with open("motor_degree2.txt", "r") as file_status:
         #     current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+        ThreadingEvent.motor_running_event.set()
         for i in range(angle):
             time.sleep(0.2)
             self.motor_forward2(speed)  # 电机正转，速度50%
@@ -1080,6 +1098,7 @@ class Motor:
         print("angle_def2:", angle)
         # with open("motor_degree2.txt", "r") as file_status:
         #     current_pos2 = int(file_status.read().strip())  # 读取并去除任何多余的空白字符
+        ThreadingEvent.motor_running_event.set()
         for i in range(angle):
             time.sleep(0.2)
             self.motor_reverse2(speed)  # 电机反转，速度50%
@@ -1108,7 +1127,7 @@ class Motor:
         time.sleep(0.1)
 
     # def read_voltage():
-    #     # 读取 A0 引脚上的电压值，返回一个值范围在-32768 到 32767之间
+    #     # 读取 A0 引脚上的电压值，返回一个值范围在 -32768 到 32767之间
     #     value = adc.read_adc(2, gain=GAIN)
     #
     #     # 将读取的值转换为电压值（范围0-4.096V）
@@ -1268,7 +1287,7 @@ class Motor:
             self.motor_backward_angle2(120, 100)
 
     def find_person_roaming(self):
-        global last_angle1, last_angle2
+        # global last_angle1, last_angle2
         if not self.cap.isOpened():
             return
         ang_map = [
@@ -1301,8 +1320,8 @@ class Motor:
                     print("finish tracking!!!!")
                     break
                 time.sleep(0.5)
-            if self.roaming_stop_flag == True:
-                break
+            # if self.roaming_stop_flag == True:
+            #     break
             time.sleep(0.3)
 
             # self.motor_forward_together2(-25, -18, 100)

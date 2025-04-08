@@ -11,6 +11,8 @@ class ThreadingEvent:
 	light_daemon_event = threading.Event()
 	screen_daemon_event = threading.Event()
 
+	motor_running_event = threading.Event()
+
 	wakeup_event = threading.Event()
 
 	execute_command_undertake = threading.Event()

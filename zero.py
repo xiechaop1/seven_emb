@@ -34,7 +34,6 @@ import argparse
 from model.undertake_callback import UndertakeCallback
 import asyncio
 from pynput import keyboard
-import signal
 
 #from base.spary import Spray
 from model.execute_command import ExecuteCommand
@@ -62,7 +61,6 @@ if args.mode == "zero":
 # if len(sys.argv) > 1:
 #     exec_tag = sys.argv[1]
 
-
 def on_press(key):
     try:
         print(f'{key.char} key pressed')
@@ -71,13 +69,10 @@ def on_press(key):
 
 def on_release(key):
     print(f'{key} key released')
-    keychar = key.char
-    if key == keyboard.Key.esc or keychar == 'q' or keychar == 'c':
-        print("exit")
-        # motor_instance.motor_stop()
-        # motor_instance.motor_stop2()
-        sys.exit()
-        # return False  # 停止监听
+    if key == keyboard.Key.esc or key == "c":
+        motor_instance.motor_stop()
+        motor_instance.motor_stop2()
+        return False  # 停止监听
 
 if Config.IS_DEBUG == False:
     os.environ["SDL_AUDIODRIVER"] = "alsa"
@@ -196,18 +191,6 @@ if __name__ == "__main__":
             on_release=on_release) as listener:
         listener.join()
 
-def signal_handler(sig, frame):
-    print("Now exiting...")
-    print("Stop motor")
-    if motor_instance is not None:
-        motor_instance.motor_stop()
-        motor_instance.motor_stop2()
-    print("Stop spray")
-    if spray_instance is not None:
-        spray_instance.turn_off()
-    sys.exit(0)
-
-signal.signal(signal.SIGINT, signal_handler)
 
 
 
