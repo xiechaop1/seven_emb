@@ -1,7 +1,11 @@
+import queue
 from xmlrpc.client import DateTime
 
 import pygame
 import os
+
+from gevent.queue import Queue
+
 from common.threading_event import ThreadingEvent
 import logging
 import time
@@ -38,6 +42,9 @@ class AudioPlayer:
         self.i = 0
         self.voice_channel = pygame.mixer.Channel(1)
         self.continue_track = None
+
+        # self.clear_list_defer_queue = queue.Queue()
+        self.clear_list_defer_tag = False
 
         # self.replay_idx = 0
 
@@ -210,6 +217,11 @@ class AudioPlayer:
             # elif audio_data["type"] == Code.EXECUTE_COMMAND_TIP_VOICE:
             #     ThreadingEvent.camera_start_event.set()
             #     ThreadingEvent.recv_execute_command_event.set()
+
+            # 延迟清理列表
+            if self.clear_list_defer_tag == True:
+                self.clear_list()
+                # self.clear_list_defer_tag = False
 
             interrupt_flag = self.get_interrupt()
             print("play audio interrupt flag:", interrupt_flag)
@@ -478,10 +490,17 @@ class AudioPlayer:
         pygame.mixer.music.stop()
         ThreadingEvent.audio_play_event.clear()
 
+    def clear_list_defer(self):
+        # self.clear_list_defer_queue.put(1)
+        self.clear_list_defer_tag = True
+
     def clear_list(self):
         """清空音频列表"""
         self.audio_list.clear()
         self.i = 0
+
+        self.clear_list_defer_tag = False
+
         logging.info("Audio list cleared.")
 
     def set_current_audio_method(self, method = Code.REC_METHOD_VOICE_CHAT):

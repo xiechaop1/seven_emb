@@ -160,11 +160,14 @@ if __name__ == "__main__":
         screen_thread = threading.Thread(target=screen_instance.daemon)
         screen_thread.start()
         screen_instance.play()
+
+        if "MOTOR_ON" in Config:
+            if Config.MOTOR_ON == True:
+                motor_instance = Motor(cv2_instance)
+                motor_instance.start()
     else:
         screen_instance = None
 
-    motor_instance = Motor(cv2_instance)
-    motor_instance.start()
 
     # screen = Screen()
     # screen.display("resources/video/think.mp4")
