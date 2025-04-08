@@ -278,11 +278,11 @@ class ExecuteCommand:
 
 		if scene_seq > 100:
 			self.audio_player.reset_interrupt(resp_msg_id, Code.REC_METHOD_VOICE_EXEC, 1)
-			if self.audio_player.get_current_track() is not None:
-				# 如果正在有声音播放，就延迟清空队列
-				self.audio_player.clear_list_defer()
-			else:
-				self.audio_player.clear_list()
+			# if self.audio_player.get_current_track() is not None:
+			# 	# 如果正在有声音播放，就延迟清空队列
+			# 	self.audio_player.clear_list_defer()
+			# else:
+			self.audio_player.clear_list()
 
 		li_voice = resp["data"]["actions"]["voice"]
 

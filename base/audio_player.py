@@ -226,9 +226,10 @@ class AudioPlayer:
             interrupt_flag = self.get_interrupt()
             print("play audio interrupt flag:", interrupt_flag)
             if interrupt_flag is None:
-                print("self.i add,", self.i)
-                # print(self.audio_list)
-                self.i = self.i + 1
+                if self.audio_list[self.i]['msg_id'] == msg_id:
+                    print("self.i add,", self.i)
+                    # print(self.audio_list)
+                    self.i = self.i + 1
             else:
                 if interrupt_flag["msg_id"] == msg_id:
                     print("self.i add by msg self,", self.i)
