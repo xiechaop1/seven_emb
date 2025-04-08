@@ -7,7 +7,6 @@ import logging
 from base.ws import WebSocketClient
 from base.mic import Mic
 from base.audio_player import AudioPlayer
-from base.motor import Motor
 from config.config import Config
 if not Config.IS_DEBUG:
     from base.light import Light
