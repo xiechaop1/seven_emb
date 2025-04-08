@@ -30,6 +30,8 @@ class Light:
     LED_INVERT = False  # True to invert the signal (when using NPN transistor level shift)
     LED_CHANNEL = 0  # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
+    BRIGHTNESS_MAX = 255
+
     def __init__(self):
         # self.light_mode = ""
 
@@ -273,11 +275,15 @@ class Light:
     def set_high(self, duration = 10):
         brightness = self.brightness
         new_brightness = brightness + duration
+        if new_brightness > self.BRIGHTNESS_MAX:
+            new_brightness = self.BRIGHTNESS_MAX
         self.set_brightness(new_brightness)
 
     def set_low(self, duration = 10):
         brightness = self.brightness
         new_brightness = brightness - duration
+        if new_brightness < 0:
+            new_brightness = 0
         self.set_brightness(new_brightness)
 
     def set_mode(self, mode):

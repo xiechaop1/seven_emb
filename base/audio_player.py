@@ -21,6 +21,8 @@ class AudioPlayer:
 
     PATH = "/tmp/"
 
+    VOLUME_MAX = 1.0
+
     def __init__(self, spray, light):
         # 初始化 Pygame mixer
         pygame.mixer.init()
@@ -50,19 +52,31 @@ class AudioPlayer:
 
     def set_back_volume_high(self, duration = 0.1):
         now_volume = pygame.mixer.music.get_volume()
-        pygame.mixer.music.set_volume(now_volume + duration)
+        new_volume = now_volume + duration
+        if new_volume > self.VOLUME_MAX:
+            new_volume = self.VOLUME_MAX
+        pygame.mixer.music.set_volume(new_volume)
 
     def set_back_volume_low(self, duration = 0.1):
         now_volume = pygame.mixer.music.get_volume()
-        pygame.mixer.music.set_volume(now_volume - duration)
+        new_volume = now_volume - duration
+        if new_volume < 0:
+            new_volume = 0
+        pygame.mixer.music.set_volume(new_volume)
 
     def set_front_volume_high(self, duration = 0.1):
         now_volume = pygame.mixer.Sound.get_volume()
-        pygame.mixer.music.set_volume(now_volume + duration)
+        new_volume = now_volume + duration
+        if new_volume > self.VOLUME_MAX:
+            new_volume = self.VOLUME_MAX
+        pygame.mixer.music.set_volume(new_volume)
 
     def set_front_volume_low(self, duration = 0.1):
         now_volume = pygame.mixer.Sound.get_volume()
-        pygame.mixer.music.set_volume(now_volume - duration)
+        new_volume = now_volume - duration
+        if new_volume < 0:
+            new_volume = 0
+        pygame.mixer.music.set_volume(new_volume)
 
 
     def audio_play_event_daemon(self):
