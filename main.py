@@ -18,6 +18,9 @@ if Config.OS is not None:
     if Config.OS == "pi5":
         from base.screen_pi5 import Screen
 
+if "MOTOR_ON" in Config:
+    if Config.MOTOR_ON == True:
+        from base.motor import Motor
 
 import os
 import cv2
