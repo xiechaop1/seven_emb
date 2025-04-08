@@ -56,6 +56,8 @@ class Light:
         self.current_colors = []
         self.curr_light_buffer = []
 
+        self.brightness = 100
+
         self.random_point_mode_colors = {
             "star": {
                 "fore_colors": [
@@ -265,7 +267,18 @@ class Light:
             else:
                 self.turn_off()
 
+    def set_brightness(self, brightness):
+        self.brightness = brightness
 
+    def set_high(self, duration = 10):
+        brightness = self.brightness
+        new_brightness = brightness + duration
+        self.set_brightness(new_brightness)
+
+    def set_low(self, duration = 10):
+        brightness = self.brightness
+        new_brightness = brightness - duration
+        self.set_brightness(new_brightness)
 
     def set_mode(self, mode):
         self.light_mode = mode
@@ -1230,6 +1243,22 @@ class Light:
                 b = bt
             self.curr_light_buffer[i] = Color(r, g, b)
 
+    def get_color(self, pos, rt, gt, bt):
+        if pos < self.light_nums[0]:
+            # 最外圈变暗
+            r = int(rt / 10)
+            g = int(gt / 10)
+            b = int(bt / 10)
+        else:
+            r = rt
+            g = gt
+            b = bt
+        r = r * (self.brightness / 100)
+        g = g * (self.brightness / 100)
+        b = b * (self.brightness / 100)
+
+        return [r, g, b]
+
     def save_color_to_buffer(self, r, g, b, start, num):
         rt = r
         gt = g
@@ -1239,15 +1268,19 @@ class Light:
             if pos >= self.LED_COUNT:
                 pos = self.LED_COUNT - 1
 
-            if pos < self.light_nums[0]:
-                # 最外圈变暗
-                r = int(rt / 10)
-                g = int(gt / 10)
-                b = int(bt / 10)
-            else:
-                r = rt
-                g = gt
-                b = bt
+            r, g, b = self.get_color(pos, rt, gt, bt)
+            # if pos < self.light_nums[0]:
+            #     # 最外圈变暗
+            #     r = int(rt / 10)
+            #     g = int(gt / 10)
+            #     b = int(bt / 10)
+            # else:
+            #     r = rt
+            #     g = gt
+            #     b = bt
+            # r = r * (self.brightness / 100)
+            # g = g * (self.brightness / 100)
+            # b = b * (self.brightness / 100)
             self.curr_light_buffer[pos] = Color(r, g, b)
 
     def show_color_by_buffer(self):
@@ -1265,15 +1298,19 @@ class Light:
         gt = g
         bt = b
         for i in range(num):
-            if i + start < self.light_nums[0]:
-                # 最外圈变暗
-                r = int(rt / 10)
-                g = int(gt / 10)
-                b = int(bt / 10)
-            else:
-                r = rt
-                g = gt
-                b = bt
+            r, g, b = self.get_color(i + start, rt, gt, bt)
+            # if i + start < self.light_nums[0]:
+            #     # 最外圈变暗
+            #     r = int(rt / 10)
+            #     g = int(gt / 10)
+            #     b = int(bt / 10)
+            # else:
+            #     r = rt
+            #     g = gt
+            #     b = bt
+            # r = r * (self.brightness / 100)
+            # g = g * (self.brightness / 100)
+            # b = b * (self.brightness / 100)
             self.strip.setPixelColor(i + start, Color(r, g, b))
             # print("j:", j)
         self.strip.show()

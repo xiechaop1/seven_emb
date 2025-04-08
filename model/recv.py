@@ -95,7 +95,12 @@ class Recv:
 							"action": act
 						}
 						# act = resp["data"]["action"]
-						if act == Code.REC_ACTION_SLEEP_ASSISTANT:
+						if act == Code.REC_ACTION_BRIGHTNESS:
+							self.light.set_high()
+						elif act == Code.REC_ACTION_VOLUME:
+							self.audio_player.set_front_volume_high()
+							self.audio_player.set_back_volume_high()
+						elif act == Code.REC_ACTION_SLEEP_ASSISTANT:
 							if resp['data']['stream_seq'] == -1:
 								# 进入助眠唤醒命令，会有一条 -1的结束，这条pass
 								continue
