@@ -43,8 +43,9 @@ class Spray:
         GPIO.output(self.SPRAY_PIN, GPIO.LOW)
 
     def shoot(self, times = 4, wait_time = 30):
-        if "SPRAY_ON" in Config and Config.SPRAY_ON == False:
-            return
+        if hasattr(Config, "SPRAY_ON"):
+            if Config.SPRAY_ON == False:
+                return
         for i in range(times):
             for j in range(3):
                 GPIO.output(self.SPRAY_PIN, GPIO.HIGH)

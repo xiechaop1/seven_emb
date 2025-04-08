@@ -13,11 +13,11 @@ if not Config.IS_DEBUG:
     from base.spray import Spray
 
 from base.screen import Screen
-if Config.OS is not None:
+if hasattr(Config, "OS"):
     if Config.OS == "pi5":
         from base.screen_pi5 import Screen
 
-if "MOTOR_ON" in Config:
+if hasattr(Config, "MOTOR_ON"):
     if Config.MOTOR_ON == True:
         from base.motor import Motor
 
@@ -163,7 +163,7 @@ if __name__ == "__main__":
         screen_thread.start()
         screen_instance.play()
 
-        if "MOTOR_ON" in Config:
+        if hasattr(Config, "MOTOR_ON"):
             if Config.MOTOR_ON == True:
                 motor_instance = Motor(cv2_instance)
                 motor_instance.start()
