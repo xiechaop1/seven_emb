@@ -23,7 +23,7 @@ class Recv:
 
 	REC_ACTION_SLEEP_ASSISTANT = "sleep_assistant"
 
-	def __init__(self, ws, wsClient, audioPlayerIns, lightIns, cv2Ins, screenIns):
+	def __init__(self, ws, wsClient, audioPlayerIns, lightIns, cv2Ins, screenIns, sprayIns):
 		self.ws = ws
 		self.wsClient = wsClient
 		self.recv_daemon = True
@@ -31,6 +31,7 @@ class Recv:
 		self.light = lightIns
 		self.cv2 = cv2Ins
 		self.screen = screenIns
+		self.spray = sprayIns
 		self.undertake = False
 
 	def daemon(self):
@@ -38,7 +39,7 @@ class Recv:
 
 		# self.wsClient.set_callback = ec_handler.undertake
 		ec_handler = ExecuteCommand(self.audio_player, self.wsClient, self.cv2)
-		co_handler = Command(self.audio_player, self.light, self.wsClient, self.cv2)
+		co_handler = Command(self.audio_player, self.light, self.spray, self.wsClient, self.cv2)
 
 		last_resp = None
 		msg_id_2_type = {}

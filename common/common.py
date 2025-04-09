@@ -1,6 +1,9 @@
 from datetime import datetime
 import sounddevice as sd
 import re
+from common.threading_event import ThreadingEvent
+from common.scence import Scence
+from config.config import Config
 
 class Common:
 
@@ -50,3 +53,24 @@ class Common:
 		ret = re.findall(format, action)
 
 		return ret
+
+	@staticmethod
+	def sleep(audio_player, light = None, spray = None):
+		Scence.scence = None
+		ThreadingEvent.audio_play_event.clear()
+		ThreadingEvent.camera_start_event.clear()
+		ThreadingEvent.spray_start_event.clear()
+		ThreadingEvent.recv_execute_command_event.clear()
+		ThreadingEvent.light_daemon_event.clear()
+		# ThreadingEvent.wakeup_event.clear()
+
+		audio_player.stop_audio()
+		audio_player.stop_music()
+		audio_player.clear_list()
+		if Config.IS_DEBUG == False:
+			if light is not None:
+				light.turn_off()
+			if spray is not None:
+				spray.turn_off()
+
+		ThreadingEvent.wakeup_event.clear()

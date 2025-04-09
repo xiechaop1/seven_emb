@@ -38,22 +38,23 @@ class Daemon:
 		return
 
 	def sleep(self):
-		Scence.scence = None
-		ThreadingEvent.audio_play_event.clear()
-		ThreadingEvent.camera_start_event.clear()
-		ThreadingEvent.spray_start_event.clear()
-		ThreadingEvent.recv_execute_command_event.clear()
-		ThreadingEvent.light_daemon_event.clear()
+		Common.sleep(self.audio_player, self.light, self.spray)
+		# Scence.scence = None
+		# ThreadingEvent.audio_play_event.clear()
+		# ThreadingEvent.camera_start_event.clear()
+		# ThreadingEvent.spray_start_event.clear()
+		# ThreadingEvent.recv_execute_command_event.clear()
+		# ThreadingEvent.light_daemon_event.clear()
+		# # ThreadingEvent.wakeup_event.clear()
+		#
+		# self.audio_player.stop_audio()
+		# self.audio_player.stop_music()
+		# self.audio_player.clear_list()
+		# if Config.IS_DEBUG == False:
+		# 	self.light.turn_off()
+		# 	self.spray.turn_off()
+		#
 		# ThreadingEvent.wakeup_event.clear()
-
-		self.audio_player.stop_audio()
-		self.audio_player.stop_music()
-		self.audio_player.clear_list()
-		if Config.IS_DEBUG == False:
-			self.light.turn_off()
-			self.spray.turn_off()
-
-		ThreadingEvent.wakeup_event.clear()
 
 
 

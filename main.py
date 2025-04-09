@@ -183,7 +183,7 @@ if __name__ == "__main__":
     logging.info("Mic is ready")
 
     #
-    recv_instance = Recv(ws_cli, client, audio_instance, light_instance, cv2_instance, screen_instance)
+    recv_instance = Recv(ws_cli, client, audio_instance, light_instance, cv2_instance, screen_instance, spray_instance)
     recv_thread = threading.Thread(target=recv_instance.daemon)
     recv_thread.start()
     # logging.info("Starting receive websocket data ...")

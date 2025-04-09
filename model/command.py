@@ -16,14 +16,15 @@ from common.code import Code
 import threading
 
 
-class ExecuteCommand:
+class Command:
 
 
 	MAX_SCENE = 6	# 最大场景ID
 
-	def __init__(self, audioPlayerIns, light, ws, cv2):
+	def __init__(self, audioPlayerIns, light, spray, ws, cv2):
 		self.audio_player = audioPlayerIns
 		self.light = light
+		self.spray = spray
 		self.ws = ws
 		self.cv2 = cv2
 
@@ -74,7 +75,9 @@ class ExecuteCommand:
 					self.light.set_high()
 				elif params == Code.REC_ACTION_PARAMS_VALUE_DOWN:
 					self.light.set_low()
-			
+		elif device == Code.REC_ACTION_PARAMS_DEVICE_SYSTEM:
+			if value == Code.REC_ACTION_PARAMS_VALUE_SLEEP:
+				Common.sleep(self.audio_player, self.light, self.spray)
 
 		return
 
