@@ -1,6 +1,7 @@
 from base.messageid import messageid
 from model.voice_chat import VoiceChat
 from model.execute_command import ExecuteCommand
+from model.command import Command
 from websocket import WebSocketException, WebSocketConnectionClosedException
 import json
 import threading
@@ -37,6 +38,7 @@ class Recv:
 
 		# self.wsClient.set_callback = ec_handler.undertake
 		ec_handler = ExecuteCommand(self.audio_player, self.wsClient, self.cv2)
+		co_handler = Command(self.audio_player, self.light, self.wsClient, self.cv2)
 
 		last_resp = None
 		msg_id_2_type = {}
@@ -95,12 +97,7 @@ class Recv:
 							"action": act
 						}
 						# act = resp["data"]["action"]
-						if act == Code.REC_ACTION_BRIGHTNESS:
-							self.light.set_high()
-						elif act == Code.REC_ACTION_VOLUME:
-							self.audio_player.set_front_volume_high()
-							self.audio_player.set_back_volume_high()
-						elif act == Code.REC_ACTION_SLEEP_ASSISTANT:
+						if act == Code.REC_ACTION_SLEEP_ASSISTANT:
 							if resp['data']['stream_seq'] == -1:
 								# 进入助眠唤醒命令，会有一条 -1的结束，这条pass
 								continue
@@ -143,8 +140,10 @@ class Recv:
 							print("play enter_sleep_mode!")
 							self.audio_player.play_voice_with_file(output_file_name)
 							last_resp = resp
-
-						# ec_handler.latest_scene_seq = 0
+						elif act == Code.REC_ACTION_COMMAND:
+							co_thread = threading.Thread(target=co_handler.deal, args=(resp,))
+							co_thread.start()
+							# continue
 						else:
 							vc_thread = threading.Thread(target=vc_handler.deal, args=(resp,))
 							vc_thread.start()
@@ -162,4 +161,5 @@ class Recv:
 							ec_thread.start()
 							# ec_handler.deal(resp)
 						continue
+
 

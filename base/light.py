@@ -272,14 +272,14 @@ class Light:
     def set_brightness(self, brightness):
         self.brightness = brightness
 
-    def set_high(self, duration = 10):
+    def set_high(self, duration = 50):
         brightness = self.brightness
         new_brightness = brightness + duration
         if new_brightness > self.BRIGHTNESS_MAX:
             new_brightness = self.BRIGHTNESS_MAX
         self.set_brightness(new_brightness)
 
-    def set_low(self, duration = 10):
+    def set_low(self, duration = 50):
         brightness = self.brightness
         new_brightness = brightness - duration
         if new_brightness < 0:

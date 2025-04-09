@@ -41,3 +41,12 @@ class Common:
 		if hw is None:
 			hw = "1,0"
 		return hw
+
+	@staticmethod
+	def get_params_from_act(action, format = None):
+		if format is None:
+			format = r"(\w+)\[(\w+)]"
+
+		ret = re.findall(format, action)
+
+		return ret
