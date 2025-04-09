@@ -1249,7 +1249,7 @@ class Light:
                 b = bt
             self.curr_light_buffer[i] = Color(r, g, b)
 
-    def get_color(self, pos, rt, gt, bt):
+    def calc_color(self, pos, rt, gt, bt):
         if pos < self.light_nums[0]:
             # 最外圈变暗
             r = int(rt / 10)
@@ -1259,9 +1259,9 @@ class Light:
             r = rt
             g = gt
             b = bt
-        r = r * (self.brightness / 100)
-        g = g * (self.brightness / 100)
-        b = b * (self.brightness / 100)
+        r = int(r * (self.brightness / 100))
+        g = int(g * (self.brightness / 100))
+        b = int(b * (self.brightness / 100))
 
         return [r, g, b]
 
@@ -1274,7 +1274,7 @@ class Light:
             if pos >= self.LED_COUNT:
                 pos = self.LED_COUNT - 1
 
-            r, g, b = self.get_color(pos, rt, gt, bt)
+            r, g, b = self.calc_color(pos, rt, gt, bt)
             # if pos < self.light_nums[0]:
             #     # 最外圈变暗
             #     r = int(rt / 10)
@@ -1304,7 +1304,7 @@ class Light:
         gt = g
         bt = b
         for i in range(num):
-            r, g, b = self.get_color(i + start, rt, gt, bt)
+            r, g, b = self.calc_color(i + start, rt, gt, bt)
             # if i + start < self.light_nums[0]:
             #     # 最外圈变暗
             #     r = int(rt / 10)
