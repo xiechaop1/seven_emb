@@ -57,7 +57,6 @@ class Command:
 					self.audio_player.set_back_volume_high()
 					self.audio_player.set_front_volume_high()
 				elif value == Code.REC_ACTION_PARAMS_VALUE_DOWN:
-					print("a")
 					self.audio_player.set_back_volume_low()
 					self.audio_player.set_front_volume_low()
 			elif operation == Code.REC_ACTION_PARAMS_OPER_VOICE:
@@ -81,6 +80,9 @@ class Command:
 			if value == Code.REC_ACTION_PARAMS_VALUE_SLEEP:
 				Common.sleep(self.audio_player, self.light, self.spray)
 
+		self.audio_player.clear_interrupt()
+		self.audio_player.replay()
+		
 		return
 
 
