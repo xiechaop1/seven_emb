@@ -29,8 +29,9 @@ class AudioPlayer:
         # pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
         self.muisc_player = pygame.mixer.music
         self.sound_player = pygame.mixer.Sound
+        self.sound_volume = 1.0
         self.voice = None
-        # pygame.mixer.music.set_volume(1.0)
+        pygame.mixer.music.set_volume(1.0)
         self.audio_list = []  # 用于存储音频文件路径
         self.current_track = None  # 当前正在播放的音频
         self.current_bgm = None
@@ -70,19 +71,23 @@ class AudioPlayer:
         logging.info(f"Set back volume low from {now_volume:.2f} to {new_volume:.2f}")
 
     def set_front_volume_high(self, duration = 0.25):
-        now_volume = self.voice.get_volume()
+        # now_volume = self.voice.get_volume()
+        now_volume = self.sound_volume
         new_volume = now_volume + duration
         if new_volume > self.VOLUME_MAX:
             new_volume = self.VOLUME_MAX
-        self.voice.set_volume(new_volume)
+        self.sound_volume = new_volume
+        # self.voice.set_volume(new_volume)
         logging.info(f"Set front volume high from {now_volume:.2f} to {new_volume:.2f}")
 
     def set_front_volume_low(self, duration = 0.25):
-        now_volume = self.voice.get_volume()
+        # now_volume = self.voice.get_volume()
+        now_volume = self.sound_volume
         new_volume = now_volume - duration
         if new_volume < 0:
             new_volume = 0
-        self.voice.set_volume(new_volume)
+        self.sound_volume = new_volume
+        # self.voice.set_volume(new_volume)
         logging.info(f"Set front volume low from {now_volume:.2f} to {new_volume:.2f}")
 
 
@@ -310,6 +315,7 @@ class AudioPlayer:
             return
         logging.info(f"Playing voice with file:{filename}")
         self.voice = self.sound_player(filename)
+        self.voice.set_volume(self.sound_volume)
         self.voice_channel.play(self.voice)
         while self.voice_channel.get_busy():
             time.sleep(0.5)
@@ -370,6 +376,7 @@ class AudioPlayer:
 
         self.current_track = audio_data
         self.voice = self.sound_player(audio_file)
+        self.voice.set_volume(self.sound_volume)
 
         # self.playing_list.append(audio_data)
         # print("play")
