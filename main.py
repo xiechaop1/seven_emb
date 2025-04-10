@@ -81,6 +81,9 @@ def on_release(key):
         sys.exit()
         # return False  # 停止监听
 
+
+os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
+
 if Config.IS_DEBUG == False:
     os.environ["SDL_AUDIODRIVER"] = "alsa"
     hw = Common.find_audio_hw()
@@ -91,7 +94,6 @@ if Config.IS_DEBUG == False:
 
     os.environ["SDL_VIDEODRIVER"] = "x11"  ########screen_modified by lixiaolin ###
     # os.environ["SDL_VIDEODRIVER"] = "quartz"
-    os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
     os.environ["XDG_RUNTIME_DIR"] = "/run/user/1000"
 
 

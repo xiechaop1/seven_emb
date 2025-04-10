@@ -97,6 +97,7 @@ class Recv:
 							# "method": method,
 							"action": act
 						}
+						print("act:",act)
 						# act = resp["data"]["action"]
 						if act == Code.REC_ACTION_SLEEP_ASSISTANT:
 							if resp['data']['stream_seq'] == -1:
