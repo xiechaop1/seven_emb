@@ -71,7 +71,7 @@ class AudioPlayer:
         new_volume = now_volume + duration
         if new_volume > self.VOLUME_MAX:
             new_volume = self.VOLUME_MAX
-        pygame.mixer.music.set_volume(new_volume)
+        pygame.mixer.Sound.set_volume(new_volume)
         logging.info("Set front volume high to %d" % new_volume)
 
     def set_front_volume_low(self, duration = 0.25):
@@ -79,7 +79,7 @@ class AudioPlayer:
         new_volume = now_volume - duration
         if new_volume < 0:
             new_volume = 0
-        pygame.mixer.music.set_volume(new_volume)
+        pygame.mixer.Sound.set_volume(new_volume)
         logging.info("Set front volume low to %d" % new_volume)
 
 
