@@ -74,7 +74,7 @@ class Command:
 			if operation == Code.REC_ACTION_PARAMS_OPER_BRIGHTNESS:
 				if value == Code.REC_ACTION_PARAMS_VALUE_UP:
 					self.light.set_high()
-				elif params == Code.REC_ACTION_PARAMS_VALUE_DOWN:
+				elif value == Code.REC_ACTION_PARAMS_VALUE_DOWN:
 					self.light.set_low()
 		elif device == Code.REC_ACTION_PARAMS_DEVICE_SYSTEM:
 			if value == Code.REC_ACTION_PARAMS_VALUE_SLEEP:
