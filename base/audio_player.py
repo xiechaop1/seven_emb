@@ -59,7 +59,7 @@ class AudioPlayer:
         if new_volume > self.VOLUME_MAX:
             new_volume = self.VOLUME_MAX
         self.music_player.set_volume(new_volume)
-        logging.info("Set back volume high to %d" % new_volume)
+        logging.info("Set back volume high to %.2f" % new_volume)
 
     def set_back_volume_low(self, duration = 0.25):
         now_volume = self.music_player.get_volume()
@@ -67,23 +67,23 @@ class AudioPlayer:
         if new_volume < 0:
             new_volume = 0
         self.music_player.set_volume(new_volume)
-        logging.info("Set back volume low to %d" % new_volume)
+        logging.info("Set back volume low to %.2f" % new_volume)
 
     def set_front_volume_high(self, duration = 0.25):
-        now_volume = self.sound_player.get_volume()
+        now_volume = self.voice.get_volume()
         new_volume = now_volume + duration
         if new_volume > self.VOLUME_MAX:
             new_volume = self.VOLUME_MAX
-        self.sound_player.set_volume(new_volume)
-        logging.info("Set front volume high to %d" % new_volume)
+        self.voice.set_volume(new_volume)
+        logging.info("Set front volume high to %.2f" % new_volume)
 
     def set_front_volume_low(self, duration = 0.25):
-        now_volume = self.sound_player.get_volume()
+        now_volume = self.voice.get_volume()
         new_volume = now_volume - duration
         if new_volume < 0:
             new_volume = 0
-        self.sound_player.set_volume(new_volume)
-        logging.info("Set front volume low to %d" % new_volume)
+        self.voice.set_volume(new_volume)
+        logging.info("Set front volume low to %.2f" % new_volume)
 
 
     def audio_play_event_daemon(self):
