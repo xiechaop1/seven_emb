@@ -29,6 +29,7 @@ class AudioPlayer:
         # pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
         self.music_player = pygame.mixer.music
         self.sound_player = pygame.mixer.Sound
+        self.voice = None
         self.music_player.set_volume(1.0)
         self.audio_list = []  # 用于存储音频文件路径
         self.current_track = None  # 当前正在播放的音频
@@ -308,8 +309,8 @@ class AudioPlayer:
         if filename == "" or filename is None:
             return
         logging.info(f"Playing voice with file:{filename}")
-        voice = self.sound_player(filename)
-        self.voice_channel.play(voice)
+        self.voice = self.sound_player(filename)
+        self.voice_channel.play(self.voice)
         while self.voice_channel.get_busy():
             time.sleep(0.5)
 
@@ -368,12 +369,12 @@ class AudioPlayer:
         #     self.music_player.stop()
 
         self.current_track = audio_data
-        voice = self.sound_player(audio_file)
+        self.voice = self.sound_player(audio_file)
 
         # self.playing_list.append(audio_data)
         # print("play")
         Common.set_latest_active_time(time.time())
-        self.voice_channel.play(voice)
+        self.voice_channel.play(self.voice)
 
         # self.music_player.load(audio_file)  # 加载音频文件
         # ThreadingEvent.audio_play_event.set()
