@@ -33,7 +33,6 @@ class Command:
 		resp_msg_id = resp["message_id"]
 		resp_conv_id = resp['conversation_id']
 
-		scene_seq = resp["data"]["scene_seq"]
 
 		action = resp["data"]["action"]
 
