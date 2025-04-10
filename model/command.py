@@ -82,7 +82,7 @@ class Command:
 
 		self.audio_player.clear_interrupt()
 		self.audio_player.replay()
-		
+
 		return
 
 
