@@ -7,6 +7,7 @@ import wheel
 from common.threading_event import ThreadingEvent
 from config.config import Config
 import random
+import queue
 
 from rpi_ws281x import *
 if not Config.IS_DEBUG:
@@ -46,8 +47,10 @@ class Light:
                                            self.LED_INVERT, self.LED_BRIGHTNESS, self.LED_CHANNEL)
         self.strip.begin()
         self.light_mode = None
+        self.light_type = None
         self.last_light_mode = None
         self.last_light_params = None
+        self.light_mode_queue = queue.Queue()
         self.current_color = None
         self.target_color = None
         self.target_params = None
@@ -306,9 +309,16 @@ class Light:
         return True
 
     def start_prev(self):
-        self.start(self.last_light_mode, self.last_light_params)
+        while True:
+            last_light_data = self.light_mode_queue.get()
+            last_light_mode = last_light_data["light_mode"]
+            last_light_params = last_light_data["light_params"]
+            last_type = last_light_data["type"]
+            if last_type != Code.LIGHT_TYPE_TEMP:
+                self.start(last_light_mode, last_light_params)
+                break
 
-    def start(self, light_mode, params):
+    def start(self, light_mode, params, type = Code.LIGHT_TYPE_SET):
         if "r" in params:
             r = params["r"]
         else:
@@ -325,10 +335,19 @@ class Light:
         self.set_target_params(params)
         self.set_target_color(f"{r},{g},{b}")
 
+        if type == Code.LIGHT_TYPE_SET and light_mode == Code.LIGHT_TYPE_DIY:
+            return
+        
         if light_mode is not None:
-            self.last_light_mode = self.light_mode
-            self.last_light_params = self.target_params
+            # self.last_light_mode = self.light_mode
+            # self.last_light_params = self.target_params
             self.set_mode(light_mode)
+
+            self.light_mode_queue.put({
+                "light_mode": light_mode,
+                "light_params": params,
+                "type": type
+            })
 
         return True
 

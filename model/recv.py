@@ -80,9 +80,6 @@ class Recv:
 				else:
 					if resp["method"] == self.REC_METHOD_VOICE_CHAT:
 						messageid.confirm_message_id(resp["method"])
-						if Config.IS_DEBUG == False:
-							self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 255, "g": 255, "b": 255})
-							self.audio_player.set_current_light(Code.LIGHT_MODE_BREATHING)
 
 						# 如果已经接到对应message_id的数据，同样的数据动作都是一致的
 						# 为sleep-assistant做的处理
@@ -147,6 +144,9 @@ class Recv:
 							co_thread.start()
 							# continue
 						else:
+							if Config.IS_DEBUG == False:
+								self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 255, "g": 255, "b": 255}, Code.LIGHT_TYPE_SET)
+								self.audio_player.set_current_light(Code.LIGHT_MODE_BREATHING)
 							vc_thread = threading.Thread(target=vc_handler.deal, args=(resp,))
 							vc_thread.start()
 							# vc_handler.deal(resp)

@@ -194,7 +194,7 @@ class Mic:
                 self.send_request(self.ws, audio_data)
                 self.recording_status = "Waiting"
                 if Config.IS_DEBUG == False:
-                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 254, "g": 211, "b": 76})
+                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 254, "g": 211, "b": 76}, Code.LIGHT_TYPE_TEMP)
                     logging.info("set light to loading mode")
                 # 场景化策略（垫音）
                 # 后面应该单独拆走
@@ -257,7 +257,7 @@ class Mic:
 
                 # continue
                 if Config.IS_DEBUG == False:
-                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0}, Code.LIGHT_TYPE_TEMP)
                     logging.info("turn on the light for weakup")
         else:
             partial = json.loads(self.rec.PartialResult())
@@ -269,7 +269,7 @@ class Mic:
                 ThreadingEvent.wakeup_event.set()
                 # print(f"检测到qibao关键词: {phonemes}")
                 if Config.IS_DEBUG == False:
-                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0}, Code.LIGHT_TYPE_TEMP)
                     logging.info("turn on the light for weakup")
 
 
@@ -389,7 +389,7 @@ class Mic:
                         # self.req_send_time = time.time()
                         self.send_request(self.ws, audio_data)
                         if Config.IS_DEBUG == False:
-                            self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 254, "g": 211, "b": 76})
+                            self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 254, "g": 211, "b": 76}, Code.LIGHT_TYPE_TEMP)
                             logging.info("set light to loading mode")
                         # 场景化策略（垫音）
                         # 后面应该单独拆走

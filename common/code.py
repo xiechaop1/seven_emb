@@ -54,6 +54,10 @@ class Code:
 	LIGHT_MODE_STATIC = "Static"
 	LIGHT_MODE_WAVE = "Wave"
 
+	LIGHT_TYPE_SET = "set"
+	LIGHT_TYPE_TEMP = "temp"
+	LIGHT_TYPE_DIY = "diy"
+
 	@staticmethod
 	def lightModelMap():
 		return {
