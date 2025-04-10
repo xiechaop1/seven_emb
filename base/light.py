@@ -1262,9 +1262,9 @@ class Light:
             r = rt
             g = gt
             b = bt
-        r = int(r * (self.brightness / 100))
-        g = int(g * (self.brightness / 100))
-        b = int(b * (self.brightness / 100))
+        r = int(r * (self.brightness / 255))
+        g = int(g * (self.brightness / 255))
+        b = int(b * (self.brightness / 255))
 
         return [r, g, b]
 
