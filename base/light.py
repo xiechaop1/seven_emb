@@ -279,7 +279,7 @@ class Light:
         if new_brightness > self.BRIGHTNESS_MAX:
             new_brightness = self.BRIGHTNESS_MAX
         self.set_brightness(new_brightness)
-        logging.info("Set brightness high to %d" % new_brightness)
+        logging.info(f"Set brightness high from {brightness} to {new_brightness}")
 
     def set_low(self, duration = 50):
         brightness = self.brightness
@@ -287,7 +287,7 @@ class Light:
         if new_brightness < 0:
             new_brightness = 0
         self.set_brightness(new_brightness)
-        logging.info("Set brightness low to %d" % new_brightness)
+        logging.info(f"Set brightness low from {brightness} to {new_brightness}")
 
     def set_mode(self, mode):
         self.light_mode = mode
