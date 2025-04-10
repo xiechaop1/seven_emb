@@ -76,6 +76,19 @@ class Command:
 					self.light.set_high()
 				elif value == Code.REC_ACTION_PARAMS_VALUE_DOWN:
 					self.light.set_low()
+			elif operation == Code.REC_ACTION_PARAMS_OPER_COLOR:
+				if value == Code.REC_ACTION_PARAMS_VALUE_GREEN:
+					self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0})
+				elif value == Code.REC_ACTION_PARAMS_VALUE_RED:
+					self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 255, "g": 0, "b": 0})
+				elif value == Code.REC_ACTION_PARAMS_VALUE_BLUE:
+					self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 0, "b": 255})
+				elif value == Code.REC_ACTION_PARAMS_VALUE_YELLOW:
+					self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 255, "g": 255, "b": 0})
+				elif value == Code.REC_ACTION_PARAMS_VALUE_PURPLE:
+					self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 128, "g": 0, "b": 128})
+				elif value == Code.REC_ACTION_PARAMS_VALUE_WHITE:
+					self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 255, "g": 255, "b": 255})
 		elif device == Code.REC_ACTION_PARAMS_DEVICE_SYSTEM:
 			if value == Code.REC_ACTION_PARAMS_VALUE_SLEEP:
 				Common.sleep(self.audio_player, self.light, self.spray)
