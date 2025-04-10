@@ -27,10 +27,10 @@ class AudioPlayer:
         # 初始化 Pygame mixer
         pygame.mixer.init()
         # pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
-        self.music_player = pygame.mixer.music
+        self.muisc_player = pygame.mixer.music
         self.sound_player = pygame.mixer.Sound
         self.voice = None
-        self.music_player.set_volume(1.0)
+        pygame.mixer.music.set_volume(1.0)
         self.audio_list = []  # 用于存储音频文件路径
         self.current_track = None  # 当前正在播放的音频
         self.current_bgm = None
@@ -54,19 +54,19 @@ class AudioPlayer:
         # self.replay_idx = 0
 
     def set_back_volume_high(self, duration = 0.25):
-        now_volume = self.music_player.get_volume()
+        now_volume = pygame.mixer.music.get_volume()
         new_volume = now_volume + duration
         if new_volume > self.VOLUME_MAX:
             new_volume = self.VOLUME_MAX
-        self.music_player.set_volume(new_volume)
+        pygame.mixer.music.set_volume(new_volume)
         logging.info(f"Set back volume high from {now_volume:.2f} to {new_volume:.2f}")
 
     def set_back_volume_low(self, duration = 0.25):
-        now_volume = self.music_player.get_volume()
+        now_volume = pygame.mixer.music.get_volume()
         new_volume = now_volume - duration
         if new_volume < 0:
             new_volume = 0
-        self.music_player.set_volume(new_volume)
+        pygame.mixer.music.set_volume(new_volume)
         logging.info(f"Set back volume low from {now_volume:.2f} to {new_volume:.2f}")
 
     def set_front_volume_high(self, duration = 0.25):
@@ -291,10 +291,10 @@ class AudioPlayer:
 
     def play_audio_with_data(self, audio_data, is_temp_save = True):
         """从列表中播放指定索引的音频"""
-        # if self.current_track is not None and self.music_player.get_busy():
-        #     self.music_player.stop()  # 停止当前播放的音频
-        # self.music_player.load(audio_file)  # 加载音频文件
-        # self.music_player.play()  # 播放音频
+        # if self.current_track is not None and pygame.mixer.music.get_busy():
+        #     pygame.mixer.music.stop()  # 停止当前播放的音频
+        # pygame.mixer.music.load(audio_file)  # 加载音频文件
+        # pygame.mixer.music.play()  # 播放音频
 
         # self.is_interrupted = 0
         # self.clear_interrupt()
@@ -362,11 +362,11 @@ class AudioPlayer:
             bgm_file = "resources/background_music/" + bgm["filename"]
             logging.debug(f"start playing bgm, bgm_file: {bgm_file}")
             if os.path.isfile(bgm_file):
-                self.music_player.load(bgm_file)  # 加载音频文件
-                self.music_player.play(-1)
+                pygame.mixer.music.load(bgm_file)  # 加载音频文件
+                pygame.mixer.music.play(-1)
                 self.current_bgm = bgm
         # else:
-        #     self.music_player.stop()
+        #     pygame.mixer.music.stop()
 
         self.current_track = audio_data
         self.voice = self.sound_player(audio_file)
@@ -376,9 +376,9 @@ class AudioPlayer:
         Common.set_latest_active_time(time.time())
         self.voice_channel.play(self.voice)
 
-        # self.music_player.load(audio_file)  # 加载音频文件
+        # pygame.mixer.music.load(audio_file)  # 加载音频文件
         # ThreadingEvent.audio_play_event.set()
-        # self.music_player.play()  # 播放音频
+        # pygame.mixer.music.play()  # 播放音频
         while self.voice_channel.get_busy():
             time.sleep(0.05)
             # pygame.time.wait(50)
@@ -525,7 +525,7 @@ class AudioPlayer:
         logging.info("set interrupted")
 
     def stop_music(self):
-        self.music_player.stop()
+        pygame.mixer.music.stop()
         ThreadingEvent.audio_play_event.clear()
 
     def clear_list_defer(self):
