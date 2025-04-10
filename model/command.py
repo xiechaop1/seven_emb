@@ -50,12 +50,15 @@ class Command:
 			if "value" in params:
 				value = params["value"]
 
+		print("dov", device, operation, value)
+
 		if device == Code.REC_ACTION_PARAMS_DEVICE_VOLUME:
 			if operation == Code.REC_ACTION_PARAMS_OPER_SOUND_MAIN:
 				if value == Code.REC_ACTION_PARAMS_VALUE_UP:
 					self.audio_player.set_back_volume_high()
 					self.audio_player.set_front_volume_high()
 				elif value == Code.REC_ACTION_PARAMS_VALUE_DOWN:
+					print("a")
 					self.audio_player.set_back_volume_low()
 					self.audio_player.set_front_volume_low()
 			elif operation == Code.REC_ACTION_PARAMS_OPER_VOICE:
