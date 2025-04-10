@@ -30,7 +30,7 @@ class AudioPlayer:
         self.muisc_player = pygame.mixer.music
         self.sound_player = pygame.mixer.Sound
         self.voice = None
-        pygame.mixer.music.set_volume(1.0)
+        # pygame.mixer.music.set_volume(1.0)
         self.audio_list = []  # 用于存储音频文件路径
         self.current_track = None  # 当前正在播放的音频
         self.current_bgm = None
