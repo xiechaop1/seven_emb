@@ -47,6 +47,7 @@ class Light:
         self.strip.begin()
         self.light_mode = None
         self.last_light_mode = None
+        self.last_light_params = None
         self.current_color = None
         self.target_color = None
         self.target_params = None
@@ -304,6 +305,9 @@ class Light:
         self.target_color = {"r": r, "g": g, "b": b}
         return True
 
+    def start_prev(self):
+        self.start(self.last_light_mode, self.last_light_params)
+
     def start(self, light_mode, params):
         if "r" in params:
             r = params["r"]
@@ -322,6 +326,8 @@ class Light:
         self.set_target_color(f"{r},{g},{b}")
 
         if light_mode is not None:
+            self.last_light_mode = self.light_mode
+            self.last_light_params = self.target_params
             self.set_mode(light_mode)
 
         return True

@@ -51,6 +51,7 @@ class Command:
 
 		print("dov", device, operation, value)
 
+		self.light.start_prev()
 		if device == Code.REC_ACTION_PARAMS_DEVICE_VOLUME:
 			if operation == Code.REC_ACTION_PARAMS_OPER_SOUND_MAIN:
 				if value == Code.REC_ACTION_PARAMS_VALUE_UP:
