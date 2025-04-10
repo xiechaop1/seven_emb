@@ -59,7 +59,7 @@ class Light:
         self.current_colors = []
         self.curr_light_buffer = []
 
-        self.brightness = 100
+        self.brightness = 255
 
         self.random_point_mode_colors = {
             "star": {
