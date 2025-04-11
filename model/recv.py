@@ -145,7 +145,7 @@ class Recv:
 							# continue
 						else:
 							if Config.IS_DEBUG == False:
-								self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 255, "g": 255, "b": 255}, Code.LIGHT_TYPE_SET)
+								self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 255, "g": 255, "b": 255}, Code.LIGHT_TYPE_TEMP)
 								self.audio_player.set_current_light(Code.LIGHT_MODE_BREATHING)
 							vc_thread = threading.Thread(target=vc_handler.deal, args=(resp,))
 							vc_thread.start()
