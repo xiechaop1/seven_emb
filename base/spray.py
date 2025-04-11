@@ -34,18 +34,29 @@ class Spray:
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.SPRAY_PIN, GPIO.OUT)
 
+        self.switcher = True
+
         # self.gpio = GPIO
 
     def delayms(ms):
         time.sleep(ms / 1000.0)  # 转换为秒
 
+    def init_off(self):
+        GPIO.output(self.SPRAY_PIN, GPIO.LOW)
+
     def turn_off(self):
         GPIO.output(self.SPRAY_PIN, GPIO.LOW)
+        self.switcher = False
+
+    def turn_on(self):
+        self.switcher = True
 
     def shoot(self, times = 4, wait_time = 30):
         if hasattr(Config, "SPRAY_ON"):
             if Config.SPRAY_ON == False:
                 return
+        if self.switcher == False:
+            return
         for i in range(times):
             for j in range(3):
                 GPIO.output(self.SPRAY_PIN, GPIO.HIGH)

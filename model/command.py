@@ -92,6 +92,12 @@ class Command:
 						self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 128, "g": 0, "b": 128}, Code.LIGHT_TYPE_DIY)
 					elif value == Code.REC_ACTION_PARAMS_VALUE_WHITE:
 						self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 255, "g": 255, "b": 255}, Code.LIGHT_TYPE_DIY)
+			elif device == Code.REC_ACTION_PARAMS_DEVICE_FRAGRANCE:
+				# 香氛
+				if value == Code.REC_ACTION_PARAMS_VALUE_ON:
+					self.spray.turn_on()
+				else:
+					self.spray.turn_off()
 			elif device == Code.REC_ACTION_PARAMS_DEVICE_SYSTEM:
 				if value == Code.REC_ACTION_PARAMS_VALUE_SLEEP:
 					Common.sleep(self.audio_player, self.light, self.spray)
