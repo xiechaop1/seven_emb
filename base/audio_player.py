@@ -54,6 +54,12 @@ class AudioPlayer:
 
         # self.replay_idx = 0
 
+    # def set_back_volume_mute(self):
+    #     # self.sound_volume = 0
+    #     new_volume = 0
+    #     pygame.mixer.music.set_volume(new_volume)
+    #     logging.info(f"Set back volume to {new_volume}, mute")
+
     def set_back_volume_high(self, duration = 0.25):
         now_volume = pygame.mixer.music.get_volume()
         new_volume = now_volume + duration
@@ -69,6 +75,12 @@ class AudioPlayer:
             new_volume = 0
         pygame.mixer.music.set_volume(new_volume)
         logging.info(f"Set back volume low from {now_volume:.2f} to {new_volume:.2f}")
+
+    # def set_front_volume_mute(self):
+    #     # self.sound_volume = 0
+    #     new_volume = 0
+    #     self.sound_volume = new_volume
+    #     logging.info(f"Set front volume to {new_volume}, mute")
 
     def set_front_volume_high(self, duration = 0.25):
         # now_volume = self.voice.get_volume()

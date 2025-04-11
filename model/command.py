@@ -62,17 +62,24 @@ class Command:
 					elif value == Code.REC_ACTION_PARAMS_VALUE_DOWN:
 						self.audio_player.set_back_volume_low()
 						self.audio_player.set_front_volume_low()
+					elif value == Code.REC_ACTION_PARAMS_VALUE_MUTE:
+						self.audio_player.set_front_volume_low(0)
+						self.audio_player.set_back_volume_low(0)
 				elif operation == Code.REC_ACTION_PARAMS_OPER_VOICE:
 					if value == Code.REC_ACTION_PARAMS_VALUE_UP:
 						self.audio_player.set_front_volume_high()
 					elif value == Code.REC_ACTION_PARAMS_VALUE_DOWN:
 						self.audio_player.set_front_volume_low()
+					elif value == Code.REC_ACTION_PARAMS_VALUE_MUTE:
+						self.audio_player.set_front_volume_low(0)
 				elif operation == Code.REC_ACTION_PARAMS_OPER_BACKSOUND \
 						or operation == Code.REC_ACTION_PARAMS_OPER_MUSIC:
 					if value == Code.REC_ACTION_PARAMS_VALUE_UP:
-						self.audio_player.set_back_volume_low()
+						self.audio_player.set_back_volume_high()
 					elif value == Code.REC_ACTION_PARAMS_VALUE_DOWN:
 						self.audio_player.set_back_volume_low()
+					elif value == Code.REC_ACTION_PARAMS_VALUE_MUTE:
+						self.audio_player.set_back_volume_low(0)
 			elif device == Code.REC_ACTION_PARAMS_DEVICE_LIGHT:
 				if operation == Code.REC_ACTION_PARAMS_OPER_BRIGHTNESS:
 					if value == Code.REC_ACTION_PARAMS_VALUE_UP:
