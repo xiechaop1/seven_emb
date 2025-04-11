@@ -232,6 +232,8 @@ class AudioPlayer:
                             logging.info("Sleep assistance event pass!")
                             ThreadingEvent.camera_start_event.set()
                             ThreadingEvent.recv_execute_command_event.set()
+                    else:
+                        self.light.start_prev()
                     # self.resume_interrupted(msg_id, 2)
                 # else:
                 #     if self.is_interrupted == 0:
