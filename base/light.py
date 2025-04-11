@@ -349,7 +349,7 @@ class Light:
                 "light_params": params,
                 "type": type
             })
-            logging.info(f"Set light mode to mode: {light_mode}, type: {type}")
+            logging.info(f"Set light mode to mode: {light_mode}, type: {type}, params: {params}")
 
         return True
 
