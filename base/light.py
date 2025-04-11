@@ -335,7 +335,8 @@ class Light:
         self.set_target_params(params)
         self.set_target_color(f"{r},{g},{b}")
 
-        if type == Code.LIGHT_TYPE_SET and light_mode == Code.LIGHT_TYPE_DIY:
+        if type == Code.LIGHT_TYPE_SET and self.light_mode == Code.LIGHT_TYPE_DIY:
+            logging.warn(f"Set light mode to {type} failed, now is DIY")
             return
 
         if light_mode is not None:
@@ -348,6 +349,7 @@ class Light:
                 "light_params": params,
                 "type": type
             })
+            logging.info(f"Set light mode to mode: {light_mode}, type: {type}")
 
         return True
 
