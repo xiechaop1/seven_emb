@@ -337,7 +337,7 @@ class Light:
 
         if type == Code.LIGHT_TYPE_SET and light_mode == Code.LIGHT_TYPE_DIY:
             return
-        
+
         if light_mode is not None:
             # self.last_light_mode = self.light_mode
             # self.last_light_params = self.target_params

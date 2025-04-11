@@ -22,14 +22,28 @@ if hasattr(Config, "MOTOR_ON"):
         from base.motor import Motor
 
 import os
-import cv2
-from threading import Event
-import threading
 from common.threading_event import ThreadingEvent
 from model.recv import Recv
 from model.daemon import Daemon
 from common.code import Code
 from common.common import Common
+
+os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
+if Config.IS_DEBUG == False:
+    os.environ["SDL_AUDIODRIVER"] = "alsa"
+    hw = Common.find_audio_hw()
+    os.environ["AUDIODEV"] = f"hw:{hw}"
+    # if Config.OS is not None:
+    #     if Config.OS == "pi5":
+    #         os.environ["AUDIODEV"] = "hw:2,0"
+
+    os.environ["SDL_VIDEODRIVER"] = "x11"  ########screen_modified by lixiaolin ###
+    # os.environ["SDL_VIDEODRIVER"] = "quartz"
+    os.environ["XDG_RUNTIME_DIR"] = "/run/user/1000"
+
+import cv2
+from threading import Event
+import threading
 import pygame
 import sys
 import argparse
@@ -80,22 +94,6 @@ def on_release(key):
         # motor_instance.motor_stop2()
         sys.exit()
         # return False  # 停止监听
-
-
-os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
-
-if Config.IS_DEBUG == False:
-    os.environ["SDL_AUDIODRIVER"] = "alsa"
-    hw = Common.find_audio_hw()
-    os.environ["AUDIODEV"] = f"hw:{hw}"
-    # if Config.OS is not None:
-    #     if Config.OS == "pi5":
-    #         os.environ["AUDIODEV"] = "hw:2,0"
-
-    os.environ["SDL_VIDEODRIVER"] = "x11"  ########screen_modified by lixiaolin ###
-    # os.environ["SDL_VIDEODRIVER"] = "quartz"
-    os.environ["XDG_RUNTIME_DIR"] = "/run/user/1000"
-
 
 if __name__ == "__main__":
     # on_start()
