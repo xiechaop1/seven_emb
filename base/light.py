@@ -50,7 +50,7 @@ class Light:
         self.light_type = None
         self.last_light_mode = None
         self.last_light_params = None
-        self.light_mode_queue = queue.Queue()
+        self.light_mode_queue = []
         self.current_color = None
         self.target_color = None
         self.target_params = None
@@ -309,8 +309,7 @@ class Light:
         return True
 
     def start_prev(self):
-        while True:
-            last_light_data = self.light_mode_queue.get()
+        for last_light_data in self.light_mode_queue[::-1]:
             last_light_mode = last_light_data["light_mode"]
             last_light_params = last_light_data["light_params"]
             last_type = last_light_data["type"]
@@ -344,7 +343,7 @@ class Light:
             # self.last_light_params = self.target_params
             self.set_mode(light_mode)
 
-            self.light_mode_queue.put({
+            self.light_mode_queue.append({
                 "light_mode": light_mode,
                 "light_params": params,
                 "type": type
