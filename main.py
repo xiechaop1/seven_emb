@@ -99,6 +99,16 @@ def on_release(key):
         # return False  # 停止监听
 
 if __name__ == "__main__":
+    try:
+        app = QApplication(sys.argv)
+        window = ui.MainWindow()
+        window.show()
+        exit_code = app.exec_()
+        sys.exit(exit_code)
+    except Exception as e:
+        print(e)
+        traceback.print_exc()
+        
     websocket_url = "ws://114.55.90.104:9001/ws"
     client = WebSocketClient(websocket_url)
     ws_cli = client.connect()
@@ -185,16 +195,6 @@ if __name__ == "__main__":
     daemon_thread.start()
     # 通过实例调用 create_websocket_client 方法
     # ws_cli = ws_instance.create_websocket_client(websocket_url)
-
-    try:
-        app = QApplication(sys.argv)
-        window = ui.MainWindow()
-        window.show()
-        exit_code = app.exec_()
-        sys.exit(exit_code)
-    except Exception as e:
-        print(e)
-        traceback.print_exc()
 
  #    kaldi_listener_thread = threading.Thread(target=kaldi_listener)
 	# kaldi_listener_thread.start()
