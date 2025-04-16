@@ -118,7 +118,9 @@ class MainWindow(QMainWindow):
         voice_btn.raise_()
 
         self.set_video_background("resources/video/main.mp4")
-        self.showFullScreen()
+        # self.showFullScreen()         # 全屏
+        self.resize(800, 600)
+        self.show()
 
     def set_video_background(self, path):
         if hasattr(self, 'player'):
@@ -167,6 +169,6 @@ class MainWindow(QMainWindow):
         self.stack.setCurrentIndex(index)
 
         if index == 0:
-            self.set_video_background("resources/video/main.mp4")
+            self.set_video_background("../resources/video/main.mp4")
         else:
             self.set_video_background(f"resources/video/scene{index}.mp4")
