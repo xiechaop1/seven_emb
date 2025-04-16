@@ -12,7 +12,7 @@ class OverlayWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setStyleSheet("background-color: rgba(0, 0, 0, 150);")
-        self.setGeometry(parent.rect())g
+        self.setGeometry(parent.rect())
         self.hide()
 
         self.floating = QWidget(self)
