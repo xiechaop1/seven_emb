@@ -3,6 +3,7 @@
 #from fastapi.staticfiles import StaticFiles
 #from config import settings, L
 import logging
+from PyQt5.QtWidgets import QApplication
 
 from base.ws import WebSocketClient
 from base.mic import Mic
@@ -27,6 +28,8 @@ from model.recv import Recv
 from model.daemon import Daemon
 from common.code import Code
 from common.common import Common
+# from model.ui import ScenePage, HomePage, OverlayWidget, MainWindow
+from model import ui
 
 os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
 if Config.IS_DEBUG == False:
@@ -38,7 +41,6 @@ if Config.IS_DEBUG == False:
     #         os.environ["AUDIODEV"] = "hw:2,0"
 
     os.environ["SDL_VIDEODRIVER"] = "x11"  ########screen_modified by lixiaolin ###
-    # os.environ["SDL_VIDEODRIVER"] = "quartz"
     os.environ["XDG_RUNTIME_DIR"] = "/run/user/1000"
 
 import cv2
@@ -51,6 +53,7 @@ from model.undertake_callback import UndertakeCallback
 import asyncio
 from pynput import keyboard
 import signal
+import traceback
 
 #from base.spary import Spray
 from model.execute_command import ExecuteCommand
@@ -96,21 +99,10 @@ def on_release(key):
         # return False  # 停止监听
 
 if __name__ == "__main__":
-    # on_start()
-    # L.debug(f"API Listen {settings.LISTEN_IP}:{settings.PORT}")
-
     websocket_url = "ws://114.55.90.104:9001/ws"
-    # ws_cli = asyncio.run(main())
     client = WebSocketClient(websocket_url)
-    # client.set_callback(UndertakeCallback.undertake)
     ws_cli = client.connect()
     pygame.init()
-    # exit(0)
-    #ws_cli = WebSocketClient.create_websocket_client(websocket_url)
-    # ws_instance = WebSocketClient()
-    # ws_cli = await ws_instance.create_websocket_client(websocket_url)
-
-    # ws_cli = ws_instance.get_client()
 
     cv2_instance = cv2.VideoCapture(0)
 
@@ -194,6 +186,16 @@ if __name__ == "__main__":
     # 通过实例调用 create_websocket_client 方法
     # ws_cli = ws_instance.create_websocket_client(websocket_url)
 
+    try:
+        app = QApplication(sys.argv)
+        window = ui.MainWindow()
+        window.show()
+        exit_code = app.exec_()
+        sys.exit(exit_code)
+    except Exception as e:
+        print(e)
+        traceback.print_exc()
+
  #    kaldi_listener_thread = threading.Thread(target=kaldi_listener)
 	# kaldi_listener_thread.start()
     with keyboard.Listener(
@@ -213,6 +215,3 @@ def signal_handler(sig, frame):
     sys.exit(0)
 
 signal.signal(signal.SIGINT, signal_handler)
-
-
-
