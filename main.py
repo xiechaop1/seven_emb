@@ -42,6 +42,7 @@ if Config.IS_DEBUG == False:
 
     os.environ["SDL_VIDEODRIVER"] = "x11"  ########screen_modified by lixiaolin ###
     os.environ["XDG_RUNTIME_DIR"] = "/run/user/1000"
+    os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = "/usr/lib/qt5/plugins/platforms"
 
 import cv2
 from threading import Event
@@ -99,16 +100,17 @@ def on_release(key):
         # return False  # 停止监听
 
 if __name__ == "__main__":
-    try:
-        app = QApplication(sys.argv)
-        window = ui.MainWindow()
-        window.show()
-        exit_code = app.exec_()
-        sys.exit(exit_code)
-    except Exception as e:
-        print(e)
-        traceback.print_exc()
-        
+    if Config.IS_DEBUG == False:
+        try:
+            app = QApplication(sys.argv)
+            window = ui.MainWindow()
+            window.show()
+            exit_code = app.exec_()
+            sys.exit(exit_code)
+        except Exception as e:
+            print(e)
+            traceback.print_exc()
+
     websocket_url = "ws://114.55.90.104:9001/ws"
     client = WebSocketClient(websocket_url)
     ws_cli = client.connect()
