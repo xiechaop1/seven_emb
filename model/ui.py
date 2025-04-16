@@ -1,11 +1,10 @@
 import sys
 import os
+import vlc
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QPushButton, QVBoxLayout,
     QStackedWidget, QHBoxLayout, QGraphicsOpacityEffect, QLabel
 )
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtCore import Qt, QUrl, QPropertyAnimation, QRect, QPoint
 from PyQt5.QtGui import QMovie
 
@@ -123,18 +122,24 @@ class MainWindow(QMainWindow):
         self.show()
 
     def set_video_background(self, path):
-        if hasattr(self, 'player'):
-            self.player.stop()
-            self.player.setMedia(QMediaContent(QUrl.fromLocalFile(os.path.abspath(path))))
-            self.player.play()
+        if not hasattr(self, 'vlc_instance'):
+            self.vlc_instance = vlc.Instance()
+            self.vlc_player = self.vlc_instance.media_player_new()
+            self.vlc_widget = QWidget(self)
+            self.vlc_widget.setGeometry(0, 0, self.width(), self.height())
+            self.setCentralWidget(self.vlc_widget)
+            self.vlc_player.set_xwindow(self.vlc_widget.winId())
         else:
-            self.video_widget = QVideoWidget(self)
-            self.player = QMediaPlayer(None, QMediaPlayer.VideoSurface)
-            self.player.setVideoOutput(self.video_widget)
-            self.player.setMedia(QMediaContent(QUrl.fromLocalFile(os.path.abspath(path))))
-            self.video_widget.setGeometry(0, 0, self.width(), self.height())
-            self.setCentralWidget(self.video_widget)
-            self.player.play()
+            self.vlc_player.stop()
+
+        media = self.vlc_instance.media_new(os.path.abspath(path))
+        self.vlc_player.set_media(media)
+        self.vlc_player.play()
+
+        self.stack.setParent(self)
+        self.stack.raise_()
+        self.overlay.setParent(self)
+        self.overlay.raise_()
 
     def switch_page(self, index):
         current_index = self.stack.currentIndex()
