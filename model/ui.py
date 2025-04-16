@@ -3,8 +3,8 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QPushButton, QVBoxLayout,
     QStackedWidget, QHBoxLayout, QGraphicsOpacityEffect, QLabel
 )
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtMultimediaWidgets import QVideoWidget
+# from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+# from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtCore import Qt, QUrl, QPropertyAnimation, QRect, QPoint
 from PyQt5.QtGui import QMovie
 
@@ -12,7 +12,7 @@ class OverlayWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setStyleSheet("background-color: rgba(0, 0, 0, 150);")
-        self.setGeometry(parent.rect())
+        self.setGeometry(parent.rect())g
         self.hide()
 
         self.floating = QWidget(self)
@@ -68,15 +68,13 @@ class MainWindow(QMainWindow):
 
         self.video_label = QLabel(self)
         self.movie = QMovie("resources/video/main.gif")
+        self.movie.setCacheMode(QMovie.CacheAll)
+        self.movie.setSpeed(100)
         self.video_label.setMovie(self.movie)
+        self.video_label.setGeometry(0, 0, 800, 600)
+        self.video_label.setScaledContents(True)
         self.movie.start()
         self.setCentralWidget(self.video_label)
-        # self.video_widget = QVideoWidget(self)
-        # self.player = QMediaPlayer(None, QMediaPlayer.VideoSurface)
-        # self.player.setVideoOutput(self.video_widget)
-        # self.player.setMedia(QMediaContent(QUrl.fromLocalFile("resources/video/main.mp4")))
-        # self.player.play()
-        # self.setCentralWidget(self.video_widget)
 
         # 页面容器
         self.stack = QStackedWidget(self)
