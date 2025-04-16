@@ -1,10 +1,11 @@
 import sys
+import os
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QPushButton, QVBoxLayout,
     QStackedWidget, QHBoxLayout, QGraphicsOpacityEffect, QLabel
 )
-# from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-# from PyQt5.QtMultimediaWidgets import QVideoWidget
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtCore import Qt, QUrl, QPropertyAnimation, QRect, QPoint
 from PyQt5.QtGui import QMovie
 
@@ -15,6 +16,11 @@ class OverlayWidget(QWidget):
         self.setGeometry(parent.rect())
         self.hide()
 
+        self.effect = QGraphicsOpacityEffect()
+        self.setGraphicsEffect(self.effect)
+        self.opacity_anim = QPropertyAnimation(self.effect, b"opacity")
+        parent.installEventFilter(self)
+
         self.floating = QWidget(self)
         self.floating.setStyleSheet("background-color: rgba(255, 255, 255, 180); border-radius: 15px;")
         self.floating.setGeometry(0, self.height(), self.width(), 200)
@@ -23,16 +29,44 @@ class OverlayWidget(QWidget):
     def show_overlay(self):
         self.show()
         self.floating.show()
+        self.floating.raise_()
+        self.opacity_anim.stop()
+        self.opacity_anim.setDuration(300)
+        self.opacity_anim.setStartValue(0)
+        self.opacity_anim.setEndValue(1)
+        self.opacity_anim.start()
+
         anim = QPropertyAnimation(self.floating, b"geometry")
-        anim.setDuration(500)
+        anim.setDuration(300)
         anim.setStartValue(QRect(0, self.height(), self.width(), 200))
         anim.setEndValue(QRect(0, self.height() - 200, self.width(), 200))
         anim.start()
-        self.anim = anim  # prevent garbage collection
+        self.anim = anim
 
     def hide_overlay(self):
+        self.opacity_anim.stop()
+        self.opacity_anim.setDuration(300)
+        self.opacity_anim.setStartValue(1)
+        self.opacity_anim.setEndValue(0)
+        self.opacity_anim.start()
+
+        anim = QPropertyAnimation(self.floating, b"geometry")
+        anim.setDuration(300)
+        anim.setStartValue(QRect(0, self.height() - 200, self.width(), 200))
+        anim.setEndValue(QRect(0, self.height(), self.width(), 200))
+        anim.finished.connect(self._finalize_hide)
+        anim.start()
+        self.anim = anim
+
+    def _finalize_hide(self):
         self.hide()
         self.floating.hide()
+
+    def eventFilter(self, obj, event):
+        if event.type() == event.MouseButtonPress and self.isVisible():
+            if not self.floating.geometry().contains(event.pos()):
+                self.hide_overlay()
+        return super().eventFilter(obj, event)
 
 class HomePage(QWidget):
     def __init__(self, switch_page_func):
@@ -59,22 +93,9 @@ class ScenePage(QWidget):
 
 class MainWindow(QMainWindow):
     def __init__(self):
-
         super().__init__()
         self.setWindowTitle("PyQt 动态界面 Demo")
         self.setGeometry(100, 100, 800, 600)
-
-        #视频背景
-
-        self.video_label = QLabel(self)
-        self.movie = QMovie("resources/video/main.gif")
-        self.movie.setCacheMode(QMovie.CacheAll)
-        self.movie.setSpeed(100)
-        self.video_label.setMovie(self.movie)
-        self.video_label.setGeometry(0, 0, 800, 600)
-        self.video_label.setScaledContents(True)
-        self.movie.start()
-        self.setCentralWidget(self.video_label)
 
         # 页面容器
         self.stack = QStackedWidget(self)
@@ -96,7 +117,22 @@ class MainWindow(QMainWindow):
         voice_btn.clicked.connect(self.overlay.show_overlay)
         voice_btn.raise_()
 
-    from PyQt5.QtCore import QPoint
+        self.set_video_background("resources/video/main.mp4")
+        self.showFullScreen()
+
+    def set_video_background(self, path):
+        if hasattr(self, 'player'):
+            self.player.stop()
+            self.player.setMedia(QMediaContent(QUrl.fromLocalFile(os.path.abspath(path))))
+            self.player.play()
+        else:
+            self.video_widget = QVideoWidget(self)
+            self.player = QMediaPlayer(None, QMediaPlayer.VideoSurface)
+            self.player.setVideoOutput(self.video_widget)
+            self.player.setMedia(QMediaContent(QUrl.fromLocalFile(os.path.abspath(path))))
+            self.video_widget.setGeometry(0, 0, self.width(), self.height())
+            self.setCentralWidget(self.video_widget)
+            self.player.play()
 
     def switch_page(self, index):
         current_index = self.stack.currentIndex()
@@ -130,8 +166,7 @@ class MainWindow(QMainWindow):
 
         self.stack.setCurrentIndex(index)
 
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     window = MainWindow()
-#     window.show()
-#     sys.exit(app.exec_())
+        if index == 0:
+            self.set_video_background("resources/video/main.mp4")
+        else:
+            self.set_video_background(f"resources/video/scene{index}.mp4")
