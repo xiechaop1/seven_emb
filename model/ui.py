@@ -211,22 +211,47 @@ class MainWindow(QMainWindow):
             self.set_video_background(f"resources/video/scene{index}.mp4")
     def mousePressEvent(self, event):
         self.start_pos = event.pos()
+        self.start_widget = self.stack.currentWidget()
 
     def mouseMoveEvent(self, event):
-        pass
+        if self.start_pos:
+            dx = event.pos().x() - self.start_pos.x()
+            current_index = self.stack.currentIndex()
+
+            # Determine direction
+            if dx < 0 and current_index < self.stack.count() - 1:
+                next_index = current_index + 1
+            elif dx > 0 and current_index > 0:
+                next_index = current_index - 1
+            else:
+                return
+
+            # Prepare widgets
+            next_widget = self.stack.widget(next_index)
+            next_widget.setGeometry(dx if dx < 0 else dx - self.width(), 0, self.width(), self.height())
+            next_widget.show()
+            self.start_widget.move(dx, 0)
+            self.dragging = True
+            self.drag_next_index = next_index
 
     def mouseReleaseEvent(self, event):
-        self.end_pos = event.pos()
-        if self.start_pos and self.end_pos:
-            dx = self.end_pos.x() - self.start_pos.x()
-            if abs(dx) > 50:  # threshold to detect swipe
-                current_index = self.stack.currentIndex()
-                if dx < 0 and current_index < self.stack.count() - 1:
-                    self.switch_page(current_index + 1)
-                elif dx > 0 and current_index > 0:
-                    self.switch_page(current_index - 1)
+        if not self.start_pos:
+            return
+
+        dx = event.pos().x() - self.start_pos.x()
+        threshold = self.width() // 3
+        current_index = self.stack.currentIndex()
+
+        if hasattr(self, 'dragging') and self.dragging and abs(dx) > threshold:
+            self.switch_page(self.drag_next_index)
+        elif hasattr(self, 'dragging') and self.dragging:
+            # Revert
+            self.stack.widget(self.drag_next_index).hide()
+            self.start_widget.setGeometry(0, 0, self.width(), self.height())
+
         self.start_pos = None
         self.end_pos = None
+        self.dragging = False
 
     def eventFilter(self, obj, event):
         if isinstance(obj, QPushButton):
