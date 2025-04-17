@@ -124,6 +124,8 @@ class MainWindow(QMainWindow):
         # self.showFullScreen()         # 全屏
         self.resize(800, 600)
         self.show()
+        self.start_pos = None
+        self.end_pos = None
 
     def set_video_background(self, path):
         print("[DEBUG] set_video_background called with path:", path)
@@ -211,6 +213,25 @@ class MainWindow(QMainWindow):
             self.set_video_background("resources/video/main.mp4")
         else:
             self.set_video_background(f"resources/video/scene{index}.mp4")
+    def mousePressEvent(self, event):
+        self.start_pos = event.pos()
+
+    def mouseMoveEvent(self, event):
+        pass
+
+    def mouseReleaseEvent(self, event):
+        self.end_pos = event.pos()
+        if self.start_pos and self.end_pos:
+            dx = self.end_pos.x() - self.start_pos.x()
+            if abs(dx) > 50:  # threshold to detect swipe
+                current_index = self.stack.currentIndex()
+                if dx < 0 and current_index < self.stack.count() - 1:
+                    self.switch_page(current_index + 1)
+                elif dx > 0 and current_index > 0:
+                    self.switch_page(current_index - 1)
+        self.start_pos = None
+        self.end_pos = None
+
     def eventFilter(self, obj, event):
         if isinstance(obj, QPushButton):
             if event.type() == event.Enter:
