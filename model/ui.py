@@ -124,8 +124,8 @@ class MainWindow(QMainWindow):
         self.vlc_instance = vlc.Instance("--aout", "dummy")
         self.media_player = self.vlc_instance.media_player_new()
 
-        # self.set_video_background("resources/video/main.mp4")
-        self.play_video("resources/video/main.mp4")
+        self.set_video_background("resources/video/main.gif")
+        # self.play_video("resources/video/main.mp4")
 
         # self.showFullScreen()         # 全屏
         self.resize(800, 600)
@@ -161,39 +161,21 @@ class MainWindow(QMainWindow):
     def set_video_background(self, path):
         print("[DEBUG] set_video_background called with path:", path)
         if not hasattr(self, 'vlc_instance'):
-            self.vlc_instance = vlc.Instance("--aout", "dummy")
-            self.vlc_widget = QFrame(self)
+            self.vlc_widget = QLabel(self)  # Use QLabel as the container for the GIF
             self.vlc_widget.setGeometry(0, 0, self.width(), self.height())
             self.setCentralWidget(self.vlc_widget)
             self.vlc_widget.show()
 
-            self.vlc_player = self.vlc_instance.media_player_new()
-
-            def delayed_bind():
-                print("[DEBUG] winId after show:", int(self.vlc_widget.winId()))
-                self.vlc_player.set_xwindow(int(self.vlc_widget.winId()))
-
-            QTimer.singleShot(0, delayed_bind)
+            movie = QMovie(os.path.abspath(path))  # Load GIF with QMovie
+            self.vlc_widget.setMovie(movie)
+            movie.start()
         else:
-            self.vlc_player.stop()
+            print("[DEBUG] Video already playing")
 
-        media = self.vlc_instance.media_new(os.path.abspath(path))
-        self.vlc_player.set_media(media)
-        def on_media_state_changed(event):
-            state = self.vlc_player.get_state()
-            print("[VLC STATE] Current state:", state)
-
-        self.vlc_player.event_manager().event_attach(
-            vlc.EventType.MediaPlayerMediaChanged, on_media_state_changed
-        )
-        print("[DEBUG] Media type:", media.get_mrl())
-        print("[DEBUG] media set:", os.path.abspath(path))
-        print("[DEBUG] player.play() returned:", self.vlc_player.play())
-        self.vlc_player.event_manager().event_attach(vlc.EventType.MediaPlayerEncounteredError, lambda e: print("[VLC ERROR] Playback error"))
-        self.vlc_player.event_manager().event_attach(vlc.EventType.MediaPlayerPlaying, lambda e: print("[VLC STATE] Playing"))
-        self.vlc_player.event_manager().event_attach(vlc.EventType.MediaPlayerStopped, lambda e: print("[VLC STATE] Stopped"))
-
-        self.vlc_player.play()
+        self.stack.setParent(self)
+        self.stack.raise_()
+        self.overlay.setParent(self)
+        self.overlay.raise_()
 
         self.stack.setParent(self)
         self.stack.raise_()
@@ -237,7 +219,7 @@ class MainWindow(QMainWindow):
         self.stack.setCurrentIndex(index)
 
         if index == 0:
-            self.play_video("resources/video/main.mp4")
+            self.play_video("resources/video/main.gif")
         else:
             self.play_video(f"resources/video/scene{index}.mp4")
 
