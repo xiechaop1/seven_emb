@@ -76,6 +76,7 @@ class HomePage(QWidget):
             btn.setFixedSize(150, 100)
             btn.setStyleSheet(f"border-image: url(resources/images/button_{i+1}.png);")
             btn.clicked.connect(lambda _, idx=i: switch_page_func(idx + 1))
+            btn.installEventFilter(self)
             layout.addWidget(btn)
         self.setLayout(layout)
 
@@ -177,3 +178,22 @@ class MainWindow(QMainWindow):
             self.set_video_background("../resources/video/main.mp4")
         else:
             self.set_video_background(f"resources/video/scene{index}.mp4")
+    def eventFilter(self, obj, event):
+        if isinstance(obj, QPushButton):
+            if event.type() == event.Enter:
+                anim = QPropertyAnimation(obj, b"geometry")
+                anim.setDuration(150)
+                rect = obj.geometry()
+                anim.setStartValue(rect)
+                anim.setEndValue(QRect(rect.x() - 5, rect.y() - 5, rect.width() + 10, rect.height() + 10))
+                anim.start()
+                obj._hover_anim = anim  # prevent garbage collection
+            elif event.type() == event.Leave:
+                anim = QPropertyAnimation(obj, b"geometry")
+                anim.setDuration(150)
+                rect = obj.geometry()
+                anim.setStartValue(rect)
+                anim.setEndValue(QRect(rect.x() + 5, rect.y() + 5, rect.width() - 10, rect.height() - 10))
+                anim.start()
+                obj._hover_anim = anim
+        return super().eventFilter(obj, event)
