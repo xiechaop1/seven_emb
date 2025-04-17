@@ -121,7 +121,7 @@ class MainWindow(QMainWindow):
         self.voice_btn.clicked.connect(lambda: print("[DEBUG] button clicked") or self.overlay.show_overlay())
 
         self.player = None
-        self.vlc_instance = vlc.Instance()
+        self.vlc_instance = vlc.Instance("--aout", "dummy")
         self.media_player = self.vlc_instance.media_player_new()
 
         # self.set_video_background("resources/video/main.mp4")
