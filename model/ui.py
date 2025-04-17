@@ -127,12 +127,12 @@ class MainWindow(QMainWindow):
 
     def set_video_background(self, path):
         if not hasattr(self, 'vlc_instance'):
-            # self.vlc_instance = vlc.Instance()
             self.vlc_instance = vlc.Instance("--aout", "dummy")
             self.vlc_widget = QFrame(self)
             self.vlc_widget.setGeometry(0, 0, self.width(), self.height())
             self.vlc_widget.show()
             self.setCentralWidget(self.vlc_widget)
+            self.vlc_player = self.vlc_instance.media_player_new()
             self.vlc_player.set_xwindow(int(self.vlc_widget.winId()))
         else:
             self.vlc_player.stop()
