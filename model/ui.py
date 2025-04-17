@@ -120,12 +120,35 @@ class MainWindow(QMainWindow):
         self.voice_btn.move(10, 550)
         self.voice_btn.clicked.connect(lambda: print("[DEBUG] button clicked") or self.overlay.show_overlay())
 
-        self.set_video_background("resources/video/main.mp4")
+        self.player = None
+        self.vlc_instance = vlc.Instance()
+        self.media_player = self.vlc_instance.media_player_new()
+
+        # self.set_video_background("resources/video/main.mp4")
+        self.play_video("resource/video/main.mp4")
+
         # self.showFullScreen()         # 全屏
         self.resize(800, 600)
         self.show()
         self.start_pos = None
         self.end_pos = None
+
+    def play_video(self, video_path):
+        self.player = self.media_player
+        media = self.vlc_instance.media_new(video_path)
+        self.player.stop()
+        self.player.set_media(media)
+        self.player.play()
+
+        self.stack.setParent(self)
+        self.stack.raise_()
+        self.overlay.setParent(self)
+        self.overlay.raise_()
+
+        self.voice_btn.setParent(self)
+        self.voice_btn.raise_()
+        self.voice_btn.show()
+
 
     def set_video_background(self, path):
         print("[DEBUG] set_video_background called with path:", path)
@@ -206,9 +229,9 @@ class MainWindow(QMainWindow):
         self.stack.setCurrentIndex(index)
 
         if index == 0:
-            self.set_video_background("resources/video/main.mp4")
+            self.play_video("resources/video/main.mp4")
         else:
-            self.set_video_background(f"resources/video/scene{index}.mp4")
+            self.play_video(f"resources/video/scene{index}.mp4")
 
     def mousePressEvent(self, event):
         self.start_pos = event.pos()
