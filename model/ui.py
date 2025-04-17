@@ -136,6 +136,10 @@ class MainWindow(QMainWindow):
 
             self.vlc_player = self.vlc_instance.media_player_new()
 
+            layout = QVBoxLayout()
+            layout.addWidget(self.vlc_player)
+            self.setLayout(layout)
+
             def delayed_bind():
                 print("[DEBUG] winId after show:", int(self.vlc_widget.winId()))
                 self.vlc_player.set_xwindow(int(self.vlc_widget.winId()))
