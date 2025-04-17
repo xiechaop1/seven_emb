@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QPushButton, QVBoxLayout,
     QStackedWidget, QHBoxLayout, QGraphicsOpacityEffect, QLabel, QFrame
 )
-from PyQt5.QtCore import Qt, QUrl, QPropertyAnimation, QRect, QPoint
+from PyQt5.QtCore import Qt, QUrl, QPropertyAnimation, QRect, QPoint, QTimer
 from PyQt5.QtGui import QMovie
 
 class OverlayWidget(QWidget):
@@ -131,11 +131,16 @@ class MainWindow(QMainWindow):
             self.vlc_instance = vlc.Instance("--aout", "dummy")
             self.vlc_widget = QFrame(self)
             self.vlc_widget.setGeometry(0, 0, self.width(), self.height())
-            self.vlc_player = self.vlc_instance.media_player_new()
-            print("[DEBUG] widget winId:", int(self.vlc_widget.winId()))
-            self.vlc_player.set_xwindow(int(self.vlc_widget.winId()))
             self.setCentralWidget(self.vlc_widget)
             self.vlc_widget.show()
+
+            self.vlc_player = self.vlc_instance.media_player_new()
+
+            def delayed_bind():
+                print("[DEBUG] winId after show:", int(self.vlc_widget.winId()))
+                self.vlc_player.set_xwindow(int(self.vlc_widget.winId()))
+
+            QTimer.singleShot(0, delayed_bind)
         else:
             self.vlc_player.stop()
 
