@@ -3,7 +3,7 @@ import os
 import vlc
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QPushButton, QVBoxLayout,
-    QStackedWidget, QHBoxLayout, QGraphicsOpacityEffect, QLabel
+    QStackedWidget, QHBoxLayout, QGraphicsOpacityEffect, QLabel, QFrame
 )
 from PyQt5.QtCore import Qt, QUrl, QPropertyAnimation, QRect, QPoint
 from PyQt5.QtGui import QMovie
@@ -114,12 +114,11 @@ class MainWindow(QMainWindow):
         self.overlay.raise_()
 
         # 模拟语音触发
-        voice_btn = QPushButton("模拟语音触发", self)
-        voice_btn.setParent(self)
-        voice_btn.raise_()
-        voice_btn.show()
-        voice_btn.move(10, 550)
-        voice_btn.clicked.connect(self.overlay.show_overlay)
+        self.voice_btn = QPushButton("模拟语音触发", self)
+        self.voice_btn.raise_()
+        self.voice_btn.show()
+        self.voice_btn.move(10, 550)
+        self.voice_btn.clicked.connect(lambda: print("[DEBUG] button clicked") or self.overlay.show_overlay())
 
         self.set_video_background("resources/video/main.mp4")
         # self.showFullScreen()         # 全屏
@@ -130,11 +129,11 @@ class MainWindow(QMainWindow):
         if not hasattr(self, 'vlc_instance'):
             # self.vlc_instance = vlc.Instance()
             self.vlc_instance = vlc.Instance("--aout", "dummy")
-            self.vlc_player = self.vlc_instance.media_player_new()
-            self.vlc_widget = QWidget(self)
+            self.vlc_widget = QFrame(self)
             self.vlc_widget.setGeometry(0, 0, self.width(), self.height())
+            self.vlc_widget.show()
             self.setCentralWidget(self.vlc_widget)
-            self.vlc_player.set_xwindow(self.vlc_widget.winId())
+            self.vlc_player.set_xwindow(int(self.vlc_widget.winId()))
         else:
             self.vlc_player.stop()
 
@@ -146,6 +145,10 @@ class MainWindow(QMainWindow):
         self.stack.raise_()
         self.overlay.setParent(self)
         self.overlay.raise_()
+
+        self.voice_btn.setParent(self)
+        self.voice_btn.raise_()
+        self.voice_btn.show()
 
     def switch_page(self, index):
         current_index = self.stack.currentIndex()
