@@ -141,6 +141,14 @@ class MainWindow(QMainWindow):
 
         media = self.vlc_instance.media_new(os.path.abspath(path))
         self.vlc_player.set_media(media)
+        def on_media_state_changed(event):
+            state = self.vlc_player.get_state()
+            print("[VLC STATE] Current state:", state)
+
+        self.vlc_player.event_manager().event_attach(
+            vlc.EventType.MediaPlayerMediaChanged, on_media_state_changed
+        )
+        print("[DEBUG] Media type:", media.get_mrl())
         print("[DEBUG] media set:", os.path.abspath(path))
         print("[DEBUG] player.play() returned:", self.vlc_player.play())
         self.vlc_player.event_manager().event_attach(vlc.EventType.MediaPlayerEncounteredError, lambda e: print("[VLC ERROR] Playback error"))
