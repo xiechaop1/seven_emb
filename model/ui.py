@@ -137,11 +137,12 @@ class MainWindow(QMainWindow):
         self.player = self.media_player
         media = self.vlc_instance.media_new(video_path)
 
-        self.vlc_widget = QFrame(self)
+        self.vlc_widget = QWidget(self)
         self.vlc_widget.setGeometry(0, 0, self.width(), self.height())
         self.setCentralWidget(self.vlc_widget)
         self.player.set_xwindow(int(self.vlc_widget.winId()))
         self.vlc_widget.show()
+        self.vlc_widget.lower()
 
         self.player.stop()
         self.player.set_media(media)
