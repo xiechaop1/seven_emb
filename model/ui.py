@@ -160,28 +160,26 @@ class MainWindow(QMainWindow):
 
     def set_video_background(self, path):
         print("[DEBUG] set_video_background called with path:", path)
-        if not hasattr(self, 'vlc_instance'):
-            self.vlc_widget = QLabel(self)  # Use QLabel as the container for the GIF
-            self.vlc_widget.setGeometry(0, 0, self.width(), self.height())
-            self.setCentralWidget(self.vlc_widget)
-            self.vlc_widget.show()
 
-            movie = QMovie(os.path.abspath(path))  # Load GIF with QMovie
-            self.vlc_widget.setMovie(movie)
-            movie.start()
-        else:
-            print("[DEBUG] Video already playing")
+        # Remove previous gif if exists
+        if hasattr(self, 'vlc_widget'):
+            self.vlc_widget.deleteLater()
+
+        self.vlc_widget = QLabel(self)
+        self.vlc_widget.setGeometry(0, 0, self.width(), self.height())
+        self.setCentralWidget(self.vlc_widget)
+        self.vlc_widget.show()
+
+        movie = QMovie(os.path.abspath(path))
+        movie.setCacheMode(QMovie.CacheAll)
+        movie.setSpeed(100)
+        self.vlc_widget.setMovie(movie)
+        movie.start()
 
         self.stack.setParent(self)
         self.stack.raise_()
         self.overlay.setParent(self)
         self.overlay.raise_()
-
-        self.stack.setParent(self)
-        self.stack.raise_()
-        self.overlay.setParent(self)
-        self.overlay.raise_()
-
         self.voice_btn.setParent(self)
         self.voice_btn.raise_()
         self.voice_btn.show()
