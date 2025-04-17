@@ -126,6 +126,7 @@ class MainWindow(QMainWindow):
         self.show()
 
     def set_video_background(self, path):
+        print("[DEBUG] set_video_background called with path:", path)
         if not hasattr(self, 'vlc_instance'):
             self.vlc_instance = vlc.Instance("--aout", "dummy")
             self.vlc_widget = QFrame(self)
@@ -133,12 +134,19 @@ class MainWindow(QMainWindow):
             self.vlc_widget.show()
             self.setCentralWidget(self.vlc_widget)
             self.vlc_player = self.vlc_instance.media_player_new()
+            print("[DEBUG] widget winId:", int(self.vlc_widget.winId()))
             self.vlc_player.set_xwindow(int(self.vlc_widget.winId()))
         else:
             self.vlc_player.stop()
 
         media = self.vlc_instance.media_new(os.path.abspath(path))
         self.vlc_player.set_media(media)
+        print("[DEBUG] media set:", os.path.abspath(path))
+        print("[DEBUG] player.play() returned:", self.vlc_player.play())
+        self.vlc_player.event_manager().event_attach(vlc.EventType.MediaPlayerEncounteredError, lambda e: print("[VLC ERROR] Playback error"))
+        self.vlc_player.event_manager().event_attach(vlc.EventType.MediaPlayerPlaying, lambda e: print("[VLC STATE] Playing"))
+        self.vlc_player.event_manager().event_attach(vlc.EventType.MediaPlayerStopped, lambda e: print("[VLC STATE] Stopped"))
+
         self.vlc_player.play()
 
         self.stack.setParent(self)
