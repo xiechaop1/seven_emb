@@ -135,7 +135,7 @@ class MainWindow(QMainWindow):
             self.setCentralWidget(self.vlc_widget)
             self.vlc_player = self.vlc_instance.media_player_new()
             print("[DEBUG] widget winId:", int(self.vlc_widget.winId()))
-            self.vlc_player.set_xwindow(int(self.vlc_widget.winId()))
+            # self.vlc_player.set_xwindow(int(self.vlc_widget.winId()))
         else:
             self.vlc_player.stop()
 
