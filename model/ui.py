@@ -125,7 +125,7 @@ class MainWindow(QMainWindow):
         self.media_player = self.vlc_instance.media_player_new()
 
         # self.set_video_background("resources/video/main.mp4")
-        self.play_video("resource/video/main.mp4")
+        self.play_video("resources/video/main.mp4")
 
         # self.showFullScreen()         # 全屏
         self.resize(800, 600)
@@ -136,6 +136,13 @@ class MainWindow(QMainWindow):
     def play_video(self, video_path):
         self.player = self.media_player
         media = self.vlc_instance.media_new(video_path)
+
+        self.vlc_widget = QFrame(self)
+        self.vlc_widget.setGeometry(0, 0, self.width(), self.height())
+        self.setCentralWidget(self.vlc_widget)
+        self.player.set_xwindow(int(self.vlc_widget.winId()))
+        self.vlc_widget.show()
+
         self.player.stop()
         self.player.set_media(media)
         self.player.play()
