@@ -209,6 +209,7 @@ class MainWindow(QMainWindow):
             self.set_video_background("resources/video/main.mp4")
         else:
             self.set_video_background(f"resources/video/scene{index}.mp4")
+
     def mousePressEvent(self, event):
         self.start_pos = event.pos()
         self.start_widget = self.stack.currentWidget()
@@ -218,19 +219,25 @@ class MainWindow(QMainWindow):
             dx = event.pos().x() - self.start_pos.x()
             current_index = self.stack.currentIndex()
 
+            # Limit drag distance for elasticity
+            if abs(dx) > self.width():
+                dx = self.width() * (1 if dx > 0 else -1)
+
             # Determine direction
-            if dx < 0 and current_index < self.stack.count() - 1:
+            if dx > 0 and current_index < self.stack.count() - 1:
                 next_index = current_index + 1
-            elif dx > 0 and current_index > 0:
+            elif dx < 0 and current_index > 0:
                 next_index = current_index - 1
             else:
                 return
 
-            # Prepare widgets
+            # Prepare widgets for elastic drag effect
             next_widget = self.stack.widget(next_index)
-            next_widget.setGeometry(dx if dx < 0 else dx - self.width(), 0, self.width(), self.height())
+            next_widget.setGeometry(dx if dx > 0 else dx + self.width(), 0, self.width(), self.height())
             next_widget.show()
             self.start_widget.move(dx, 0)
+
+            # Mark dragging is active
             self.dragging = True
             self.drag_next_index = next_index
 
@@ -243,9 +250,17 @@ class MainWindow(QMainWindow):
         current_index = self.stack.currentIndex()
 
         if hasattr(self, 'dragging') and self.dragging and abs(dx) > threshold:
+            # If the swipe is enough to switch pages
             self.switch_page(self.drag_next_index)
         elif hasattr(self, 'dragging') and self.dragging:
-            # Revert
+            # Smooth bounce back animation if the swipe is below threshold
+            anim = QPropertyAnimation(self.start_widget, b"pos")
+            anim.setDuration(300)
+            anim.setStartValue(self.start_widget.pos())
+            anim.setEndValue(QPoint(0, 0))
+            anim.start()
+
+            # Revert widget positions after bounce back
             self.stack.widget(self.drag_next_index).hide()
             self.start_widget.setGeometry(0, 0, self.width(), self.height())
 
