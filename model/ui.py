@@ -26,6 +26,7 @@ class OverlayWidget(QWidget):
         self.floating.hide()
 
     def show_overlay(self):
+        print("[DEBUG] show_overlay called")
         self.show()
         self.floating.show()
         self.floating.raise_()
@@ -109,13 +110,16 @@ class MainWindow(QMainWindow):
 
         # 浮层遮罩
         self.overlay = OverlayWidget(self)
+        self.overlay.setGeometry(self.rect())
         self.overlay.raise_()
 
         # 模拟语音触发
         voice_btn = QPushButton("模拟语音触发", self)
+        voice_btn.setParent(self)
+        voice_btn.raise_()
+        voice_btn.show()
         voice_btn.move(10, 550)
         voice_btn.clicked.connect(self.overlay.show_overlay)
-        voice_btn.raise_()
 
         self.set_video_background("resources/video/main.mp4")
         # self.showFullScreen()         # 全屏
@@ -176,7 +180,7 @@ class MainWindow(QMainWindow):
         self.stack.setCurrentIndex(index)
 
         if index == 0:
-            self.set_video_background("../resources/video/main.mp4")
+            self.set_video_background("resources/video/main.mp4")
         else:
             self.set_video_background(f"resources/video/scene{index}.mp4")
     def eventFilter(self, obj, event):
