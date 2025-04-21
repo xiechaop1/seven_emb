@@ -33,12 +33,13 @@ if Config.OS == "lineage":
     from model import ui
 
 os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
+if Config.OS == "lineage":
+    os.environ["SDL_AUDIODRIVER"] = "pulse"
+else:
+    os.environ["SDL_AUDIODRIVER"] = "alsa"
+
 if Config.IS_DEBUG == False:
-    if Config.OS == "lineage":
-        os.environ["SDL_AUDIODRIVER"] = "pulse"
-    else:
-        os.environ["SDL_AUDIODRIVER"] = "alsa"
-        os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = "/usr/lib/qt5/plugins/platforms"
+    os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = "/usr/lib/qt5/plugins/platforms"
     hw = Common.find_audio_hw()
     os.environ["AUDIODEV"] = f"hw:{hw}"
     # if Config.OS is not None:
@@ -56,7 +57,7 @@ import sys
 import argparse
 from model.undertake_callback import UndertakeCallback
 import asyncio
-from pynput import keyboard
+# from pynput import keyboard
 import signal
 import traceback
 
@@ -207,10 +208,10 @@ if __name__ == "__main__":
 
  #    kaldi_listener_thread = threading.Thread(target=kaldi_listener)
 	# kaldi_listener_thread.start()
-    with keyboard.Listener(
-            on_press=on_press,
-            on_release=on_release) as listener:
-        listener.join()
+    # with keyboard.Listener(
+    #         on_press=on_press,
+    #         on_release=on_release) as listener:
+    #     listener.join()
 
 def signal_handler(sig, frame):
     print("Now exiting...")
