@@ -29,7 +29,8 @@ from model.daemon import Daemon
 from common.code import Code
 from common.common import Common
 # from model.ui import ScenePage, HomePage, OverlayWidget, MainWindow
-from model import ui
+if Config.OS == "lineage":
+    from model import ui
 
 os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
 if Config.IS_DEBUG == False:
@@ -37,6 +38,7 @@ if Config.IS_DEBUG == False:
         os.environ["SDL_AUDIODRIVER"] = "pulse"
     else:
         os.environ["SDL_AUDIODRIVER"] = "alsa"
+        os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = "/usr/lib/qt5/plugins/platforms"
     hw = Common.find_audio_hw()
     os.environ["AUDIODEV"] = f"hw:{hw}"
     # if Config.OS is not None:
@@ -45,7 +47,6 @@ if Config.IS_DEBUG == False:
 
     os.environ["SDL_VIDEODRIVER"] = "x11"  ########screen_modified by lixiaolin ###
     os.environ["XDG_RUNTIME_DIR"] = "/run/user/1000"
-    os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = "/usr/lib/qt5/plugins/platforms"
 
 import cv2
 from threading import Event
@@ -104,15 +105,18 @@ def on_release(key):
 
 if __name__ == "__main__":
     if Config.IS_DEBUG == False:
-        try:
-            app = QApplication(sys.argv)
-            window = ui.MainWindow()
-            window.show()
-            exit_code = app.exec_()
-            sys.exit(exit_code)
-        except Exception as e:
-            print(e)
-            traceback.print_exc()
+        if Config.OS == "lineage":
+            pass
+        else:
+            try:
+                app = QApplication(sys.argv)
+                window = ui.MainWindow()
+                window.show()
+                exit_code = app.exec_()
+                sys.exit(exit_code)
+            except Exception as e:
+                print(e)
+                traceback.print_exc()
 
     websocket_url = "ws://114.55.90.104:9001/ws"
     client = WebSocketClient(websocket_url)
