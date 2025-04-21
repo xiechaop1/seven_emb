@@ -33,7 +33,10 @@ from model import ui
 
 os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
 if Config.IS_DEBUG == False:
-    os.environ["SDL_AUDIODRIVER"] = "alsa"
+    if Config.OS == "lineage":
+        os.environ["SDL_AUDIODRIVER"] = "pulse"
+    else:
+        os.environ["SDL_AUDIODRIVER"] = "alsa"
     hw = Common.find_audio_hw()
     os.environ["AUDIODEV"] = f"hw:{hw}"
     # if Config.OS is not None:
