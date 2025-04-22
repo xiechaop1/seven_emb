@@ -3,7 +3,6 @@
 #from fastapi.staticfiles import StaticFiles
 #from config import settings, L
 import logging
-from PyQt5.QtWidgets import QApplication
 
 from base.ws import WebSocketClient
 from base.mic import Mic
@@ -30,6 +29,7 @@ from common.code import Code
 from common.common import Common
 # from model.ui import ScenePage, HomePage, OverlayWidget, MainWindow
 if Config.OS != "lineage":
+    from PyQt5.QtWidgets import QApplication
     from model import ui
 
 os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
