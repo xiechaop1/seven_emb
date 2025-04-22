@@ -11,8 +11,10 @@ from config.config import Config
 if not Config.IS_DEBUG:
     from base.light import Light
     from base.spray import Spray
-
-from base.screen import Screen
+else:
+    from PyQt5.QtWidgets import QApplication
+    from model import ui
+    from base.screen import Screen
 if hasattr(Config, "OS"):
     if Config.OS == "pi5":
         from base.screen_pi5 import Screen
@@ -28,9 +30,9 @@ from model.daemon import Daemon
 from common.code import Code
 from common.common import Common
 # from model.ui import ScenePage, HomePage, OverlayWidget, MainWindow
-if Config.OS != "lineage":
-    from PyQt5.QtWidgets import QApplication
-    from model import ui
+# if Config.OS != "lineage":
+#     from PyQt5.QtWidgets import QApplication
+#     from model import ui
 
 os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
 if Config.OS == "lineage":
@@ -105,7 +107,7 @@ def on_release(key):
         # return False  # 停止监听
 
 if __name__ == "__main__":
-    if Config.IS_DEBUG == False:
+    if Config.IS_DEBUG == True:
         if Config.OS == "lineage":
             pass
         else:
