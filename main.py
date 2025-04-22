@@ -29,7 +29,7 @@ from model.daemon import Daemon
 from common.code import Code
 from common.common import Common
 # from model.ui import ScenePage, HomePage, OverlayWidget, MainWindow
-if Config.OS == "lineage":
+if Config.OS != "lineage":
     from model import ui
 
 os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
@@ -109,15 +109,16 @@ if __name__ == "__main__":
         if Config.OS == "lineage":
             pass
         else:
-            try:
-                app = QApplication(sys.argv)
-                window = ui.MainWindow()
-                window.show()
-                exit_code = app.exec_()
-                sys.exit(exit_code)
-            except Exception as e:
-                print(e)
-                traceback.print_exc()
+            if args.mode != "show":
+                try:
+                    app = QApplication(sys.argv)
+                    window = ui.MainWindow()
+                    window.show()
+                    exit_code = app.exec_()
+                    sys.exit(exit_code)
+                except Exception as e:
+                    print(e)
+                    traceback.print_exc()
 
     websocket_url = "ws://114.55.90.104:9001/ws"
     client = WebSocketClient(websocket_url)
@@ -168,7 +169,7 @@ if __name__ == "__main__":
     audio_play_thread.start()
     logging.info("audio is ready")
 
-    if args.mode != "demo":
+    if args.mode != "demo" and args.mode != "show":
         screen_instance = Screen()
         screen_instance.add("resources/video/main.mp4", 100)
         screen_thread = threading.Thread(target=screen_instance.daemon)
