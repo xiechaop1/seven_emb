@@ -40,16 +40,15 @@ if Config.OS == "lineage":
 else:
     os.environ["SDL_AUDIODRIVER"] = "alsa"
 
-if Config.IS_DEBUG == False:
+if Config.IS_DEBUG == True:
     os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = "/usr/lib/qt5/plugins/platforms"
-    hw = Common.find_audio_hw()
-    os.environ["AUDIODEV"] = f"hw:{hw}"
-    # if Config.OS is not None:
-    #     if Config.OS == "pi5":
-    #         os.environ["AUDIODEV"] = "hw:2,0"
-
-    os.environ["SDL_VIDEODRIVER"] = "x11"  ########screen_modified by lixiaolin ###
-    os.environ["XDG_RUNTIME_DIR"] = "/run/user/1000"
+hw = Common.find_audio_hw()
+os.environ["AUDIODEV"] = f"hw:{hw}"
+# if Config.OS is not None:
+#     if Config.OS == "pi5":
+#         os.environ["AUDIODEV"] = "hw:2,0"
+os.environ["SDL_VIDEODRIVER"] = "x11"  ########screen_modified by lixiaolin ###
+os.environ["XDG_RUNTIME_DIR"] = "/run/user/1000"
 
 import cv2
 from threading import Event
