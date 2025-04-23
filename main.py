@@ -106,6 +106,7 @@ def on_release(key):
         # return False  # 停止监听
 
 if __name__ == "__main__":
+    print(f"Starting with mode {args.mode}")
     if Config.IS_DEBUG == True:
         if Config.OS == "lineage":
             pass
