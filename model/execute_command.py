@@ -307,6 +307,7 @@ class ExecuteCommand:
 
 		bgm = resp["data"]["actions"]["bgm"]
 		light = resp["data"]["actions"]["light"]
+		skip_photo_capture = resp["data"]["actions"]["skip_photo_capture"]
 
 		# print(bgm)
 		# self.voice_add_lock.Lock()
@@ -319,7 +320,7 @@ class ExecuteCommand:
 					self.voice_add_lock.release()
 
 			if not self.voice_add_lock.acquire(False):
-				logging.warning("Duplicate Voice Add", resp_msg_id)
+				logging.warn(f"Duplicate Voice Add, msg_id: {resp_msg_id}")
 				return
 
 			print("lock: ", self.voice_add_lock.locked())
@@ -371,6 +372,8 @@ class ExecuteCommand:
 				audio_data["voice_count"] = li_voices_list_len
 				audio_data["wait_time"] = li_wait_time
 				audio_data["light"] = light
+
+				audio_data["skip_photo_capture"] = skip_photo_capture
 
 				audio_data["continue"] = True # 设置标志位，打断以后，可以继续播放
 
