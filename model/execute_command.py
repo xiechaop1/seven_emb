@@ -307,7 +307,7 @@ class ExecuteCommand:
 
 		bgm = resp["data"]["actions"]["bgm"]
 		light = resp["data"]["actions"]["light"]
-		skip_photo_capture = resp["data"]["actions"]["skip_photo_capture"]
+		# skip_photo_capture = resp["data"]["actions"]["skip_photo_capture"]
 
 		# print(bgm)
 		# self.voice_add_lock.Lock()
