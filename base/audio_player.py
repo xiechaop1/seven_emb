@@ -340,12 +340,12 @@ class AudioPlayer:
         if audio_data["filename"] == "" or audio_data["filename"] is None:
             return
         audio_file = audio_data["filename"]
-        skip_photo_capture = audio_data["skip_photo_capture"]
+        # skip_photo_capture = audio_data["skip_photo_capture"]
 
-        if skip_photo_capture == True:
-            ThreadingEvent.camera_start_event.clear()
-        else:
-            ThreadingEvent.camera_start_event.set()
+        # if skip_photo_capture == True:
+        #     ThreadingEvent.camera_start_event.clear()
+        # else:
+        #     ThreadingEvent.camera_start_event.set()
 
         type = audio_data["type"]
         wait_time = audio_data["wait_time"]

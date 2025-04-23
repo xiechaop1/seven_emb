@@ -373,7 +373,7 @@ class ExecuteCommand:
 				audio_data["wait_time"] = li_wait_time
 				audio_data["light"] = light
 
-				audio_data["skip_photo_capture"] = skip_photo_capture
+				# audio_data["skip_photo_capture"] = skip_photo_capture
 
 				audio_data["continue"] = True # 设置标志位，打断以后，可以继续播放
 
