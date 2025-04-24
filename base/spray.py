@@ -60,9 +60,9 @@ class Spray:
         for i in range(times):
             for j in range(3):
                 GPIO.output(self.SPRAY_PIN, GPIO.HIGH)
-                time.sleep(1.5)
+                time.sleep(2)
                 GPIO.output(self.SPRAY_PIN, GPIO.LOW)
-                time.sleep(0.05)
+                time.sleep(0.25)
             print("GPIO.HIGH!")
             time.sleep(wait_time)
 
