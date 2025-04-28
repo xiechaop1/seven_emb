@@ -52,6 +52,8 @@ class ExecuteCommand:
 						photo_list.append(photo)
 					if self.take_photo_max_ct > 1:
 						time.sleep(1)
+			else:
+				time.sleep(self.take_photo_max_ct)
 
 			self.commit(photo_list)
 			time.sleep(0.5)
