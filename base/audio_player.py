@@ -340,14 +340,17 @@ class AudioPlayer:
         if audio_data["filename"] == "" or audio_data["filename"] is None:
             return
         audio_file = audio_data["filename"]
-        skip_photo_capture = audio_data["skip_photo_capture"]
-
-        if skip_photo_capture == True:
-            ThreadingEvent.camera_start_event.clear()
-        else:
-            ThreadingEvent.camera_start_event.set()
-
         type = audio_data["type"]
+
+        if type == Code.REC_METHOD_VOICE_CHAT:
+            if "skip_photo_capture" in audio_data:
+                skip_photo_capture = audio_data["skip_photo_capture"]
+
+                if skip_photo_capture == True:
+                    ThreadingEvent.camera_start_event.clear()
+                else:
+                    ThreadingEvent.camera_start_event.set()
+
         wait_time = audio_data["wait_time"]
         # spray = audio_data["spray"]
         if "bgm" in audio_data:
