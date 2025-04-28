@@ -10,6 +10,7 @@ import time
 
 from base.camera import Camera
 from base.messageid import messageid
+from common.scence import Scence
 from common.threading_event import ThreadingEvent
 from common.common import Common
 from common.code import Code
@@ -39,19 +40,17 @@ class ExecuteCommand:
 	def take_photo(self):
 		while True:
 			print("camera event: ", ThreadingEvent.camera_start_event.is_set())
-			if not ThreadingEvent.camera_start_event.is_set():
-				photo_list = []
-				self.commit(photo_list)
 			ThreadingEvent.camera_start_event.wait()
 			# i = 0
 
 			photo_list = []
-			for i in range(self.take_photo_max_ct):
-				photo = self.camera.take_photo(f"captured_image_{i}")
-				if photo:
-					photo_list.append(photo)
-				if self.take_photo_max_ct > 1:
-					time.sleep(1)
+			if Scence.skip_photo_capture == False:
+				for i in range(self.take_photo_max_ct):
+					photo = self.camera.take_photo(f"captured_image_{i}")
+					if photo:
+						photo_list.append(photo)
+					if self.take_photo_max_ct > 1:
+						time.sleep(1)
 
 			self.commit(photo_list)
 			time.sleep(0.5)
