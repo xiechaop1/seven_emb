@@ -347,9 +347,9 @@ class AudioPlayer:
                 skip_photo_capture = audio_data["skip_photo_capture"]
 
                 if skip_photo_capture == True:
-                    ThreadingEvent.camera_start_event.set()
-                else:
                     ThreadingEvent.camera_start_event.clear()
+                else:
+                    ThreadingEvent.camera_start_event.set()
 
         wait_time = audio_data["wait_time"]
         # spray = audio_data["spray"]
