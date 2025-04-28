@@ -44,6 +44,7 @@ class ExecuteCommand:
 			# i = 0
 
 			photo_list = []
+			print("skip photo: ", Scence.skip_photo_capture)
 			if Scence.skip_photo_capture == False:
 				for i in range(self.take_photo_max_ct):
 					photo = self.camera.take_photo(f"captured_image_{i}")

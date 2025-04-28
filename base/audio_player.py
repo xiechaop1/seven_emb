@@ -342,7 +342,7 @@ class AudioPlayer:
         audio_file = audio_data["filename"]
         type = audio_data["type"]
 
-        if type == Code.REC_METHOD_VOICE_CHAT:
+        if type == Code.REC_METHOD_VOICE_EXEC:
             if "skip_photo_capture" in audio_data:
                 skip_photo_capture = audio_data["skip_photo_capture"]
 
