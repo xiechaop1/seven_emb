@@ -28,28 +28,7 @@ class Command:
 		self.ws = ws
 		self.cv2 = cv2
 
-	def deal(self, resp):
-
-		resp_msg_id = resp["message_id"]
-		resp_conv_id = resp['conversation_id']
-
-
-		action = resp["data"]["action"]
-
-
-		params = resp["data"]["action_params"]
-		device = None
-		operation = None
-		value = None
-		if params is not None:
-			if "device" in params:
-				device = params["device"]
-			if "operation" in params:
-				operation = params["operation"]
-			if "value" in params:
-				value = params["value"]
-
-		print("dov", device, operation, value)
+	def deal(self, device, operation, value):
 
 		if device is not None:
 

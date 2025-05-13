@@ -10,6 +10,7 @@ import time
 
 from base.camera import Camera
 from base.messageid import messageid
+from common.scence import Scence
 from common.threading_event import ThreadingEvent
 from common.common import Common
 from common.code import Code
@@ -43,12 +44,16 @@ class ExecuteCommand:
 			# i = 0
 
 			photo_list = []
-			for i in range(self.take_photo_max_ct):
-				photo = self.camera.take_photo(f"captured_image_{i}")
-				if photo:
-					photo_list.append(photo)
-				if self.take_photo_max_ct > 1:
-					time.sleep(1)
+			print("skip photo: ", Scence.skip_photo_capture)
+			if Scence.skip_photo_capture == False:
+				for i in range(self.take_photo_max_ct):
+					photo = self.camera.take_photo(f"captured_image_{i}")
+					if photo:
+						photo_list.append(photo)
+					if self.take_photo_max_ct > 1:
+						time.sleep(1)
+			else:
+				time.sleep(self.take_photo_max_ct)
 
 			self.commit(photo_list)
 			time.sleep(0.5)
@@ -307,7 +312,7 @@ class ExecuteCommand:
 
 		bgm = resp["data"]["actions"]["bgm"]
 		light = resp["data"]["actions"]["light"]
-		# skip_photo_capture = resp["data"]["actions"]["skip_photo_capture"]
+		skip_photo_capture = resp["data"]["actions"]["skip_photo_capture"]
 
 		# print(bgm)
 		# self.voice_add_lock.Lock()
@@ -373,7 +378,7 @@ class ExecuteCommand:
 				audio_data["wait_time"] = li_wait_time
 				audio_data["light"] = light
 
-				# audio_data["skip_photo_capture"] = skip_photo_capture
+				audio_data["skip_photo_capture"] = skip_photo_capture
 
 				audio_data["continue"] = True # 设置标志位，打断以后，可以继续播放
 
