@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget,  QGraphicsBlurEf
 from GUI.buttons import CustomButton , ImageButton
 # from buttons import CustomButton , ImageButton
 # from GUI.animations import fadeAnimation
+
 import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
@@ -38,6 +39,7 @@ SECOND_NAME_W = 160
 SECOND_NAME_H = 50
 SECOND_GUIDE_W = 828
 SECOND_GUIDE_H = 274
+
 
 BOTBAR_BTN_R = 100
 
@@ -456,12 +458,11 @@ class MainWindow(QMainWindow):
         self.firstBGMovie = QMovie("/home/dsg/test/seven_emb/resources/images/firstback_fire.gif")
         self.firstBG.setMovie(self.firstBGMovie)
         self.firstBGMovie.start()
-        self.firstBG.hide()
-         
+        self.firstBG.hide()         
         self.firstMenu = FirstWidget(self)
         self.firstMenu.setGeometry(self.width(), 0, self.width(), self.height()) 
         # self.firstMenu.hide() 
-        
+
         # 创建二级界面 
         self.SecondMenuIndex = 0 #当前二级菜单页序数     
         self.SecondMenuGrp = [] #二级菜单子项列表
@@ -851,5 +852,6 @@ if __name__ == '__main__':
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
+
     
     
