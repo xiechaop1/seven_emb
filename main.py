@@ -123,7 +123,7 @@ if __name__ == "__main__":
                     traceback.print_exc()
 
     # websocket_url = "ws://114.55.90.104:9001/ws"
-    if Config.WEBSOCKET_URL is not None:
+    if "WEBSOCKET_URL" in Config:
         websocket_url = Config.WEBSOCKET_URL
     else:
         websocket_url = "ws://114.55.90.104:9001/ws"
