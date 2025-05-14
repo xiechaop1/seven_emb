@@ -122,7 +122,11 @@ if __name__ == "__main__":
                     print(e)
                     traceback.print_exc()
 
-    websocket_url = "ws://114.55.90.104:9001/ws"
+    # websocket_url = "ws://114.55.90.104:9001/ws"
+    if Config.WEBSOCKET_URL is not None:
+        websocket_url = Config.WEBSOCKET_URL
+    else:
+        websocket_url = "ws://114.55.90.104:9001/ws"
     client = WebSocketClient(websocket_url)
     ws_cli = client.connect()
     pygame.init()
