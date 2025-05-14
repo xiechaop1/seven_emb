@@ -29,6 +29,7 @@ from model.recv import Recv
 from model.daemon import Daemon
 from common.code import Code
 from common.common import Common
+from GUI import gui
 # from model.ui import ScenePage, HomePage, OverlayWidget, MainWindow
 # if Config.OS != "lineage":
 #     from PyQt5.QtWidgets import QApplication
@@ -114,7 +115,7 @@ if __name__ == "__main__":
             if args.mode != "show":
                 try:
                     app = QApplication(sys.argv)
-                    window = ui.MainWindow()
+                    window = gui.MainWindow()
                     window.show()
                     exit_code = app.exec_()
                     sys.exit(exit_code)
@@ -123,10 +124,10 @@ if __name__ == "__main__":
                     traceback.print_exc()
 
     # websocket_url = "ws://114.55.90.104:9001/ws"
-    if "WEBSOCKET_URL" in Config:
-        websocket_url = Config.WEBSOCKET_URL
-    else:
-        websocket_url = "ws://114.55.90.104:9001/ws"
+    # if "WEBSOCKET_URL" in Config:
+    #     websocket_url = Config.WEBSOCKET_URL
+    # else:
+    websocket_url = "ws://114.55.90.104:9001/ws"
     client = WebSocketClient(websocket_url)
     ws_cli = client.connect()
     pygame.init()
@@ -219,6 +220,12 @@ if __name__ == "__main__":
     #         on_press=on_press,
     #         on_release=on_release) as listener:
     #     listener.join()
+    
+    app = QApplication(sys.argv)
+    window = gui.MainWindow()
+    window.show()
+    sys.exit(app.exec_())
+    
 
 def signal_handler(sig, frame):
     print("Now exiting...")
