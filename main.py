@@ -71,6 +71,7 @@ import traceback
 from model.execute_command import ExecuteCommand
 #from base.spary import Spray
 from PyQt5.QtCore import QObject, pyqtSignal
+from GUI import gui
 
 # async def main():
 #     websocket_url = "ws://114.55.90.104:9001/ws"

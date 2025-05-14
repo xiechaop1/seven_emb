@@ -503,14 +503,15 @@ class MainWindow(QMainWindow):
         self.AnimationFlash()
         
     def messageHandler(self, text):
-        print(f"Message Received")
         if text == "voice appear":
+            print(f"voice appear Received")
             self.voiceDetectingPage.raise_()
             self.voiceDetectingPage.show()   
         elif text == "voice disappear":
+            print(f"voice disappear Received")
             self.voiceDetectingPage.hide()
         elif text == "enter sleep":
-            print("window received sleep")
+            print(f"enter sleep Received")
             if self.menu_flag != 3:
                 self.thirdBGMovie = QMovie(coacherMovie[self.SecondMenuIndex][0])
                 self.thirdBG.setMovie(self.thirdBGMovie)
