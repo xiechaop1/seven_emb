@@ -34,6 +34,10 @@ class Light:
 
     BRIGHTNESS_MAX = 255
 
+    LED_COUNT_PER_LINE = 6
+
+    LED_LINE_COUNT = 4
+
     def __init__(self):
         # self.light_mode = ""
 
