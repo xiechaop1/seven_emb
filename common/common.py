@@ -34,6 +34,7 @@ class Common:
 		# 遍历设备列表查找设备索引
 		for i, device in enumerate(sd.query_devices()):
 			print(device['name'], device_name)
+			
 			if device_name in device['name'] and device['max_input_channels'] > 0:
 				tmp = device['name']
 				hw_idx = re.findall(r"\(hw:(\d+,\d+)", tmp)
