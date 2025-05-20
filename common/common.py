@@ -28,10 +28,12 @@ class Common:
 		return True;
 
 	@staticmethod
-	def find_audio_hw(device_name = "Yundea 1076"):
+	def find_audio_hw(device_name = "Yundea A31-1"):
+		# Yundea 1076
 		hw = None
 		# 遍历设备列表查找设备索引
 		for i, device in enumerate(sd.query_devices()):
+			print(device['name'], device_name)
 			if device_name in device['name'] and device['max_input_channels'] > 0:
 				tmp = device['name']
 				hw_idx = re.findall(r"\(hw:(\d+,\d+)", tmp)
