@@ -134,7 +134,7 @@ class Mic:
         while True:
             if not ThreadingEvent.wakeup_event.is_set():
                 if Config.IS_DEBUG == True:
-                    device_idx = 2
+                    device_idx = 1
                 else:
                     device_idx = self.find_device_index()
 
