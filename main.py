@@ -29,7 +29,6 @@ from model.recv import Recv
 from model.daemon import Daemon
 from common.code import Code
 from common.common import Common
-# from GUI import gui
 # from model.ui import ScenePage, HomePage, OverlayWidget, MainWindow
 # if Config.OS != "lineage":
 #     from PyQt5.QtWidgets import QApplication
@@ -78,6 +77,9 @@ from model.execute_command import ExecuteCommand
 parser = argparse.ArgumentParser()
 parser.add_argument('--mode', default="", type=str, help='demo mode without screen')
 args = parser.parse_args()
+
+if args.mode != "demo" and args.mode != "show":
+    from GUI import gui
 
 if args.mode == "zero":
     cv2_instance = cv2.VideoCapture(0)
@@ -221,11 +223,12 @@ if __name__ == "__main__":
     #         on_press=on_press,
     #         on_release=on_release) as listener:
     #     listener.join()
-    
-    app = QApplication(sys.argv)
-    window = gui.MainWindow()
-    window.show()
-    sys.exit(app.exec_())
+
+    if args.mode != "demo" and args.mode != "show":
+        app = QApplication(sys.argv)
+        window = gui.MainWindow()
+        window.show()
+        sys.exit(app.exec_())
     
 
 def signal_handler(sig, frame):
