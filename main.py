@@ -29,7 +29,6 @@ from model.recv import Recv
 from model.daemon import Daemon
 from common.code import Code
 from common.common import Common
-from GUI import gui
 # from model.ui import ScenePage, HomePage, OverlayWidget, MainWindow
 # if Config.OS != "lineage":
 #     from PyQt5.QtWidgets import QApplication
@@ -83,6 +82,9 @@ class Communicator(QObject):
 parser = argparse.ArgumentParser()
 parser.add_argument('--mode', default="", type=str, help='demo mode without screen')
 args = parser.parse_args()
+
+if args.mode != "demo" and args.mode != "show":
+    from GUI import gui
 
 if args.mode == "zero":
     cv2_instance = cv2.VideoCapture(0)
@@ -241,6 +243,7 @@ if __name__ == "__main__":
     daemon_thread.start()
     
     sys.exit(app.exec_())
+
     
 
 def signal_handler(sig, frame):
