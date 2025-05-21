@@ -66,6 +66,7 @@ import traceback
 #from base.spary import Spray
 from model.execute_command import ExecuteCommand
 #from base.spary import Spray
+from PyQt5.QtCore import QObject, pyqtSignal
 
 # async def main():
 #     websocket_url = "ws://114.55.90.104:9001/ws"
@@ -74,6 +75,10 @@ from model.execute_command import ExecuteCommand
 #     ws = await client.create_websocket_client(websocket_url)  # ✅ 连接 WebSocket
 #     if ws:  # 连接成功
 #         return ws
+
+# 信号器：定义一个跨线程信号
+class Communicator(QObject):
+    message = pyqtSignal(str)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--mode', default="", type=str, help='demo mode without screen')
@@ -134,7 +139,10 @@ if __name__ == "__main__":
     pygame.init()
 
     cv2_instance = cv2.VideoCapture(0)
-
+    
+    #创建信号槽
+    comm = Communicator()
+    
     if not Config.IS_DEBUG:
         # 暂时去掉，等上板子再试
         # spray_instance = ""
@@ -174,7 +182,7 @@ if __name__ == "__main__":
     # audio_stop_thread = threading.Thread(target=audio_instance.audio_stop_event_daemon)
     # audio_stop_thread.start()
     audio_play_thread = threading.Thread(target=audio_instance.audio_play_event_daemon)
-    audio_play_thread.start()
+    # audio_play_thread.start()
     logging.info("audio is ready")
 
     if args.mode != "demo" and args.mode != "show":
@@ -195,23 +203,23 @@ if __name__ == "__main__":
     # screen = Screen()
     # screen.display("resources/video/think.mp4")
 
-    mic_instance = Mic(client, audio_instance, light_instance, screen_instance)
+    mic_instance = Mic(client, audio_instance, light_instance, screen_instance, comm)
     kaldi_thread = threading.Thread(target=mic_instance.kaldi_listener)
-    kaldi_thread.start()
+    # kaldi_thread.start()
 
     # mic_thread = threading.Thread(target=mic_instance.daemon)
     # mic_thread.start()
     logging.info("Mic is ready")
 
     #
-    recv_instance = Recv(ws_cli, client, audio_instance, light_instance, cv2_instance, screen_instance, spray_instance)
+    recv_instance = Recv(ws_cli, client, audio_instance, light_instance, cv2_instance, screen_instance, spray_instance, comm)
     recv_thread = threading.Thread(target=recv_instance.daemon)
-    recv_thread.start()
+    # recv_thread.start()
     # logging.info("Starting receive websocket data ...")
 
     daemon_instance = Daemon(audio_instance, light_instance, spray_instance)
     daemon_thread = threading.Thread(target=daemon_instance.deal)
-    daemon_thread.start()
+    # daemon_thread.start()
     # 通过实例调用 create_websocket_client 方法
     # ws_cli = ws_instance.create_websocket_client(websocket_url)
 
@@ -225,6 +233,13 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = gui.MainWindow()
     window.show()
+    #对接槽接口   
+    comm.message.connect(window.messageHandler)
+    audio_play_thread.start()
+    kaldi_thread.start()
+    recv_thread.start()
+    daemon_thread.start()
+    
     sys.exit(app.exec_())
     
 

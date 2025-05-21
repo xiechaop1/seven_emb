@@ -2,11 +2,12 @@ import sys
 from turtle import isvisible
 import vlc
 from PyQt5.QtCore import Qt, QPropertyAnimation, pyqtProperty, QRectF, QRect, QEasingCurve, QPoint
-from PyQt5.QtCore import Qt, QRectF, QTimer, QTime, QDate, QPropertyAnimation
+from PyQt5.QtCore import Qt, QRectF, QTimer, QTime, QDate, QPropertyAnimation, QObject, pyqtSignal
 from PyQt5.QtGui import QPainter, QColor, QImage, QPixmap, QFont, QFontDatabase, QPalette, QMouseEvent, QIcon, QMovie
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget,  QGraphicsBlurEffect, QLabel, QGraphicsOpacityEffect, QPushButton, QStackedWidget, QFrame
-# import DSGDemo_rc
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget,  QGraphicsBlurEffect, QLabel, QGraphicsOpacityEffect, QPushButton, QStackedWidget, QFrame, QGraphicsView, QGraphicsScene, QGraphicsRectItem
 from GUI.buttons import CustomButton , ImageButton
+# from buttons import CustomButton , ImageButton
+# from GUI.animations import fadeAnimation
 import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
@@ -38,10 +39,10 @@ SECOND_NAME_H = 50
 SECOND_GUIDE_W = 828
 SECOND_GUIDE_H = 274
 
-BOTBAR_PLAYBTN_R = 100
+BOTBAR_BTN_R = 100
 
-GUIDE_BTN_W = 40
-GUIDE_BTN_H = 100
+GUIDE_BTN_W = 50
+GUIDE_BTN_H = 120
 
 VOICE_DETECTING_ICON_R = 100
 VOICE_DETECTING_ICON_BOTGAP = 100
@@ -55,26 +56,17 @@ coacherBackground = ["/home/dsg/test/seven_emb/resources/images/secondback_guruj
                      "/home/dsg/test/seven_emb/resources/images/zeroback_sun.jpg"]
 coacherGuideTxt = ["    As the day comes to an end, release yourself\nfrom the busyness and allow your body and mind\nto fully relax. Close your eyes, gently bid farewell\nto today, and drift into a peaceful dream.",
                    "    As the day comes to an end, release yourself\nfrom the busyness and allow your body and mind\nto fully relax. Close your eyes, gently bid farewell\nto today, and drift into a peaceful dream."]
+coacherMovie = [["/home/dsg/test/seven_emb/resources/images/third_breath.gif", "/home/dsg/test/seven_emb/resources/images/third_starsky.gif"],
+                ["/home/dsg/test/seven_emb/resources/images/third_starsky.gif", "/home/dsg/test/seven_emb/resources/images/third_breath.gif"]]
 
+# 这个类专门用来发信号（必须继承 QObject）
+class Communicator(QObject):
+    message = pyqtSignal(str)
 
 class FirstWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setAutoFillBackground(False)  # 不自动填充背景，保持透明
-        # self.setAttribute(Qt.WA_TransparentForMouseEvents)
-        # self.setAttribute(Qt.WA_TranslucentBackground)
-        # self.setStyleSheet("background: transparent")
-        
-        # #设置播放路径和播放视频
-        # self.vlcInstance = vlc.Instance()
-        # self.videoPlayer = self.vlcInstance.media_player_new()
-        # media = self.vlcInstance.media_new("/home/dsg/test/seven_emb/resources/video/main.mp4")
-        # self.videoPlayer.set_media(media)
-        # #视频衬底
-        # self.video_label = QLabel(self)
-        # self.video_label.setGeometry(0, 0, WINDOW_W, WINDOW_H)
-        # self.show()  # 必须 show 后 QLabel 才有 winId
-        # self.videoPlayer.set_xwindow(self.video_label.winId())
         
         #跑道衬底
         self.label = QLabel(self)
@@ -122,11 +114,6 @@ class FirstWidget(QWidget):
         
         # 将绘制的图像转换为 QPixmap 显示在 QLabel 中
         self.pixmap = QPixmap.fromImage(runway_image)
-
-        # # 设置高斯模糊效果
-        # # blur_effect = QGraphicsBlurEffect()
-        # # blur_effect.setBlurRadius(0)  # 设置模糊半径
-        # # self.label.setGraphicsEffect(blur_effect)
         self.label.setPixmap(self.pixmap)
         
         #加载icon
@@ -163,12 +150,7 @@ class FirstWidget(QWidget):
     def MeditationClicked(self):
         # print(f"Mouse clicked")
         if self.parent().menu_flag == 1:
-           self.parent().firstBG.hide()
-           self.parent().leftBtn.hide()
-           self.parent().rightBtn.hide()
-           self.hide()
            self.parent().SecondMenuGrp[0].fade_in()
-           self.parent().First2Second_finish_switch()
         else:
            print('illegal click\n')
            return
@@ -256,16 +238,15 @@ class SecondWidget(QWidget):
         # self.animation.setStartValue(0)
         # self.animation.setEndValue(1)
         # self.animation.finished.connect(self.parent().First2Second_finish_switch)
-        
-    
-        
     def fade_in(self):
+        # self.raise_()
+        # self.parent().afterRaise()
+        for i in range(len(coacher)):
+            self.parent().SecondMenuGrp[i].raise_()
+        self.parent().afterRaise()
         self.show()
-        # self.animation.start()
+        self.parent().animation_second.start()
              
-        
-        
-
 class TopBarDisplayWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -344,10 +325,43 @@ class BottomBarDisplayWidget(QWidget):
         self.update_time()  
         
         # 绘制播放按钮
-        self.playbutton = ImageButton(BOTBAR_PLAYBTN_R, BOTBAR_PLAYBTN_R, "/home/dsg/test/seven_emb/resources/images/bottombar_playButton.png", self)
-        self.playbutton.setGeometry((self.size().width()-BOTBAR_PLAYBTN_R)//2, (self.size().height() - BOTBAR_PLAYBTN_R)//2, BOTBAR_PLAYBTN_R, BOTBAR_PLAYBTN_R)  # 设置按钮位置和大小
+        self.playbutton = ImageButton(BOTBAR_BTN_R, BOTBAR_BTN_R, "/home/dsg/test/seven_emb/resources/images/bottombar_playButton.png", self)
+        self.playbutton.setGeometry((self.size().width()-BOTBAR_BTN_R)//2, (self.size().height() - BOTBAR_BTN_R)//2, BOTBAR_BTN_R, BOTBAR_BTN_R)  # 设置按钮位置和大小
+        self.playbutton.clicked.connect(self.playClicked)
         self.playbutton.hide()
+        # 绘制停止按钮
+        self.stopbutton = ImageButton(BOTBAR_BTN_R, BOTBAR_BTN_R, "/home/dsg/test/seven_emb/resources/images/bottombar_stop.png", self)
+        self.stopbutton.setGeometry((self.size().width()-BOTBAR_BTN_R)//2, (self.size().height() - BOTBAR_BTN_R)//2, BOTBAR_BTN_R, BOTBAR_BTN_R)  # 设置按钮位置和大小
+        self.stopbutton.clicked.connect(self.stopClicked)
+        self.stopbutton.hide()
 
+    def playClicked(self):
+        # print(f"Mouse clicked")
+        if self.parent().menu_flag == 2:
+           self.parent().thirdBGMovie = QMovie(coacherMovie[self.parent().SecondMenuIndex][0])
+           self.parent().thirdBG.setMovie(self.parent().thirdBGMovie)
+           self.parent().thirdBGMovie.start()
+        #    self.parent().thirdBG.hide()
+           self.parent().thirdBG.raise_()
+           self.parent().afterRaise()
+           self.parent().thirdBG.show()
+           self.parent().animation_third.start()
+        else:
+           print('illegal click\n')
+           return
+       
+    def stopClicked(self):
+        if self.parent().menu_flag == 2:
+           self.parent().thirdBGMovie = QMovie(coacherMovie[self.parent().SecondMenuIndex][0])
+           self.parent().thirdBG.setMovie(self.parent().thirdBGMovie)
+           self.parent().thirdBGMovie.start()
+           self.parent().thirdBG.raise_()
+           self.parent().afterRaise()
+           self.parent().thirdBG.show()
+        else:
+           print('illegal click\n')
+           return
+        
     def update_time(self):
         # 获取当前时间并更新到 QLabel 中
         # print("time")
@@ -356,37 +370,6 @@ class BottomBarDisplayWidget(QWidget):
         self.date_label.setText(current_date)  # 设置 QLabel 显示当前日期
         self.time_label.setText(current_time)  # 设置 QLabel 显示当前时间  
         
-# class VoiceDetectingWidget(QWidget):
-#     def __init__(self, parent=None):
-#         super().__init__(parent)
-#         self.setAutoFillBackground(False)  # 不自动填充背景，保持透明
-#         self.setGeometry(0 , 0, WINDOW_W, WINDOW_H)
-        
-#         self.backScene = QLabel(self)
-#         self.backScene.setGeometry(0, 0, self.width(), self.height())        
-#         # 设置绘制颜色（跑道的颜色）
-#         backScene_color = QColor(0, 0, 0, 200)  # 半透明的白色
-#         backScene_image = QImage(WINDOW_W, WINDOW_H, QImage.Format_ARGB32_Premultiplied)
-#         backScene_image.fill(Qt.transparent)  # 设置透明背景
-#         # 使用 QPainter 绘制跑道形状到 QImage 上
-#         painter = QPainter(backScene_image)
-#         painter.setRenderHint(QPainter.Antialiasing)
-#         painter.setRenderHint(QPainter.SmoothPixmapTransform)
-#         painter.setBrush(backScene_color)
-#         painter.setPen(Qt.NoPen)
-#         painter.drawRect(0, 0, WINDOW_W, WINDOW_H)  # 绘制跑道形状
-#         painter.end()
-#         # 将绘制的图像转换为 QPixmap 显示在 QLabel 中
-#         self.pixmap = QPixmap.fromImage(backScene_image)
-#         self.backScene.setPixmap(self.pixmap)
-        
-#         self.Icon = QLabel(self)
-#         self.Icon.setGeometry((WINDOW_W-VOICE_DETECTING_ICON_R)//2 , WINDOW_H-VOICE_DETECTING_ICON_R-VOICE_DETECTING_ICON_BOTGAP, VOICE_DETECTING_ICON_R, VOICE_DETECTING_ICON_R)
-#         self.Icon.setScaledContents(True)
-#         self.voiceDetectingMovie = QMovie("/home/dsg/test/demo0423/voiceDetecting3.gif")
-#         self.Icon.setMovie(self.voiceDetectingMovie)
-#         self.voiceDetectingMovie.start()
-
 class VoiceDetectingWidget(QWidget):
     def __init__(self, image_folder, interval=100, parent=None):
         super().__init__(parent)
@@ -407,8 +390,7 @@ class VoiceDetectingWidget(QWidget):
         
         self.backScene = QLabel(self)
         self.backScene.setGeometry(0, 0, self.width(), self.height())        
-        # 设置绘制颜色（跑道的颜色）
-        backScene_color = QColor(0, 0, 0, 200)  # 半透明的白色
+        backScene_color = QColor(0, 0, 0, 200)  # 半透明的黑色
         backScene_image = QImage(WINDOW_W, WINDOW_H, QImage.Format_ARGB32_Premultiplied)
         backScene_image.fill(Qt.transparent)  # 设置透明背景
         # 使用 QPainter 绘制跑道形状到 QImage 上
@@ -458,19 +440,16 @@ class MainWindow(QMainWindow):
         
         # self.Container = QStackedWidget(self)
         # self.Container.setGeometry(0,0,WINDOW_W, WINDOW_H)
-        
+        # self.scene = QGraphicsScene()
+        # self.setScene(self.scene)
         # 创建初始界面
         self.initBG = QLabel(self)
         self.initBG.setPixmap(QPixmap("/home/dsg/test/seven_emb/resources/images/zeroback_sun.jpg").scaled(self.size(), Qt.IgnoreAspectRatio))
         self.initBG.setGeometry(0, 0, self.width(), self.height())
+        # self.initRect = QGraphicsRectItem(self.initBG)
         # self.initBG.hide()
              
         # 创建一级界面
-        # self.firstBG = QLabel(self)
-        # self.firstBG.setPixmap(QPixmap(":First/background.jpg").scaled(self.size(), Qt.IgnoreAspectRatio))
-        # self.firstBG.setGeometry(0, 0, self.width(), self.height())
-        # self.firstBG.hide()
-        
         self.firstBG = QLabel(self)
         self.firstBG.setGeometry(0, 0, self.width(), self.height())
         self.firstBG.setScaledContents(True)
@@ -478,21 +457,10 @@ class MainWindow(QMainWindow):
         self.firstBG.setMovie(self.firstBGMovie)
         self.firstBGMovie.start()
         self.firstBG.hide()
-        
-        # self.firstBG_video = QFrame(self)
-        # self.firstBG_video.setGeometry(0, 0, self.width(), self.height())
-        # self.vlcInstance = vlc.Instance()
-        # self.videoPlayer = self.vlcInstance.media_player_new()
-        # media = self.vlcInstance.media_new("/home/dsg/test/seven_emb/resources/video/main.mp4")
-        # self.videoPlayer.set_media(media)
-        # self.videoPlayer.set_xwindow(self.firstBG_video.winId())  # X11
-        # self.firstBG_video.hide()
          
         self.firstMenu = FirstWidget(self)
         self.firstMenu.setGeometry(self.width(), 0, self.width(), self.height()) 
         # self.firstMenu.hide() 
-        
-        self.init2FirstFlash()
         
         # 创建二级界面 
         self.SecondMenuIndex = 0 #当前二级菜单页序数     
@@ -505,10 +473,13 @@ class MainWindow(QMainWindow):
         self.next_SecondMenu = self.SecondMenuGrp[self.SecondMenuIndex+1]
         
         # #创建三级场景界面
-        # self.thirdBG = QLabel(self) 
-        # self.thirdBG.setPixmap(QPixmap(":Third/breath.jpeg").scaled(self.size(), Qt.IgnoreAspectRatio))
-        # self.thirdBG.setGeometry(0, 0, self.width(), self.height())
-        # self.thirdBG.hide()
+        self.thirdBG = QLabel(self)
+        self.thirdBG.setGeometry(0, 0, self.width(), self.height())
+        self.thirdBG.setScaledContents(True)
+        # self.thirdBGMovie = QMovie("/home/dsg/test/seven_emb/resources/images/third_starsky.gif")
+        # self.thirdBG.setMovie(self.thirdBGMovie)
+        # self.thirdBGMovie.start()
+        self.thirdBG.hide()
         
         # 创建topBar
         self.TopBar = TopBarDisplayWidget(self) 
@@ -518,21 +489,36 @@ class MainWindow(QMainWindow):
         # 创建左右按钮
         self.leftBtn = ImageButton(GUIDE_BTN_W,GUIDE_BTN_H,"/home/dsg/test/seven_emb/resources/images/leftSingleArrow.png",self)
         self.leftBtn.clicked.connect(self.leftArrowClicked)
-        self.leftBtn.move(GUIDE_BTN_W, (WINDOW_H - GUIDE_BTN_H)//2)
+        self.leftBtn.move(GUIDE_BTN_W//2, (WINDOW_H - GUIDE_BTN_H)//2)
         self.leftBtn.hide()
         self.rightBtn = ImageButton(GUIDE_BTN_W,GUIDE_BTN_H,"/home/dsg/test/seven_emb/resources/images/rightSingleArrow.png",self)
         self.rightBtn.clicked.connect(self.rightArrowClicked)
-        self.rightBtn.move(WINDOW_W - 2*GUIDE_BTN_W, (WINDOW_H - GUIDE_BTN_H)//2) 
+        self.rightBtn.move(WINDOW_W - GUIDE_BTN_W - GUIDE_BTN_W//2, (WINDOW_H - GUIDE_BTN_H)//2) 
         self.rightBtn.hide()
         # 创建语音交互图层       
-        # self.voiceDetecting = QLabel(self)
-        # self.voiceDetecting.setGeometry((WINDOW_W-VOICE_DETECTING_ICON_R)//2 , WINDOW_H-VOICE_DETECTING_ICON_R-VOICE_DETECTING_ICON_BOTGAP, VOICE_DETECTING_ICON_R, VOICE_DETECTING_ICON_R)
-        # self.voiceDetecting.setScaledContents(True)
-        # self.voiceDetectingMovie = QMovie("/home/dsg/test/demo0423/voiceDetecting3.gif")
-        # self.voiceDetecting.setMovie(self.voiceDetectingMovie)
-        # self.voiceDetectingMovie.start()
         self.voiceDetectingPage = VoiceDetectingWidget("/home/dsg/test/seven_emb/resources/images/voiceDynamicImage", 100, self)
+        self.voiceDetectingPage.hide()
         
+        #添加动画效果
+        self.AnimationFlash()
+        
+    def messageHandler(self, text):
+        print(f"Message Received")
+        if text == "voice appear":
+            self.voiceDetectingPage.raise_()
+            self.voiceDetectingPage.show()   
+        elif text == "voice disappear":
+            self.voiceDetectingPage.hide()
+        elif text == "enter sleep":
+            print("window received sleep")
+            if self.menu_flag != 3:
+                self.thirdBGMovie = QMovie(coacherMovie[self.SecondMenuIndex][0])
+                self.thirdBG.setMovie(self.thirdBGMovie)
+                self.thirdBGMovie.start()
+                self.thirdBG.raise_()
+                self.afterRaise()
+                self.thirdBG.show()
+                self.animation_third.start()
 
     def mousePressEvent(self, event: QMouseEvent):
         # print(f"Mouse clicked")
@@ -542,6 +528,9 @@ class MainWindow(QMainWindow):
             self.animation_init.start() 
             return 
         if self.menu_flag == 0:
+            self.firstBG.raise_()
+            self.firstMenu.raise_()
+            self.afterRaise()
             self.firstBG.show()
             self.animation_first.start() 
         elif self.menu_flag == 1:
@@ -594,36 +583,55 @@ class MainWindow(QMainWindow):
             moved_p = end_x - self.ClickStartPos
             moved_x = moved_p.x()
             threshold = self.width() // 4
-            if moved_x < -threshold:
-                # self.firstMenu.show()
-                self.animation_firstMenuIn.start()
-            if moved_x > threshold:
-                self.animation_firstMenuOut.start()
-                # self.firstMenu.hide()
-                # self.BottomBar.show()
-                # self.TopBar.time_label.hide()
-                # self.leftBtn.hide()  
-            if moved_x == 0:
-                if self.voiceDetectingPage.isVisible():
-                    self.voiceDetectingPage.hide()   
+            if moved_x < 0:
+                self.animation_firstMenuIn.setStartValue(self.firstMenu.pos())
+                if moved_x < -threshold:
+                    self.animation_firstMenuIn.setEndValue(QPoint(0, 0))
+                    self.animation_firstMenuIn.setDuration(self.firstMenu.pos().x()//2)#动画时间跟滑动距离成比例，确保速度相同
+                    self.animation_firstMenuIn.start()
                 else:
-                    self.voiceDetectingPage.show()           
+                    self.animation_firstMenuIn.setEndValue(QPoint(self.width(), 0))
+                    self.animation_firstMenuIn.setDuration(200)#动画时间跟滑动距离成比例，确保速度相同
+                    self.animation_firstMenuIn.start()
+                    
+            elif moved_x > 0:
+                self.animation_firstMenuOut.setStartValue(self.firstMenu.pos())
+                if moved_x > threshold:
+                    self.animation_firstMenuOut.setEndValue(QPoint(self.width(), 0))
+                    self.animation_firstMenuOut.setDuration((self.width()-self.firstMenu.pos().x())//2)#动画时间跟滑动距离成比例，确保速度相同
+                    self.animation_firstMenuOut.start()
+                else:
+                    self.animation_firstMenuOut.setEndValue(QPoint(0, 0))
+                    self.animation_firstMenuOut.setDuration(200)#动画时间跟滑动距离成比例，确保速度相同
+                    self.animation_firstMenuOut.start()
+                    
+            # elif moved_x == 0:
+            #     if self.voiceDetectingPage.isVisible():
+            #         self.voiceDetectingPage.hide()   
+            #     else:
+            #         self.voiceDetectingPage.raise_()
+            #         self.voiceDetectingPage.show()           
                 
         elif self.menu_flag == 2:
             end_x = self.curr_SecondMenu.pos().x()
             moved_x = end_x - self.curr_start.x()
             threshold = self.width() // 4
-            if moved_x < -threshold and self.SecondMenuIndex < len(coacher) - 1:
-                self.animate_transition(self.SecondMenuIndex + 1)
-            elif moved_x > threshold and self.SecondMenuIndex > 0:
-                self.animate_transition(self.SecondMenuIndex - 1)
-            elif moved_x < 0:
-                self.animate_transition(self.SecondMenuIndex + 1, reset=True) 
+            if moved_x < 0:
+                if moved_x < -threshold and self.SecondMenuIndex < len(coacher) - 1:
+                    self.animate_transition(self.SecondMenuIndex + 1)
+                else:
+                    self.animate_transition(self.SecondMenuIndex + 1, reset=True) 
             elif moved_x > 0:
-                self.animate_transition(self.SecondMenuIndex - 1, reset=True)
+                if moved_x > threshold and self.SecondMenuIndex > 0:
+                    self.animate_transition(self.SecondMenuIndex - 1)
+                else:
+                    self.animate_transition(self.SecondMenuIndex - 1, reset=True)
             
     def leftArrowClicked(self):
         if(self.menu_flag == 1):
+            self.animation_firstMenuOut.setStartValue(self.firstMenu.pos())
+            self.animation_firstMenuOut.setDuration((self.width()-self.firstMenu.pos().x())//2)#动画时间跟滑动距离成比例，确保速度相同
+            self.animation_firstMenuOut.start()
             return
         elif(self.menu_flag == 2):
             if(self.SecondMenuIndex > 0):
@@ -631,7 +639,11 @@ class MainWindow(QMainWindow):
                 self.next_SecondMenu = self.SecondMenuGrp[self.SecondMenuIndex-1]
                 self.animate_transition(self.SecondMenuIndex - 1)
             else:
-                
+                self.firstBG.raise_()
+                self.firstMenu.raise_()
+                self.afterRaise()
+                self.firstBG.show()
+                self.animation_first.start()
                 return
         
 
@@ -664,18 +676,19 @@ class MainWindow(QMainWindow):
             self.anim_next.start()
         else:
             # 动画滑动切换
+            print(self.curr_SecondMenu.pos())
             self.anim_current = QPropertyAnimation(self.curr_SecondMenu, b"pos")
-            self.anim_current.setDuration(duration)
             self.anim_current.setEasingCurve(QEasingCurve.InOutCubic)
             self.anim_current.setStartValue(self.curr_SecondMenu.pos())
             self.anim_current.setEndValue(QPoint(-self.width() if new_index > self.SecondMenuIndex else self.width(), 0))
+            self.anim_current.setDuration(abs(abs(self.curr_SecondMenu.pos().x())-self.width())//2)#动画时间跟滑动距离成比例，确保速度相同
             self.anim_current.start()
 
-            self.anim_next = QPropertyAnimation(self.next_SecondMenu, b"pos")
-            self.anim_next.setDuration(duration)
+            self.anim_next = QPropertyAnimation(self.next_SecondMenu, b"pos")  
             self.anim_next.setEasingCurve(QEasingCurve.InOutCubic)
             self.anim_next.setStartValue(self.next_SecondMenu.pos())
             self.anim_next.setEndValue(QPoint(0, 0))
+            self.anim_next.setDuration(abs(self.next_SecondMenu.pos().x())//2)#动画时间跟滑动距离成比例，确保速度相同
             self.anim_next.start()
 
             self.anim_next.finished.connect(lambda: self.finalize_transition(new_index))
@@ -688,17 +701,34 @@ class MainWindow(QMainWindow):
             self.SecondMenuGrp[i].move(self.zero_start.x() + self.width()*i*(self.SecondMenuIndex - new_index), 0)
         self.SecondMenuIndex = new_index
         self.curr_SecondMenu = self.SecondMenuGrp[self.SecondMenuIndex]
+        if self.SecondMenuIndex == len(coacher) - 1:
+            if self.SecondMenuIndex == 0:
+                self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftSingleArrow.png")
+            else:
+                self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftDoubleArrow.png")
+            self.leftBtn.show()
+            self.rightBtn.hide()
+        elif self.SecondMenuIndex == 0:
+            self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftSingleArrow.png")
+            self.leftBtn.show()
+            self.rightBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/rightDoubleArrow.png")
+            self.rightBtn.show()
+        else:
+            self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftDoubleArrow.png")
+            self.leftBtn.show()
+            self.rightBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/rightDoubleArrow.png")
+            self.rightBtn.show()
         
     
-    def init2FirstFlash(self):
+    def AnimationFlash(self):
         #锁屏背景淡入动画
         self.initEffect = QGraphicsOpacityEffect()
-        self.initBG.setGraphicsEffect(self.initEffect)
         self.animation_init = QPropertyAnimation(self.initEffect, b"opacity")
         self.animation_init.setDuration(1000)  # 1秒淡入
         self.animation_init.setStartValue(0)
         self.animation_init.setEndValue(1) 
-        self.animation_init.finished.connect(self.init_finish_switch)       
+        self.animation_init.finished.connect(self.init_finish_switch) 
+        self.initBG.setGraphicsEffect(self.initEffect)      
         #一级菜单背景淡入动画
         self.effect = QGraphicsOpacityEffect()
         self.firstBG.setGraphicsEffect(self.effect)
@@ -711,43 +741,58 @@ class MainWindow(QMainWindow):
         self.animation_firstMenuIn = QPropertyAnimation(self.firstMenu, b"pos")
         self.animation_firstMenuIn.setDuration(300)
         self.animation_firstMenuIn.setEasingCurve(QEasingCurve.InOutCubic)
-        self.animation_firstMenuIn.setStartValue(self.firstMenu.pos())
+        # self.animation_firstMenuIn.setStartValue(self.firstMenu.pos())
         self.animation_firstMenuIn.setEndValue(QPoint(0, 0))
         self.animation_firstMenuIn.finished.connect(self.FirstMenu_finish_switch)
         #一级菜单组件滑动出场动画
         self.animation_firstMenuOut = QPropertyAnimation(self.firstMenu, b"pos")
         self.animation_firstMenuOut.setDuration(300)
         self.animation_firstMenuOut.setEasingCurve(QEasingCurve.InOutCubic)
-        self.animation_firstMenuOut.setStartValue(self.firstMenu.pos())
+        # self.animation_firstMenuOut.setStartValue(self.firstMenu.pos())
         self.animation_firstMenuOut.setEndValue(QPoint(self.width(), 0))
         self.animation_firstMenuOut.finished.connect(self.FirstMenu_finish_switch)
+        #二级页面淡入动画
+        self.secondEffect = QGraphicsOpacityEffect()
+        self.SecondMenuGrp[0].setGraphicsEffect(self.secondEffect)
+        self.animation_second = QPropertyAnimation(self.secondEffect, b"opacity")
+        self.animation_second.setDuration(1000)  # 1秒淡入
+        self.animation_second.setStartValue(0)
+        self.animation_second.setEndValue(1)
+        self.animation_second.finished.connect(self.Second_finish_switch)
+        #三级场景淡入动画
+        self.thirdEffect = QGraphicsOpacityEffect()
+        self.animation_third = QPropertyAnimation(self.thirdEffect, b"opacity")
+        self.animation_third.setDuration(1000)  # 1秒淡入
+        self.animation_third.setStartValue(0)
+        self.animation_third.setEndValue(1) 
+        self.animation_third.finished.connect(self.Third_finish_switch) 
+        self.thirdBG.setGraphicsEffect(self.thirdEffect)
+                
     
     def init_finish_switch(self):
         if self.menu_flag == 1:
             self.firstBG.hide()
             self.firstMenu.hide()
             self.TopBar.time_label.hide()
+            self.leftBtn.hide()
             self.rightBtn.hide()
             self.BottomBar.date_label.show()
             self.BottomBar.time_label.show()
-            self.BottomBar.playbutton.hide()
+            # self.BottomBar.playbutton.hide()
             self.BottomBar.show()
         self.menu_flag = 0
         
     def First_finish_switch(self):
         if self.menu_flag == 0:
             self.initBG.hide()
-            # self.BottomBar.hide()
-            # self.TopBar.time_label.show() 
-            # self.initHide()    
-            # self.rightBtn.image = QPixmap(":Public/rightDoubleArrow.png")
-            # self.rightBtn.show()
-            # self.firstMenu.show()
-            # self.animation_firstMenu.start()     
+            self.firstMenu.show()
         elif self.menu_flag == 2:
-            self.leftBtn.hide()
+            self.leftBtn.show()
             self.BottomBar.hide()
-            self.rightBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/rightSingleArrow.png")
+            self.BottomBar.date_label.show()
+            self.BottomBar.time_label.show()
+            self.BottomBar.playbutton.hide()
+            self.rightBtn.hide()
             self.curr_SecondMenu.hide()
         self.menu_flag = 1
         
@@ -763,48 +808,47 @@ class MainWindow(QMainWindow):
             self.TopBar.time_label.hide()
             self.BottomBar.show()
         
-    def First2Second_finish_switch(self):
+    def Second_finish_switch(self):
+        if self.menu_flag == 1:
+            self.BottomBar.date_label.hide()
+            self.BottomBar.time_label.hide()
+            self.BottomBar.playbutton.show()
+            self.BottomBar.show()
+            self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftSingleArrow.png")
+            self.leftBtn.show()
+            self.rightBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/rightDoubleArrow.png")
+            self.rightBtn.show()
+            self.menu_flag = 2
+            
+    def Third_finish_switch(self):
+        # if self.menu_flag != 2:
+        self.TopBar.time_label.show()
+        self.TopBar.status_label.show()
         self.BottomBar.date_label.hide()
         self.BottomBar.time_label.hide()
-        self.BottomBar.playbutton.show()
-        self.BottomBar.show()
-        self.leftBtn.show()
-        self.rightBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/rightDoubleArrow.png")
-        self.rightBtn.show()
-        self.menu_flag = 2
-        
-    def Second2Fisrt_finish_switch(self):
+        self.BottomBar.playbutton.hide()
+        self.BottomBar.stopbutton.show()
         self.leftBtn.hide()
-        self.BottomBar.hide()
-        self.rightBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/rightSingleArrow.png")
+        self.rightBtn.hide()
         self.curr_SecondMenu.hide()
-        
-    # def initHide(self):
-    #     self.initBG.hide()
-    #     self.BottomBar.hide()
-    #     self.TopBar.time_label.show()
-        
-    # def initShow(self):
-    #     self.TopBar.time_label.hide()
-    #     self.initBG.show()
-    #     self.BottomBar.playbutton.hide()
-    #     self.BottomBar.date_label.show()
-    #     self.BottomBar.time_label.show()
-    #     self.BottomBar.show()
-        
-    # def firstHide(self):
-        
+        self.menu_flag = 3      
         
                 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             app.quit()
             
+    def afterRaise(self):
+        self.TopBar.raise_()
+        self.BottomBar.raise_()
+        self.leftBtn.raise_()
+        self.rightBtn.raise_()
+            
         
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     window = MainWindow()
-#     window.show()
-#     sys.exit(app.exec_())
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())
     
     

@@ -27,6 +27,7 @@ import uuid
 import json
 from vosk import Model, KaldiRecognizer, SpkModel
 from scipy import signal
+# from GUI.gui import Communicator
 
 
 class Mic:
@@ -58,7 +59,7 @@ class Mic:
     # SPK_MODEL_PATH = "/home/li/vosk-api/python/example/vosk-model-spk-0.4"
     # model_path = "/home/li/vosk-model-small-cn-0.22"
 
-    def __init__(self, ws, audio_player, light, screen, threshold=800, timeout=30, sample_rate=16000, frame_duration=30):
+    def __init__(self, ws, audio_player, light, screen, communicator, threshold=800, timeout=30, sample_rate=16000, frame_duration=30):
         """
         初始化麦克风参数
         :param threshold: 静音检测阈值（音频幅度超过该值视为非静音）
@@ -128,13 +129,16 @@ class Mic:
         self.speech_buffer_size = self.sample_rate * self.frame_duration // 1000
         self.audio_memory = io.BytesIO()
         self.start_time = time.time()
+        
+        self.comm = communicator
 
     def kaldi_listener(self):
 
         while True:
             if not ThreadingEvent.wakeup_event.is_set():
                 if Config.IS_DEBUG == True:
-                    device_idx = 2
+                    # device_idx = 2
+                    device_idx = self.find_device_index()
                 else:
                     device_idx = self.find_device_index()
 
@@ -144,6 +148,9 @@ class Mic:
                         pass
 
     def main_callback(self, indata, frames, time1, status):
+        if status != 0:
+            print(status)
+            # return
         if not ThreadingEvent.wakeup_event.is_set():
             self.wake_callback(indata, frames, time1, status)
 
@@ -182,6 +189,7 @@ class Mic:
 
         if self.recording_status == "Save" and audio_data is not None:
             logging.info("Recording saving...")
+            self.comm.message.emit("voice disappear")  # 发信号到主线程
             try:
                 # # 场景化策略（垫音）
                 # # 后面应该单独拆走
@@ -253,12 +261,11 @@ class Mic:
                 print(f"检测到qibao关键词: {self.target_keywords[1]}")
                 self.voice_buffer = indata
                 ThreadingEvent.wakeup_event.set()
-                # print(f"检测到qibao关键词: {phonemes}")
-
+                # print(f"检测到qibao关键词: {phonemes}") 
                 # continue
                 if Config.IS_DEBUG == False:
                     self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0}, Code.LIGHT_TYPE_TEMP)
-                    logging.info("turn on the light for weakup")
+                    logging.info("turn on the light for wakeup")
         else:
             partial = json.loads(self.rec.PartialResult())
             partial_text = partial.get("partial", "")
@@ -268,9 +275,10 @@ class Mic:
                 self.voice_buffer = indata
                 ThreadingEvent.wakeup_event.set()
                 # print(f"检测到qibao关键词: {phonemes}")
+                # self.comm.message.emit("wake up")  # 发信号到主线程
                 if Config.IS_DEBUG == False:
                     self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0}, Code.LIGHT_TYPE_TEMP)
-                    logging.info("turn on the light for weakup")
+                    logging.info("turn on the light for wakeup")
 
 
         # print("final:", self.rec.FinalResult())
@@ -615,15 +623,23 @@ class Mic:
         # if start_frame is not None:
         # #     self.frames.append(start_frame)
         #     self.audio_memory.write(start_frame)
-
+        self.comm.message.emit("voice appear")  # 发信号到主线程
+        # if len(self.frames) > 0:
+        #     for _, frame_data in enumerate(self.frames):
+        #         frame = frame_data["data"]
+        #         ts = frame_data["ts"]
+        #         now_time = time.time()
+        #         if now_time - ts > 1:
+        #             # 把1s以内的声音也放进来
+        #             continue
+        #         self.audio_memory.write(frame)
+        #     self.frames = []
+        
         if len(self.frames) > 0:
-            for _, frame_data in enumerate(self.frames):
-                frame = frame_data["data"]
-                ts = frame_data["ts"]
-                now_time = time.time()
-                if now_time - ts > 1:
-                    # 把1s以内的声音也放进来
-                    continue
+            # 取最后 3 帧（如果不足3帧就取全部），按正序排列
+            last_frames = self.frames[-3:]
+            for frame_dict in last_frames:
+                frame = frame_dict["data"]
                 self.audio_memory.write(frame)
             self.frames = []
 
