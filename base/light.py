@@ -372,13 +372,21 @@ class Light:
     def rainbow_circle(self, colors = []):
         if len(colors) == 0:
             colors = [
+                # [255, 0, 0],
+                # [128, 128, 0],
+                # [96, 128, 128],
+                # [0, 255, 128],
+                # [0, 255, 255],
+                # [0, 128, 255],
+                # [0, 0, 255]
                 [255, 0, 0],
-                [128, 128, 0],
-                [96, 128, 128],
-                [0, 255, 128],
-                [0, 255, 255],
-                [0, 128, 255],
-                [0, 0, 255]
+                [255, 3, 255],
+                [15, 122, 255],
+                [0, 222, 255],
+                [3, 255, 3],
+                [246, 255, 0],
+                [255, 192, 0],
+                [255, 96, 0]
             ]
 
         def_color = [0, 0, 0]
@@ -397,6 +405,7 @@ class Light:
             for color_pos in range(len(self.light_nums)):
                 # color_buffer.append(colors[color_idx])
                 color_i = color_idx + color_pos
+                color_i = color_i % len(colors)
                 if color_i >= len(colors):
                     color_buffer = def_color
                 else:
