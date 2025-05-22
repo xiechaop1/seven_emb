@@ -518,7 +518,7 @@ class Light:
                     else:
                         curr_color = fore_color
 
-                start = start_num + buff
+                start = start_num + half_line + buff
 
                 r, g, b = curr_color
 
