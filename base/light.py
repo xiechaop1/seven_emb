@@ -1225,9 +1225,9 @@ class Light:
         while True:
             if self.light_mode != Code.LIGHT_MODE_BREATHING or self.ts > self.run_ts:
                 break
-            self.fade(0, 0, 0, r, g, b, steps, wait_ms)
+            self.fade(0, 0, 0, r, g, b, 0, self.LED_COUNT, steps, wait_ms)
             time.sleep(wait_ms/1000.0)
-            self.fade(r, g, b, 0, 0, 0, steps, wait_ms)
+            self.fade(r, g, b, 0, 0, 0, 0, self.LED_COUNT, steps, wait_ms)
 
     def Breathing(self, r, g, b, steps = 200, wait_ms = 200):
         start = self.LED_COUNT
