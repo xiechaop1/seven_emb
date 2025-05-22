@@ -237,9 +237,9 @@ if __name__ == "__main__":
     #         on_release=on_release) as listener:
     #     listener.join()
     
-    app = QApplication(sys.argv)
-    window = gui.MainWindow()
-    window.show()
+    # app = QApplication(sys.argv)
+    # window = gui.MainWindow()
+    # window.show()
     #对接槽接口   
     comm.message.connect(window.messageHandler)
     audio_play_thread.start()
