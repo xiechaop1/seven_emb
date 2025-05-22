@@ -31,3 +31,5 @@ class Config:
 
 	SPRAY_ON = False
 	MOTOR_ON = False
+	DEVICE_NAME = "Yundea A31-1"
+	# DEVICE_NAME = "Yundea 1076"

@@ -113,7 +113,11 @@ class Mic:
         self.wakeup_keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
         # self.command_keywords = '["关机"]'
 
-        self.device_name = "Yundea 1076"
+        # self.device_name = "Yundea 1076"
+        if hasattr(Config, "DEVICE_NAME"):
+            self.device_name = Config.DEVICE_NAME
+        else:
+            self.device_name = "Yundea 1076"
         # device_name = "SP002Ua"
         # device_name='JieLi BR21'
         self.device_index = None

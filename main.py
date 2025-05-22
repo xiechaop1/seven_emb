@@ -42,7 +42,12 @@ else:
 
 if Config.IS_DEBUG == True:
     os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = "/usr/lib/qt5/plugins/platforms"
-hw = Common.find_audio_hw()
+# hw_name = "Yundea 1076"
+# hw_name = "Yundea A31-1"
+if hasattr(Config, "DEVICE_NAME"):
+    hw = Common.find_audio_hw(Config.DEVICE_NAME)
+else:
+    hw = Common.find_audio_hw()
 os.environ["AUDIODEV"] = f"hw:{hw}"
 # if Config.OS is not None:
 #     if Config.OS == "pi5":
