@@ -488,9 +488,9 @@ class Light:
 
             params = []
             last_buffer_temp = []
+            start_num = 0
             for idx, light_num in enumerate(self.light_nums):
                 half_line = light_num // 2
-                start_num += light_num
                 if idx > 0:
                     last_buff = last_buffer[idx - 1]
                     buff = last_buff["buff"]
@@ -513,7 +513,7 @@ class Light:
                     # if buff == max_wave_num or buff == (-1 * max_wave_num):
                     #     break
 
-                    if add_tag > 0:
+                    if add_tag < 0:
                         curr_color = back_color
                     else:
                         curr_color = fore_color
@@ -538,6 +538,7 @@ class Light:
                     "color": curr_color
                 }
                 )
+                start_num += light_num
 
                 # duration = wait_ms / 1000
             last_buffer = last_buffer_temp
