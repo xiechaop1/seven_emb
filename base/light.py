@@ -23,7 +23,8 @@ if not Config.IS_DEBUG:
 class Light:
 
     # LED strip configuration:
-    LED_COUNT = 112  # Number of LED pixels.
+    # LED_COUNT = 112  # Number of LED pixels.
+    LED_COUNT = 24  # Number of LED pixels.
     LED_PIN = 18  # 18      # GPIO pin connected to the pixels (18 uses PWM!).
     # LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
     LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -244,7 +245,7 @@ class Light:
                 else:
                     wait_ms = 100
 
-                self.wave(fore_color, back_color, max_wave_num, wait_ms)
+                self.wave_line(fore_color, back_color, max_wave_num, wait_ms)
 
             elif light_mode == Code.LIGHT_MODE_STATIC:
                 self.Static(r, g, b)
@@ -442,6 +443,115 @@ class Light:
         else:
             self.current_colors.append(color)
         self.fade(curr_r, curr_g, curr_b, r, g, b, start, num)
+
+
+    def wave_line(self, fore_color, back_color = None, max_wave_num = 2, wait_ms = 100):
+        if back_color is None:
+            back_color = [0, 0, 0]
+
+        # 描绘半层前景色
+        start_num = 0
+        init_color_buffer = []
+        init_color2_buffer = []
+        init_start_buffer = []
+        init_num_buffer = []
+        last_buffer = []
+        for idx, light_num in enumerate(self.light_nums):
+            half_line = light_num // 2
+
+            start_num += light_num
+
+            init_color_buffer.append(back_color)
+            init_start_buffer.append([start_num])
+            init_num_buffer.append([half_line])
+            init_color2_buffer.append([0, 0, 0])
+
+            init_color_buffer.append(fore_color)
+            init_start_buffer.append([half_line])
+            init_num_buffer.append([half_line])
+            init_color2_buffer.append([0, 0, 0])
+
+            last_buffer.append({
+                "buff": 0,
+                "add_tag": 1,
+                "color": fore_color
+            })
+
+        self.fade_total_by_range(init_color_buffer, init_color2_buffer, init_start_buffer, init_num_buffer)
+
+        add_tag = 1
+        add_num_buffer = 1
+        add_num = 1
+
+        while True:
+            if self.light_mode != Code.LIGHT_MODE_WAVE or self.ts > self.run_ts:
+                break
+
+            params = []
+            last_buffer_temp = []
+            for idx, light_num in enumerate(self.light_nums):
+                half_line = light_num // 2
+                start_num += light_num
+                if idx > 0:
+                    last_buff = last_buffer[idx - 1]
+                    buff = last_buff["buff"]
+                    curr_color = last_buff["color"]
+                else:
+                    last_buff = last_buffer[0]
+                    buff = last_buff["buff"]
+
+                    if buff == max_wave_num or buff == (-1 * max_wave_num):
+                        if add_num_buffer == 1:
+                            add_num_buffer = 0
+                            add_tag = (-1) * add_tag
+                        else:
+                            add_num_buffer = 1
+
+                        add_num = add_num_buffer * add_tag
+
+                    buff += add_num
+
+                    # if buff == max_wave_num or buff == (-1 * max_wave_num):
+                    #     break
+
+                    if add_tag > 0:
+                        curr_color = back_color
+                    else:
+                        curr_color = fore_color
+
+                start = start_num + buff
+
+                r, g, b = curr_color
+
+                # start = start_line + buff
+
+                params.append({
+                    "r": r,
+                    "g": g,
+                    "b": b,
+                    "start": start,
+                    "num": 1
+                })
+
+                last_buffer_temp.append({
+                    "buff": buff,
+                    "add_tag": add_tag,
+                    "color": curr_color
+                }
+                )
+
+                # duration = wait_ms / 1000
+            last_buffer = last_buffer_temp
+            # if buff == max_wave_num or buff == (-1 * max_wave_num):
+            #     continue
+
+            # print("params: ", params)
+            # print("last:", last_buffer)
+            self.show_color_by_range(params)
+
+            duration = wait_ms / 1000
+            time.sleep(duration)
+
 
 
     def wave(self, fore_color, back_color = None, max_wave_num = 2, wait_ms = 100):
@@ -706,7 +816,8 @@ class Light:
                     for j in range(rand_num_per_group):
                         nums = []
                         # 最内两圈灯珠一共40个
-                        rand_pos = random.randint(self.LED_COUNT - 40, self.LED_COUNT - 1)
+                        # rand_pos = random.randint(self.LED_COUNT - 40, self.LED_COUNT - 1)
+                        rand_pos = random.randint(0, self.LED_COUNT - 1)
                         point_starts.append([rand_pos])
                         rgb1.append(fore_color)
                         rgb2.append(back_color)
