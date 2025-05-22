@@ -157,7 +157,9 @@ if __name__ == "__main__":
         spray_thread = threading.Thread(target=spray_instance.deal)
         spray_thread.start()
 
-        spray_instance.init_off()
+        spray_instance.init_off(Spray.SPRAY_PIN)
+        spray_instance.init_off(Spray.SPRAY_PIN2)
+        spray_instance.init_off(Spray.SPRAY_PIN3)
         logging.info("spray initialized and turn off")
         #
 
