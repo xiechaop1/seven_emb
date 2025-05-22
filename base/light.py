@@ -253,9 +253,9 @@ class Light:
                 self.Gradient(r, g, b)
             elif light_mode == Code.LIGHT_MODE_BREATHING:
                 if steps is None:
-                    self.Breathing(r, g, b)
+                    self.Breathing1(r, g, b)
                 else:
-                    self.Breathing(r, g, b, steps)
+                    self.Breathing1(r, g, b, steps)
             elif light_mode == Code.LIGHT_MODE_CIRCLE:
                 keys = ["r1", "g1", "b1", "r2", "g2", "b2", "time_duration", "times"]
 
@@ -1220,6 +1220,14 @@ class Light:
                     break
                 self.strip.show()
                 time.sleep(wait_time)
+
+    def Breathing1(self, r, g, b, steps = 200, wait_ms = 200):
+        while True:
+            if self.light_mode != Code.LIGHT_MODE_BREATHING or self.ts > self.run_ts:
+                break
+            self.fade(0, 0, 0, r, g, b, steps, wait_ms)
+            time.sleep(wait_ms/1000.0)
+            self.fade(r, g, b, 0, 0, 0, steps, wait_ms)
 
     def Breathing(self, r, g, b, steps = 200, wait_ms = 200):
         start = self.LED_COUNT
