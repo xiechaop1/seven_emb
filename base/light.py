@@ -60,7 +60,8 @@ class Light:
         self.target_params = None
         self.ts = 0
         self.run_ts = 0
-        self.light_nums = [40, 32, 24, 16]
+        # self.light_nums = [40, 32, 24, 16]
+        self.light_nums = [6,6,6,6]
         self.light_sector_step = [
             5, 4, 3, 2
         ]
