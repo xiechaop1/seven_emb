@@ -459,14 +459,12 @@ class Light:
         for idx, light_num in enumerate(self.light_nums):
             half_line = light_num // 2
 
-            start_num += light_num
-
-            init_color_buffer.append(back_color)
+            init_color_buffer.append(fore_color)
             init_start_buffer.append([start_num])
             init_num_buffer.append([half_line])
             init_color2_buffer.append([0, 0, 0])
 
-            init_color_buffer.append(fore_color)
+            init_color_buffer.append(back_color)
             init_start_buffer.append([half_line])
             init_num_buffer.append([half_line])
             init_color2_buffer.append([0, 0, 0])
@@ -476,6 +474,7 @@ class Light:
                 "add_tag": 1,
                 "color": fore_color
             })
+            start_num += light_num
 
         self.fade_total_by_range(init_color_buffer, init_color2_buffer, init_start_buffer, init_num_buffer)
 
