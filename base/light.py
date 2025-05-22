@@ -1232,14 +1232,14 @@ class Light:
                 start -= num
                 if idx < start_idx:
                     continue
-                self.fade(0, 0, 0, r, g, b, start, num, 50)
+                self.fade(0, 0, 0, r, g, b, start, num, steps)
             time.sleep(wait_ms/1000.0)
             start = 0
             for idx, num in enumerate(self.light_nums):
                 if idx > len(self.light_nums) - 2:
                     start += num
                     continue
-                self.fade(r, g, b, 0, 0, 0, start, num, 50)
+                self.fade(r, g, b, 0, 0, 0, start, num, steps)
                 start += num
             time.sleep(wait_ms/1000.0)
             start_idx = 1
