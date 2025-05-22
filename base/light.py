@@ -24,7 +24,7 @@ class Light:
 
     # LED strip configuration:
     # LED_COUNT = 112  # Number of LED pixels.
-    LED_COUNT = 24  # Number of LED pixels.
+    LED_COUNT = 48  # Number of LED pixels.
     LED_PIN = 18  # 18      # GPIO pin connected to the pixels (18 uses PWM!).
     # LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
     LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -37,7 +37,7 @@ class Light:
 
     LED_COUNT_PER_LINE = 6
 
-    LED_LINE_COUNT = 4
+    LED_LINE_COUNT = 8
 
     def __init__(self):
         # self.light_mode = ""
@@ -62,11 +62,11 @@ class Light:
         self.ts = 0
         self.run_ts = 0
         # self.light_nums = [40, 32, 24, 16]
-        self.light_nums = [6,6,6,6]
+        self.light_nums = [6,6,6,6,6,6,6,6]
         # self.light_sector_step = [
         #     5, 4, 3, 2
         # ]
-        self.light_sector_step = [6,6,6,6]
+        self.light_sector_step = [6,6,6,6,6,6,6,6]
         self.current_colors = []
         self.curr_light_buffer = []
 

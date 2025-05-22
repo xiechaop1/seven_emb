@@ -10,6 +10,8 @@ class Spray:
     # 延时函数
 
     SPRAY_PIN = 22
+    SPRAY_PIN2 = 23
+    SPRAY_PIN3 = 24
 
     def __init__(self):
 
@@ -33,6 +35,8 @@ class Spray:
         # def scent_spray(scent_spray_flag):
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.SPRAY_PIN, GPIO.OUT)
+        GPIO.setup(self.SPRAY_PIN2, GPIO.OUT)
+        GPIO.setup(self.SPRAY_PIN3, GPIO.OUT)
 
         self.switcher = True
 
@@ -41,17 +45,17 @@ class Spray:
     def delayms(ms):
         time.sleep(ms / 1000.0)  # 转换为秒
 
-    def init_off(self):
-        GPIO.output(self.SPRAY_PIN, GPIO.LOW)
+    def init_off(self, pin=SPRAY_PIN):
+        GPIO.output(pin, GPIO.LOW)
 
-    def turn_off(self):
-        GPIO.output(self.SPRAY_PIN, GPIO.LOW)
+    def turn_off(self, pin=SPRAY_PIN):
+        GPIO.output(pin, GPIO.LOW)
         self.switcher = False
 
     def turn_on(self):
         self.switcher = True
 
-    def shoot(self, times = 4, wait_time = 30):
+    def shoot(self, times = 4, wait_time = 30, pin=SPRAY_PIN):
         if hasattr(Config, "SPRAY_ON"):
             if Config.SPRAY_ON == False:
                 return
@@ -59,9 +63,9 @@ class Spray:
             return
         for i in range(times):
             for j in range(3):
-                GPIO.output(self.SPRAY_PIN, GPIO.HIGH)
+                GPIO.output(pin, GPIO.HIGH)
                 time.sleep(2)
-                GPIO.output(self.SPRAY_PIN, GPIO.LOW)
+                GPIO.output(pin, GPIO.LOW)
                 time.sleep(0.25)
             print("GPIO.HIGH!")
             time.sleep(wait_time)
