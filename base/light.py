@@ -62,9 +62,10 @@ class Light:
         self.run_ts = 0
         # self.light_nums = [40, 32, 24, 16]
         self.light_nums = [6,6,6,6]
-        self.light_sector_step = [
-            5, 4, 3, 2
-        ]
+        # self.light_sector_step = [
+        #     5, 4, 3, 2
+        # ]
+        self.light_sector_step = [6,6,6,6]
         self.current_colors = []
         self.curr_light_buffer = []
 
@@ -413,8 +414,8 @@ class Light:
                     color_buffer = colors[color_i]
                 # print(color_buffer_idx, len(color_buffer))
                 threading.Thread(target=self.rainbow_circle_exec, args=(color_pos, color_buffer)).start()
-                time.sleep(0.05)
-            time.sleep(3)
+                time.sleep(0.01)
+            time.sleep(2)
 
             color_idx += 1
 
