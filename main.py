@@ -245,14 +245,14 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = gui.MainWindow()
     window.show()
+    print("window appear")
     # 对接槽接口
     comm.message.connect(window.messageHandler)
     audio_play_thread.start()
     kaldi_thread.start()
     recv_thread.start()
     daemon_thread.start()
-    
-    # sys.exit(app.exec_())
+    sys.exit(app.exec_())
 
     
 
