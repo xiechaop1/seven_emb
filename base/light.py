@@ -459,12 +459,12 @@ class Light:
         for idx, light_num in enumerate(self.light_nums):
             half_line = light_num // 2
 
-            init_color_buffer.append(fore_color)
+            init_color_buffer.append(back_color)
             init_start_buffer.append([start_num])
             init_num_buffer.append([half_line])
             init_color2_buffer.append([0, 0, 0])
 
-            init_color_buffer.append(back_color)
+            init_color_buffer.append(fore_color)
             init_start_buffer.append([half_line])
             init_num_buffer.append([half_line])
             init_color2_buffer.append([0, 0, 0])
@@ -472,7 +472,7 @@ class Light:
             last_buffer.append({
                 "buff": 0,
                 "add_tag": 1,
-                "color": fore_color
+                "color": back_color
             })
             start_num += light_num
 
@@ -514,9 +514,9 @@ class Light:
                     #     break
 
                     if add_tag < 0:
-                        curr_color = back_color
-                    else:
                         curr_color = fore_color
+                    else:
+                        curr_color = back_color
 
                 start = start_num + half_line + buff
 
