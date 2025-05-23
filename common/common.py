@@ -28,7 +28,8 @@ class Common:
 		return True;
 
 	@staticmethod
-	def find_audio_hw(device_name = "Yundea 1076"):
+	def find_audio_hw(device_name = "Yundea A31-1"):
+		# Yundea 1076
 		hw = None
 		# 遍历设备列表查找设备索引
 		for i, device in enumerate(sd.query_devices()):
