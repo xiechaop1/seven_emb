@@ -133,7 +133,7 @@ class Mic:
         self.speech_buffer_size = self.sample_rate * self.frame_duration // 1000
         self.audio_memory = io.BytesIO()
         self.start_time = time.time()
-        
+
         self.comm = communicator
 
     def kaldi_listener(self):
@@ -267,7 +267,8 @@ class Mic:
                 print(f"检测到qibao关键词: {self.target_keywords[1]}")
                 self.voice_buffer = indata
                 ThreadingEvent.wakeup_event.set()
-                # print(f"检测到qibao关键词: {phonemes}") 
+                self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
+                # print(f"检测到qibao关键词: {phonemes}")
                 # continue
                 if Config.IS_DEBUG == False:
                     self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0}, Code.LIGHT_TYPE_TEMP)
@@ -280,6 +281,7 @@ class Mic:
                 print(f"检测到qibao关键词: {self.target_keywords[1]}")
                 self.voice_buffer = indata
                 ThreadingEvent.wakeup_event.set()
+                self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
                 # print(f"检测到qibao关键词: {phonemes}")
                 # self.comm.message.emit("wake up")  # 发信号到主线程
                 if Config.IS_DEBUG == False:
@@ -640,7 +642,7 @@ class Mic:
         #             continue
         #         self.audio_memory.write(frame)
         #     self.frames = []
-        
+
         if len(self.frames) > 0:
             # 取最后 3 帧（如果不足3帧就取全部），按正序排列
             last_frames = self.frames[-3:]

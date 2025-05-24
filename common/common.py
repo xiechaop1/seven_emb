@@ -8,6 +8,7 @@ from config.config import Config
 class Common:
 
 	latest_active_time = 0
+	latest_voice_time = 0
 
 	@staticmethod
 	def __init__():
@@ -26,6 +27,15 @@ class Common:
 	def set_latest_active_time(time):
 		Common.latest_active_time = time
 		return True;
+
+	@staticmethod
+	def set_latest_voice_time(time):
+		Common.latest_voice_time = time
+		return True;
+
+	@staticmethod
+	def get_latest_voice_time():
+		return Common.latest_voice_time
 
 	@staticmethod
 	def find_audio_hw(device_name = "Yundea A31-1"):

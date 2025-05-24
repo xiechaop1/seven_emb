@@ -244,8 +244,8 @@ class AudioPlayer:
                             logging.info("Sleep assistance event pass!")
                             ThreadingEvent.camera_start_event.set()
                             ThreadingEvent.recv_execute_command_event.set()
-                    else:
-                        self.light.start_prev()
+                    # else:
+                        # self.light.start_prev()
                     # self.resume_interrupted(msg_id, 2)
                 # else:
                 #     if self.is_interrupted == 0:
@@ -406,6 +406,8 @@ class AudioPlayer:
         # self.playing_list.append(audio_data)
         # print("play")
         Common.set_latest_active_time(time.time())
+        if type == Code.REC_METHOD_VOICE_CHAT:
+            Common.set_latest_voice_time(time.time())
         self.voice_channel.play(self.voice)
 
         # pygame.mixer.music.load(audio_file)  # 加载音频文件
