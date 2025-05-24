@@ -12,6 +12,7 @@ import time
 class Daemon:
 
 	TURN_OFF_DURATION = 300   # (s)
+	NAP_DURATION = 30 #(s)
 
 	def __init__(self, audio_ins, light_ins, spray_ins):
 		self.light = light_ins
@@ -28,6 +29,9 @@ class Daemon:
 			now_time = time.time()
 
 			duration = now_time - latest_active_time
+			if latest_active_time > 0 and duration > self.NAP_DURATION and ThreadingEvent.wakeup_event.is_set():
+				logging.info(f"No activity detected for {duration} seconds, over {self.NAP_DURATION} secs, taking a nap ...")
+				self.nap()
 			if latest_active_time > 0 and duration > self.TURN_OFF_DURATION:
 				logging.info(f"Rest time over {self.TURN_OFF_DURATION} seconds, sleeping ..., duration: {duration}")
 				# 超过时间没有活动（没有声音）
@@ -36,6 +40,10 @@ class Daemon:
 			time.sleep(10)
 
 		return
+
+	def nap(self):
+		ThreadingEvent.wakeup_event.clear()
+
 
 	def sleep(self):
 		Common.sleep(self.audio_player, self.light, self.spray)
