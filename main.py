@@ -3,6 +3,7 @@
 #from fastapi.staticfiles import StaticFiles
 #from config import settings, L
 import logging
+from datetime import datetime, time
 
 from base.ws import WebSocketClient
 from base.mic import Mic
@@ -11,10 +12,10 @@ from config.config import Config
 if not Config.IS_DEBUG:
     from base.light import Light
     from base.spray import Spray
-else:
-    from PyQt5.QtWidgets import QApplication
-    from model import ui
-    from base.screen import Screen
+# else:
+    # from PyQt5.QtWidgets import QApplication
+    # from model import ui
+    # from base.screen import Screen
 if hasattr(Config, "OS"):
     if Config.OS == "pi5":
         from base.screen_pi5 import Screen
@@ -70,7 +71,7 @@ import traceback
 #from base.spary import Spray
 from model.execute_command import ExecuteCommand
 #from base.spary import Spray
-from PyQt5.QtCore import QObject, pyqtSignal
+# from PyQt5.QtCore import QObject, pyqtSignal
 
 # async def main():
 #     websocket_url = "ws://114.55.90.104:9001/ws"
@@ -81,8 +82,9 @@ from PyQt5.QtCore import QObject, pyqtSignal
 #         return ws
 
 # 信号器：定义一个跨线程信号
-class Communicator(QObject):
-    message = pyqtSignal(str)
+# class Communicator(QObject):
+    # message = pyqtSignal(str)
+from model.scheduler import TaskDaemon
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--mode', default="", type=str, help='demo mode without screen')
@@ -96,6 +98,26 @@ if args.mode == "zero":
     motor_instance = Motor(cv2_instance)
     motor_instance.find_zero_pos()
     sys.exit(0)
+
+# 创建守护进程
+daemon = TaskDaemon("tasks.json")
+
+# 创建闹钟任务
+alarm_time = time(20, 33)  # 每天早上7:30
+weekdays = None  # 周一到周五
+alarm_task = daemon.create_alarm_task("Morning Alarm", alarm_time, weekdays)
+
+# # 创建系统任务
+# system_task = daemon.create_system_task(
+#     name="Daily Backup",
+#     content={"type": "backup", "target": "/data"},
+#     schedule_type=TaskScheduleType.DAILY,
+#     execution_time=time(2, 0)  # 每天凌晨2点
+# )
+
+# 启动守护进程
+daemon.start()
+sys.exit(0)
 
 # exec_tag = None
 # if len(sys.argv) > 1:
