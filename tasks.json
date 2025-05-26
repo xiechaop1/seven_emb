@@ -16,7 +16,58 @@
       "last_run_time": "2025-05-26T20:33:00.805936",
       "last_run_result": "{\"success\": true, \"message\": \"Task executed successfully\"}",
       "is_enabled": false
+    },
+    "2": {
+      "id": 2,
+      "name": "Morning Alarm",
+      "task_type": "alarm",
+      "schedule_type": "once",
+      "next_run_time": "2025-05-26T20:39:00",
+      "content": "{\"type\": \"alarm\", \"action\": \"play_sound\"}",
+      "created_at": "2025-05-26T20:38:14.812278",
+      "updated_at": "2025-05-26T20:38:14.812278",
+      "execution_time": "20:39:00",
+      "weekdays": null,
+      "parameters": null,
+      "status": "pending",
+      "last_run_time": null,
+      "last_run_result": null,
+      "is_enabled": true
+    },
+    "3": {
+      "id": 3,
+      "name": "Morning Alarm",
+      "task_type": "alarm",
+      "schedule_type": "once",
+      "next_run_time": "2025-05-26T20:39:00",
+      "content": "{\"type\": \"alarm\", \"action\": \"play_sound\"}",
+      "created_at": "2025-05-26T20:38:30.377752",
+      "updated_at": "2025-05-26T20:38:30.377752",
+      "execution_time": "20:39:00",
+      "weekdays": null,
+      "parameters": null,
+      "status": "pending",
+      "last_run_time": null,
+      "last_run_result": null,
+      "is_enabled": true
+    },
+    "4": {
+      "id": 4,
+      "name": "Morning Alarm",
+      "task_type": "alarm",
+      "schedule_type": "once",
+      "next_run_time": "2025-05-26T20:39:00",
+      "content": "{\"type\": \"alarm\", \"action\": \"play_sound\"}",
+      "created_at": "2025-05-26T20:38:59.830034",
+      "updated_at": "2025-05-26T20:38:59.830034",
+      "execution_time": "20:39:00",
+      "weekdays": null,
+      "parameters": null,
+      "status": "pending",
+      "last_run_time": null,
+      "last_run_result": null,
+      "is_enabled": true
     }
   },
-  "next_id": 2
+  "next_id": 5
 }

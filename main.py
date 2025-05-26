@@ -3,7 +3,7 @@
 #from fastapi.staticfiles import StaticFiles
 #from config import settings, L
 import logging
-from datetime import datetime, time
+from datetime import time
 
 from base.ws import WebSocketClient
 from base.mic import Mic
@@ -30,6 +30,7 @@ from model.recv import Recv
 from model.daemon import Daemon
 from common.code import Code
 from common.common import Common
+from model.scheduler import TaskDaemon
 # from model.ui import ScenePage, HomePage, OverlayWidget, MainWindow
 # if Config.OS != "lineage":
 #     from PyQt5.QtWidgets import QApplication
@@ -83,8 +84,7 @@ from model.execute_command import ExecuteCommand
 
 # 信号器：定义一个跨线程信号
 # class Communicator(QObject):
-    # message = pyqtSignal(str)
-from model.scheduler import TaskDaemon
+#     message = pyqtSignal(str)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--mode', default="", type=str, help='demo mode without screen')
@@ -98,26 +98,6 @@ if args.mode == "zero":
     motor_instance = Motor(cv2_instance)
     motor_instance.find_zero_pos()
     sys.exit(0)
-
-# 创建守护进程
-daemon = TaskDaemon("tasks.json")
-
-# 创建闹钟任务
-alarm_time = time(20, 33)  # 每天早上7:30
-weekdays = None  # 周一到周五
-alarm_task = daemon.create_alarm_task("Morning Alarm", alarm_time, weekdays)
-
-# # 创建系统任务
-# system_task = daemon.create_system_task(
-#     name="Daily Backup",
-#     content={"type": "backup", "target": "/data"},
-#     schedule_type=TaskScheduleType.DAILY,
-#     execution_time=time(2, 0)  # 每天凌晨2点
-# )
-
-# 启动守护进程
-daemon.start()
-sys.exit(0)
 
 # exec_tag = None
 # if len(sys.argv) > 1:
@@ -170,8 +150,27 @@ if __name__ == "__main__":
     cv2_instance = cv2.VideoCapture(0)
     
     #创建信号槽
-    comm = Communicator()
+    # comm = Communicator()
+
+    task_daemon = TaskDaemon("tasks.json")
+    # 创建闹钟任务
+    alarm_time = time(20, 39)  # 每天早上7:30
+    weekdays = None  # 周一到周五
+    alarm_task = task_daemon.create_alarm_task("Morning Alarm", alarm_time, weekdays)
+
+    alarm = threading.Thread(target=task_daemon.start)
     
+    # # 创建系统任务
+    # system_task = daemon.create_system_task(
+    #     name="Daily Backup",
+    #     content={"type": "backup", "target": "/data"},
+    #     schedule_type=TaskScheduleType.DAILY,
+    #     execution_time=time(2, 0)  # 每天凌晨2点
+    # )
+
+    # 启动守护进程
+    # daemon.start()
+
     if not Config.IS_DEBUG:
         # 暂时去掉，等上板子再试
         # spray_instance = ""
@@ -271,6 +270,26 @@ if __name__ == "__main__":
     kaldi_thread.start()
     recv_thread.start()
     daemon_thread.start()
+
+    # # 创建守护进程
+    # task_daemon = TaskDaemon("tasks.json")
+    #
+    # # 创建闹钟任务
+    # alarm_time = time(20, 37)  # 每天早上7:30
+    # weekdays = None  # 周一到周五
+    # alarm_task = task_daemon.create_alarm_task("Morning Alarm", alarm_time, weekdays)
+    #
+    # alarm = threading.Thread(target=task_daemon.start)
+    # # # 创建系统任务
+    # # system_task = daemon.create_system_task(
+    # #     name="Daily Backup",
+    # #     content={"type": "backup", "target": "/data"},
+    # #     schedule_type=TaskScheduleType.DAILY,
+    # #     execution_time=time(2, 0)  # 每天凌晨2点
+    # # )
+    #
+    # # 启动守护进程
+    # # daemon.start()
     
     # sys.exit(app.exec_())
 
