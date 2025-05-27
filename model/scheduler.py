@@ -131,7 +131,7 @@ class TaskScheduler:
                 if next_tasks:
                     next_task, next_time = next_tasks[0]
                     # 检查是否有过期未执行的任务
-                    if (now - next_time).total_seconds() > 60:
+                    if (now - next_time).total_seconds() > 5:
                         logging.warning(f"任务已过期未执行: ID={next_task.id}, 名称={next_task.name}, "
                                       f"计划执行时间={next_time.isoformat()}, "
                                       f"已过期 {(now - next_time).total_seconds()/60:.1f} 分钟")
