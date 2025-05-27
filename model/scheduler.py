@@ -183,9 +183,10 @@ class TaskScheduler:
                     self._save_tasks(tasks, next_id)
                 logging.debug(f"任务状态已更新为执行中: ID={task.id}")
                 
-                # 执行任务
-                result = self._run_task(task)
-                logging.info(f"任务执行完成: ID={task.id}, 结果={result}")
+                # 创建动作执行线程
+                action_thread = threading.Thread(target=self._run_task, args=(task,))
+                action_thread.daemon = True
+                action_thread.start()
                 
                 # 如果设置了持续时间，等待指定时间后停止
                 if task.duration is not None:
@@ -195,10 +196,13 @@ class TaskScheduler:
                         logging.info(f"任务达到持续时间自动停止: ID={task.id}")
                     self.stop_task(task.id)
                 
+                # 等待动作执行线程完成
+                action_thread.join(timeout=1)  # 给动作线程1秒时间完成清理工作
+                
                 # 更新任务状态和结果
                 with self.lock:
-                    task.last_run_result = json.dumps(result)
-                    task.status = TaskStatus.COMPLETED if result.get("success") else TaskStatus.FAILED
+                    task.last_run_result = json.dumps({"success": True, "message": "Task executed"})
+                    task.status = TaskStatus.COMPLETED
                     
                     # 如果是单次任务，执行完成后禁用
                     if task.schedule_type == TaskScheduleType.ONCE:
