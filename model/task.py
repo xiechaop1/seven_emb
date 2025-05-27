@@ -139,9 +139,21 @@ class Task:
             kwargs['actions'] = json.dumps([])
         return cls(
             id=kwargs.get('id', 0),
+            name=kwargs.get('name', ''),
+            task_type=kwargs.get('task_type', TaskType.CUSTOM),
+            schedule_type=kwargs.get('schedule_type', TaskScheduleType.ONCE),
+            next_run_time=kwargs.get('next_run_time', now),
+            content=kwargs.get('content', ''),
             created_at=now,
             updated_at=now,
-            **kwargs
+            actions=kwargs.get('actions', json.dumps([])),
+            execution_time=kwargs.get('execution_time'),
+            weekdays=kwargs.get('weekdays'),
+            parameters=kwargs.get('parameters'),
+            status=kwargs.get('status', TaskStatus.PENDING),
+            last_run_time=kwargs.get('last_run_time'),
+            last_run_result=kwargs.get('last_run_result'),
+            is_enabled=kwargs.get('is_enabled', True)
         )
 
     def to_dict(self) -> Dict[str, Any]:
