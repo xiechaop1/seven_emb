@@ -293,7 +293,7 @@ if __name__ == "__main__":
                 }
             }
         ]
-    task_daemon.create_alarm_task("Test_sound", execution_time, actions)
+    task_daemon.create_alarm_task("Test_sound", execution_time, actions, 3)
     actions = [
         {
             "action_type": "light",
@@ -304,7 +304,7 @@ if __name__ == "__main__":
             }
         }
     ]
-    task_daemon.create_alarm_task("Test_light", execution_time, actions)
+    task_daemon.create_alarm_task("Test_light", execution_time, actions, 3)
     
     # 添加任务到调度器
     # task_daemon.scheduler.add_task(task)

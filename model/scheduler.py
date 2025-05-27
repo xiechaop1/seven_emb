@@ -546,7 +546,7 @@ class TaskDaemon:
         self.stop()
         sys.exit(0)
         
-    def create_alarm_task(self, name: str, execution_time: time, parameters: dict, weekdays: list = None) -> Task:
+    def create_alarm_task(self, name: str, execution_time: time, parameters: dict, duration: int, weekdays: list = None) -> Task:
         """创建闹钟任务"""
         task = Task.create(
             name=name,
@@ -554,6 +554,7 @@ class TaskDaemon:
             schedule_type=TaskScheduleType.WEEKLY if weekdays else TaskScheduleType.ONCE,
             execution_time=execution_time.isoformat(),
             weekdays=json.dumps(weekdays) if weekdays else None,
+            duration=duration,
             # content=json.dumps({
             #     "type": "alarm",
             #     "action": "play_sound"
@@ -572,6 +573,7 @@ class TaskDaemon:
             schedule_type=schedule_type,
             execution_time=execution_time.isoformat() if execution_time else None,
             weekdays=json.dumps(weekdays) if weekdays else None,
+            duration=duration,
             content=json.dumps(content),
             next_run_time=self._calculate_initial_run_time(execution_time, weekdays).isoformat()
         )
