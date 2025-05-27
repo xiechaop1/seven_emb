@@ -262,14 +262,26 @@ if __name__ == "__main__":
     # 计算当前时间1分钟后的时间
     now = datetime.now()
     one_minute_later = (now + timedelta(minutes=1)).time()
+    execution_time = one_minute_later.strftime("%H:%M:%S"),  # 使用计算出的时间
     
     # 创建任务，使用计算出的时间
-    task = Task.create(
-        name="Sunrise Light",
-        task_type=TaskType.SYSTEM,
-        schedule_type=TaskScheduleType.ONCE,  # 改为单次执行
-        execution_time=one_minute_later.strftime("%H:%M:%S"),  # 使用计算出的时间
-        actions=json.dumps([
+    # task = Task.create(
+    #     name="Sunrise Light",
+    #     task_type=TaskType.SYSTEM,
+    #     schedule_type=TaskScheduleType.ONCE,  # 改为单次执行
+    #     execution_time=one_minute_later.strftime("%H:%M:%S"),  # 使用计算出的时间
+    #     actions=json.dumps([
+    #         {
+    #             "action_type": "light",
+    #             "target": "bedroom_light",
+    #             "parameters": {
+    #                 "mode": Code.LIGHT_MODE_BREATHING,
+    #                 "params": {"r":0, "g":255, "b":255, "steps": 200}
+    #             }
+    #         }
+    #     ])
+    # )
+    actions = [
             {
                 "action_type": "light",
                 "target": "bedroom_light",
@@ -278,11 +290,11 @@ if __name__ == "__main__":
                     "params": {"r":0, "g":255, "b":255, "steps": 200}
                 }
             }
-        ])
-    )
+        ]
+    task_daemon.create_alarm_task("Test", execution_time, actions)
     
     # 添加任务到调度器
-    task_daemon.scheduler.add_task(task)
+    # task_daemon.scheduler.add_task(task)
 
     # 启动守护进程
     task_daemon.start()
