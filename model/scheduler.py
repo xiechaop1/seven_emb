@@ -5,7 +5,7 @@ import json
 import threading
 import time as time_module
 import os
-from .task import Task, TaskStatus, TaskScheduleType, TaskType
+from .task import Task, TaskStatus, TaskScheduleType, TaskType, TaskAction, ActionType, LightCommand, SoundCommand, DisplayCommand
 import signal
 import sys
 
@@ -17,45 +17,46 @@ logging.basicConfig(
 )
 
 class TaskScheduler:
-    def __init__(self, storage_file: str):
+    def __init__(self, storage_file, audioPlayerIns, lightIns, sprayIns):
         self.storage_file = storage_file
-        self.tasks: Dict[int, Task] = {}
-        self.next_id = 1
         self.running = False
         self.thread = None
         self.lock = threading.Lock()
+        self.last_check_time = None
+
+        self.audio_player = audioPlayerIns
+        self.light = lightIns
+        self.spray = sprayIns
+
         logging.info(f"初始化任务调度器，存储文件: {storage_file}")
-        self._load_tasks()
         
-    def _load_tasks(self):
+    def _load_tasks(self) -> Dict[int, Task]:
         """从文件加载任务"""
         if os.path.exists(self.storage_file):
             try:
                 with open(self.storage_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                    self.tasks = {int(k): Task.from_dict(v) for k, v in data.get('tasks', {}).items()}
-                    self.next_id = data.get('next_id', 1)
-                logging.info(f"成功从文件加载 {len(self.tasks)} 个任务")
-                for task_id, task in self.tasks.items():
-                    logging.debug(f"加载任务: ID={task_id}, 名称={task.name}, 类型={task.task_type}, "
-                                f"状态={task.status}, 下次执行时间={task.next_run_time}")
+                    tasks = {int(k): Task.from_dict(v) for k, v in data.get('tasks', {}).items()}
+                    next_id = data.get('next_id', 1)
+                logging.debug(f"从文件加载 {len(tasks)} 个任务")
+                return tasks, next_id
             except Exception as e:
                 logging.error(f"加载任务文件失败: {str(e)}")
-                self.tasks = {}
-                self.next_id = 1
+                return {}, 1
         else:
             logging.info("任务文件不存在，创建新的任务列表")
+            return {}, 1
                 
-    def _save_tasks(self):
+    def _save_tasks(self, tasks: Dict[int, Task], next_id: int):
         """保存任务到文件"""
         try:
             data = {
-                'tasks': {str(k): v.to_dict() for k, v in self.tasks.items()},
-                'next_id': self.next_id
+                'tasks': {str(k): v.to_dict() for k, v in tasks.items()},
+                'next_id': next_id
             }
             with open(self.storage_file, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
-            logging.debug(f"成功保存 {len(self.tasks)} 个任务到文件")
+            logging.debug(f"成功保存 {len(tasks)} 个任务到文件")
         except Exception as e:
             logging.error(f"保存任务到文件失败: {str(e)}")
             
@@ -80,7 +81,6 @@ class TaskScheduler:
         self.running = False
         if self.thread:
             self.thread.join()
-        self._save_tasks()
         logging.info("任务调度器已停止")
             
     def _scheduler_loop(self):
@@ -88,7 +88,12 @@ class TaskScheduler:
         logging.info("开始调度器主循环")
         while self.running:
             try:
-                self._check_and_execute_tasks()
+                now = datetime.now()
+                # 每分钟检查一次
+                if (self.last_check_time is None or 
+                    (now - self.last_check_time).total_seconds() >= 60):
+                    self._check_and_execute_tasks()
+                    self.last_check_time = now
                 time_module.sleep(1)
             except Exception as e:
                 logging.error(f"调度器主循环发生错误: {str(e)}")
@@ -96,14 +101,16 @@ class TaskScheduler:
     def _check_and_execute_tasks(self):
         """检查并执行到期的任务"""
         with self.lock:
+            # 每次检查都从文件重新加载任务
+            tasks, next_id = self._load_tasks()
             now = datetime.now()
-            # 查找所有待执行的任务，增加时间检查
+            
+            # 查找所有待执行的任务
             tasks_to_execute = [
-                task for task in self.tasks.values()
+                task for task in tasks.values()
                 if task.status == TaskStatus.PENDING and 
-                task.is_enabled and  # 只执行启用状态的任务
+                task.is_enabled and
                 datetime.fromisoformat(task.next_run_time) <= now and
-                # 只执行未超过1分钟的任务
                 (now - datetime.fromisoformat(task.next_run_time)).total_seconds() <= 60
             ]
             
@@ -112,12 +119,12 @@ class TaskScheduler:
                 for task in tasks_to_execute:
                     logging.info(f"准备执行任务: ID={task.id}, 名称={task.name}, "
                                f"类型={task.task_type}, 计划执行时间={task.next_run_time}")
-                    self._execute_task(task)
+                    self._execute_task(task, tasks, next_id)
             else:
                 # 显示下一个要执行的任务
                 next_tasks = sorted(
                     [(task, datetime.fromisoformat(task.next_run_time)) 
-                     for task in self.tasks.values() 
+                     for task in tasks.values() 
                      if task.status == TaskStatus.PENDING and task.is_enabled],
                     key=lambda x: x[1]
                 )
@@ -131,20 +138,22 @@ class TaskScheduler:
                         # 如果是单次任务，直接禁用
                         if next_task.schedule_type == TaskScheduleType.ONCE:
                             next_task.is_enabled = False
-                            self._save_tasks()
+                            tasks[next_task.id] = next_task
+                            self._save_tasks(tasks, next_id)
                             logging.info(f"单次任务已过期，已禁用: ID={next_task.id}, 名称={next_task.name}")
                     else:
                         logging.debug(f"下一个待执行任务: ID={next_task.id}, 名称={next_task.name}, "
                                     f"计划执行时间={next_time.isoformat()}")
                 
-    def _execute_task(self, task: Task):
+    def _execute_task(self, task: Task, tasks: Dict[int, Task], next_id: int):
         """执行任务"""
         logging.info(f"开始执行任务: ID={task.id}, 名称={task.name}")
         try:
             # 更新任务状态为执行中
             task.status = TaskStatus.RUNNING
             task.last_run_time = datetime.now().isoformat()
-            self._save_tasks()
+            tasks[task.id] = task
+            self._save_tasks(tasks, next_id)
             logging.debug(f"任务状态已更新为执行中: ID={task.id}")
             
             # 执行任务
@@ -164,7 +173,8 @@ class TaskScheduler:
                 self._calculate_next_run_time(task)
                 logging.debug(f"任务下次执行时间已更新: ID={task.id}, 时间={task.next_run_time}")
             
-            self._save_tasks()
+            tasks[task.id] = task
+            self._save_tasks(tasks, next_id)
             
         except Exception as e:
             logging.error(f"任务执行失败: ID={task.id}, 错误={str(e)}")
@@ -173,14 +183,160 @@ class TaskScheduler:
                 "success": False,
                 "error": str(e)
             })
-            self._save_tasks()
+            tasks[task.id] = task
+            self._save_tasks(tasks, next_id)
             
     def _run_task(self, task: Task) -> dict:
         """运行具体任务"""
-        # 这里需要根据task_type和content来实现具体的任务执行逻辑
+        try:
+            actions = task.get_actions()
+            results = []
+            
+            for action in actions:
+                result = self._execute_action(action)
+                results.append(result)
+                
+            return {
+                "success": all(r.get("success", False) for r in results),
+                "message": "Task executed successfully",
+                "results": results
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
+    def _execute_action(self, action: TaskAction) -> dict:
+        """执行具体动作"""
+        try:
+            if action.action_type == ActionType.LIGHT:
+                return self._execute_light_action(action)
+            elif action.action_type == ActionType.SOUND:
+                return self._execute_sound_action(action)
+            elif action.action_type == ActionType.DISPLAY:
+                return self._execute_display_action(action)
+            elif action.action_type == ActionType.COMBINED:
+                return self._execute_combined_action(action)
+            else:
+                raise ValueError(f"未知的动作类型: {action.action_type}")
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
+    def _execute_light_action(self, action: TaskAction) -> dict:
+        """执行灯光控制动作"""
+        try:
+            params = action.get_light_params()
+            # if not params:
+            #     raise ValueError("无效的灯光参数")
+
+            # # 根据命令类型执行不同的操作
+            # if params.command == LightCommand.TURN_ON:
+            #     # TODO: 实现开灯逻辑
+            #     return {
+            #         "success": True,
+            #         "message": f"灯光已开启: {action.target}",
+            #         "parameters": params.to_dict()
+            #     }
+            # elif params.command == LightCommand.SET_BRIGHTNESS:
+            #     # TODO: 实现亮度调节逻辑
+            #     return {
+            #         "success": True,
+            #         "message": f"灯光亮度已设置为 {params.brightness}%",
+            #         "parameters": params.to_dict()
+            #     }
+            # elif params.command == LightCommand.SET_COLOR:
+            #     # TODO: 实现颜色设置逻辑
+            #     self.light.start(params.mode, )
+            #     return {
+            #         "success": True,
+            #         "message": f"灯光颜色已设置为 {params.color}",
+            #         "parameters": params.to_dict()
+            #     }
+            
+            # ... 其他命令处理 ...
+            self.light.start(params.mode, params.params)
+            
+            return {
+                "success": True,
+                "message": f"灯光模式已设置为: {params.mode}",
+                "parameters": {
+                    "mode": params.mode,
+                    "params": params.params
+                }
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
+    def _execute_sound_action(self, action: TaskAction) -> dict:
+        """执行声音播放动作"""
+        try:
+            params = action.get_sound_params()
+            if not params:
+                raise ValueError("无效的声音参数")
+
+            if params.command == SoundCommand.PLAY:
+                # TODO: 实现播放逻辑
+                return {
+                    "success": True,
+                    "message": f"开始播放: {params.file_path}",
+                    "parameters": params.to_dict()
+                }
+            elif params.command == SoundCommand.SET_VOLUME:
+                # TODO: 实现音量调节逻辑
+                return {
+                    "success": True,
+                    "message": f"音量已设置为 {params.volume}%",
+                    "parameters": params.to_dict()
+                }
+            # ... 其他命令处理 ...
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
+    def _execute_display_action(self, action: TaskAction) -> dict:
+        """执行屏幕显示动作"""
+        try:
+            params = action.get_display_params()
+            if not params:
+                raise ValueError("无效的显示参数")
+
+            if params.command == DisplayCommand.SHOW_TEXT:
+                # TODO: 实现文本显示逻辑
+                return {
+                    "success": True,
+                    "message": f"显示文本: {params.content}",
+                    "parameters": params.to_dict()
+                }
+            elif params.command == DisplayCommand.SHOW_IMAGE:
+                # TODO: 实现图片显示逻辑
+                return {
+                    "success": True,
+                    "message": f"显示图片: {params.image_path}",
+                    "parameters": params.to_dict()
+                }
+            # ... 其他命令处理 ...
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
+    def _execute_combined_action(self, action: TaskAction) -> dict:
+        """执行组合动作"""
+        # TODO: 实现组合动作的执行逻辑
         return {
             "success": True,
-            "message": "Task executed successfully"
+            "message": "组合动作执行成功",
+            "parameters": action.parameters
         }
         
     def _calculate_next_run_time(self, task: Task):
@@ -219,10 +375,11 @@ class TaskScheduler:
     def add_task(self, task: Task) -> Task:
         """添加新任务"""
         with self.lock:
-            task.id = self.next_id
-            self.next_id += 1
-            self.tasks[task.id] = task
-            self._save_tasks()
+            tasks, next_id = self._load_tasks()
+            task.id = next_id
+            next_id += 1
+            tasks[task.id] = task
+            self._save_tasks(tasks, next_id)
             logging.info(f"添加新任务成功: ID={task.id}, 名称={task.name}, "
                         f"类型={task.task_type}, 计划执行时间={task.next_run_time}")
             return task
@@ -230,10 +387,11 @@ class TaskScheduler:
     def remove_task(self, task_id: int) -> bool:
         """移除任务"""
         with self.lock:
-            if task_id in self.tasks:
-                task = self.tasks[task_id]
-                del self.tasks[task_id]
-                self._save_tasks()
+            tasks, next_id = self._load_tasks()
+            if task_id in tasks:
+                task = tasks[task_id]
+                del tasks[task_id]
+                self._save_tasks(tasks, next_id)
                 logging.info(f"移除任务成功: ID={task_id}, 名称={task.name}")
                 return True
             logging.warning(f"移除任务失败: ID={task_id} 不存在")
@@ -241,7 +399,8 @@ class TaskScheduler:
             
     def get_task(self, task_id: int) -> Optional[Task]:
         """获取任务"""
-        task = self.tasks.get(task_id)
+        tasks, _ = self._load_tasks()
+        task = tasks.get(task_id)
         if task:
             logging.debug(f"获取任务: ID={task_id}, 名称={task.name}, 状态={task.status}")
         else:
@@ -250,7 +409,8 @@ class TaskScheduler:
         
     def get_pending_tasks(self) -> List[Task]:
         """获取所有待执行的任务"""
-        pending_tasks = [task for task in self.tasks.values() if task.status == TaskStatus.PENDING]
+        tasks, _ = self._load_tasks()
+        pending_tasks = [task for task in tasks.values() if task.status == TaskStatus.PENDING]
         logging.debug(f"当前待执行任务数量: {len(pending_tasks)}")
         for task in pending_tasks:
             logging.debug(f"待执行任务: ID={task.id}, 名称={task.name}, "
@@ -268,8 +428,8 @@ class TaskDaemon:
             return
             
         # 设置信号处理
-        signal.signal(signal.SIGTERM, self._handle_signal)
-        signal.signal(signal.SIGINT, self._handle_signal)
+        # signal.signal(signal.SIGTERM, self._handle_signal)
+        # signal.signal(signal.SIGINT, self._handle_signal)
         
         self.running = True
         logging.info("Task daemon started")

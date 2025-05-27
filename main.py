@@ -3,7 +3,6 @@
 #from fastapi.staticfiles import StaticFiles
 #from config import settings, L
 import logging
-from datetime import time
 
 from base.ws import WebSocketClient
 from base.mic import Mic
@@ -30,11 +29,14 @@ from model.recv import Recv
 from model.daemon import Daemon
 from common.code import Code
 from common.common import Common
-from model.scheduler import TaskDaemon
 # from model.ui import ScenePage, HomePage, OverlayWidget, MainWindow
 # if Config.OS != "lineage":
 #     from PyQt5.QtWidgets import QApplication
 #     from model import ui
+
+from datetime import time, datetime, timedelta
+from model.scheduler import TaskDaemon
+import json
 
 os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
 if Config.OS == "lineage":
@@ -152,25 +154,6 @@ if __name__ == "__main__":
     #创建信号槽
     # comm = Communicator()
 
-    task_daemon = TaskDaemon("tasks.json")
-    # 创建闹钟任务
-    alarm_time = time(20, 39)  # 每天早上7:30
-    weekdays = None  # 周一到周五
-    alarm_task = task_daemon.create_alarm_task("Morning Alarm", alarm_time, weekdays)
-
-    alarm = threading.Thread(target=task_daemon.start)
-    
-    # # 创建系统任务
-    # system_task = daemon.create_system_task(
-    #     name="Daily Backup",
-    #     content={"type": "backup", "target": "/data"},
-    #     schedule_type=TaskScheduleType.DAILY,
-    #     execution_time=time(2, 0)  # 每天凌晨2点
-    # )
-
-    # 启动守护进程
-    # daemon.start()
-
     if not Config.IS_DEBUG:
         # 暂时去掉，等上板子再试
         # spray_instance = ""
@@ -271,25 +254,36 @@ if __name__ == "__main__":
     recv_thread.start()
     daemon_thread.start()
 
-    # # 创建守护进程
-    # task_daemon = TaskDaemon("tasks.json")
-    #
-    # # 创建闹钟任务
-    # alarm_time = time(20, 37)  # 每天早上7:30
-    # weekdays = None  # 周一到周五
-    # alarm_task = task_daemon.create_alarm_task("Morning Alarm", alarm_time, weekdays)
-    #
-    # alarm = threading.Thread(target=task_daemon.start)
-    # # # 创建系统任务
-    # # system_task = daemon.create_system_task(
-    # #     name="Daily Backup",
-    # #     content={"type": "backup", "target": "/data"},
-    # #     schedule_type=TaskScheduleType.DAILY,
-    # #     execution_time=time(2, 0)  # 每天凌晨2点
-    # # )
-    #
-    # # 启动守护进程
-    # # daemon.start()
+    # 创建守护进程
+    task_daemon = TaskDaemon("tasks.json")
+
+    # 计算当前时间1分钟后的时间
+    now = datetime.now()
+    one_minute_later = (now + timedelta(minutes=1)).time()
+    
+    # 创建任务，使用计算出的时间
+    task = Task.create(
+        name="Sunrise Light",
+        task_type=TaskType.SYSTEM,
+        schedule_type=TaskScheduleType.ONCE,  # 改为单次执行
+        execution_time=one_minute_later.strftime("%H:%M:%S"),  # 使用计算出的时间
+        actions=json.dumps([
+            {
+                "action_type": "light",
+                "target": "bedroom_light",
+                "parameters": {
+                    "mode": Code.LIGHT_MODE_BREATHING,
+                    "params": {"r":0, "g":255, "b":255, "steps": 200}
+                }
+            }
+        ])
+    )
+    
+    # 添加任务到调度器
+    task_daemon.scheduler.add_task(task)
+
+    # 启动守护进程
+    task_daemon.start()
     
     # sys.exit(app.exec_())
 
