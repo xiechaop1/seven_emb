@@ -5,9 +5,12 @@ import json
 import threading
 import time as time_module
 import os
+
+from common.threading_event import ThreadingEvent
 from .task import Task, TaskStatus, TaskScheduleType, TaskType, TaskAction, ActionType, LightCommand, SoundCommand, DisplayCommand
 import signal
 import sys
+from common.code import Code
 
 # 配置日志格式
 logging.basicConfig(
@@ -30,6 +33,8 @@ class TaskScheduler:
 
         self.task_threads = {}  # 用于存储任务执行线程
         self.thread_lock = threading.Lock()  # 用于保护task_threads的访问
+        self.running_tasks = {}  # 用于存储正在运行的任务及其停止事件
+        self.task_stop_events = {}  # 用于存储任务的停止事件
 
         logging.info(f"初始化任务调度器，存储文件: {storage_file}")
         
@@ -110,25 +115,30 @@ class TaskScheduler:
     def _check_and_execute_tasks(self):
         """检查并执行到期的任务"""
         with self.lock:
-            # 每次检查都从文件重新加载任务
             tasks, next_id = self._load_tasks()
             now = datetime.now()
             
             # 查找所有待执行的任务
-            tasks_to_execute = [
-                task for task in tasks.values()
-                if task.status == TaskStatus.PENDING and 
-                task.is_enabled and
-                datetime.fromisoformat(task.next_run_time) <= now and
-                (now - datetime.fromisoformat(task.next_run_time)).total_seconds() <= 5
-            ]
+            tasks_to_execute = []
+            for task in tasks.values():
+                if (task.status == TaskStatus.PENDING and 
+                    task.is_enabled and
+                    datetime.fromisoformat(task.next_run_time) <= now):
+                    
+                    time_diff = (now - datetime.fromisoformat(task.next_run_time)).total_seconds()
+                    
+                    # 一次性任务：5秒内执行
+                    if task.schedule_type == TaskScheduleType.ONCE and time_diff <= 5:
+                        tasks_to_execute.append(task)
+                    # 周期性任务：1秒内执行
+                    elif task.schedule_type in [TaskScheduleType.DAILY, TaskScheduleType.WEEKLY] and time_diff <= 1:
+                        tasks_to_execute.append(task)
             
             if tasks_to_execute:
                 logging.info(f"发现 {len(tasks_to_execute)} 个待执行任务")
                 for task in tasks_to_execute:
                     logging.info(f"准备执行任务: ID={task.id}, 名称={task.name}, "
                                f"类型={task.task_type}, 计划执行时间={task.next_run_time}")
-                    # 为每个任务创建独立的执行线程
                     self._execute_task_concurrent(task, tasks, next_id)
             else:
                 # 显示下一个要执行的任务
@@ -159,6 +169,12 @@ class TaskScheduler:
         """并发执行任务"""
         def task_execution():
             try:
+                # 创建停止事件
+                stop_event = threading.Event()
+                with self.thread_lock:
+                    self.task_stop_events[task.id] = stop_event
+                    self.running_tasks[task.id] = task
+
                 # 更新任务状态为执行中
                 with self.lock:
                     task.status = TaskStatus.RUNNING
@@ -170,6 +186,14 @@ class TaskScheduler:
                 # 执行任务
                 result = self._run_task(task)
                 logging.info(f"任务执行完成: ID={task.id}, 结果={result}")
+                
+                # 如果设置了持续时间，等待指定时间后停止
+                if task.duration is not None:
+                    if stop_event.wait(timeout=task.duration):
+                        logging.info(f"任务被手动停止: ID={task.id}")
+                    else:
+                        logging.info(f"任务达到持续时间自动停止: ID={task.id}")
+                    self.stop_task(task.id)
                 
                 # 更新任务状态和结果
                 with self.lock:
@@ -199,8 +223,12 @@ class TaskScheduler:
                     tasks[task.id] = task
                     self._save_tasks(tasks, next_id)
             finally:
-                # 清理线程记录
+                # 清理任务记录
                 with self.thread_lock:
+                    if task.id in self.task_stop_events:
+                        del self.task_stop_events[task.id]
+                    if task.id in self.running_tasks:
+                        del self.running_tasks[task.id]
                     if task.id in self.task_threads:
                         del self.task_threads[task.id]
 
@@ -283,7 +311,7 @@ class TaskScheduler:
             #     }
             
             # ... 其他命令处理 ...
-            self.light.start(params.mode, params.params)
+            self.light.start(params.mode, params.params, Code.LIGHT_TYPE_TEMP)
             
             return {
                 "success": True,
@@ -307,7 +335,6 @@ class TaskScheduler:
                 raise ValueError("无效的声音参数")
 
             if params.command == SoundCommand.PLAY:
-                # TODO: 实现播放逻辑
                 file_path = params.file_path
                 # self.audio_player.play_voice_with_file(file_path)
                 self.audio_player.play_music_with_file(file_path)
@@ -444,6 +471,36 @@ class TaskScheduler:
             logging.debug(f"待执行任务: ID={task.id}, 名称={task.name}, "
                         f"计划执行时间={task.next_run_time}")
         return pending_tasks
+
+    def stop_task(self, task_id: int) -> bool:
+        """手动停止任务"""
+        with self.thread_lock:
+            if task_id in self.task_stop_events:
+                # 设置停止事件
+                self.task_stop_events[task_id].set()
+                
+                # 停止相关的硬件操作
+                if task_id in self.running_tasks:
+                    task = self.running_tasks[task_id]
+                    actions = task.get_actions()
+                    for action in actions:
+                        if action.action_type == ActionType.LIGHT:
+                            self.light.start_prev()
+                        elif action.action_type == ActionType.SOUND:
+                            self.audio_player.stop_music()
+                            ThreadingEvent.audio_play_event.set()
+                        elif action.action_type == ActionType.DISPLAY:
+                            # 实现显示停止逻辑
+                            pass
+                
+                logging.info(f"已发送停止信号到任务: ID={task_id}")
+                return True
+            return False
+
+    def get_running_tasks(self) -> List[Task]:
+        """获取当前正在运行的任务列表"""
+        with self.thread_lock:
+            return list(self.running_tasks.values())
 
 class TaskDaemon:
     def __init__(self, storage_file: str, audioPlayerIns, lightIns, sprayIns):
