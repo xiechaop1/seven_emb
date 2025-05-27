@@ -550,36 +550,113 @@ class TaskDaemon:
         self.stop()
         sys.exit(0)
         
+    def _is_duplicate_task(self, task_type: TaskType, schedule_type: TaskScheduleType, 
+                          execution_time: str, weekdays: str, actions: str) -> Optional[Task]:
+        """检查是否存在完全相同的任务"""
+        tasks, _ = self.scheduler._load_tasks()
+        for task in tasks.values():
+            if (task.task_type == task_type and
+                task.schedule_type == schedule_type and
+                task.execution_time == execution_time and
+                task.weekdays == weekdays and
+                task.actions == actions):
+                return task
+        return None
+
     def create_alarm_task(self, name: str, execution_time: time, parameters: dict, duration: int, weekdays: list = None) -> Task:
         """创建闹钟任务"""
+        # 检查是否存在完全相同的任务
+        schedule_type = TaskScheduleType.WEEKLY if weekdays else TaskScheduleType.ONCE
+        execution_time_str = execution_time.isoformat()
+        weekdays_str = json.dumps(weekdays) if weekdays else None
+        actions_str = json.dumps(parameters)
+
+        existing_task = self._is_duplicate_task(
+            TaskType.ALARM,
+            schedule_type,
+            execution_time_str,
+            weekdays_str,
+            actions_str
+        )
+
+        if existing_task:
+            # 如果任务存在但被禁用，则启用它
+            if not existing_task.is_enabled:
+                existing_task.is_enabled = True
+                existing_task.status = TaskStatus.PENDING
+                # 更新下次执行时间
+                existing_task.next_run_time = self._calculate_initial_run_time(
+                    time.fromisoformat(existing_task.execution_time),
+                    json.loads(existing_task.weekdays) if existing_task.weekdays else None
+                ).isoformat()
+                # 保存更新后的任务
+                tasks, next_id = self.scheduler._load_tasks()
+                tasks[existing_task.id] = existing_task
+                self.scheduler._save_tasks(tasks, next_id)
+                logging.info(f"启用已存在的任务: ID={existing_task.id}, 名称={existing_task.name}")
+            else:
+                logging.info(f"任务已存在且处于启用状态: ID={existing_task.id}, 名称={existing_task.name}")
+            return existing_task
+
+        # 如果不存在相同任务，则创建新任务
         task = Task.create(
             name=name,
             task_type=TaskType.ALARM,
-            schedule_type=TaskScheduleType.WEEKLY if weekdays else TaskScheduleType.ONCE,
-            execution_time=execution_time.isoformat(),
-            weekdays=json.dumps(weekdays) if weekdays else None,
+            schedule_type=schedule_type,
+            execution_time=execution_time_str,
+            weekdays=weekdays_str,
             duration=duration,
-            # content=json.dumps({
-            #     "type": "alarm",
-            #     "action": "play_sound"
-            # }),
-            actions=json.dumps(parameters),
+            actions=actions_str,
             next_run_time=self._calculate_initial_run_time(execution_time, weekdays).isoformat()
         )
         return self.scheduler.add_task(task)
         
     def create_system_task(self, name: str, content: dict, schedule_type: TaskScheduleType,
-                          execution_time: time = None, weekdays: list = None) -> Task:
+                          execution_time: time = None, weekdays: list = None, duration: int = None) -> Task:
         """创建系统任务"""
+        # 检查是否存在完全相同的任务
+        execution_time_str = execution_time.isoformat() if execution_time else None
+        weekdays_str = json.dumps(weekdays) if weekdays else None
+        content_str = json.dumps(content)
+
+        existing_task = self._is_duplicate_task(
+            TaskType.SYSTEM,
+            schedule_type,
+            execution_time_str,
+            weekdays_str,
+            content_str
+        )
+
+        if existing_task:
+            # 如果任务存在但被禁用，则启用它
+            if not existing_task.is_enabled:
+                existing_task.is_enabled = True
+                existing_task.status = TaskStatus.PENDING
+                # 更新下次执行时间
+                if execution_time:
+                    existing_task.next_run_time = self._calculate_initial_run_time(
+                        time.fromisoformat(existing_task.execution_time),
+                        json.loads(existing_task.weekdays) if existing_task.weekdays else None
+                    ).isoformat()
+                # 保存更新后的任务
+                tasks, next_id = self.scheduler._load_tasks()
+                tasks[existing_task.id] = existing_task
+                self.scheduler._save_tasks(tasks, next_id)
+                logging.info(f"启用已存在的任务: ID={existing_task.id}, 名称={existing_task.name}")
+            else:
+                logging.info(f"任务已存在且处于启用状态: ID={existing_task.id}, 名称={existing_task.name}")
+            return existing_task
+
+        # 如果不存在相同任务，则创建新任务
         task = Task.create(
             name=name,
             task_type=TaskType.SYSTEM,
             schedule_type=schedule_type,
-            execution_time=execution_time.isoformat() if execution_time else None,
-            weekdays=json.dumps(weekdays) if weekdays else None,
+            execution_time=execution_time_str,
+            weekdays=weekdays_str,
             duration=duration,
-            content=json.dumps(content),
-            next_run_time=self._calculate_initial_run_time(execution_time, weekdays).isoformat()
+            content=content_str,
+            next_run_time=self._calculate_initial_run_time(execution_time, weekdays).isoformat() if execution_time else None
         )
         return self.scheduler.add_task(task)
         
@@ -626,4 +703,95 @@ class TaskDaemon:
     def get_all_tasks_status(self) -> List[dict]:
         """获取所有任务的状态信息"""
         return self.scheduler.get_all_tasks_status()
+
+    def update_task(self, task_id: int, **kwargs) -> Optional[Task]:
+        """更新任务数据
+        
+        Args:
+            task_id: 任务ID
+            **kwargs: 要更新的字段，可以包括：
+                - name: 任务名称
+                - execution_time: 执行时间
+                - weekdays: 执行星期
+                - duration: 持续时间
+                - parameters: 任务参数
+                - content: 任务内容（系统任务）
+        
+        Returns:
+            更新后的任务对象，如果任务不存在则返回None
+        """
+        tasks, next_id = self.scheduler._load_tasks()
+        if task_id not in tasks:
+            logging.warning(f"更新任务失败: ID={task_id} 不存在")
+            return None
+            
+        task = tasks[task_id]
+        
+        # 更新任务字段
+        if 'name' in kwargs:
+            task.name = kwargs['name']
+        if 'execution_time' in kwargs:
+            task.execution_time = kwargs['execution_time'].isoformat()
+        if 'weekdays' in kwargs:
+            task.weekdays = json.dumps(kwargs['weekdays']) if kwargs['weekdays'] else None
+        if 'duration' in kwargs:
+            task.duration = kwargs['duration']
+        if 'parameters' in kwargs and task.task_type == TaskType.ALARM:
+            task.actions = json.dumps(kwargs['parameters'])
+        if 'content' in kwargs and task.task_type == TaskType.SYSTEM:
+            task.content = json.dumps(kwargs['content'])
+            
+        # 更新下次执行时间
+        if 'execution_time' in kwargs or 'weekdays' in kwargs:
+            task.next_run_time = self._calculate_initial_run_time(
+                time.fromisoformat(task.execution_time),
+                json.loads(task.weekdays) if task.weekdays else None
+            ).isoformat()
+            
+        # 保存更新后的任务
+        tasks[task_id] = task
+        self.scheduler._save_tasks(tasks, next_id)
+        
+        logging.info(f"任务更新成功: ID={task_id}, 名称={task.name}")
+        return task
+
+    def toggle_task(self, task_id: int, enable: bool = None) -> Optional[Task]:
+        """切换任务的启用状态
+        
+        Args:
+            task_id: 任务ID
+            enable: 是否启用，如果为None则切换当前状态
+        
+        Returns:
+            更新后的任务对象，如果任务不存在则返回None
+        """
+        tasks, next_id = self.scheduler._load_tasks()
+        if task_id not in tasks:
+            logging.warning(f"切换任务状态失败: ID={task_id} 不存在")
+            return None
+            
+        task = tasks[task_id]
+        
+        # 如果enable为None，则切换当前状态
+        if enable is None:
+            enable = not task.is_enabled
+            
+        # 更新任务状态
+        task.is_enabled = enable
+        task.status = TaskStatus.PENDING if enable else TaskStatus.DISABLED
+        
+        # 如果启用任务，更新下次执行时间
+        if enable:
+            task.next_run_time = self._calculate_initial_run_time(
+                time.fromisoformat(task.execution_time),
+                json.loads(task.weekdays) if task.weekdays else None
+            ).isoformat()
+            
+        # 保存更新后的任务
+        tasks[task_id] = task
+        self.scheduler._save_tasks(tasks, next_id)
+        
+        status = "启用" if enable else "禁用"
+        logging.info(f"任务{status}成功: ID={task_id}, 名称={task.name}")
+        return task
 
