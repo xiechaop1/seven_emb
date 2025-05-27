@@ -292,7 +292,18 @@ if __name__ == "__main__":
                 }
             }
         ]
-    task_daemon.create_alarm_task("Test", execution_time, actions)
+    task_daemon.create_alarm_task("Test_sound", execution_time, actions)
+    actions = [
+        {
+            "action_type": "light",
+            "target": "bedroom_light",
+            "parameters": {
+                "mode": Code.LIGHT_MODE_BREATHING,
+                "params": {"r":0, "g":255, "b":255, "steps": 200}
+            }
+        }
+    ]
+    task_daemon.create_alarm_task("Test_lightg", execution_time, actions)
     
     # 添加任务到调度器
     # task_daemon.scheduler.add_task(task)
