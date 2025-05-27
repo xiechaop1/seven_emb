@@ -283,6 +283,9 @@ class TaskScheduler:
 
             if params.command == SoundCommand.PLAY:
                 # TODO: 实现播放逻辑
+                file_path = params.file_path
+                # self.audio_player.play_voice_with_file(file_path)
+                self.audio_player.play_music_with_file(file_path)
                 return {
                     "success": True,
                     "message": f"开始播放: {params.file_path}",

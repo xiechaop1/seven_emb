@@ -283,11 +283,12 @@ if __name__ == "__main__":
     # )
     actions = [
             {
-                "action_type": "light",
+                "action_type": "sound",
                 "target": "bedroom_light",
                 "parameters": {
-                    "mode": Code.LIGHT_MODE_BREATHING,
-                    "params": {"r":0, "g":255, "b":255, "steps": 200}
+                    "file_paht": "xyxh.mp3",
+                    # "mode": Code.LIGHT_MODE_BREATHING,
+                    # "params": {"r":0, "g":255, "b":255, "steps": 200}
                 }
             }
         ]

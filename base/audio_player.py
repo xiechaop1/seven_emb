@@ -324,15 +324,41 @@ class AudioPlayer:
             self.current_track = audio_data
         # logging.info(f"Now playing: {audio_file}")
 
-    def play_voice_with_file(self, filename):
+    def play_music_with_file(self, filename, loops = 1, inter = True):
+        logging.info(f"Playing {filename} music, loops: {loops}, is_interrupt: {inter}")
+
+        filename = "resources/background_music/" + filename
+        if os.path.isfile(filename):
+            if inter == True:
+                self.stop_audio()
+                self.interrupt(None, Code.REC_METHOD_VOICE_MUSIC, 2, 3)
+                self.stop_music()
+
+            pygame.mixer.music.load(filename)  # 加载音频文件
+            pygame.mixer.music.play(loops)
+
+            while pygame.mixer.music.get_busy() == True:
+                time.sleep(0.05)
+
+            if inter == True:
+                ThreadingEvent.audio_play_event.set()
+
+    def stop_music(self):
+        pygame.mixer.music.stop()
+
+    def play_voice_with_file(self, filename, loops = 1):
         if filename == "" or filename is None:
             return
-        logging.info(f"Playing voice with file:{filename}")
-        self.voice = self.sound_player(filename)
-        self.voice.set_volume(self.sound_volume)
-        self.voice_channel.play(self.voice)
-        while self.voice_channel.get_busy():
-            time.sleep(0.5)
+        logging.info(f"Playing voice with file:{filename}, loops:{loops}")
+        if loops == -1:
+            loops = 1000000
+        for i in range(loops):
+
+            self.voice = self.sound_player(filename)
+            self.voice.set_volume(self.sound_volume)
+            self.voice_channel.play(self.voice)
+            while self.voice_channel.get_busy():
+                time.sleep(0.5)
 
         return
 
@@ -557,10 +583,6 @@ class AudioPlayer:
         }
         ThreadingEvent.audio_play_event.clear()
         logging.info("set interrupted")
-
-    def stop_music(self):
-        pygame.mixer.music.stop()
-        ThreadingEvent.audio_play_event.clear()
 
     def clear_list_defer(self):
         # self.clear_list_defer_queue.put(1)
