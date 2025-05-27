@@ -28,6 +28,9 @@ class TaskScheduler:
         self.light = lightIns
         self.spray = sprayIns
 
+        self.task_threads = {}  # 用于存储任务执行线程
+        self.thread_lock = threading.Lock()  # 用于保护task_threads的访问
+
         logging.info(f"初始化任务调度器，存储文件: {storage_file}")
         
     def _load_tasks(self) -> Dict[int, Task]:
@@ -79,6 +82,12 @@ class TaskScheduler:
             return
             
         self.running = False
+        
+        # 等待所有任务线程完成
+        with self.thread_lock:
+            for thread in self.task_threads.values():
+                thread.join(timeout=5)  # 最多等待5秒
+            
         if self.thread:
             self.thread.join()
         logging.info("任务调度器已停止")
@@ -119,7 +128,8 @@ class TaskScheduler:
                 for task in tasks_to_execute:
                     logging.info(f"准备执行任务: ID={task.id}, 名称={task.name}, "
                                f"类型={task.task_type}, 计划执行时间={task.next_run_time}")
-                    self._execute_task(task, tasks, next_id)
+                    # 为每个任务创建独立的执行线程
+                    self._execute_task_concurrent(task, tasks, next_id)
             else:
                 # 显示下一个要执行的任务
                 next_tasks = sorted(
@@ -145,47 +155,62 @@ class TaskScheduler:
                         logging.debug(f"下一个待执行任务: ID={next_task.id}, 名称={next_task.name}, "
                                     f"计划执行时间={next_time.isoformat()}")
                 
-    def _execute_task(self, task: Task, tasks: Dict[int, Task], next_id: int):
-        """执行任务"""
-        logging.info(f"开始执行任务: ID={task.id}, 名称={task.name}")
-        try:
-            # 更新任务状态为执行中
-            task.status = TaskStatus.RUNNING
-            task.last_run_time = datetime.now().isoformat()
-            tasks[task.id] = task
-            self._save_tasks(tasks, next_id)
-            logging.debug(f"任务状态已更新为执行中: ID={task.id}")
-            
-            # 执行任务
-            result = self._run_task(task)
-            logging.info(f"任务执行完成: ID={task.id}, 结果={result}")
-            
-            # 更新任务状态和结果
-            task.last_run_result = json.dumps(result)
-            task.status = TaskStatus.COMPLETED if result.get("success") else TaskStatus.FAILED
-            
-            # 如果是单次任务，执行完成后禁用
-            if task.schedule_type == TaskScheduleType.ONCE:
-                task.is_enabled = False
-                logging.info(f"单次任务执行完成，已禁用: ID={task.id}, 名称={task.name}")
-            else:
-                # 计算下次执行时间
-                self._calculate_next_run_time(task)
-                logging.debug(f"任务下次执行时间已更新: ID={task.id}, 时间={task.next_run_time}")
-            
-            tasks[task.id] = task
-            self._save_tasks(tasks, next_id)
-            
-        except Exception as e:
-            logging.error(f"任务执行失败: ID={task.id}, 错误={str(e)}")
-            task.status = TaskStatus.FAILED
-            task.last_run_result = json.dumps({
-                "success": False,
-                "error": str(e)
-            })
-            tasks[task.id] = task
-            self._save_tasks(tasks, next_id)
-            
+    def _execute_task_concurrent(self, task: Task, tasks: Dict[int, Task], next_id: int):
+        """并发执行任务"""
+        def task_execution():
+            try:
+                # 更新任务状态为执行中
+                with self.lock:
+                    task.status = TaskStatus.RUNNING
+                    task.last_run_time = datetime.now().isoformat()
+                    tasks[task.id] = task
+                    self._save_tasks(tasks, next_id)
+                logging.debug(f"任务状态已更新为执行中: ID={task.id}")
+                
+                # 执行任务
+                result = self._run_task(task)
+                logging.info(f"任务执行完成: ID={task.id}, 结果={result}")
+                
+                # 更新任务状态和结果
+                with self.lock:
+                    task.last_run_result = json.dumps(result)
+                    task.status = TaskStatus.COMPLETED if result.get("success") else TaskStatus.FAILED
+                    
+                    # 如果是单次任务，执行完成后禁用
+                    if task.schedule_type == TaskScheduleType.ONCE:
+                        task.is_enabled = False
+                        logging.info(f"单次任务执行完成，已禁用: ID={task.id}, 名称={task.name}")
+                    else:
+                        # 计算下次执行时间
+                        self._calculate_next_run_time(task)
+                        logging.debug(f"任务下次执行时间已更新: ID={task.id}, 时间={task.next_run_time}")
+                    
+                    tasks[task.id] = task
+                    self._save_tasks(tasks, next_id)
+                
+            except Exception as e:
+                logging.error(f"任务执行失败: ID={task.id}, 错误={str(e)}")
+                with self.lock:
+                    task.status = TaskStatus.FAILED
+                    task.last_run_result = json.dumps({
+                        "success": False,
+                        "error": str(e)
+                    })
+                    tasks[task.id] = task
+                    self._save_tasks(tasks, next_id)
+            finally:
+                # 清理线程记录
+                with self.thread_lock:
+                    if task.id in self.task_threads:
+                        del self.task_threads[task.id]
+
+        # 创建并启动任务执行线程
+        thread = threading.Thread(target=task_execution)
+        thread.daemon = True
+        with self.thread_lock:
+            self.task_threads[task.id] = thread
+        thread.start()
+
     def _run_task(self, task: Task) -> dict:
         """运行具体任务"""
         try:
