@@ -91,7 +91,7 @@ class TaskScheduler:
                 now = datetime.now()
                 # 每分钟检查一次
                 if (self.last_check_time is None or 
-                    (now - self.last_check_time).total_seconds() >= 60):
+                    (now - self.last_check_time).total_seconds() >= 5):
                     self._check_and_execute_tasks()
                     self.last_check_time = now
                 time_module.sleep(1)
@@ -111,7 +111,7 @@ class TaskScheduler:
                 if task.status == TaskStatus.PENDING and 
                 task.is_enabled and
                 datetime.fromisoformat(task.next_run_time) <= now and
-                (now - datetime.fromisoformat(task.next_run_time)).total_seconds() <= 60
+                (now - datetime.fromisoformat(task.next_run_time)).total_seconds() <= 5
             ]
             
             if tasks_to_execute:
