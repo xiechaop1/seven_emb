@@ -36,6 +36,7 @@ from common.common import Common
 
 from datetime import time, datetime, timedelta
 from model.scheduler import TaskDaemon
+from model.task import Task, TaskType, TaskScheduleType, TaskStatus, TaskAction
 import json
 
 os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
@@ -256,7 +257,7 @@ if __name__ == "__main__":
     daemon_thread.start()
 
     # 创建守护进程
-    task_daemon = TaskDaemon("tasks.json")
+    task_daemon = TaskDaemon("tasks.json", audio_instance, light_instance, spray_instance)
 
     # 计算当前时间1分钟后的时间
     now = datetime.now()

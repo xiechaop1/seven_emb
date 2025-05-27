@@ -418,8 +418,8 @@ class TaskScheduler:
         return pending_tasks
 
 class TaskDaemon:
-    def __init__(self, storage_file: str):
-        self.scheduler = TaskScheduler(storage_file)
+    def __init__(self, storage_file: str, audioPlayerIns, lightIns, sprayIns):
+        self.scheduler = TaskScheduler(storage_file, audioPlayerIns, lightIns, sprayIns)
         self.running = False
         
     def start(self):
