@@ -261,8 +261,8 @@ if __name__ == "__main__":
 
     # 计算当前时间1分钟后的时间
     now = datetime.now()
-    one_minute_later = (now + timedelta(minutes=1)).time()
-    execution_time = one_minute_later.strftime("%H:%M:%S"),  # 使用计算出的时间
+    execution_time = (now + timedelta(minutes=1)).time()
+    # execution_time = one_minute_later.strftime("%H:%M:%S"),  # 使用计算出的时间
     
     # 创建任务，使用计算出的时间
     # task = Task.create(
