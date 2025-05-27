@@ -129,6 +129,7 @@ class Task:
     last_run_time: Optional[str] = None
     last_run_result: Optional[str] = None
     is_enabled: bool = True
+    duration: Optional[int] = None  # 任务持续时间（秒），None表示持续执行直到手动停止
 
     @classmethod
     def create(cls, **kwargs) -> 'Task':
@@ -153,7 +154,8 @@ class Task:
             status=kwargs.get('status', TaskStatus.PENDING),
             last_run_time=kwargs.get('last_run_time'),
             last_run_result=kwargs.get('last_run_result'),
-            is_enabled=kwargs.get('is_enabled', True)
+            is_enabled=kwargs.get('is_enabled', True),
+            duration=kwargs.get('duration')
         )
 
     def to_dict(self) -> Dict[str, Any]:
