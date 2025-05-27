@@ -36,7 +36,7 @@ from common.common import Common
 
 from datetime import time, datetime, timedelta
 from model.scheduler import TaskDaemon
-from model.task import Task, TaskType, TaskScheduleType, TaskStatus, TaskAction
+from model.task import Task, TaskType, TaskScheduleType, TaskStatus, TaskAction, SoundCommand
 import json
 
 os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
@@ -286,7 +286,8 @@ if __name__ == "__main__":
                 "action_type": "sound",
                 "target": "bedroom_light",
                 "parameters": {
-                    "file_paht": "xyxh.mp3",
+                    "command": SoundCommand.PLAY,
+                    "file_path": "xyxh.mp3",
                     # "mode": Code.LIGHT_MODE_BREATHING,
                     # "params": {"r":0, "g":255, "b":255, "steps": 200}
                 }
@@ -303,7 +304,7 @@ if __name__ == "__main__":
             }
         }
     ]
-    task_daemon.create_alarm_task("Test_lightg", execution_time, actions)
+    task_daemon.create_alarm_task("Test_light", execution_time, actions)
     
     # 添加任务到调度器
     # task_daemon.scheduler.add_task(task)
