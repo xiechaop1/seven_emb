@@ -158,7 +158,7 @@ class Light:
         }
 
         # 把颜色填充
-        for i in range(112):
+        for i in range(self.LED_COUNT):
             self.curr_light_buffer.append(Color(0,0,0))
 
     def daemon(self):
@@ -991,45 +991,6 @@ class Light:
 
         return
 
-    def colorWipe2(self, strip, color, wait_ms=100):
-        """Wipe color across display a pixel at a time."""
-        # print("colorWipe2 act.")
-        # for i in range(self.strip.numPixels()):
-            # self.strip.setPixelColor(i, color)
-            # self.strip.show()
-        for i in range(self.strip.numPixels()):
-            self.strip.setPixelColor(i, color)
-            self.strip.show()
-            time.sleep(wait_ms/1000.0)
-    # Define functions which animate LEDs in various ways.
-    def colorWipe(self, strip, color, wait_ms=40):
-        """Wipe color across display a pixel at a time."""
-        # print("colorWipe act.")
-        for i in range(self.strip.numPixels()):
-            self.strip.setPixelColor(i, color)
-        self.strip.show()
-            # time.sleep(wait_ms/1000.0)
-
-    def colorWipe_single(self, strip, color, wait_ms=40):
-        """Wipe color across display a pixel at a time."""
-        # print("colorWipe_single act.")
-        for i in range(self.strip.numPixels()):
-            self.strip.setPixelColor(i, color)
-            self.strip.show()
-            time.sleep(wait_ms/1000.0)
-    def theaterChase(self, strip, color, wait_ms=50, iterations=10):
-        """Movie theater light style chaser animation."""
-        # print("theaterChase act.")
-        for j in range(iterations):
-            for q in range(3):
-                for i in range(0, self.strip.numPixels(), 3):
-                    self.strip.setPixelColor(i+q, color)
-                self.strip.show()
-                time.sleep(wait_ms/1000.0)
-                for i in range(0, self.strip.numPixels(), 3):
-                    self.strip.setPixelColor(i+q, 0)
-
-
     def Gradient(self, r, g, b):
 
         old_color = self.get_color()
@@ -1044,29 +1005,6 @@ class Light:
         self.fill_light_buffer(r, g, b)
 
         return
-
-    def overflowing(self, line_num = 1, light_num = 7, steps = 5):
-
-        colors = [
-            [255, 0, 0],
-            [128, 128, 0],
-            [96, 128, 128],
-            [0, 255, 128],
-            [0, 255, 255],
-            [0, 128, 255],
-            [0, 0, 255]
-        ]
-
-        for i in range(line_num):
-            line_pos = random.randint(1, 4)
-            light_max = self.light_nums[light_num - 1]
-            start = random.randint(0, light_max)
-
-            color_idx = random.randint(0, len(colors) - 1)
-            color = colors[color_idx]
-
-
-
 
     def fade_total_by_range(self, rgbs1 = [], old_rgbs2 = [], starts = [], nums = [], steps = 100):
         if len(starts) == 0:
@@ -1123,36 +1061,6 @@ class Light:
             pos -= 170
             return Color(0, pos * 3, 255 - pos * 3)
 
-    def Shadowing(self, strip, wait_ms=20, iterations=1):
-        """Draw rainbow that fades across all pixels at once."""
-        # print("rainbow act.")
-        for j in range(256*iterations):
-            for i in range(self.strip.numPixels()):
-                self.strip.setPixelColor(i, wheel((i+j) & 255))
-            self.strip.show()
-            time.sleep(wait_ms/1000.0)
-
-    def rainbowCycle(self, strip, wait_ms=20, iterations=5):
-        """Draw rainbow that uniformly distributes itself across all pixels."""
-        # print("rainbowCycle act.")
-        for j in range(256*iterations):
-            for i in range(self.strip.numPixels()):
-                self.strip.setPixelColor(i, wheel((int(i * 256 / self.strip.numPixels()) + j) & 255))
-            self.strip.show()
-            time.sleep(wait_ms/1000.0)
-
-    def theaterChaseRainbow(self, strip, wait_ms=50):
-        """Rainbow movie theater light style chaser animation."""
-        # print("theaterChaseRainbow act.")
-        for j in range(256):
-            for q in range(3):
-                for i in range(0, self.strip.numPixels(), 3):
-                    self.strip.setPixelColor(i+q, wheel((i+j) % 255))
-                self.strip.show()
-                time.sleep(wait_ms/1000.0)
-                for i in range(0, self.strip.numPixels(), 3):
-                    self.strip.setPixelColor(i+q, 0)
-
 
     def BreathWithTwoColor(self, r1, g1, b1, r2, g2, b2, wait_time = 0.2):
         rtag = 1
@@ -1194,7 +1102,9 @@ class Light:
                     bt = bt + btag * step
                 else:
                     bt = b2
-                for i in range(self.strip.numPixels()):
+                # self.strip.numPixels()
+                for i in range(self.LED_COUNT):
+                    self.set_color_buffer(i, Color(rt, gt, bt))
                     self.strip.setPixelColor(i, Color(rt, gt, bt))
                 if rt == r2 and gt == g2 and bt == b2:
                     break
@@ -1214,7 +1124,8 @@ class Light:
                     bt = bt - btag * step
                 else:
                     bt = b1
-                for i in range(self.strip.numPixels()):
+                for i in range(self.LED_COUNT):
+                    self.set_color_buffer(i, Color(rt, gt, bt))
                     self.strip.setPixelColor(i, Color(rt, gt, bt))
                 if rt == r1 and gt == g1 and bt == b1:
                     break
@@ -1314,7 +1225,9 @@ class Light:
                     bt = bt - step
                 else:
                     bt = 0
-                for i in range(self.strip.numPixels()):
+                # self.strip.numPixels()
+                for i in range(self.LED_COUNT):
+                    self.set_color_buffer(i, Color(rt, gt, bt))
                     self.strip.setPixelColor(i, Color(rt, gt, bt))
                 if rt == 0 and gt == 0 and bt == 0:
                     break
@@ -1334,7 +1247,7 @@ class Light:
                     bt = bt + 1
                 else:
                     bt = b
-                for i in range(self.strip.numPixels()):
+                for i in range(self.LED_COUNT):
                     self.strip.setPixelColor(i, Color(rt, gt, bt))
                 if rt == r and gt == g and bt == b:
                     break
@@ -1461,7 +1374,8 @@ class Light:
         # print("r,g,b:", r, g, b)
         # for j in range(255):
         if num == 0:
-            num = self.strip.numPixels()
+            # num = self.strip.numPixels()
+            num = self.LED_COUNT
 
         rt = r
         gt = g
@@ -1480,6 +1394,7 @@ class Light:
             # r = r * (self.brightness / 100)
             # g = g * (self.brightness / 100)
             # b = b * (self.brightness / 100)
+            self.set_color_buffer(i + start, Color(r, g, b))
             self.strip.setPixelColor(i + start, Color(r, g, b))
             # print("j:", j)
         self.strip.show()
@@ -1492,7 +1407,9 @@ class Light:
         # time.sleep(2)
 
     def clear(self):
-        for i in range(self.strip.numPixels()):
+        # self.strip.numPixels()
+        for i in range(self.LED_COUNT):
+            self.set_color_buffer(i, Color(0, 0, 0))
             self.strip.setPixelColor(i, Color(0, 0, 0))
         self.strip.show()
 
@@ -1500,7 +1417,11 @@ class Light:
         # print("turn_off act.")
         # for j in range(255, -1, -1):
         self.set_mode("")
-        for i in range(self.strip.numPixels()):
+        for i in range(self.LED_COUNT):
+            self.set_color_buffer(i, Color(0, 0, 0))
             self.strip.setPixelColor(i, Color(0, 0, 0))
         self.strip.show()
         #time.sleep(0.01)
+
+    def set_color_buffer(self, pos, color):
+        self.curr_light_buffer[pos] = color
