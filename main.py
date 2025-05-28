@@ -11,8 +11,8 @@ from config.config import Config
 if not Config.IS_DEBUG:
     from base.light import Light
     from base.spray import Spray
-# else:
-    # from PyQt5.QtWidgets import QApplication
+else:
+    from PyQt5.QtWidgets import QApplication
     # from model import ui
     # from base.screen import Screen
 if hasattr(Config, "OS"):
@@ -77,7 +77,7 @@ import traceback
 #from base.spary import Spray
 from model.execute_command import ExecuteCommand
 #from base.spary import Spray
-# from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal
 
 # async def main():
 #     websocket_url = "ws://114.55.90.104:9001/ws"
@@ -88,14 +88,14 @@ from model.execute_command import ExecuteCommand
 #         return ws
 
 # 信号器：定义一个跨线程信号
-# class Communicator(QObject):
-#     message = pyqtSignal(str)
+class Communicator(QObject):
+    message = pyqtSignal(str)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--mode', default="", type=str, help='demo mode without screen')
 args = parser.parse_args()
 
-if args.mode != "demo" and args.mode != "show":
+if args.mode != "demo":
     from GUI import gui
 
 if args.mode == "zero":
@@ -127,20 +127,6 @@ def on_release(key):
 
 if __name__ == "__main__":
     print(f"Starting with mode {args.mode}")
-    if Config.IS_DEBUG == True:
-        if Config.OS == "lineage":
-            pass
-        else:
-            if args.mode != "show":
-                try:
-                    app = QApplication(sys.argv)
-                    window = gui.MainWindow()
-                    window.show()
-                    exit_code = app.exec_()
-                    sys.exit(exit_code)
-                except Exception as e:
-                    print(e)
-                    traceback.print_exc()
 
     # websocket_url = "ws://114.55.90.104:9001/ws"
     # if "WEBSOCKET_URL" in Config:
@@ -155,8 +141,8 @@ if __name__ == "__main__":
     cv2_instance = cv2.VideoCapture(0)
     
     #创建信号槽
-    # comm = Communicator()
-    comm = None
+    comm = Communicator()
+    # comm = None
 
     if not Config.IS_DEBUG:
         # 暂时去掉，等上板子再试
@@ -248,11 +234,11 @@ if __name__ == "__main__":
     #         on_release=on_release) as listener:
     #     listener.join()
     
-    # app = QApplication(sys.argv)
-    # window = gui.MainWindow()
-    # window.show()
+    app = QApplication(sys.argv)
+    window = gui.MainWindow()
+    window.show()
     #对接槽接口   
-    # comm.message.connect(window.messageHandler)
+    comm.message.connect(window.messageHandler)
     audio_play_thread.start()
     kaldi_thread.start()
     recv_thread.start()
