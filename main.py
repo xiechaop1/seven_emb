@@ -189,19 +189,19 @@ if __name__ == "__main__":
     # audio_play_thread.start()
     logging.info("audio is ready")
 
-    if args.mode != "demo" and args.mode != "show":
-        screen_instance = Screen()
-        screen_instance.add("resources/video/main.mp4", 100)
-        screen_thread = threading.Thread(target=screen_instance.daemon)
-        screen_thread.start()
-        screen_instance.play()
-
-        if hasattr(Config, "MOTOR_ON"):
-            if Config.MOTOR_ON == True:
-                motor_instance = Motor(cv2_instance)
-                motor_instance.start()
-    else:
-        screen_instance = None
+    # if args.mode != "demo" and args.mode != "show":
+    #     screen_instance = Screen()
+    #     screen_instance.add("resources/video/main.mp4", 100)
+    #     screen_thread = threading.Thread(target=screen_instance.daemon)
+    #     screen_thread.start()
+    #     screen_instance.play()
+    #
+    #     if hasattr(Config, "MOTOR_ON"):
+    #         if Config.MOTOR_ON == True:
+    #             motor_instance = Motor(cv2_instance)
+    #             motor_instance.start()
+    # else:
+    screen_instance = None
 
 
     # screen = Screen()
@@ -304,10 +304,9 @@ if __name__ == "__main__":
 
 
     # 启动守护进程
-    task_daemon.start()
+    task_thread = threading.Thread(target=task_daemon.start)
 
-
-    # sys.exit(app.exec_())
+    sys.exit(app.exec_())
 
     
 
