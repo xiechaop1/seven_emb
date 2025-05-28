@@ -23,7 +23,7 @@ class Recv:
 
 	REC_ACTION_SLEEP_ASSISTANT = "sleep_assistant"
 
-	def __init__(self, ws, wsClient, audioPlayerIns, lightIns, cv2Ins, screenIns, sprayIns):
+	def __init__(self, ws, wsClient, audioPlayerIns, lightIns, cv2Ins, screenIns, sprayIns, communicator):
 		self.ws = ws
 		self.wsClient = wsClient
 		self.recv_daemon = True
@@ -33,6 +33,7 @@ class Recv:
 		self.screen = screenIns
 		self.spray = sprayIns
 		self.undertake = False
+		self.comm = communicator
 
 	def daemon(self):
 		vc_handler = VoiceChat(self.audio_player)
@@ -97,6 +98,7 @@ class Recv:
 						print("act:",act)
 						# act = resp["data"]["action"]
 						if act == Code.REC_ACTION_SLEEP_ASSISTANT:
+							self.comm.message.emit("enter sleep")  # 发信号到主线程
 							if resp['data']['stream_seq'] == -1:
 								# 进入助眠唤醒命令，会有一条 -1的结束，这条pass
 								continue

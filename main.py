@@ -142,7 +142,6 @@ if __name__ == "__main__":
     
     #创建信号槽
     comm = Communicator()
-    # comm = None
 
     if not Config.IS_DEBUG:
         # 暂时去掉，等上板子再试
