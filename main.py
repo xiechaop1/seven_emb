@@ -242,29 +242,34 @@ if __name__ == "__main__":
     #         on_release=on_release) as listener:
     #     listener.join()
     
+    audio_play_thread.start()
+    kaldi_thread.start()
+    recv_thread.start()
+    daemon_thread.start()
+
+
+    def signal_handler(sig, frame):
+        print("Now exiting...")
+        # print("Stop motor")
+        # if motor_instance is not None:
+        #     motor_instance.motor_stop()
+        #     motor_instance.motor_stop2()
+        print("Stop spray")
+        if spray_instance is not None and spray_instance != "":
+            spray_instance.turn_off()
+        sys.exit(0)
+
+
+    signal.signal(signal.SIGINT, signal_handler)
+
     app = QApplication(sys.argv)
     window = gui.MainWindow()
     window.show()
     print("window appear")
     # 对接槽接口
     comm.message.connect(window.messageHandler)
-    audio_play_thread.start()
-    kaldi_thread.start()
-    recv_thread.start()
-    daemon_thread.start()
+
     sys.exit(app.exec_())
 
     
 
-def signal_handler(sig, frame):
-    print("Now exiting...")
-    print("Stop motor")
-    if motor_instance is not None:
-        motor_instance.motor_stop()
-        motor_instance.motor_stop2()
-    print("Stop spray")
-    if spray_instance is not None:
-        spray_instance.turn_off()
-    sys.exit(0)
-
-signal.signal(signal.SIGINT, signal_handler)
