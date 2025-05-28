@@ -506,6 +506,146 @@ class TaskScheduler:
         with self.thread_lock:
             return list(self.running_tasks.values())
 
+    def enable_task(self, task_id: int) -> bool:
+        """启用任务
+        
+        Args:
+            task_id: 任务ID
+            
+        Returns:
+            bool: 是否成功启用任务
+        """
+        with self.lock:
+            tasks, next_id = self._load_tasks()
+            if task_id not in tasks:
+                logging.warning(f"启用任务失败: ID={task_id} 不存在")
+                return False
+                
+            task = tasks[task_id]
+            if task.is_enabled:
+                logging.info(f"任务已经是启用状态: ID={task_id}")
+                return True
+                
+            task.is_enabled = True
+            task.status = TaskStatus.PENDING
+            # 更新下次执行时间
+            if task.execution_time:
+                task.next_run_time = self._calculate_next_run_time(task)
+                
+            tasks[task_id] = task
+            self._save_tasks(tasks, next_id)
+            logging.info(f"任务启用成功: ID={task_id}, 名称={task.name}")
+            return True
+
+    def disable_task(self, task_id: int) -> bool:
+        """禁用任务
+        
+        Args:
+            task_id: 任务ID
+            
+        Returns:
+            bool: 是否成功禁用任务
+        """
+        with self.lock:
+            tasks, next_id = self._load_tasks()
+            if task_id not in tasks:
+                logging.warning(f"禁用任务失败: ID={task_id} 不存在")
+                return False
+                
+            task = tasks[task_id]
+            if not task.is_enabled:
+                logging.info(f"任务已经是禁用状态: ID={task_id}")
+                return True
+                
+            task.is_enabled = False
+            task.status = TaskStatus.DISABLED
+            tasks[task_id] = task
+            self._save_tasks(tasks, next_id)
+            logging.info(f"任务禁用成功: ID={task_id}, 名称={task.name}")
+            return True
+
+    def get_task_status(self, task_id: int) -> Optional[dict]:
+        """获取任务状态信息
+        
+        Args:
+            task_id: 任务ID
+            
+        Returns:
+            Optional[dict]: 任务状态信息字典，如果任务不存在则返回None
+        """
+        with self.lock:
+            tasks, _ = self._load_tasks()
+            if task_id not in tasks:
+                logging.warning(f"获取任务状态失败: ID={task_id} 不存在")
+                return None
+                
+            task = tasks[task_id]
+            status = {
+                "id": task.id,
+                "name": task.name,
+                "type": task.task_type,
+                "status": task.status,
+                "is_enabled": task.is_enabled,
+                "execution_time": task.execution_time,
+                "next_run_time": task.next_run_time,
+                "created_at": task.created_at,
+                "last_run_time": task.last_run_time,
+                "last_run_result": task.last_run_result,
+                "schedule_type": task.schedule_type,
+                "weekdays": task.weekdays,
+                "duration": task.duration
+            }
+            
+            # 根据任务类型添加特定信息
+            if task.task_type == TaskType.ALARM:
+                status["actions"] = task.actions
+            elif task.task_type == TaskType.SYSTEM:
+                status["content"] = task.content
+                
+            logging.debug(f"获取任务状态成功: ID={task_id}, 名称={task.name}")
+            return status
+
+    def get_all_tasks_status(self) -> List[dict]:
+        """获取所有任务的状态信息
+        
+        Returns:
+            List[dict]: 包含所有任务状态信息的字典列表
+        """
+        with self.lock:
+            tasks, _ = self._load_tasks()
+            status_list = []
+            
+            for task in tasks.values():
+                status = {
+                    "id": task.id,
+                    "name": task.name,
+                    "type": task.task_type,
+                    "status": task.status,
+                    "is_enabled": task.is_enabled,
+                    "execution_time": task.execution_time,
+                    "next_run_time": task.next_run_time,
+                    "created_at": task.created_at,
+                    "last_run_time": task.last_run_time,
+                    "last_run_result": task.last_run_result,
+                    "schedule_type": task.schedule_type,
+                    "weekdays": task.weekdays,
+                    "duration": task.duration
+                }
+                
+                # 根据任务类型添加特定信息
+                if task.task_type == TaskType.ALARM:
+                    status["actions"] = task.actions
+                elif task.task_type == TaskType.SYSTEM:
+                    status["content"] = task.content
+                    
+                status_list.append(status)
+                
+            # 按创建时间排序
+            status_list.sort(key=lambda x: x["created_at"])
+            
+            logging.debug(f"获取所有任务状态信息，共 {len(status_list)} 个任务")
+            return status_list
+
 class TaskDaemon:
     def __init__(self, storage_file: str, audioPlayerIns, lightIns, sprayIns):
         self.scheduler = TaskScheduler(storage_file, audioPlayerIns, lightIns, sprayIns)
@@ -794,4 +934,51 @@ class TaskDaemon:
         status = "启用" if enable else "禁用"
         logging.info(f"任务{status}成功: ID={task_id}, 名称={task.name}")
         return task
+
+    def get_tasks(self, task_type: Optional[TaskType] = None) -> List[Task]:
+        """获取任务列表
+        
+        Args:
+            task_type: 任务类型，可选值：
+                - None: 获取所有任务
+                - TaskType.ALARM: 只获取闹钟任务
+                - TaskType.SYSTEM: 只获取系统任务
+        
+        Returns:
+            任务列表
+        """
+        tasks, _ = self.scheduler._load_tasks()
+        
+        if task_type is None:
+            # 获取所有任务
+            task_list = list(tasks.values())
+            logging.debug(f"获取所有任务，共 {len(task_list)} 个")
+        else:
+            # 根据类型筛选任务
+            task_list = [task for task in tasks.values() if task.task_type == task_type]
+            type_name = "闹钟" if task_type == TaskType.ALARM else "系统"
+            logging.debug(f"获取{type_name}任务，共 {len(task_list)} 个")
+            
+        # 按创建时间排序
+        task_list.sort(key=lambda x: x.created_at)
+        
+        # 记录每个任务的详细信息
+        for task in task_list:
+            logging.debug(
+                f"任务详情: ID={task.id}, 名称={task.name}, "
+                f"类型={task.task_type}, 状态={task.status}, "
+                f"启用状态={'启用' if task.is_enabled else '禁用'}, "
+                f"执行时间={task.execution_time}, "
+                f"下次执行={task.next_run_time}"
+            )
+            
+        return task_list
+
+    def get_alarm_tasks(self) -> List[Task]:
+        """获取所有闹钟任务"""
+        return self.get_tasks(TaskType.ALARM)
+
+    def get_system_tasks(self) -> List[Task]:
+        """获取所有系统任务"""
+        return self.get_tasks(TaskType.SYSTEM)
 

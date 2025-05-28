@@ -42,6 +42,8 @@ import json
 os.environ["DISPLAY"] = ":0"  ########screen_modified by lixiaolin ###
 if Config.OS == "lineage":
     os.environ["SDL_AUDIODRIVER"] = "pulse"
+elif Config.OS == "Mac":
+    os.environ["SDL_AUDIODRIVER"] = "coreaudio"
 else:
     os.environ["SDL_AUDIODRIVER"] = "alsa"
 
@@ -309,9 +311,16 @@ if __name__ == "__main__":
     # 添加任务到调度器
     # task_daemon.scheduler.add_task(task)
 
+    # 获取所有任务
+    # all_tasks = task_daemon.get_tasks()
+    # print("Schedule List")
+    # print(all_tasks)
+
+
     # 启动守护进程
     task_daemon.start()
-    
+
+
     # sys.exit(app.exec_())
 
     
