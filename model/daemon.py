@@ -12,7 +12,7 @@ import time
 class Daemon:
 
 	TURN_OFF_DURATION = 300   # (s)
-	NAP_DURATION = 30 #(s)
+ 	NAP_DURATION = 30 #(s)
 
 	def __init__(self, audio_ins, light_ins, spray_ins):
 		self.light = light_ins
