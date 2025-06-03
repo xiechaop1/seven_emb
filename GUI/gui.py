@@ -49,17 +49,19 @@ GUIDE_BTN_H = 120
 VOICE_DETECTING_ICON_R = 100
 VOICE_DETECTING_ICON_BOTGAP = 100
 
+RESOURCE_ROOT = "resources"
+
 
 
 coacher = ["Guruji", "Guruji"]
-coacherHead = ["/home/dsg/test/seven_emb/resources/images/secondhead_guruji.png", 
-               "/home/dsg/test/seven_emb/resources/images/secondhead_guruji.png"]
-coacherBackground = ["/home/dsg/test/seven_emb/resources/images/secondback_guruji.jpg", 
-                     "/home/dsg/test/seven_emb/resources/images/zeroback_sun.jpg"]
+coacherHead = ["resources/images/secondhead_guruji.png", 
+               "resources/images/secondhead_guruji.png"]
+coacherBackground = ["resources/images/secondback_guruji.jpg", 
+                     "resources/images/zeroback_sun.jpg"]
 coacherGuideTxt = ["    As the day comes to an end, release yourself\nfrom the busyness and allow your body and mind\nto fully relax. Close your eyes, gently bid farewell\nto today, and drift into a peaceful dream.",
                    "    As the day comes to an end, release yourself\nfrom the busyness and allow your body and mind\nto fully relax. Close your eyes, gently bid farewell\nto today, and drift into a peaceful dream."]
-coacherMovie = [["/home/dsg/test/seven_emb/resources/images/third_breath.gif", "/home/dsg/test/seven_emb/resources/images/third_starsky.gif"],
-                ["/home/dsg/test/seven_emb/resources/images/third_starsky.gif", "/home/dsg/test/seven_emb/resources/images/third_breath.gif"]]
+coacherMovie = [["resources/images/third_breath.gif", "resources/images/third_starsky.gif"],
+                ["resources/images/third_starsky.gif", "resources/images/third_breath.gif"]]
 
 # 这个类专门用来发信号（必须继承 QObject）
 class Communicator(QObject):
@@ -75,9 +77,9 @@ class FirstWidget(QWidget):
         self.label.setGeometry(0, 0, WINDOW_W, WINDOW_H)
         
         #icon图标按钮
-        self.iconBTN = [ImageButton(FIRST_ICON_R, FIRST_ICON_R, "/home/dsg/test/seven_emb/resources/images/firstmenu_Meditation.png", self),
-                        ImageButton(FIRST_ICON_R, FIRST_ICON_R, "/home/dsg/test/seven_emb/resources/images/firstmenu_Hypnotise.png", self),
-                        ImageButton(FIRST_ICON_R, FIRST_ICON_R, "/home/dsg/test/seven_emb/resources/images/firstmenu_Tools.png", self)]
+        self.iconBTN = [ImageButton(FIRST_ICON_R, FIRST_ICON_R, "resources/images/firstmenu_Meditation.png", self),
+                        ImageButton(FIRST_ICON_R, FIRST_ICON_R, "resources/images/firstmenu_Hypnotise.png", self),
+                        ImageButton(FIRST_ICON_R, FIRST_ICON_R, "resources/images/firstmenu_Tools.png", self)]
         #icon名称
         self.txtQLabel = [QLabel(self),
                           QLabel(self),
@@ -276,7 +278,7 @@ class TopBarDisplayWidget(QWidget):
         
         #状态栏显示
         self.status_label = QLabel(self)
-        self.status_pixmap = QPixmap("/home/dsg/test/seven_emb/resources/images/topbar_wifiConnected.png")
+        self.status_pixmap = QPixmap("resources/images/topbar_wifiConnected.png")
         self.status_label.setGeometry(WINDOW_W//2+FIRST_TOPRTC_W*2, WINDOW_W//120, FIRST_STATUS_W, FIRST_STATUS_H)
         self.status_pixmap = self.status_pixmap.scaled(FIRST_STATUS_H, FIRST_STATUS_H*2//3, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         self.status_label.setPixmap(self.status_pixmap)  
@@ -327,12 +329,12 @@ class BottomBarDisplayWidget(QWidget):
         self.update_time()  
         
         # 绘制播放按钮
-        self.playbutton = ImageButton(BOTBAR_BTN_R, BOTBAR_BTN_R, "/home/dsg/test/seven_emb/resources/images/bottombar_playButton.png", self)
+        self.playbutton = ImageButton(BOTBAR_BTN_R, BOTBAR_BTN_R, "resources/images/bottombar_playButton.png", self)
         self.playbutton.setGeometry((self.size().width()-BOTBAR_BTN_R)//2, (self.size().height() - BOTBAR_BTN_R)//2, BOTBAR_BTN_R, BOTBAR_BTN_R)  # 设置按钮位置和大小
         self.playbutton.clicked.connect(self.playClicked)
         self.playbutton.hide()
         # 绘制停止按钮
-        self.stopbutton = ImageButton(BOTBAR_BTN_R, BOTBAR_BTN_R, "/home/dsg/test/seven_emb/resources/images/bottombar_stop.png", self)
+        self.stopbutton = ImageButton(BOTBAR_BTN_R, BOTBAR_BTN_R, "resources/images/bottombar_stop.png", self)
         self.stopbutton.setGeometry((self.size().width()-BOTBAR_BTN_R)//2, (self.size().height() - BOTBAR_BTN_R)//2, BOTBAR_BTN_R, BOTBAR_BTN_R)  # 设置按钮位置和大小
         self.stopbutton.clicked.connect(self.stopClicked)
         self.stopbutton.hide()
@@ -720,20 +722,20 @@ class MainWindow(QMainWindow):
         self.curr_SecondMenu = self.SecondMenuGrp[self.SecondMenuIndex]
         if self.SecondMenuIndex == len(coacher) - 1:
             if self.SecondMenuIndex == 0:
-                self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftSingleArrow.png")
+                self.leftBtn.image = QPixmap("resources/images/leftSingleArrow.png")
             else:
-                self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftDoubleArrow.png")
+                self.leftBtn.image = QPixmap("resources/images/leftDoubleArrow.png")
             self.leftBtn.show()
             self.rightBtn.hide()
         elif self.SecondMenuIndex == 0:
-            self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftSingleArrow.png")
+            self.leftBtn.image = QPixmap("resources/images/leftSingleArrow.png")
             self.leftBtn.show()
-            self.rightBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/rightDoubleArrow.png")
+            self.rightBtn.image = QPixmap("resources/images/rightDoubleArrow.png")
             self.rightBtn.show()
         else:
-            self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftDoubleArrow.png")
+            self.leftBtn.image = QPixmap("resources/images/leftDoubleArrow.png")
             self.leftBtn.show()
-            self.rightBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/rightDoubleArrow.png")
+            self.rightBtn.image = QPixmap("resources/images/rightDoubleArrow.png")
             self.rightBtn.show()
         
     
@@ -818,7 +820,7 @@ class MainWindow(QMainWindow):
             # print(self.firstMenu.pos().x())
             self.BottomBar.hide()
             self.TopBar.time_label.show()
-            self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftSingleArrow.png")
+            self.leftBtn.image = QPixmap("resources/images/leftSingleArrow.png")
             self.leftBtn.show()
         else:
             self.leftBtn.hide()
@@ -831,9 +833,9 @@ class MainWindow(QMainWindow):
             self.BottomBar.time_label.hide()
             self.BottomBar.playbutton.show()
             self.BottomBar.show()
-            self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftSingleArrow.png")
+            self.leftBtn.image = QPixmap("resources/images/leftSingleArrow.png")
             self.leftBtn.show()
-            self.rightBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/rightDoubleArrow.png")
+            self.rightBtn.image = QPixmap("resources/images/rightDoubleArrow.png")
             self.rightBtn.show()
             self.menu_flag = 2
             
