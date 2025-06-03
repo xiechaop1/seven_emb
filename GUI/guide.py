@@ -113,12 +113,44 @@ class BaseGuidePage(QWidget):
         self.back_btn = CustomButton(200, 60, self.button_container)
         self.back_btn.setText("返回")
         self.back_btn.setGeometry((WINDOW_W-600)//2, 0, 200, 60)
+        self.back_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #4a4a4a;
+                color: white;
+                border: none;
+                border-radius: 30px;
+                font-size: 20px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #5a5a5a;
+            }
+            QPushButton:pressed {
+                background-color: #3a3a3a;
+            }
+        """)
         self.back_btn.clicked.connect(self.back_clicked.emit)
         
         # 创建下一步按钮
         self.next_btn = CustomButton(200, 60, self.button_container)
         self.next_btn.setText("下一步")
         self.next_btn.setGeometry((WINDOW_W+200)//2, 0, 200, 60)
+        self.next_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #4a4a4a;
+                color: white;
+                border: none;
+                border-radius: 30px;
+                font-size: 20px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #5a5a5a;
+            }
+            QPushButton:pressed {
+                background-color: #3a3a3a;
+            }
+        """)
         self.next_btn.clicked.connect(self.next_clicked.emit)
 
 class WelcomePage(BaseGuidePage):
@@ -137,12 +169,47 @@ class LanguagePage(BaseGuidePage):
         self.language_group = QButtonGroup(self)
         languages = ["英语", "中文", "日语", "法语"]
         
+        # 创建语言选择容器
+        self.language_container = QWidget(self)
+        self.language_container.setGeometry((WINDOW_W-400)//2, 300, 400, 300)
+        
+        # 创建单选按钮
         for i, lang in enumerate(languages):
-            radio = QRadioButton(lang, self)
-            radio.setGeometry((WINDOW_W-200)//2, 300+i*60, 200, 50)
-            radio.setStyleSheet("color: white; font-size: 24px;")
+            radio = QRadioButton(lang, self.language_container)
+            radio.setGeometry(0, i*60, 400, 50)
+            radio.setStyleSheet("""
+                QRadioButton {
+                    color: white;
+                    font-size: 24px;
+                    padding: 10px;
+                }
+                QRadioButton::indicator {
+                    width: 30px;
+                    height: 30px;
+                }
+                QRadioButton::indicator:unchecked {
+                    border: 2px solid #4a4a4a;
+                    border-radius: 15px;
+                    background-color: #2a2a2a;
+                }
+                QRadioButton::indicator:checked {
+                    border: 2px solid #4a4a4a;
+                    border-radius: 15px;
+                    background-color: #4a4a4a;
+                }
+            """)
             self.language_group.addButton(radio, i)
             radio.show()
+            
+        # 修改下一步按钮的启用状态
+        self.next_btn.setEnabled(False)
+        
+        # 连接信号
+        self.language_group.buttonClicked.connect(self.update_next_button)
+        
+    def update_next_button(self):
+        """更新下一步按钮状态"""
+        self.next_btn.setEnabled(True)
 
 class DatePage(BaseGuidePage):
     def __init__(self, parent=None):
