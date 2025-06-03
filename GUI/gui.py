@@ -12,6 +12,9 @@ from GUI.buttons import CustomButton , ImageButton
 import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
+# 定义资源根目录
+RESOURCE_ROOT = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'resources')
+
 WINDOW_W = 1080
 WINDOW_H = 1080
 FIRST_ICON_R = 150
@@ -52,8 +55,10 @@ VOICE_DETECTING_ICON_BOTGAP = 100
 
 
 coacher = ["Guruji", "Guruji"]
-coacherHead = ["resources/images/secondhead_guruji.png", 
-               "resources/images/secondhead_guruji.png"]
+coacherHead = [
+    os.path.join(RESOURCE_ROOT, "images/secondhead_guruji.png"),
+    os.path.join(RESOURCE_ROOT, "images/secondhead_guruji.png")
+]
 coacherBackground = ["resources/images/secondback_guruji.jpg", 
                      "resources/images/zeroback_sun.jpg"]
 coacherGuideTxt = ["    As the day comes to an end, release yourself\nfrom the busyness and allow your body and mind\nto fully relax. Close your eyes, gently bid farewell\nto today, and drift into a peaceful dream.",
@@ -422,10 +427,10 @@ class VoiceDetectingWidget(QWidget):
         self.current_index = (self.current_index + 1) % self.total_images              
         
 class GuidePage(QWidget):
-    """引导页面的基类"""
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setup_ui()
+        self.setup_style()
         
     def setup_ui(self):
         self.layout = QVBoxLayout(self)
@@ -443,6 +448,45 @@ class GuidePage(QWidget):
         desc.setAlignment(Qt.AlignCenter)
         desc.setWordWrap(True)
         self.layout.addWidget(desc)
+
+    def setup_style(self):
+        # 设置背景
+        self.setStyleSheet("""
+            QWidget {
+                background-color: rgba(0, 0, 0, 0.8);
+            }
+            QPushButton {
+                background-color: #4a90e2;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+            QPushButton:hover {
+                background-color: #357abd;
+            }
+            QLabel {
+                color: white;
+            }
+            QRadioButton {
+                color: white;
+                font-size: 16px;
+            }
+            QSlider::groove:horizontal {
+                border: 1px solid #999999;
+                height: 8px;
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);
+                margin: 2px 0;
+            }
+            QSlider::handle:horizontal {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);
+                border: 1px solid #5c5c5c;
+                width: 18px;
+                margin: -2px 0;
+                border-radius: 3px;
+            }
+        """)
 
 class WelcomePage(GuidePage):
     """欢迎页面"""
@@ -551,6 +595,7 @@ class GuideSystem(QStackedWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setup_pages()
+        self.setup_animations()
         
     def setup_pages(self):
         # 添加所有引导页面
@@ -565,15 +610,37 @@ class GuideSystem(QStackedWidget):
         for page in self.pages:
             self.addWidget(page)
             
+    def setup_animations(self):
+        # 创建页面切换动画
+        self.page_animation = QPropertyAnimation(self, b"pos")
+        self.page_animation.setDuration(300)
+        self.page_animation.setEasingCurve(QEasingCurve.InOutCubic)
+        
     def next_page(self):
         current = self.currentIndex()
         if current < self.count() - 1:
-            self.setCurrentIndex(current + 1)
+            # 设置动画
+            self.page_animation.setStartValue(self.pos())
+            self.page_animation.setEndValue(QPoint(-self.width(), 0))
+            self.page_animation.finished.connect(lambda: self._finish_next_page(current + 1))
+            self.page_animation.start()
             
+    def _finish_next_page(self, next_index):
+        self.setCurrentIndex(next_index)
+        self.move(0, 0)
+        
     def prev_page(self):
         current = self.currentIndex()
         if current > 0:
-            self.setCurrentIndex(current - 1)
+            # 设置动画
+            self.page_animation.setStartValue(self.pos())
+            self.page_animation.setEndValue(QPoint(self.width(), 0))
+            self.page_animation.finished.connect(lambda: self._finish_prev_page(current - 1))
+            self.page_animation.start()
+            
+    def _finish_prev_page(self, prev_index):
+        self.setCurrentIndex(prev_index)
+        self.move(0, 0)
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -659,7 +726,8 @@ class MainWindow(QMainWindow):
         
         # 添加引导系统
         self.guide_system = GuideSystem(self)
-        self.guide_system.hide()  # 初始隐藏
+        self.guide_system.setGeometry(0, 0, WINDOW_W, WINDOW_H)  # 设置引导系统的大小
+        self.show_guide()  # 主动显示引导系统
         
     def messageHandler(self, text):
         if text == "voice appear":
@@ -1007,6 +1075,18 @@ class MainWindow(QMainWindow):
     def show_guide(self):
         self.guide_system.show()
         self.guide_system.raise_()
+        # 隐藏其他界面元素
+        self.initBG.hide()
+        self.firstBG.hide()
+        self.firstMenu.hide()
+        self.TopBar.hide()
+        self.BottomBar.hide()
+        
+    def hide_guide(self):
+        self.guide_system.hide()
+        # 显示主界面
+        self.initBG.show()
+        self.animation_init.start()
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
