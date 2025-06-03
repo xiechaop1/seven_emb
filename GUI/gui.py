@@ -160,6 +160,10 @@ class LogoPage(GuidePage):
             self.timer.timeout.connect(self.check_video_end)
             self.timer.start(1000)
             
+            # 隐藏导航按钮
+            self.back_btn.hide()
+            self.next_btn.hide()
+            
         except Exception as e:
             print(f"视频播放失败: {e}")
             self.show_static_logo()
@@ -177,13 +181,19 @@ class LogoPage(GuidePage):
             logo.setAlignment(Qt.AlignCenter)
             logo.setGeometry(0, 0, WINDOW_W, WINDOW_H)
             
+        # 隐藏导航按钮
+        self.back_btn.hide()
+        self.next_btn.hide()
+            
         QTimer.singleShot(3000, lambda: self.next_clicked.emit())
         
     def check_video_end(self):
         try:
             if self.player.get_state() == vlc.State.Ended:
+                print("视频播放结束，切换到下一页")  # 添加调试信息
                 self.next_clicked.emit()
-        except:
+        except Exception as e:
+            print(f"检查视频状态时出错: {e}")  # 添加调试信息
             self.next_clicked.emit()
 
 class WelcomePage(GuidePage):
@@ -887,16 +897,20 @@ class GuideSystem(QWidget):
         # 连接页面导航信号
         for i, page in enumerate(self.pages):
             if i > 0:  # 除了第一页，所有页面都需要返回按钮
-                page.back_clicked.connect(lambda: self.show_page(self.page_container.currentIndex() - 1))
+                page.back_clicked.connect(lambda checked, idx=i-1: self.show_page(idx))
             if i < len(self.pages) - 1:  # 除了最后一页，所有页面都需要下一步按钮
-                page.next_clicked.connect(lambda: self.show_page(self.page_container.currentIndex() + 1))
+                page.next_clicked.connect(lambda checked, idx=i+1: self.show_page(idx))
                 
         # 连接最后一页的完成信号
         self.pages[-1].finished.connect(self.on_guide_finished)
         
+        # 显示第一页
+        self.show_page(0)
+        
     def show_page(self, index):
         if 0 <= index < len(self.pages):
             self.page_container.setCurrentIndex(index)
+            print(f"切换到页面 {index}")  # 添加调试信息
             
     def on_guide_finished(self):
         self.parent().hide_guide()
