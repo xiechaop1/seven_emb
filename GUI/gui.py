@@ -424,33 +424,33 @@ class VoiceDetectingWidget(QWidget):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setFixedSize(WINDOW_W, WINDOW_H) #设置主窗口固定大小
-        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint) #把窗口设置为“无边框且总在最前面”的窗口
+        self.setFixedSize(WINDOW_W, WINDOW_H)
+        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         self.setCursor(Qt.BlankCursor)
         
         self.ClickStartPos = None
         self.DraggingFlag = False
-        #加载字体
-        font_db = QFontDatabase()
-        font_db.addApplicationFont("resources/fonts/PingFang_Regular.ttf")#"PingFang SC Regular"
-        font_db.addApplicationFont("resources/fonts/PingFang_Bold.ttf")#"PingFang SC Bold"
-        font_db.addApplicationFont("resources/fonts/PingFang_Light.ttf")#"PingFang SC Light"
-        font_db.addApplicationFont("resources/fonts/SourceHanSerifCN-Heavy-4.otf")#"Source Han Serif CN"
-        font_db.addApplicationFont("resources/fonts/SourceHanSerifCN-Bold-2.otf")#"Source Han Serif CN"
-        #菜单级数标识
-        self.menu_flag = 0    
         
-        # self.Container = QStackedWidget(self)
-        # self.Container.setGeometry(0,0,WINDOW_W, WINDOW_H)
-        # self.scene = QGraphicsScene()
-        # self.setScene(self.scene)
+        # 加载字体
+        font_db = QFontDatabase()
+        font_db.addApplicationFont("resources/fonts/PingFang_Regular.ttf")
+        font_db.addApplicationFont("resources/fonts/PingFang_Bold.ttf")
+        font_db.addApplicationFont("resources/fonts/PingFang_Light.ttf")
+        font_db.addApplicationFont("resources/fonts/SourceHanSerifCN-Heavy-4.otf")
+        font_db.addApplicationFont("resources/fonts/SourceHanSerifCN-Bold-2.otf")
+        
+        # 菜单级数标识
+        self.menu_flag = 0
+        
+        # 创建引导页面
+        self.guide_page = GuidePage(self)
+        self.guide_page.hide()
+        
         # 创建初始界面
         self.initBG = QLabel(self)
         self.initBG.setPixmap(QPixmap("resources/images/zeroback_sun.jpg").scaled(self.size(), Qt.IgnoreAspectRatio))
         self.initBG.setGeometry(0, 0, self.width(), self.height())
-        # self.initRect = QGraphicsRectItem(self.initBG)
-        # self.initBG.hide()
-             
+        
         # 创建一级界面
         self.firstBG = QLabel(self)
         self.firstBG.setGeometry(0, 0, self.width(), self.height())
@@ -458,14 +458,14 @@ class MainWindow(QMainWindow):
         self.firstBGMovie = QMovie("resources/images/firstback_fire.gif")
         self.firstBG.setMovie(self.firstBGMovie)
         self.firstBGMovie.start()
-        self.firstBG.hide()         
+        self.firstBG.hide()
+        
         self.firstMenu = FirstWidget(self)
-        self.firstMenu.setGeometry(self.width(), 0, self.width(), self.height()) 
-        # self.firstMenu.hide() 
-
-        # 创建二级界面 
-        self.SecondMenuIndex = 0 #当前二级菜单页序数     
-        self.SecondMenuGrp = [] #二级菜单子项列表
+        self.firstMenu.setGeometry(self.width(), 0, self.width(), self.height())
+        
+        # 创建二级界面
+        self.SecondMenuIndex = 0
+        self.SecondMenuGrp = []
         for i in range(len(coacher)):
             self.SecondMenuGrp.append(SecondWidget(i,self))
             if i == 0:
@@ -473,35 +473,49 @@ class MainWindow(QMainWindow):
         self.curr_SecondMenu = self.SecondMenuGrp[self.SecondMenuIndex]
         self.next_SecondMenu = self.SecondMenuGrp[self.SecondMenuIndex+1]
         
-        # #创建三级场景界面
+        # 创建三级场景界面
         self.thirdBG = QLabel(self)
         self.thirdBG.setGeometry(0, 0, self.width(), self.height())
         self.thirdBG.setScaledContents(True)
-        # self.thirdBGMovie = QMovie("resources/images/third_starsky.gif")
-        # self.thirdBG.setMovie(self.thirdBGMovie)
-        # self.thirdBGMovie.start()
         self.thirdBG.hide()
         
         # 创建topBar
-        self.TopBar = TopBarDisplayWidget(self) 
-        # self.TopBar.hide()       
+        self.TopBar = TopBarDisplayWidget(self)
+        
         # 创建BottomBar
         self.BottomBar = BottomBarDisplayWidget(self)
+        
         # 创建左右按钮
         self.leftBtn = ImageButton(GUIDE_BTN_W,GUIDE_BTN_H,"resources/images/leftSingleArrow.png",self)
         self.leftBtn.clicked.connect(self.leftArrowClicked)
         self.leftBtn.move(GUIDE_BTN_W//2, (WINDOW_H - GUIDE_BTN_H)//2)
         self.leftBtn.hide()
+        
         self.rightBtn = ImageButton(GUIDE_BTN_W,GUIDE_BTN_H,"resources/images/rightSingleArrow.png",self)
         self.rightBtn.clicked.connect(self.rightArrowClicked)
-        self.rightBtn.move(WINDOW_W - GUIDE_BTN_W - GUIDE_BTN_W//2, (WINDOW_H - GUIDE_BTN_H)//2) 
+        self.rightBtn.move(WINDOW_W - GUIDE_BTN_W - GUIDE_BTN_W//2, (WINDOW_H - GUIDE_BTN_H)//2)
         self.rightBtn.hide()
-        # 创建语音交互图层       
+        
+        # 创建语音交互图层
         self.voiceDetectingPage = VoiceDetectingWidget("resources/images/voiceDynamicImage", 100, self)
         self.voiceDetectingPage.hide()
         
-        #添加动画效果
+        # 添加动画效果
         self.AnimationFlash()
+        
+        # 显示引导页面
+        self.show_guide()
+        
+    def show_guide(self):
+        """显示引导页面"""
+        self.guide_page.show()
+        self.guide_page.raise_()
+        
+    def show_main_interface(self):
+        """显示主界面"""
+        self.guide_page.hide()
+        self.initBG.show()
+        self.animation_init.start()
         
     def messageHandler(self, text):
         if text == "voice appear":
