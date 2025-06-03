@@ -67,6 +67,429 @@ coacherMovie = [["resources/images/third_breath.gif", "resources/images/third_st
 class Communicator(QObject):
     message = pyqtSignal(str)
 
+class GuidePage(QWidget):
+    back_clicked = pyqtSignal()
+    next_clicked = pyqtSignal()
+    finished = pyqtSignal()
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        
+    def setup_ui(self):
+        self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(0)
+        
+        # 创建背景
+        self.background = QLabel(self)
+        self.background.setPixmap(QPixmap(os.path.join(RESOURCE_ROOT, "images/background.jpg")).scaled(WINDOW_W, WINDOW_H))
+        self.background.setGeometry(0, 0, WINDOW_W, WINDOW_H)
+        
+        # 创建内容容器
+        self.content = QWidget(self)
+        self.content.setGeometry(0, 0, WINDOW_W, WINDOW_H)
+        self.content_layout = QVBoxLayout(self.content)
+        
+        # 创建导航按钮容器
+        self.nav_container = QWidget(self)
+        self.nav_container.setGeometry(0, WINDOW_H - 100, WINDOW_W, 100)
+        self.nav_layout = QHBoxLayout(self.nav_container)
+        
+        # 创建导航按钮
+        self.back_btn = CustomButton(150, 50, self.nav_container)
+        self.back_btn.setText("返回")
+        self.back_btn.clicked.connect(self.back_clicked.emit)
+        
+        self.next_btn = CustomButton(150, 50, self.nav_container)
+        self.next_btn.setText("下一步")
+        self.next_btn.clicked.connect(self.next_clicked.emit)
+        
+        self.nav_layout.addWidget(self.back_btn)
+        self.nav_layout.addStretch()
+        self.nav_layout.addWidget(self.next_btn)
+        
+    def add_title(self, text):
+        title = QLabel(text)
+        title.setFont(QFont("Source Han Serif CN", 36))
+        title.setStyleSheet("color: white;")
+        title.setAlignment(Qt.AlignCenter)
+        self.content_layout.addWidget(title)
+        
+    def add_description(self, text):
+        desc = QLabel(text)
+        desc.setFont(QFont("PingFang SC", 18))
+        desc.setStyleSheet("color: white;")
+        desc.setAlignment(Qt.AlignCenter)
+        desc.setWordWrap(True)
+        self.content_layout.addWidget(desc)
+
+class LogoPage(GuidePage):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_video()
+        
+    def setup_video(self):
+        try:
+            # 创建VLC实例
+            self.instance = vlc.Instance('--no-audio')
+            self.player = self.instance.media_player_new()
+            
+            # 创建视频显示区域
+            self.video_widget = QWidget(self)
+            self.video_widget.setGeometry(0, 0, WINDOW_W, WINDOW_H)
+            
+            # 根据平台设置视频输出
+            if sys.platform.startswith('linux'):
+                self.player.set_xwindow(self.video_widget.winId())
+            elif sys.platform == "win32":
+                self.player.set_hwnd(self.video_widget.winId())
+            elif sys.platform == "darwin":
+                self.player.set_nsobject(int(self.video_widget.winId()))
+            
+            # 加载并播放视频
+            self.media = self.instance.media_new(os.path.join(RESOURCE_ROOT, "video/main.mp4"))
+            self.player.set_media(self.media)
+            self.player.play()
+            
+            # 创建定时器检查视频是否结束
+            self.timer = QTimer(self)
+            self.timer.timeout.connect(self.check_video_end)
+            self.timer.start(1000)
+            
+        except Exception as e:
+            print(f"视频播放失败: {e}")
+            self.show_static_logo()
+            
+    def show_static_logo(self):
+        try:
+            logo = QLabel(self)
+            logo.setPixmap(QPixmap(os.path.join(RESOURCE_ROOT, "images/mindora_logo.png")).scaled(WINDOW_W//2, WINDOW_W//2, Qt.KeepAspectRatio))
+            logo.setAlignment(Qt.AlignCenter)
+            logo.setGeometry(0, 0, WINDOW_W, WINDOW_H)
+        except:
+            logo = QLabel("Mindora", self)
+            logo.setFont(QFont("Source Han Serif CN", 48))
+            logo.setStyleSheet("color: white;")
+            logo.setAlignment(Qt.AlignCenter)
+            logo.setGeometry(0, 0, WINDOW_W, WINDOW_H)
+            
+        QTimer.singleShot(3000, lambda: self.next_clicked.emit())
+        
+    def check_video_end(self):
+        try:
+            if self.player.get_state() == vlc.State.Ended:
+                self.next_clicked.emit()
+        except:
+            self.next_clicked.emit()
+
+class WelcomePage(GuidePage):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        
+    def setup_ui(self):
+        self.add_title("欢迎使用 Mindora")
+        self.add_description("让我们开始一段美好的旅程")
+        
+        start_btn = CustomButton(200, 60, self)
+        start_btn.setText("开始体验")
+        start_btn.clicked.connect(self.next_clicked.emit)
+        self.content_layout.addWidget(start_btn, alignment=Qt.AlignCenter)
+
+class LanguagePage(GuidePage):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        
+    def setup_ui(self):
+        self.add_title("选择语言")
+        self.add_description("请选择您偏好的语言")
+        
+        languages = ["简体中文", "English", "日本語", "한국어"]
+        self.language_group = QButtonGroup(self)
+        
+        for lang in languages:
+            radio = QRadioButton(lang)
+            radio.setFont(QFont("PingFang SC", 16))
+            radio.setStyleSheet("color: white;")
+            self.language_group.addButton(radio)
+            self.content_layout.addWidget(radio, alignment=Qt.AlignCenter)
+            
+        self.content_layout.addStretch()
+
+class DatePage(GuidePage):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        
+    def setup_ui(self):
+        self.add_title("选择日期")
+        self.add_description("请选择您想要开始体验的日期")
+        
+        self.date_combo = QComboBox()
+        self.date_combo.setFont(QFont("PingFang SC", 16))
+        self.date_combo.setStyleSheet("""
+            QComboBox {
+                color: white;
+                background-color: rgba(255, 255, 255, 0.2);
+                border: 1px solid white;
+                border-radius: 5px;
+                padding: 5px;
+            }
+            QComboBox::drop-down {
+                border: none;
+            }
+            QComboBox::down-arrow {
+                image: none;
+            }
+        """)
+        
+        # 添加日期选项（前后一年）
+        current_date = QDate.currentDate()
+        for i in range(-365, 366):
+            date = current_date.addDays(i)
+            self.date_combo.addItem(date.toString("yyyy年MM月dd日"))
+            
+        self.content_layout.addWidget(self.date_combo, alignment=Qt.AlignCenter)
+        self.content_layout.addStretch()
+
+class TimePage(GuidePage):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        
+    def setup_ui(self):
+        self.add_title("选择时间")
+        self.add_description("请选择您想要开始体验的时间")
+        
+        self.time_combo = QComboBox()
+        self.time_combo.setFont(QFont("PingFang SC", 16))
+        self.time_combo.setStyleSheet("""
+            QComboBox {
+                color: white;
+                background-color: rgba(255, 255, 255, 0.2);
+                border: 1px solid white;
+                border-radius: 5px;
+                padding: 5px;
+            }
+            QComboBox::drop-down {
+                border: none;
+            }
+            QComboBox::down-arrow {
+                image: none;
+            }
+        """)
+        
+        # 添加时间选项（5分钟间隔）
+        for hour in range(24):
+            for minute in range(0, 60, 5):
+                time = QTime(hour, minute)
+                self.time_combo.addItem(time.toString("HH:mm"))
+                
+        self.content_layout.addWidget(self.time_combo, alignment=Qt.AlignCenter)
+        self.content_layout.addStretch()
+
+class ReligionPage(GuidePage):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        
+    def setup_ui(self):
+        self.add_title("选择信仰")
+        self.add_description("请选择您的信仰（可选）")
+        
+        religions = ["无", "佛教", "基督教", "伊斯兰教", "印度教", "其他"]
+        self.religion_group = QButtonGroup(self)
+        
+        for religion in religions:
+            radio = QRadioButton(religion)
+            radio.setFont(QFont("PingFang SC", 16))
+            radio.setStyleSheet("color: white;")
+            self.religion_group.addButton(radio)
+            self.content_layout.addWidget(radio, alignment=Qt.AlignCenter)
+            
+        self.content_layout.addStretch()
+
+class StressLevelPage(GuidePage):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        
+    def setup_ui(self):
+        self.add_title("压力水平")
+        self.add_description("请评估您当前的压力水平")
+        
+        self.slider = QSlider(Qt.Horizontal)
+        self.slider.setMinimum(0)
+        self.slider.setMaximum(10)
+        self.slider.setValue(5)
+        self.slider.setStyleSheet("""
+            QSlider::groove:horizontal {
+                border: 1px solid white;
+                height: 8px;
+                background: rgba(255, 255, 255, 0.2);
+                margin: 2px 0;
+            }
+            QSlider::handle:horizontal {
+                background: white;
+                border: 1px solid white;
+                width: 18px;
+                margin: -2px 0;
+                border-radius: 9px;
+            }
+        """)
+        
+        self.value_label = QLabel("5")
+        self.value_label.setFont(QFont("PingFang SC", 16))
+        self.value_label.setStyleSheet("color: white;")
+        self.value_label.setAlignment(Qt.AlignCenter)
+        
+        self.slider.valueChanged.connect(lambda v: self.value_label.setText(str(v)))
+        
+        self.content_layout.addWidget(self.slider)
+        self.content_layout.addWidget(self.value_label)
+        self.content_layout.addStretch()
+
+class SleepQualityPage(GuidePage):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        
+    def setup_ui(self):
+        self.add_title("睡眠质量")
+        self.add_description("请评估您过去一周的睡眠质量")
+        
+        self.slider = QSlider(Qt.Horizontal)
+        self.slider.setMinimum(0)
+        self.slider.setMaximum(10)
+        self.slider.setValue(5)
+        self.slider.setStyleSheet("""
+            QSlider::groove:horizontal {
+                border: 1px solid white;
+                height: 8px;
+                background: rgba(255, 255, 255, 0.2);
+                margin: 2px 0;
+            }
+            QSlider::handle:horizontal {
+                background: white;
+                border: 1px solid white;
+                width: 18px;
+                margin: -2px 0;
+                border-radius: 9px;
+            }
+        """)
+        
+        self.value_label = QLabel("5")
+        self.value_label.setFont(QFont("PingFang SC", 16))
+        self.value_label.setStyleSheet("color: white;")
+        self.value_label.setAlignment(Qt.AlignCenter)
+        
+        self.slider.valueChanged.connect(lambda v: self.value_label.setText(str(v)))
+        
+        self.content_layout.addWidget(self.slider)
+        self.content_layout.addWidget(self.value_label)
+        self.content_layout.addStretch()
+
+class ProblemSelectionPage(GuidePage):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        
+    def setup_ui(self):
+        self.add_title("问题选择")
+        self.add_description("请选择您希望通过 Mindora 解决的问题（可多选）")
+        
+        problems = [
+            "睡眠问题",
+            "压力管理",
+            "焦虑缓解",
+            "情绪调节",
+            "专注力提升",
+            "冥想练习"
+        ]
+        
+        for problem in problems:
+            checkbox = QCheckBox(problem)
+            checkbox.setFont(QFont("PingFang SC", 16))
+            checkbox.setStyleSheet("color: white;")
+            self.content_layout.addWidget(checkbox, alignment=Qt.AlignCenter)
+            
+        self.content_layout.addStretch()
+
+class MentorSelectionPage(GuidePage):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        
+    def setup_ui(self):
+        self.add_title("选择导师")
+        self.add_description("请选择一位导师，您可以点击播放按钮聆听他们的介绍")
+        
+        mentors = [
+            {
+                "name": "Guruji",
+                "image": "resources/images/secondhead_guruji.png",
+                "audio": "resources/audio/guruji_intro.mp3"
+            },
+            {
+                "name": "Sun",
+                "image": "resources/images/secondhead_sun.png",
+                "audio": "resources/audio/sun_intro.mp3"
+            }
+        ]
+        
+        self.mentor_group = QButtonGroup(self)
+        
+        for mentor in mentors:
+            container = QWidget()
+            layout = QVBoxLayout(container)
+            
+            radio = QRadioButton(mentor["name"])
+            radio.setFont(QFont("PingFang SC", 16))
+            radio.setStyleSheet("color: white;")
+            self.mentor_group.addButton(radio)
+            
+            image = QLabel()
+            image.setPixmap(QPixmap(mentor["image"]).scaled(200, 200, Qt.KeepAspectRatio))
+            
+            play_btn = CustomButton(100, 40, container)
+            play_btn.setText("播放")
+            play_btn.clicked.connect(lambda checked, a=mentor["audio"]: self.play_audio(a))
+            
+            layout.addWidget(radio, alignment=Qt.AlignCenter)
+            layout.addWidget(image, alignment=Qt.AlignCenter)
+            layout.addWidget(play_btn, alignment=Qt.AlignCenter)
+            
+            self.content_layout.addWidget(container)
+            
+        self.content_layout.addStretch()
+        
+    def play_audio(self, audio_file):
+        # 这里需要实现音频播放功能
+        pass
+
+class CompletionPage(GuidePage):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        
+    def setup_ui(self):
+        self.add_title("设置完成")
+        self.add_description("感谢您完成初始设置，现在您可以开始使用 Mindora 了")
+        
+        # 显示产品信息
+        info = QLabel()
+        info.setPixmap(QPixmap(os.path.join(RESOURCE_ROOT, "images/product_guide.png")).scaled(WINDOW_W//2, WINDOW_W//2, Qt.KeepAspectRatio))
+        info.setAlignment(Qt.AlignCenter)
+        
+        start_btn = CustomButton(200, 60, self)
+        start_btn.setText("开始体验")
+        start_btn.clicked.connect(self.finished.emit)
+        
+        self.content_layout.addWidget(info)
+        self.content_layout.addWidget(start_btn, alignment=Qt.AlignCenter)
+
 class FirstWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -423,6 +846,58 @@ class VoiceDetectingWidget(QWidget):
         self.label.setPixmap(pixmap)
         self.current_index = (self.current_index + 1) % self.total_images              
         
+class GuideSystem(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        self.setup_pages()
+        
+    def setup_ui(self):
+        self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(0)
+        
+        # 创建页面容器
+        self.page_container = QStackedWidget()
+        self.layout.addWidget(self.page_container)
+        
+    def setup_pages(self):
+        # 创建所有引导页面
+        self.pages = [
+            LogoPage(),
+            WelcomePage(),
+            LanguagePage(),
+            DatePage(),
+            TimePage(),
+            ReligionPage(),
+            StressLevelPage(),
+            SleepQualityPage(),
+            ProblemSelectionPage(),
+            MentorSelectionPage(),
+            CompletionPage()
+        ]
+        
+        # 添加页面到容器
+        for page in self.pages:
+            self.page_container.addWidget(page)
+            
+        # 连接页面导航信号
+        for i, page in enumerate(self.pages):
+            if i > 0:  # 除了第一页，所有页面都需要返回按钮
+                page.back_clicked.connect(lambda: self.show_page(self.page_container.currentIndex() - 1))
+            if i < len(self.pages) - 1:  # 除了最后一页，所有页面都需要下一步按钮
+                page.next_clicked.connect(lambda: self.show_page(self.page_container.currentIndex() + 1))
+                
+        # 连接最后一页的完成信号
+        self.pages[-1].finished.connect(self.on_guide_finished)
+        
+    def show_page(self, index):
+        if 0 <= index < len(self.pages):
+            self.page_container.setCurrentIndex(index)
+            
+    def on_guide_finished(self):
+        self.parent().hide_guide()
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
