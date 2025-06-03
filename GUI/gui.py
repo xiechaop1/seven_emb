@@ -488,6 +488,46 @@ class GuidePage(QWidget):
             }
         """)
 
+class LogoPage(GuidePage):
+    """开机LOGO视频播放页面"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        
+    def setup_ui(self):
+        # 创建视频播放器
+        self.instance = vlc.Instance()
+        self.player = self.instance.media_player_new()
+        
+        # 创建视频显示区域
+        self.video_widget = QWidget(self)
+        self.video_widget.setGeometry(0, 0, WINDOW_W, WINDOW_H)
+        
+        # 设置视频输出到widget
+        if sys.platform.startswith('linux'):  # for Linux using the X Server
+            self.player.set_xwindow(self.video_widget.winId())
+        elif sys.platform == "win32":  # for Windows
+            self.player.set_hwnd(self.video_widget.winId())
+        elif sys.platform == "darwin":  # for MacOS
+            self.player.set_nsobject(int(self.video_widget.winId()))
+            
+        # 加载视频
+        media = self.instance.media_new("resources/video/mindora_logo.mp4")
+        self.player.set_media(media)
+        
+        # 播放视频
+        self.player.play()
+        
+        # 视频播放完成后自动进入下一页
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.check_video_end)
+        self.timer.start(1000)  # 每秒检查一次
+        
+    def check_video_end(self):
+        if self.player.get_state() == vlc.State.Ended:
+            self.timer.stop()
+            self.parent().next_page()
+
 class WelcomePage(GuidePage):
     """欢迎页面"""
     def __init__(self, parent=None):
@@ -528,24 +568,53 @@ class LanguagePage(GuidePage):
         self.layout.addLayout(nav_layout)
 
 class DateTimePage(GuidePage):
-    """日期时间选择页面"""
+    """日期选择页面"""
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.add_title("请选择您当前所在地的日期和时间")
+        self.add_title("请选择您当前所在地的日期")
         
         # 日期选择
         date_layout = QHBoxLayout()
         self.date_combo = QComboBox()
         # 添加日期选项
+        current_date = QDate.currentDate()
+        for i in range(-365, 366):  # 前后一年的日期
+            date = current_date.addDays(i)
+            self.date_combo.addItem(date.toString("yyyy-MM-dd"))
+        self.date_combo.setCurrentText(current_date.toString("yyyy-MM-dd"))
         date_layout.addWidget(self.date_combo)
+        
+        self.layout.addLayout(date_layout)
+        
+        # 导航按钮
+        nav_layout = QHBoxLayout()
+        back_btn = QPushButton("返回")
+        next_btn = QPushButton("下一步")
+        back_btn.clicked.connect(self.parent().prev_page)
+        next_btn.clicked.connect(self.parent().next_page)
+        nav_layout.addWidget(back_btn)
+        nav_layout.addWidget(next_btn)
+        self.layout.addLayout(nav_layout)
+
+class TimePage(GuidePage):
+    """时间选择页面"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.add_title("请选择您当前所在地的时间")
         
         # 时间选择
         time_layout = QHBoxLayout()
         self.time_combo = QComboBox()
         # 添加时间选项
+        for hour in range(24):
+            for minute in range(0, 60, 5):  # 每5分钟一个选项
+                time_str = f"{hour:02d}:{minute:02d}"
+                self.time_combo.addItem(time_str)
+        current_time = QTime.currentTime()
+        current_time_str = current_time.toString("hh:mm")
+        self.time_combo.setCurrentText(current_time_str)
         time_layout.addWidget(self.time_combo)
         
-        self.layout.addLayout(date_layout)
         self.layout.addLayout(time_layout)
         
         # 导航按钮
@@ -590,6 +659,179 @@ class StressLevelPage(GuidePage):
         nav_layout.addWidget(next_btn)
         self.layout.addLayout(nav_layout)
 
+class ReligionPage(GuidePage):
+    """宗教选择页面"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.add_title("请选择您所在的宗教")
+        
+        # 宗教选择按钮组
+        self.religion_group = QButtonGroup(self)
+        religions = ["无宗教信仰", "佛教", "基督教", "伊斯兰教", "印度教", "其他"]
+        
+        for religion in religions:
+            btn = QRadioButton(religion)
+            btn.setFont(QFont("PingFang SC", 16))
+            self.religion_group.addButton(btn)
+            self.layout.addWidget(btn, alignment=Qt.AlignCenter)
+            
+        # 添加导航按钮
+        nav_layout = QHBoxLayout()
+        back_btn = QPushButton("返回")
+        next_btn = QPushButton("下一步")
+        back_btn.clicked.connect(self.parent().prev_page)
+        next_btn.clicked.connect(self.parent().next_page)
+        nav_layout.addWidget(back_btn)
+        nav_layout.addWidget(next_btn)
+        self.layout.addLayout(nav_layout)
+
+class SleepQualityPage(GuidePage):
+    """睡眠质量选择页面"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.add_title("请选择您近1周的睡眠质量")
+        
+        # 睡眠质量滑块
+        self.sleep_slider = QSlider(Qt.Horizontal)
+        self.sleep_slider.setMinimum(0)
+        self.sleep_slider.setMaximum(100)
+        self.sleep_slider.setValue(50)
+        
+        # 添加颜色标记
+        color_layout = QHBoxLayout()
+        colors = ["非常不好", "一般", "良好", "非常好"]
+        for color in colors:
+            label = QLabel(color)
+            label.setStyleSheet("color: white;")
+            color_layout.addWidget(label)
+            
+        self.layout.addWidget(self.sleep_slider)
+        self.layout.addLayout(color_layout)
+        
+        # 导航按钮
+        nav_layout = QHBoxLayout()
+        back_btn = QPushButton("返回")
+        next_btn = QPushButton("下一步")
+        back_btn.clicked.connect(self.parent().prev_page)
+        next_btn.clicked.connect(self.parent().next_page)
+        nav_layout.addWidget(back_btn)
+        nav_layout.addWidget(next_btn)
+        self.layout.addLayout(nav_layout)
+
+class ProblemSelectionPage(GuidePage):
+    """问题选择页面"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.add_title("请选择您希望通过Mindora帮助您解决的问题")
+        
+        # 问题选择复选框组
+        problems = [
+            "改善睡眠质量",
+            "缓解压力",
+            "提高专注力",
+            "情绪管理",
+            "冥想练习",
+            "放松身心",
+            "提高工作效率"
+        ]
+        
+        for problem in problems:
+            checkbox = QCheckBox(problem)
+            checkbox.setFont(QFont("PingFang SC", 16))
+            self.layout.addWidget(checkbox, alignment=Qt.AlignCenter)
+            
+        # 添加导航按钮
+        nav_layout = QHBoxLayout()
+        back_btn = QPushButton("返回")
+        next_btn = QPushButton("下一步")
+        back_btn.clicked.connect(self.parent().prev_page)
+        next_btn.clicked.connect(self.parent().next_page)
+        nav_layout.addWidget(back_btn)
+        nav_layout.addWidget(next_btn)
+        self.layout.addLayout(nav_layout)
+
+class MentorSelectionPage(GuidePage):
+    """导师选择页面"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.add_title("重要的一步：请选择您喜爱的流派和导师")
+        self.add_description("每个导师有独特的特长和独在的世界，您可以试听导师的自我介绍以便选择。\n当您希望更换导师时，您随时可以通过设置页面进行更换")
+        
+        # 导师选择区域
+        mentor_layout = QVBoxLayout()
+        mentors = [
+            {"name": "Guruji", "image": "resources/images/secondhead_guruji.png", "audio": "resources/audio/guruji_intro.mp3"},
+            {"name": "Sun", "image": "resources/images/secondhead_sun.png", "audio": "resources/audio/sun_intro.mp3"}
+        ]
+        
+        for mentor in mentors:
+            mentor_widget = QWidget()
+            mentor_widget.setStyleSheet("background-color: rgba(255, 255, 255, 0.1); border-radius: 10px;")
+            mentor_layout_widget = QHBoxLayout(mentor_widget)
+            
+            # 导师头像
+            image_label = QLabel()
+            pixmap = QPixmap(mentor["image"])
+            image_label.setPixmap(pixmap.scaled(100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            mentor_layout_widget.addWidget(image_label)
+            
+            # 导师信息
+            info_layout = QVBoxLayout()
+            name_label = QLabel(mentor["name"])
+            name_label.setFont(QFont("PingFang SC", 16))
+            info_layout.addWidget(name_label)
+            
+            # 试听按钮
+            listen_btn = QPushButton("试听介绍")
+            listen_btn.clicked.connect(lambda checked, audio=mentor["audio"]: self.play_audio(audio))
+            info_layout.addWidget(listen_btn)
+            
+            mentor_layout_widget.addLayout(info_layout)
+            mentor_layout.addWidget(mentor_widget)
+            
+        self.layout.addLayout(mentor_layout)
+        
+        # 添加导航按钮
+        nav_layout = QHBoxLayout()
+        back_btn = QPushButton("返回")
+        next_btn = QPushButton("下一步")
+        back_btn.clicked.connect(self.parent().prev_page)
+        next_btn.clicked.connect(self.parent().next_page)
+        nav_layout.addWidget(back_btn)
+        nav_layout.addWidget(next_btn)
+        self.layout.addLayout(nav_layout)
+        
+    def play_audio(self, audio_file):
+        # TODO: 实现音频播放功能
+        pass
+
+class CompletionPage(GuidePage):
+    """完成设置页面"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.add_title("Great！您已经完成了初始的设置")
+        
+        # 产品说明
+        description = """
+        在开始我们的旅程之前，请允许我再次向您保证，Mindora极其注重您的隐私，可以在不联网的时候使用所有能力。
+        并提供了物理按键以一键关闭系统的声音、灯光、香氛。
+        
+        您可以通过Mindora来唤醒他，也可以用触屏完成整个操作。
+        当您希望更新内容时，您可以链接WIFI，完成系统及更多新内容的下载
+        """
+        self.add_description(description)
+        
+        # 产品说明图
+        product_image = QLabel()
+        product_image.setPixmap(QPixmap("resources/images/product_guide.png").scaled(400, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        self.layout.addWidget(product_image, alignment=Qt.AlignCenter)
+        
+        # 开始按钮
+        start_btn = QPushButton("开始Mindora的体验")
+        start_btn.setFixedSize(200, 50)
+        start_btn.clicked.connect(self.parent().hide_guide)
+        self.layout.addWidget(start_btn, alignment=Qt.AlignCenter)
+
 class GuideSystem(QStackedWidget):
     """引导系统主类"""
     def __init__(self, parent=None):
@@ -600,11 +842,17 @@ class GuideSystem(QStackedWidget):
     def setup_pages(self):
         # 添加所有引导页面
         self.pages = [
+            LogoPage(self),  # 添加LOGO视频页面
             WelcomePage(self),
             LanguagePage(self),
             DateTimePage(self),
+            TimePage(self),
             StressLevelPage(self),
-            # ... 添加其他页面
+            ReligionPage(self),
+            SleepQualityPage(self),
+            ProblemSelectionPage(self),
+            MentorSelectionPage(self),
+            CompletionPage(self)
         ]
         
         for page in self.pages:

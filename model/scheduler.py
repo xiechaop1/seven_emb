@@ -19,6 +19,48 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
+class TaskAction:
+    def __init__(self, action_type: ActionType, target: str, parameters: dict = None):
+        self.action_type = action_type
+        self.target = target
+        self.parameters = parameters or {}
+
+    @classmethod
+    def create_light_action(cls, mode: str, params: dict) -> 'TaskAction':
+        """创建灯光动作"""
+        return cls(
+            action_type=ActionType.LIGHT,
+            target="light",
+            parameters={
+                "mode": mode,
+                "params": params
+            }
+        )
+
+    @classmethod
+    def create_screen_action(cls, mode: str, params: dict) -> 'TaskAction':
+        """创建屏幕动作"""
+        return cls(
+            action_type=ActionType.DISPLAY,
+            target="screen",
+            parameters={
+                "mode": mode,
+                "params": params
+            }
+        )
+
+    @classmethod
+    def create_sound_action(cls, file_path: str, volume: int = 100) -> 'TaskAction':
+        """创建声音动作"""
+        return cls(
+            action_type=ActionType.SOUND,
+            target="sound",
+            parameters={
+                "file_path": file_path,
+                "volume": volume
+            }
+        )
+
 class TaskScheduler:
     def __init__(self, storage_file, audioPlayerIns, lightIns, sprayIns):
         self.storage_file = storage_file
@@ -183,10 +225,15 @@ class TaskScheduler:
                     self._save_tasks(tasks, next_id)
                 logging.debug(f"任务状态已更新为执行中: ID={task.id}")
                 
-                # 创建动作执行线程
-                action_thread = threading.Thread(target=self._run_task, args=(task,))
-                action_thread.daemon = True
-                action_thread.start()
+                # 执行所有动作
+                actions = task.get_actions()
+                for action in actions:
+                    if action.action_type == ActionType.LIGHT:
+                        self._execute_light_action(action)
+                    elif action.action_type == ActionType.SOUND:
+                        self._execute_sound_action(action)
+                    elif action.action_type == ActionType.DISPLAY:
+                        self._execute_display_action(action)
                 
                 # 如果设置了持续时间，等待指定时间后停止
                 if task.duration is not None:
@@ -195,9 +242,6 @@ class TaskScheduler:
                     else:
                         logging.info(f"任务达到持续时间自动停止: ID={task.id}")
                     self.stop_task(task.id)
-                
-                # 等待动作执行线程完成
-                action_thread.join(timeout=1)  # 给动作线程1秒时间完成清理工作
                 
                 # 更新任务状态和结果
                 with self.lock:
@@ -286,44 +330,19 @@ class TaskScheduler:
     def _execute_light_action(self, action: TaskAction) -> dict:
         """执行灯光控制动作"""
         try:
-            params = action.get_light_params()
-            # if not params:
-            #     raise ValueError("无效的灯光参数")
-
-            # # 根据命令类型执行不同的操作
-            # if params.command == LightCommand.TURN_ON:
-            #     # TODO: 实现开灯逻辑
-            #     return {
-            #         "success": True,
-            #         "message": f"灯光已开启: {action.target}",
-            #         "parameters": params.to_dict()
-            #     }
-            # elif params.command == LightCommand.SET_BRIGHTNESS:
-            #     # TODO: 实现亮度调节逻辑
-            #     return {
-            #         "success": True,
-            #         "message": f"灯光亮度已设置为 {params.brightness}%",
-            #         "parameters": params.to_dict()
-            #     }
-            # elif params.command == LightCommand.SET_COLOR:
-            #     # TODO: 实现颜色设置逻辑
-            #     self.light.start(params.mode, )
-            #     return {
-            #         "success": True,
-            #         "message": f"灯光颜色已设置为 {params.color}",
-            #         "parameters": params.to_dict()
-            #     }
+            params = action.parameters
+            mode = params.get("mode")
+            light_params = params.get("params", {})
             
-            # ... 其他命令处理 ...
-            self.light.start(params.mode, params.params, Code.LIGHT_TYPE_TEMP)
+            if not mode:
+                raise ValueError("无效的灯光模式")
+            
+            self.light.start(mode, light_params, Code.LIGHT_TYPE_TEMP)
             
             return {
                 "success": True,
-                "message": f"灯光模式已设置为: {params.mode}",
-                "parameters": {
-                    "mode": params.mode,
-                    "params": params.params
-                }
+                "message": f"灯光模式已设置为: {mode}",
+                "parameters": params
             }
         except Exception as e:
             return {
@@ -334,27 +353,22 @@ class TaskScheduler:
     def _execute_sound_action(self, action: TaskAction) -> dict:
         """执行声音播放动作"""
         try:
-            params = action.get_sound_params()
-            if not params:
-                raise ValueError("无效的声音参数")
-
-            if params.command == SoundCommand.PLAY:
-                file_path = params.file_path
-                # self.audio_player.play_voice_with_file(file_path)
-                self.audio_player.play_music_with_file(file_path)
-                return {
-                    "success": True,
-                    "message": f"开始播放: {params.file_path}",
-                    "parameters": params.to_dict()
-                }
-            elif params.command == SoundCommand.SET_VOLUME:
-                # TODO: 实现音量调节逻辑
-                return {
-                    "success": True,
-                    "message": f"音量已设置为 {params.volume}%",
-                    "parameters": params.to_dict()
-                }
-            # ... 其他命令处理 ...
+            params = action.parameters
+            file_path = params.get("file_path")
+            volume = params.get("volume", 100)
+            
+            if not file_path:
+                raise ValueError("无效的声音文件路径")
+            
+            self.audio_player.play_music_with_file(file_path)
+            # 设置音量
+            self.audio_player.set_volume(volume)
+            
+            return {
+                "success": True,
+                "message": f"开始播放: {file_path}",
+                "parameters": params
+            }
         except Exception as e:
             return {
                 "success": False,
@@ -364,25 +378,29 @@ class TaskScheduler:
     def _execute_display_action(self, action: TaskAction) -> dict:
         """执行屏幕显示动作"""
         try:
-            params = action.get_display_params()
-            if not params:
-                raise ValueError("无效的显示参数")
-
-            if params.command == DisplayCommand.SHOW_TEXT:
-                # TODO: 实现文本显示逻辑
-                return {
-                    "success": True,
-                    "message": f"显示文本: {params.content}",
-                    "parameters": params.to_dict()
-                }
-            elif params.command == DisplayCommand.SHOW_IMAGE:
-                # TODO: 实现图片显示逻辑
-                return {
-                    "success": True,
-                    "message": f"显示图片: {params.image_path}",
-                    "parameters": params.to_dict()
-                }
-            # ... 其他命令处理 ...
+            params = action.parameters
+            mode = params.get("mode")
+            display_params = params.get("params", {})
+            
+            if not mode:
+                raise ValueError("无效的显示模式")
+            
+            # 根据模式执行不同的显示效果
+            if mode == "animation":
+                # 播放动画
+                pass
+            elif mode == "text":
+                # 显示文本
+                pass
+            elif mode == "image":
+                # 显示图片
+                pass
+            
+            return {
+                "success": True,
+                "message": f"显示模式已设置为: {mode}",
+                "parameters": params
+            }
         except Exception as e:
             return {
                 "success": False,
