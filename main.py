@@ -349,5 +349,3 @@ if __name__ == "__main__":
 
     sys.exit(app.exec_())
 
-=======
->>>>>>> refactoring_0217
