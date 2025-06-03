@@ -304,10 +304,10 @@ if __name__ == "__main__":
 
     def signal_handler(sig, frame):
         print("Now exiting...")
-        print("Stop motor")
-        if motor_instance is not None:
-            motor_instance.motor_stop()
-            motor_instance.motor_stop2()
+        # print("Stop motor")
+        # if motor_instance is not None:
+        #     motor_instance.motor_stop()
+        #     motor_instance.motor_stop2()
         print("Stop spray")
         if spray_instance is not None:
             spray_instance.turn_off()

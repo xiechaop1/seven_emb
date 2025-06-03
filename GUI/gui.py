@@ -4,7 +4,7 @@ import vlc
 from PyQt5.QtCore import Qt, QPropertyAnimation, pyqtProperty, QRectF, QRect, QEasingCurve, QPoint
 from PyQt5.QtCore import Qt, QRectF, QTimer, QTime, QDate, QPropertyAnimation, QObject, pyqtSignal
 from PyQt5.QtGui import QPainter, QColor, QImage, QPixmap, QFont, QFontDatabase, QPalette, QMouseEvent, QIcon, QMovie
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget,  QGraphicsBlurEffect, QLabel, QGraphicsOpacityEffect, QPushButton, QStackedWidget, QFrame, QGraphicsView, QGraphicsScene, QGraphicsRectItem
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget,  QGraphicsBlurEffect, QLabel, QGraphicsOpacityEffect, QPushButton, QStackedWidget, QFrame, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QVBoxLayout, QHBoxLayout, QComboBox, QSlider, QCheckBox, QRadioButton, QButtonGroup, QScrollArea
 from GUI.buttons import CustomButton , ImageButton
 # from buttons import CustomButton , ImageButton
 # from GUI.animations import fadeAnimation
@@ -419,11 +419,165 @@ class VoiceDetectingWidget(QWidget):
         self.label.setPixmap(pixmap)
         self.current_index = (self.current_index + 1) % self.total_images              
         
+class GuidePage(QWidget):
+    """引导页面的基类"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        
+    def setup_ui(self):
+        self.layout = QVBoxLayout(self)
+        self.layout.setAlignment(Qt.AlignCenter)
+        
+    def add_title(self, text):
+        title = QLabel(text)
+        title.setFont(QFont("PingFang SC", 24, QFont.Bold))
+        title.setAlignment(Qt.AlignCenter)
+        self.layout.addWidget(title)
+        
+    def add_description(self, text):
+        desc = QLabel(text)
+        desc.setFont(QFont("PingFang SC", 16))
+        desc.setAlignment(Qt.AlignCenter)
+        desc.setWordWrap(True)
+        self.layout.addWidget(desc)
+
+class WelcomePage(GuidePage):
+    """欢迎页面"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.add_title("Hello，欢迎来到Mindora 的世界")
+        self.add_description("在最开始的时候，请选择一些必要的信息，以便Mindora带给你关于冥想和助眠的更好体验")
+        
+        # 添加开始按钮
+        start_btn = QPushButton("开始")
+        start_btn.setFixedSize(200, 50)
+        start_btn.clicked.connect(self.parent().next_page)
+        self.layout.addWidget(start_btn, alignment=Qt.AlignCenter)
+
+class LanguagePage(GuidePage):
+    """语言选择页面"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.add_title("请选择您的语言")
+        
+        # 语言选择按钮组
+        self.lang_group = QButtonGroup(self)
+        languages = ["English", "中文", "日本語", "Français"]
+        
+        for lang in languages:
+            btn = QRadioButton(lang)
+            btn.setFont(QFont("PingFang SC", 16))
+            self.lang_group.addButton(btn)
+            self.layout.addWidget(btn, alignment=Qt.AlignCenter)
+            
+        # 添加导航按钮
+        nav_layout = QHBoxLayout()
+        back_btn = QPushButton("返回")
+        next_btn = QPushButton("下一步")
+        back_btn.clicked.connect(self.parent().prev_page)
+        next_btn.clicked.connect(self.parent().next_page)
+        nav_layout.addWidget(back_btn)
+        nav_layout.addWidget(next_btn)
+        self.layout.addLayout(nav_layout)
+
+class DateTimePage(GuidePage):
+    """日期时间选择页面"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.add_title("请选择您当前所在地的日期和时间")
+        
+        # 日期选择
+        date_layout = QHBoxLayout()
+        self.date_combo = QComboBox()
+        # 添加日期选项
+        date_layout.addWidget(self.date_combo)
+        
+        # 时间选择
+        time_layout = QHBoxLayout()
+        self.time_combo = QComboBox()
+        # 添加时间选项
+        time_layout.addWidget(self.time_combo)
+        
+        self.layout.addLayout(date_layout)
+        self.layout.addLayout(time_layout)
+        
+        # 导航按钮
+        nav_layout = QHBoxLayout()
+        back_btn = QPushButton("返回")
+        next_btn = QPushButton("下一步")
+        back_btn.clicked.connect(self.parent().prev_page)
+        next_btn.clicked.connect(self.parent().next_page)
+        nav_layout.addWidget(back_btn)
+        nav_layout.addWidget(next_btn)
+        self.layout.addLayout(nav_layout)
+
+class StressLevelPage(GuidePage):
+    """压力水平选择页面"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.add_title("请选择您近1周的压力水平")
+        
+        # 压力水平滑块
+        self.stress_slider = QSlider(Qt.Horizontal)
+        self.stress_slider.setMinimum(0)
+        self.stress_slider.setMaximum(100)
+        self.stress_slider.setValue(50)
+        
+        # 添加颜色标记
+        color_layout = QHBoxLayout()
+        colors = ["红", "黄", "蓝", "绿"]
+        for color in colors:
+            label = QLabel(color)
+            color_layout.addWidget(label)
+            
+        self.layout.addWidget(self.stress_slider)
+        self.layout.addLayout(color_layout)
+        
+        # 导航按钮
+        nav_layout = QHBoxLayout()
+        back_btn = QPushButton("返回")
+        next_btn = QPushButton("下一步")
+        back_btn.clicked.connect(self.parent().prev_page)
+        next_btn.clicked.connect(self.parent().next_page)
+        nav_layout.addWidget(back_btn)
+        nav_layout.addWidget(next_btn)
+        self.layout.addLayout(nav_layout)
+
+class GuideSystem(QStackedWidget):
+    """引导系统主类"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_pages()
+        
+    def setup_pages(self):
+        # 添加所有引导页面
+        self.pages = [
+            WelcomePage(self),
+            LanguagePage(self),
+            DateTimePage(self),
+            StressLevelPage(self),
+            # ... 添加其他页面
+        ]
+        
+        for page in self.pages:
+            self.addWidget(page)
+            
+    def next_page(self):
+        current = self.currentIndex()
+        if current < self.count() - 1:
+            self.setCurrentIndex(current + 1)
+            
+    def prev_page(self):
+        current = self.currentIndex()
+        if current > 0:
+            self.setCurrentIndex(current - 1)
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setFixedSize(WINDOW_W, WINDOW_H) #设置主窗口固定大小
-        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint) #把窗口设置为“无边框且总在最前面”的窗口
+        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint) #把窗口设置为"无边框且总在最前面"的窗口
         self.setCursor(Qt.BlankCursor)
         
         self.ClickStartPos = None
@@ -501,6 +655,10 @@ class MainWindow(QMainWindow):
         
         #添加动画效果
         self.AnimationFlash()
+        
+        # 添加引导系统
+        self.guide_system = GuideSystem(self)
+        self.guide_system.hide()  # 初始隐藏
         
     def messageHandler(self, text):
         print(f"Message Received")
@@ -844,6 +1002,9 @@ class MainWindow(QMainWindow):
         self.leftBtn.raise_()
         self.rightBtn.raise_()
             
+    def show_guide(self):
+        self.guide_system.show()
+        self.guide_system.raise_()
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
