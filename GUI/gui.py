@@ -77,9 +77,10 @@ class GuidePage(QWidget):
         self.setup_ui()
         
     def setup_ui(self):
-        self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.setSpacing(0)
+        # 创建主布局
+        self.main_layout = QVBoxLayout(self)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(0)
         
         # 创建背景
         self.background = QLabel(self)
@@ -90,6 +91,8 @@ class GuidePage(QWidget):
         self.content = QWidget(self)
         self.content.setGeometry(0, 0, WINDOW_W, WINDOW_H)
         self.content_layout = QVBoxLayout(self.content)
+        self.content_layout.setContentsMargins(50, 50, 50, 150)  # 添加边距
+        self.content_layout.setSpacing(20)  # 设置组件间距
         
         # 创建导航按钮容器
         self.nav_container = QWidget(self)
@@ -186,13 +189,13 @@ class LogoPage(GuidePage):
 class WelcomePage(GuidePage):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setup_ui()
+        self.setup_welcome_ui()
         
-    def setup_ui(self):
+    def setup_welcome_ui(self):
         self.add_title("欢迎使用 Mindora")
         self.add_description("让我们开始一段美好的旅程")
         
-        start_btn = CustomButton(200, 60, self)
+        start_btn = CustomButton(200, 60, self.content)
         start_btn.setText("开始体验")
         start_btn.clicked.connect(self.next_clicked.emit)
         self.content_layout.addWidget(start_btn, alignment=Qt.AlignCenter)
@@ -200,14 +203,14 @@ class WelcomePage(GuidePage):
 class LanguagePage(GuidePage):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setup_ui()
+        self.setup_language_ui()
         
-    def setup_ui(self):
+    def setup_language_ui(self):
         self.add_title("选择语言")
         self.add_description("请选择您偏好的语言")
         
         languages = ["简体中文", "English", "日本語", "한국어"]
-        self.language_group = QButtonGroup(self)
+        self.language_group = QButtonGroup(self.content)
         
         for lang in languages:
             radio = QRadioButton(lang)
@@ -221,13 +224,13 @@ class LanguagePage(GuidePage):
 class DatePage(GuidePage):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setup_ui()
+        self.setup_date_ui()
         
-    def setup_ui(self):
+    def setup_date_ui(self):
         self.add_title("选择日期")
         self.add_description("请选择您想要开始体验的日期")
         
-        self.date_combo = QComboBox()
+        self.date_combo = QComboBox(self.content)
         self.date_combo.setFont(QFont("PingFang SC", 16))
         self.date_combo.setStyleSheet("""
             QComboBox {
@@ -257,13 +260,13 @@ class DatePage(GuidePage):
 class TimePage(GuidePage):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setup_ui()
+        self.setup_time_ui()
         
-    def setup_ui(self):
+    def setup_time_ui(self):
         self.add_title("选择时间")
         self.add_description("请选择您想要开始体验的时间")
         
-        self.time_combo = QComboBox()
+        self.time_combo = QComboBox(self.content)
         self.time_combo.setFont(QFont("PingFang SC", 16))
         self.time_combo.setStyleSheet("""
             QComboBox {
@@ -293,14 +296,14 @@ class TimePage(GuidePage):
 class ReligionPage(GuidePage):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setup_ui()
+        self.setup_religion_ui()
         
-    def setup_ui(self):
+    def setup_religion_ui(self):
         self.add_title("选择信仰")
         self.add_description("请选择您的信仰（可选）")
         
         religions = ["无", "佛教", "基督教", "伊斯兰教", "印度教", "其他"]
-        self.religion_group = QButtonGroup(self)
+        self.religion_group = QButtonGroup(self.content)
         
         for religion in religions:
             radio = QRadioButton(religion)
@@ -314,13 +317,13 @@ class ReligionPage(GuidePage):
 class StressLevelPage(GuidePage):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setup_ui()
+        self.setup_stress_ui()
         
-    def setup_ui(self):
+    def setup_stress_ui(self):
         self.add_title("压力水平")
         self.add_description("请评估您当前的压力水平")
         
-        self.slider = QSlider(Qt.Horizontal)
+        self.slider = QSlider(Qt.Horizontal, self.content)
         self.slider.setMinimum(0)
         self.slider.setMaximum(10)
         self.slider.setValue(5)
@@ -340,7 +343,7 @@ class StressLevelPage(GuidePage):
             }
         """)
         
-        self.value_label = QLabel("5")
+        self.value_label = QLabel("5", self.content)
         self.value_label.setFont(QFont("PingFang SC", 16))
         self.value_label.setStyleSheet("color: white;")
         self.value_label.setAlignment(Qt.AlignCenter)
@@ -354,13 +357,13 @@ class StressLevelPage(GuidePage):
 class SleepQualityPage(GuidePage):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setup_ui()
+        self.setup_sleep_ui()
         
-    def setup_ui(self):
+    def setup_sleep_ui(self):
         self.add_title("睡眠质量")
         self.add_description("请评估您过去一周的睡眠质量")
         
-        self.slider = QSlider(Qt.Horizontal)
+        self.slider = QSlider(Qt.Horizontal, self.content)
         self.slider.setMinimum(0)
         self.slider.setMaximum(10)
         self.slider.setValue(5)
@@ -380,7 +383,7 @@ class SleepQualityPage(GuidePage):
             }
         """)
         
-        self.value_label = QLabel("5")
+        self.value_label = QLabel("5", self.content)
         self.value_label.setFont(QFont("PingFang SC", 16))
         self.value_label.setStyleSheet("color: white;")
         self.value_label.setAlignment(Qt.AlignCenter)
@@ -394,9 +397,9 @@ class SleepQualityPage(GuidePage):
 class ProblemSelectionPage(GuidePage):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setup_ui()
+        self.setup_problem_ui()
         
-    def setup_ui(self):
+    def setup_problem_ui(self):
         self.add_title("问题选择")
         self.add_description("请选择您希望通过 Mindora 解决的问题（可多选）")
         
@@ -410,7 +413,7 @@ class ProblemSelectionPage(GuidePage):
         ]
         
         for problem in problems:
-            checkbox = QCheckBox(problem)
+            checkbox = QCheckBox(problem, self.content)
             checkbox.setFont(QFont("PingFang SC", 16))
             checkbox.setStyleSheet("color: white;")
             self.content_layout.addWidget(checkbox, alignment=Qt.AlignCenter)
@@ -420,9 +423,9 @@ class ProblemSelectionPage(GuidePage):
 class MentorSelectionPage(GuidePage):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setup_ui()
+        self.setup_mentor_ui()
         
-    def setup_ui(self):
+    def setup_mentor_ui(self):
         self.add_title("选择导师")
         self.add_description("请选择一位导师，您可以点击播放按钮聆听他们的介绍")
         
@@ -439,10 +442,10 @@ class MentorSelectionPage(GuidePage):
             }
         ]
         
-        self.mentor_group = QButtonGroup(self)
+        self.mentor_group = QButtonGroup(self.content)
         
         for mentor in mentors:
-            container = QWidget()
+            container = QWidget(self.content)
             layout = QVBoxLayout(container)
             
             radio = QRadioButton(mentor["name"])
@@ -472,18 +475,18 @@ class MentorSelectionPage(GuidePage):
 class CompletionPage(GuidePage):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setup_ui()
+        self.setup_completion_ui()
         
-    def setup_ui(self):
+    def setup_completion_ui(self):
         self.add_title("设置完成")
         self.add_description("感谢您完成初始设置，现在您可以开始使用 Mindora 了")
         
         # 显示产品信息
-        info = QLabel()
+        info = QLabel(self.content)
         info.setPixmap(QPixmap(os.path.join(RESOURCE_ROOT, "images/product_guide.png")).scaled(WINDOW_W//2, WINDOW_W//2, Qt.KeepAspectRatio))
         info.setAlignment(Qt.AlignCenter)
         
-        start_btn = CustomButton(200, 60, self)
+        start_btn = CustomButton(200, 60, self.content)
         start_btn.setText("开始体验")
         start_btn.clicked.connect(self.finished.emit)
         
