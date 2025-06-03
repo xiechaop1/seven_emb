@@ -97,9 +97,9 @@ class Recv:
 						}
 						print("act:",act)
 						# act = resp["data"]["action"]
-						if act == Code.REC_ACTION_SLEEP_ASSISTANT:
-							self.comm.message.emit("enter sleep")  # 发信号到主线程
+						if act == Code.REC_ACTION_SLEEP_ASSISTANT:		
 							if resp['data']['stream_seq'] == -1:
+								self.comm.message.emit("enter sleep")  # 发信号到主线程
 								# 进入助眠唤醒命令，会有一条 -1的结束，这条pass
 								continue
 							# 线程判断，如果已经启动线程，就不再启动
@@ -179,7 +179,6 @@ class Recv:
 						if ThreadingEvent.recv_execute_command_event.is_set():
 							# print("recv event2:", ThreadingEvent.recv_execute_command_event)
 							print("pre resp for exec", resp["message_id"])
-
 							ec_thread = threading.Thread(target=ec_handler.deal, args=(resp,))
 							ec_thread.start()
 							# ec_handler.deal(resp)

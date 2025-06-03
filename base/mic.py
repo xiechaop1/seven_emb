@@ -135,6 +135,7 @@ class Mic:
         self.start_time = time.time()
 
         self.comm = communicator
+        self.framNo = 0
 
     def kaldi_listener(self):
 
@@ -189,6 +190,7 @@ class Mic:
         audio_data = None
         if self.recording_status == "Recording":
             # indata = self.resample_audio1(indata, self.SAMPLERATE_ORIG, self.SAMPLERATE_TARGET)
+            self.framNo += 1
             audio_data = self.start_recording(indata, volume)
         else:
             self.frames.append({"data": indata, "ts": time.time()})
@@ -631,7 +633,6 @@ class Mic:
         # if start_frame is not None:
         # #     self.frames.append(start_frame)
         #     self.audio_memory.write(start_frame)
-        self.comm.message.emit("voice appear")  # 发信号到主线程
         # if len(self.frames) > 0:
         #     for _, frame_data in enumerate(self.frames):
         #         frame = frame_data["data"]
@@ -644,6 +645,7 @@ class Mic:
         #     self.frames = []
 
         if len(self.frames) > 0:
+            self.comm.message.emit("voice appear")  # 发信号到主线程
             # 取最后 3 帧（如果不足3帧就取全部），按正序排列
             last_frames = self.frames[-3:]
             for frame_dict in last_frames:
@@ -651,22 +653,27 @@ class Mic:
                 self.audio_memory.write(frame)
             self.frames = []
 
-        # has_interrupt = False
-        # if self.recording_status == "Recording":
-        time_duration = time.time() - self.start_time
-        # print(time_duration, self.has_interrupt)
-        if time_duration > 0.4 and self.has_interrupt == False:
-            if self.screen is not None:
-                self.screen.add("resources/video/main1.mp4", 100)
-                self.screen.play()
-            self.audio_player.interrupt()
-            self.audio_player.stop_audio()
-            ThreadingEvent.recv_execute_command_event.clear()
-            ThreadingEvent.camera_start_event.clear()
-            self.has_interrupt = True
-        # data = self.stream.read(self.sample_rate * self.frame_duration // 1000, exception_on_overflow=False)
-        # data = self.stream.read(self.buffer_size, exception_on_overflow=False)
-        # self.frames.append(data)
+        # time_duration = time.time() - self.start_time
+        # if time_duration > 0.4 and self.has_interrupt == False:
+        #     if self.screen is not None:
+        #         self.screen.add("resources/video/main1.mp4", 100)
+        #         self.screen.play()
+        #     self.audio_player.interrupt()
+        #     self.audio_player.stop_audio()
+        #     ThreadingEvent.recv_execute_command_event.clear()
+        #     ThreadingEvent.camera_start_event.clear()
+        #     self.has_interrupt = True
+        
+        if self.has_interrupt == False:
+            # if self.screen is not None:
+            #     self.screen.add("resources/video/main1.mp4", 100)
+            #     self.screen.play()
+            if self.framNo > 1: 
+                self.audio_player.interrupt()
+                self.audio_player.stop_audio()
+                ThreadingEvent.recv_execute_command_event.clear()
+                ThreadingEvent.camera_start_event.clear()
+                self.has_interrupt = True
 
         self.audio_memory.write(indata.tobytes())
         # self.frames.append(indata.tobytes())
@@ -679,26 +686,24 @@ class Mic:
             # print("tag:", self.is_speech(data), self.slience_tag)
             logging.info("Silence detected.")
             self.recording_status = "Save"
+            self.framNo = 0
             # self.stop_recording()
 
         # 超过 timeout 秒自动停止
         if time.time() - self.start_time > self.timeout:
             logging.info("Recording time exceeded, stopping...")
             self.recording_status = "Save"
+            self.framNo = 0
             # self.stop_recording()
 
         # audio_memory.write(indata.tobytes())
         if self.recording_status == "Save":
-            time_duration = time.time() - self.start_time
-            if time_duration > 0.4:
-                self.audio_player.interrupt()
-                self.audio_player.stop_audio()
-                ThreadingEvent.recv_execute_command_event.clear()
-                ThreadingEvent.camera_start_event.clear()
-                # audio_memory = io.BytesIO()
-                # for frame in pre_buffer:
-                # audio_memory.write(frame.tobytes())
-                # pre_buffer.clear()
+            # time_duration = time.time() - self.start_time
+            # if time_duration > 0.4:
+            #     self.audio_player.interrupt()
+            #     self.audio_player.stop_audio()
+            #     ThreadingEvent.recv_execute_command_event.clear()
+            #     ThreadingEvent.camera_start_event.clear()
             audio_data = self.audio_memory.getvalue()
             # self.save_recording()
             # audio_data = self.save_to_buffer()

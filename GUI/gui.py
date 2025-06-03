@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget,  QGraphicsBlurEf
 from GUI.buttons import CustomButton , ImageButton
 # from buttons import CustomButton , ImageButton
 # from GUI.animations import fadeAnimation
+
 import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
@@ -38,6 +39,7 @@ SECOND_NAME_W = 160
 SECOND_NAME_H = 50
 SECOND_GUIDE_W = 828
 SECOND_GUIDE_H = 274
+
 
 BOTBAR_BTN_R = 100
 
@@ -610,12 +612,11 @@ class MainWindow(QMainWindow):
         self.firstBGMovie = QMovie("/home/dsg/test/seven_emb/resources/images/firstback_fire.gif")
         self.firstBG.setMovie(self.firstBGMovie)
         self.firstBGMovie.start()
-        self.firstBG.hide()
-         
+        self.firstBG.hide()         
         self.firstMenu = FirstWidget(self)
         self.firstMenu.setGeometry(self.width(), 0, self.width(), self.height()) 
         # self.firstMenu.hide() 
-        
+
         # 创建二级界面 
         self.SecondMenuIndex = 0 #当前二级菜单页序数     
         self.SecondMenuGrp = [] #二级菜单子项列表
@@ -661,14 +662,15 @@ class MainWindow(QMainWindow):
         self.guide_system.hide()  # 初始隐藏
         
     def messageHandler(self, text):
-        print(f"Message Received")
         if text == "voice appear":
+            print(f"voice appear Received")
             self.voiceDetectingPage.raise_()
             self.voiceDetectingPage.show()   
         elif text == "voice disappear":
+            print(f"voice disappear Received")
             self.voiceDetectingPage.hide()
         elif text == "enter sleep":
-            print("window received sleep")
+            print(f"enter sleep Received")
             if self.menu_flag != 3:
                 self.thirdBGMovie = QMovie(coacherMovie[self.SecondMenuIndex][0])
                 self.thirdBG.setMovie(self.thirdBGMovie)
@@ -1011,5 +1013,6 @@ if __name__ == '__main__':
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
+
     
     

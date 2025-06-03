@@ -29,6 +29,7 @@ from model.recv import Recv
 from model.daemon import Daemon
 from common.code import Code
 from common.common import Common
+from GUI import gui
 # from model.ui import ScenePage, HomePage, OverlayWidget, MainWindow
 # if Config.OS != "lineage":
 #     from PyQt5.QtWidgets import QApplication
@@ -78,6 +79,7 @@ import traceback
 from model.execute_command import ExecuteCommand
 #from base.spary import Spray
 from PyQt5.QtCore import QObject, pyqtSignal
+from GUI import gui
 
 # async def main():
 #     websocket_url = "ws://114.55.90.104:9001/ws"
@@ -117,13 +119,13 @@ def on_press(key):
 
 def on_release(key):
     print(f'{key} key released')
-    keychar = key.char
-    if key == keyboard.Key.esc or keychar == 'q' or keychar == 'c':
-        print("exit")
-        # motor_instance.motor_stop()
-        # motor_instance.motor_stop2()
-        sys.exit()
-        # return False  # 停止监听
+    # keychar = key.char
+    # if key == keyboard.Key.esc or keychar == 'q' or keychar == 'c':
+    #     print("exit")
+    #     # motor_instance.motor_stop()
+    #     # motor_instance.motor_stop2()
+    #     sys.exit()
+    #     # return False  # 停止监听
 
 if __name__ == "__main__":
     print(f"Starting with mode {args.mode}")
@@ -239,56 +241,80 @@ if __name__ == "__main__":
     recv_thread.start()
     daemon_thread.start()
 
-    # 创建守护进程
-    task_daemon = TaskDaemon("tasks.json", audio_instance, light_instance, spray_instance)
-
-    # 计算当前时间1分钟后的时间
-    now = datetime.now()
-    execution_time = (now + timedelta(seconds=10)).time()
-    # execution_time = one_minute_later.strftime("%H:%M:%S"),  # 使用计算出的时间
-    
-    # 创建任务，使用计算出的时间
-    # task = Task.create(
-    #     name="Sunrise Light",
-    #     task_type=TaskType.SYSTEM,
-    #     schedule_type=TaskScheduleType.ONCE,  # 改为单次执行
-    #     execution_time=one_minute_later.strftime("%H:%M:%S"),  # 使用计算出的时间
-    #     actions=json.dumps([
+    # # 创建守护进程
+    # task_daemon = TaskDaemon("tasks.json", audio_instance, light_instance, spray_instance)
+    #
+    # # 计算当前时间1分钟后的时间
+    # now = datetime.now()
+    # execution_time = (now + timedelta(seconds=10)).time()
+    # # execution_time = one_minute_later.strftime("%H:%M:%S"),  # 使用计算出的时间
+    #
+    # # 创建任务，使用计算出的时间
+    # # task = Task.create(
+    # #     name="Sunrise Light",
+    # #     task_type=TaskType.SYSTEM,
+    # #     schedule_type=TaskScheduleType.ONCE,  # 改为单次执行
+    # #     execution_time=one_minute_later.strftime("%H:%M:%S"),  # 使用计算出的时间
+    # #     actions=json.dumps([
+    # #         {
+    # #             "action_type": "light",
+    # #             "target": "bedroom_light",
+    # #             "parameters": {
+    # #                 "mode": Code.LIGHT_MODE_BREATHING,
+    # #                 "params": {"r":0, "g":255, "b":255, "steps": 200}
+    # #             }
+    # #         }
+    # #     ])
+    # # )
+    # actions = [
     #         {
-    #             "action_type": "light",
+    #             "action_type": "sound",
     #             "target": "bedroom_light",
     #             "parameters": {
-    #                 "mode": Code.LIGHT_MODE_BREATHING,
-    #                 "params": {"r":0, "g":255, "b":255, "steps": 200}
+    #                 "command": SoundCommand.PLAY,
+    #                 "file_path": "xyxh.mp3",
+    #                 # "mode": Code.LIGHT_MODE_BREATHING,
+    #                 # "params": {"r":0, "g":255, "b":255, "steps": 200}
     #             }
     #         }
-    #     ])
-    # )
-    actions = [
-            {
-                "action_type": "sound",
-                "target": "bedroom_light",
-                "parameters": {
-                    "command": SoundCommand.PLAY,
-                    "file_path": "xyxh.mp3",
-                    # "mode": Code.LIGHT_MODE_BREATHING,
-                    # "params": {"r":0, "g":255, "b":255, "steps": 200}
-                }
-            }
-        ]
-    task_daemon.create_alarm_task("Test_sound", execution_time, actions, 3)
-    actions = [
-        {
-            "action_type": "light",
-            "target": "bedroom_light",
-            "parameters": {
-                "mode": Code.LIGHT_MODE_BREATHING,
-                "params": {"r":0, "g":255, "b":255, "steps": 200}
-            }
-        }
-    ]
-    task_daemon.create_alarm_task("Test_light", execution_time, actions, 3)
-    
+    #     ]
+    # task_daemon.create_alarm_task("Test_sound", execution_time, actions, 3)
+    # actions = [
+    #     {
+    #         "action_type": "light",
+    #         "target": "bedroom_light",
+    #         "parameters": {
+    #             "mode": Code.LIGHT_MODE_BREATHING,
+    #             "params": {"r":0, "g":255, "b":255, "steps": 200}
+    #         }
+    #     }
+    # ]
+    # task_daemon.create_alarm_task("Test_light", execution_time, actions, 3)
+
+    def signal_handler(sig, frame):
+        print("Now exiting...")
+        # print("Stop motor")
+        # if motor_instance is not None:
+        #     motor_instance.motor_stop()
+        #     motor_instance.motor_stop2()
+        print("Stop spray")
+        if spray_instance is not None and spray_instance != "":
+            spray_instance.turn_off()
+        sys.exit(0)
+
+
+    signal.signal(signal.SIGINT, signal_handler)
+
+    app = QApplication(sys.argv)
+    window = gui.MainWindow()
+    window.show()
+    print("window appear")
+    # 对接槽接口
+    comm.message.connect(window.messageHandler)
+
+    sys.exit(app.exec_())
+
+
     # 添加任务到调度器
     # task_daemon.scheduler.add_task(task)
 
@@ -299,7 +325,7 @@ if __name__ == "__main__":
 
 
     # 启动守护进程
-    task_thread = threading.Thread(target=task_daemon.start)
+    # task_thread = threading.Thread(target=task_daemon.start)
 
 
     def signal_handler(sig, frame):
@@ -323,3 +349,5 @@ if __name__ == "__main__":
 
     sys.exit(app.exec_())
 
+=======
+>>>>>>> refactoring_0217
