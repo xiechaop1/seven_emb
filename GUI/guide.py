@@ -58,8 +58,22 @@ class GuidePage(QWidget):
         self.mentor_page.next_clicked.connect(lambda: self.stack.setCurrentIndex(9))
         self.final_page.finish_clicked.connect(self.finish_guide)
         
+        # 连接返回按钮信号
+        self.language_page.back_clicked.connect(lambda: self.stack.setCurrentIndex(0))
+        self.date_page.back_clicked.connect(lambda: self.stack.setCurrentIndex(1))
+        self.time_page.back_clicked.connect(lambda: self.stack.setCurrentIndex(2))
+        self.religion_page.back_clicked.connect(lambda: self.stack.setCurrentIndex(3))
+        self.stress_page.back_clicked.connect(lambda: self.stack.setCurrentIndex(4))
+        self.sleep_page.back_clicked.connect(lambda: self.stack.setCurrentIndex(5))
+        self.problems_page.back_clicked.connect(lambda: self.stack.setCurrentIndex(6))
+        self.mentor_page.back_clicked.connect(lambda: self.stack.setCurrentIndex(7))
+        self.final_page.back_clicked.connect(lambda: self.stack.setCurrentIndex(8))
+        
         # 设置初始页面
         self.stack.setCurrentIndex(0)
+        
+        # 在欢迎页面隐藏返回按钮
+        self.welcome_page.back_btn.hide()
         
     def finish_guide(self):
         # 完成引导流程，返回主界面
@@ -67,6 +81,7 @@ class GuidePage(QWidget):
 
 class BaseGuidePage(QWidget):
     next_clicked = pyqtSignal()
+    back_clicked = pyqtSignal()
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -90,10 +105,20 @@ class BaseGuidePage(QWidget):
         self.content.setAlignment(Qt.AlignCenter)
         self.content.setStyleSheet("color: white; font-size: 24px;")
         
+        # 创建按钮容器
+        self.button_container = QWidget(self)
+        self.button_container.setGeometry(0, WINDOW_H-200, WINDOW_W, 60)
+        
+        # 创建返回按钮
+        self.back_btn = CustomButton(200, 60, self.button_container)
+        self.back_btn.setText("返回")
+        self.back_btn.setGeometry((WINDOW_W-600)//2, 0, 200, 60)
+        self.back_btn.clicked.connect(self.back_clicked.emit)
+        
         # 创建下一步按钮
-        self.next_btn = CustomButton(200, 60, self)
+        self.next_btn = CustomButton(200, 60, self.button_container)
         self.next_btn.setText("下一步")
-        self.next_btn.setGeometry((WINDOW_W-200)//2, WINDOW_H-200, 200, 60)
+        self.next_btn.setGeometry((WINDOW_W+200)//2, 0, 200, 60)
         self.next_btn.clicked.connect(self.next_clicked.emit)
 
 class WelcomePage(BaseGuidePage):
