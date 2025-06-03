@@ -116,7 +116,7 @@ class BaseGuidePage(QWidget):
         self.back_btn.setStyleSheet("""
             QPushButton {
                 background-color: #4a4a4a;
-                color: white;
+                color: #FFD700;
                 border: none;
                 border-radius: 30px;
                 font-size: 20px;
@@ -138,7 +138,7 @@ class BaseGuidePage(QWidget):
         self.next_btn.setStyleSheet("""
             QPushButton {
                 background-color: #4a4a4a;
-                color: white;
+                color: #FFD700;
                 border: none;
                 border-radius: 30px;
                 font-size: 20px;
@@ -158,6 +158,8 @@ class WelcomePage(BaseGuidePage):
         super().__init__(parent)
         self.title.setText("欢迎来到Mindora的世界")
         self.content.setText("在最开始的时候，请选择一些必要的信息，\n以便Mindora带给你关于冥想和助眠的更好体验")
+        # 在欢迎页面隐藏返回按钮
+        self.back_btn.hide()
 
 class LanguagePage(BaseGuidePage):
     def __init__(self, parent=None):
@@ -201,9 +203,6 @@ class LanguagePage(BaseGuidePage):
             self.language_group.addButton(radio, i)
             radio.show()
             
-        # 隐藏下一步按钮，因为选择语言后直接进入下一页
-        self.next_btn.hide()
-        
         # 连接信号
         self.language_group.buttonClicked.connect(self.on_language_selected)
         
