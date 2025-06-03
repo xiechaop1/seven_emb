@@ -58,6 +58,9 @@ class GuidePage(QWidget):
         self.mentor_page.next_clicked.connect(lambda: self.stack.setCurrentIndex(9))
         self.final_page.finish_clicked.connect(self.finish_guide)
         
+        # 设置初始页面
+        self.stack.setCurrentIndex(0)
+        
     def finish_guide(self):
         # 完成引导流程，返回主界面
         self.parent().show_main_interface()

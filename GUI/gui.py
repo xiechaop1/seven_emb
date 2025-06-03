@@ -540,6 +540,11 @@ class MainWindow(QMainWindow):
     def mousePressEvent(self, event: QMouseEvent):
         # print(f"Mouse clicked")
         super().mousePressEvent(event)
+        
+        # 如果引导页面正在显示，不处理其他点击事件
+        if self.guide_page.isVisible():
+            return
+            
         if event.button() == Qt.RightButton:
             self.initBG.show()
             self.animation_init.start() 
