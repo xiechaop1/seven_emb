@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtCore import Qt, QPropertyAnimation, pyqtProperty, QRectF, QRect, QEasingCurve, QPoint, QTimer, QTime, QDate
+from PyQt5.QtCore import Qt, QPropertyAnimation, pyqtProperty, QRectF, QRect, QEasingCurve, QPoint, QTimer, QTime, QDate, pyqtSignal
 from PyQt5.QtGui import QPainter, QColor, QImage, QPixmap, QFont, QFontDatabase, QPalette, QMouseEvent, QIcon, QMovie
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QGraphicsBlurEffect, QLabel, 
                            QGraphicsOpacityEffect, QPushButton, QStackedWidget, QFrame, 
