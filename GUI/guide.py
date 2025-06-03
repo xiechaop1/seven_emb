@@ -201,15 +201,15 @@ class LanguagePage(BaseGuidePage):
             self.language_group.addButton(radio, i)
             radio.show()
             
-        # 修改下一步按钮的启用状态
-        self.next_btn.setEnabled(False)
+        # 隐藏下一步按钮，因为选择语言后直接进入下一页
+        self.next_btn.hide()
         
         # 连接信号
-        self.language_group.buttonClicked.connect(self.update_next_button)
+        self.language_group.buttonClicked.connect(self.on_language_selected)
         
-    def update_next_button(self):
-        """更新下一步按钮状态"""
-        self.next_btn.setEnabled(True)
+    def on_language_selected(self):
+        """当选择语言时直接进入下一个页面"""
+        self.next_clicked.emit()
 
 class DatePage(BaseGuidePage):
     def __init__(self, parent=None):
