@@ -12,9 +12,6 @@ from GUI.buttons import CustomButton , ImageButton
 import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
-# 定义资源根目录
-RESOURCE_ROOT = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'resources')
-
 WINDOW_W = 1080
 WINDOW_H = 1080
 FIRST_ICON_R = 150
@@ -55,16 +52,14 @@ VOICE_DETECTING_ICON_BOTGAP = 100
 
 
 coacher = ["Guruji", "Guruji"]
-coacherHead = [
-    os.path.join(RESOURCE_ROOT, "images/secondhead_guruji.png"),
-    os.path.join(RESOURCE_ROOT, "images/secondhead_guruji.png")
-]
-coacherBackground = ["resources/images/secondback_guruji.jpg", 
-                     "resources/images/zeroback_sun.jpg"]
+coacherHead = ["/home/dsg/test/seven_emb/resources/images/secondhead_guruji.png", 
+               "/home/dsg/test/seven_emb/resources/images/secondhead_guruji.png"]
+coacherBackground = ["/home/dsg/test/seven_emb/resources/images/secondback_guruji.jpg", 
+                     "/home/dsg/test/seven_emb/resources/images/zeroback_sun.jpg"]
 coacherGuideTxt = ["    As the day comes to an end, release yourself\nfrom the busyness and allow your body and mind\nto fully relax. Close your eyes, gently bid farewell\nto today, and drift into a peaceful dream.",
                    "    As the day comes to an end, release yourself\nfrom the busyness and allow your body and mind\nto fully relax. Close your eyes, gently bid farewell\nto today, and drift into a peaceful dream."]
-coacherMovie = [["resources/images/third_breath.gif", "resources/images/third_starsky.gif"],
-                ["resources/images/third_starsky.gif", "resources/images/third_breath.gif"]]
+coacherMovie = [["/home/dsg/test/seven_emb/resources/images/third_breath.gif", "/home/dsg/test/seven_emb/resources/images/third_starsky.gif"],
+                ["/home/dsg/test/seven_emb/resources/images/third_starsky.gif", "/home/dsg/test/seven_emb/resources/images/third_breath.gif"]]
 
 # 这个类专门用来发信号（必须继承 QObject）
 class Communicator(QObject):
@@ -80,9 +75,9 @@ class FirstWidget(QWidget):
         self.label.setGeometry(0, 0, WINDOW_W, WINDOW_H)
         
         #icon图标按钮
-        self.iconBTN = [ImageButton(FIRST_ICON_R, FIRST_ICON_R, "resources/images/firstmenu_Meditation.png", self),
-                        ImageButton(FIRST_ICON_R, FIRST_ICON_R, "resources/images/firstmenu_Hypnotise.png", self),
-                        ImageButton(FIRST_ICON_R, FIRST_ICON_R, "resources/images/firstmenu_Tools.png", self)]
+        self.iconBTN = [ImageButton(FIRST_ICON_R, FIRST_ICON_R, "/home/dsg/test/seven_emb/resources/images/firstmenu_Meditation.png", self),
+                        ImageButton(FIRST_ICON_R, FIRST_ICON_R, "/home/dsg/test/seven_emb/resources/images/firstmenu_Hypnotise.png", self),
+                        ImageButton(FIRST_ICON_R, FIRST_ICON_R, "/home/dsg/test/seven_emb/resources/images/firstmenu_Tools.png", self)]
         #icon名称
         self.txtQLabel = [QLabel(self),
                           QLabel(self),
@@ -281,7 +276,7 @@ class TopBarDisplayWidget(QWidget):
         
         #状态栏显示
         self.status_label = QLabel(self)
-        self.status_pixmap = QPixmap("resources/images/topbar_wifiConnected.png")
+        self.status_pixmap = QPixmap("/home/dsg/test/seven_emb/resources/images/topbar_wifiConnected.png")
         self.status_label.setGeometry(WINDOW_W//2+FIRST_TOPRTC_W*2, WINDOW_W//120, FIRST_STATUS_W, FIRST_STATUS_H)
         self.status_pixmap = self.status_pixmap.scaled(FIRST_STATUS_H, FIRST_STATUS_H*2//3, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         self.status_label.setPixmap(self.status_pixmap)  
@@ -332,12 +327,12 @@ class BottomBarDisplayWidget(QWidget):
         self.update_time()  
         
         # 绘制播放按钮
-        self.playbutton = ImageButton(BOTBAR_BTN_R, BOTBAR_BTN_R, "resources/images/bottombar_playButton.png", self)
+        self.playbutton = ImageButton(BOTBAR_BTN_R, BOTBAR_BTN_R, "/home/dsg/test/seven_emb/resources/images/bottombar_playButton.png", self)
         self.playbutton.setGeometry((self.size().width()-BOTBAR_BTN_R)//2, (self.size().height() - BOTBAR_BTN_R)//2, BOTBAR_BTN_R, BOTBAR_BTN_R)  # 设置按钮位置和大小
         self.playbutton.clicked.connect(self.playClicked)
         self.playbutton.hide()
         # 绘制停止按钮
-        self.stopbutton = ImageButton(BOTBAR_BTN_R, BOTBAR_BTN_R, "resources/images/bottombar_stop.png", self)
+        self.stopbutton = ImageButton(BOTBAR_BTN_R, BOTBAR_BTN_R, "/home/dsg/test/seven_emb/resources/images/bottombar_stop.png", self)
         self.stopbutton.setGeometry((self.size().width()-BOTBAR_BTN_R)//2, (self.size().height() - BOTBAR_BTN_R)//2, BOTBAR_BTN_R, BOTBAR_BTN_R)  # 设置按钮位置和大小
         self.stopbutton.clicked.connect(self.stopClicked)
         self.stopbutton.hide()
@@ -426,557 +421,103 @@ class VoiceDetectingWidget(QWidget):
         self.label.setPixmap(pixmap)
         self.current_index = (self.current_index + 1) % self.total_images              
         
-class GuidePage(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setup_ui()
-        self.setup_style()
-        
-    def setup_ui(self):
-        self.layout = QVBoxLayout(self)
-        self.layout.setAlignment(Qt.AlignCenter)
-        
-    def add_title(self, text):
-        title = QLabel(text)
-        title.setFont(QFont("PingFang SC", 24, QFont.Bold))
-        title.setAlignment(Qt.AlignCenter)
-        self.layout.addWidget(title)
-        
-    def add_description(self, text):
-        desc = QLabel(text)
-        desc.setFont(QFont("PingFang SC", 16))
-        desc.setAlignment(Qt.AlignCenter)
-        desc.setWordWrap(True)
-        self.layout.addWidget(desc)
-
-    def setup_style(self):
-        # 设置背景
-        self.setStyleSheet("""
-            QWidget {
-                background-color: rgba(0, 0, 0, 0.8);
-            }
-            QPushButton {
-                background-color: #4a90e2;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                padding: 10px 20px;
-                font-size: 16px;
-            }
-            QPushButton:hover {
-                background-color: #357abd;
-            }
-            QLabel {
-                color: white;
-            }
-            QRadioButton {
-                color: white;
-                font-size: 16px;
-            }
-            QSlider::groove:horizontal {
-                border: 1px solid #999999;
-                height: 8px;
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);
-                margin: 2px 0;
-            }
-            QSlider::handle:horizontal {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);
-                border: 1px solid #5c5c5c;
-                width: 18px;
-                margin: -2px 0;
-                border-radius: 3px;
-            }
-        """)
-
-class LogoPage(GuidePage):
-    """开机LOGO视频播放页面"""
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setup_ui()
-        
-    def setup_ui(self):
-        # 创建视频播放器
-        self.instance = vlc.Instance()
-        self.player = self.instance.media_player_new()
-        
-        # 创建视频显示区域
-        self.video_widget = QWidget(self)
-        self.video_widget.setGeometry(0, 0, WINDOW_W, WINDOW_H)
-        
-        # 设置视频输出到widget
-        if sys.platform.startswith('linux'):  # for Linux using the X Server
-            self.player.set_xwindow(self.video_widget.winId())
-        elif sys.platform == "win32":  # for Windows
-            self.player.set_hwnd(self.video_widget.winId())
-        elif sys.platform == "darwin":  # for MacOS
-            self.player.set_nsobject(int(self.video_widget.winId()))
-            
-        # 加载视频
-        media = self.instance.media_new("resources/video/mindora_logo.mp4")
-        self.player.set_media(media)
-        
-        # 播放视频
-        self.player.play()
-        
-        # 视频播放完成后自动进入下一页
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.check_video_end)
-        self.timer.start(1000)  # 每秒检查一次
-        
-    def check_video_end(self):
-        if self.player.get_state() == vlc.State.Ended:
-            self.timer.stop()
-            self.parent().next_page()
-
-class WelcomePage(GuidePage):
-    """欢迎页面"""
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.add_title("Hello，欢迎来到Mindora 的世界")
-        self.add_description("在最开始的时候，请选择一些必要的信息，以便Mindora带给你关于冥想和助眠的更好体验")
-        
-        # 添加开始按钮
-        start_btn = QPushButton("开始")
-        start_btn.setFixedSize(200, 50)
-        start_btn.clicked.connect(self.parent().next_page)
-        self.layout.addWidget(start_btn, alignment=Qt.AlignCenter)
-
-class LanguagePage(GuidePage):
-    """语言选择页面"""
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.add_title("请选择您的语言")
-        
-        # 语言选择按钮组
-        self.lang_group = QButtonGroup(self)
-        languages = ["English", "中文", "日本語", "Français"]
-        
-        for lang in languages:
-            btn = QRadioButton(lang)
-            btn.setFont(QFont("PingFang SC", 16))
-            self.lang_group.addButton(btn)
-            self.layout.addWidget(btn, alignment=Qt.AlignCenter)
-            
-        # 添加导航按钮
-        nav_layout = QHBoxLayout()
-        back_btn = QPushButton("返回")
-        next_btn = QPushButton("下一步")
-        back_btn.clicked.connect(self.parent().prev_page)
-        next_btn.clicked.connect(self.parent().next_page)
-        nav_layout.addWidget(back_btn)
-        nav_layout.addWidget(next_btn)
-        self.layout.addLayout(nav_layout)
-
-class DateTimePage(GuidePage):
-    """日期选择页面"""
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.add_title("请选择您当前所在地的日期")
-        
-        # 日期选择
-        date_layout = QHBoxLayout()
-        self.date_combo = QComboBox()
-        # 添加日期选项
-        current_date = QDate.currentDate()
-        for i in range(-365, 366):  # 前后一年的日期
-            date = current_date.addDays(i)
-            self.date_combo.addItem(date.toString("yyyy-MM-dd"))
-        self.date_combo.setCurrentText(current_date.toString("yyyy-MM-dd"))
-        date_layout.addWidget(self.date_combo)
-        
-        self.layout.addLayout(date_layout)
-        
-        # 导航按钮
-        nav_layout = QHBoxLayout()
-        back_btn = QPushButton("返回")
-        next_btn = QPushButton("下一步")
-        back_btn.clicked.connect(self.parent().prev_page)
-        next_btn.clicked.connect(self.parent().next_page)
-        nav_layout.addWidget(back_btn)
-        nav_layout.addWidget(next_btn)
-        self.layout.addLayout(nav_layout)
-
-class TimePage(GuidePage):
-    """时间选择页面"""
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.add_title("请选择您当前所在地的时间")
-        
-        # 时间选择
-        time_layout = QHBoxLayout()
-        self.time_combo = QComboBox()
-        # 添加时间选项
-        for hour in range(24):
-            for minute in range(0, 60, 5):  # 每5分钟一个选项
-                time_str = f"{hour:02d}:{minute:02d}"
-                self.time_combo.addItem(time_str)
-        current_time = QTime.currentTime()
-        current_time_str = current_time.toString("hh:mm")
-        self.time_combo.setCurrentText(current_time_str)
-        time_layout.addWidget(self.time_combo)
-        
-        self.layout.addLayout(time_layout)
-        
-        # 导航按钮
-        nav_layout = QHBoxLayout()
-        back_btn = QPushButton("返回")
-        next_btn = QPushButton("下一步")
-        back_btn.clicked.connect(self.parent().prev_page)
-        next_btn.clicked.connect(self.parent().next_page)
-        nav_layout.addWidget(back_btn)
-        nav_layout.addWidget(next_btn)
-        self.layout.addLayout(nav_layout)
-
-class StressLevelPage(GuidePage):
-    """压力水平选择页面"""
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.add_title("请选择您近1周的压力水平")
-        
-        # 压力水平滑块
-        self.stress_slider = QSlider(Qt.Horizontal)
-        self.stress_slider.setMinimum(0)
-        self.stress_slider.setMaximum(100)
-        self.stress_slider.setValue(50)
-        
-        # 添加颜色标记
-        color_layout = QHBoxLayout()
-        colors = ["红", "黄", "蓝", "绿"]
-        for color in colors:
-            label = QLabel(color)
-            color_layout.addWidget(label)
-            
-        self.layout.addWidget(self.stress_slider)
-        self.layout.addLayout(color_layout)
-        
-        # 导航按钮
-        nav_layout = QHBoxLayout()
-        back_btn = QPushButton("返回")
-        next_btn = QPushButton("下一步")
-        back_btn.clicked.connect(self.parent().prev_page)
-        next_btn.clicked.connect(self.parent().next_page)
-        nav_layout.addWidget(back_btn)
-        nav_layout.addWidget(next_btn)
-        self.layout.addLayout(nav_layout)
-
-class ReligionPage(GuidePage):
-    """宗教选择页面"""
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.add_title("请选择您所在的宗教")
-        
-        # 宗教选择按钮组
-        self.religion_group = QButtonGroup(self)
-        religions = ["无宗教信仰", "佛教", "基督教", "伊斯兰教", "印度教", "其他"]
-        
-        for religion in religions:
-            btn = QRadioButton(religion)
-            btn.setFont(QFont("PingFang SC", 16))
-            self.religion_group.addButton(btn)
-            self.layout.addWidget(btn, alignment=Qt.AlignCenter)
-            
-        # 添加导航按钮
-        nav_layout = QHBoxLayout()
-        back_btn = QPushButton("返回")
-        next_btn = QPushButton("下一步")
-        back_btn.clicked.connect(self.parent().prev_page)
-        next_btn.clicked.connect(self.parent().next_page)
-        nav_layout.addWidget(back_btn)
-        nav_layout.addWidget(next_btn)
-        self.layout.addLayout(nav_layout)
-
-class SleepQualityPage(GuidePage):
-    """睡眠质量选择页面"""
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.add_title("请选择您近1周的睡眠质量")
-        
-        # 睡眠质量滑块
-        self.sleep_slider = QSlider(Qt.Horizontal)
-        self.sleep_slider.setMinimum(0)
-        self.sleep_slider.setMaximum(100)
-        self.sleep_slider.setValue(50)
-        
-        # 添加颜色标记
-        color_layout = QHBoxLayout()
-        colors = ["非常不好", "一般", "良好", "非常好"]
-        for color in colors:
-            label = QLabel(color)
-            label.setStyleSheet("color: white;")
-            color_layout.addWidget(label)
-            
-        self.layout.addWidget(self.sleep_slider)
-        self.layout.addLayout(color_layout)
-        
-        # 导航按钮
-        nav_layout = QHBoxLayout()
-        back_btn = QPushButton("返回")
-        next_btn = QPushButton("下一步")
-        back_btn.clicked.connect(self.parent().prev_page)
-        next_btn.clicked.connect(self.parent().next_page)
-        nav_layout.addWidget(back_btn)
-        nav_layout.addWidget(next_btn)
-        self.layout.addLayout(nav_layout)
-
-class ProblemSelectionPage(GuidePage):
-    """问题选择页面"""
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.add_title("请选择您希望通过Mindora帮助您解决的问题")
-        
-        # 问题选择复选框组
-        problems = [
-            "改善睡眠质量",
-            "缓解压力",
-            "提高专注力",
-            "情绪管理",
-            "冥想练习",
-            "放松身心",
-            "提高工作效率"
-        ]
-        
-        for problem in problems:
-            checkbox = QCheckBox(problem)
-            checkbox.setFont(QFont("PingFang SC", 16))
-            self.layout.addWidget(checkbox, alignment=Qt.AlignCenter)
-            
-        # 添加导航按钮
-        nav_layout = QHBoxLayout()
-        back_btn = QPushButton("返回")
-        next_btn = QPushButton("下一步")
-        back_btn.clicked.connect(self.parent().prev_page)
-        next_btn.clicked.connect(self.parent().next_page)
-        nav_layout.addWidget(back_btn)
-        nav_layout.addWidget(next_btn)
-        self.layout.addLayout(nav_layout)
-
-class MentorSelectionPage(GuidePage):
-    """导师选择页面"""
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.add_title("重要的一步：请选择您喜爱的流派和导师")
-        self.add_description("每个导师有独特的特长和独在的世界，您可以试听导师的自我介绍以便选择。\n当您希望更换导师时，您随时可以通过设置页面进行更换")
-        
-        # 导师选择区域
-        mentor_layout = QVBoxLayout()
-        mentors = [
-            {"name": "Guruji", "image": "resources/images/secondhead_guruji.png", "audio": "resources/audio/guruji_intro.mp3"},
-            {"name": "Sun", "image": "resources/images/secondhead_sun.png", "audio": "resources/audio/sun_intro.mp3"}
-        ]
-        
-        for mentor in mentors:
-            mentor_widget = QWidget()
-            mentor_widget.setStyleSheet("background-color: rgba(255, 255, 255, 0.1); border-radius: 10px;")
-            mentor_layout_widget = QHBoxLayout(mentor_widget)
-            
-            # 导师头像
-            image_label = QLabel()
-            pixmap = QPixmap(mentor["image"])
-            image_label.setPixmap(pixmap.scaled(100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-            mentor_layout_widget.addWidget(image_label)
-            
-            # 导师信息
-            info_layout = QVBoxLayout()
-            name_label = QLabel(mentor["name"])
-            name_label.setFont(QFont("PingFang SC", 16))
-            info_layout.addWidget(name_label)
-            
-            # 试听按钮
-            listen_btn = QPushButton("试听介绍")
-            listen_btn.clicked.connect(lambda checked, audio=mentor["audio"]: self.play_audio(audio))
-            info_layout.addWidget(listen_btn)
-            
-            mentor_layout_widget.addLayout(info_layout)
-            mentor_layout.addWidget(mentor_widget)
-            
-        self.layout.addLayout(mentor_layout)
-        
-        # 添加导航按钮
-        nav_layout = QHBoxLayout()
-        back_btn = QPushButton("返回")
-        next_btn = QPushButton("下一步")
-        back_btn.clicked.connect(self.parent().prev_page)
-        next_btn.clicked.connect(self.parent().next_page)
-        nav_layout.addWidget(back_btn)
-        nav_layout.addWidget(next_btn)
-        self.layout.addLayout(nav_layout)
-        
-    def play_audio(self, audio_file):
-        # TODO: 实现音频播放功能
-        pass
-
-class CompletionPage(GuidePage):
-    """完成设置页面"""
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.add_title("Great！您已经完成了初始的设置")
-        
-        # 产品说明
-        description = """
-        在开始我们的旅程之前，请允许我再次向您保证，Mindora极其注重您的隐私，可以在不联网的时候使用所有能力。
-        并提供了物理按键以一键关闭系统的声音、灯光、香氛。
-        
-        您可以通过Mindora来唤醒他，也可以用触屏完成整个操作。
-        当您希望更新内容时，您可以链接WIFI，完成系统及更多新内容的下载
-        """
-        self.add_description(description)
-        
-        # 产品说明图
-        product_image = QLabel()
-        product_image.setPixmap(QPixmap("resources/images/product_guide.png").scaled(400, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        self.layout.addWidget(product_image, alignment=Qt.AlignCenter)
-        
-        # 开始按钮
-        start_btn = QPushButton("开始Mindora的体验")
-        start_btn.setFixedSize(200, 50)
-        start_btn.clicked.connect(self.parent().hide_guide)
-        self.layout.addWidget(start_btn, alignment=Qt.AlignCenter)
-
-class GuideSystem(QStackedWidget):
-    """引导系统主类"""
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setup_pages()
-        self.setup_animations()
-        
-    def setup_pages(self):
-        # 添加所有引导页面
-        self.pages = [
-            LogoPage(self),  # 添加LOGO视频页面
-            WelcomePage(self),
-            LanguagePage(self),
-            DateTimePage(self),
-            TimePage(self),
-            StressLevelPage(self),
-            ReligionPage(self),
-            SleepQualityPage(self),
-            ProblemSelectionPage(self),
-            MentorSelectionPage(self),
-            CompletionPage(self)
-        ]
-        
-        for page in self.pages:
-            self.addWidget(page)
-            
-    def setup_animations(self):
-        # 创建页面切换动画
-        self.page_animation = QPropertyAnimation(self, b"pos")
-        self.page_animation.setDuration(300)
-        self.page_animation.setEasingCurve(QEasingCurve.InOutCubic)
-        
-    def next_page(self):
-        current = self.currentIndex()
-        if current < self.count() - 1:
-            # 设置动画
-            self.page_animation.setStartValue(self.pos())
-            self.page_animation.setEndValue(QPoint(-self.width(), 0))
-            self.page_animation.finished.connect(lambda: self._finish_next_page(current + 1))
-            self.page_animation.start()
-            
-    def _finish_next_page(self, next_index):
-        self.setCurrentIndex(next_index)
-        self.move(0, 0)
-        
-    def prev_page(self):
-        current = self.currentIndex()
-        if current > 0:
-            # 设置动画
-            self.page_animation.setStartValue(self.pos())
-            self.page_animation.setEndValue(QPoint(self.width(), 0))
-            self.page_animation.finished.connect(lambda: self._finish_prev_page(current - 1))
-            self.page_animation.start()
-            
-    def _finish_prev_page(self, prev_index):
-        self.setCurrentIndex(prev_index)
-        self.move(0, 0)
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setFixedSize(WINDOW_W, WINDOW_H) #设置主窗口固定大小
-        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint) #把窗口设置为"无边框且总在最前面"的窗口
+        self.setFixedSize(WINDOW_W, WINDOW_H)
+        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
         self.setCursor(Qt.BlankCursor)
         
         self.ClickStartPos = None
         self.DraggingFlag = False
-        #加载字体
-        font_db = QFontDatabase()
-        font_db.addApplicationFont("resources/fonts/PingFang_Regular.ttf")#"PingFang SC Regular"
-        font_db.addApplicationFont("resources/fonts/PingFang_Bold.ttf")#"PingFang SC Bold"
-        font_db.addApplicationFont("resources/fonts/PingFang_Light.ttf")#"PingFang SC Light"
-        font_db.addApplicationFont("resources/fonts/SourceHanSerifCN-Heavy-4.otf")#"Source Han Serif CN"
-        font_db.addApplicationFont("resources/fonts/SourceHanSerifCN-Bold-2.otf")#"Source Han Serif CN"
-        #菜单级数标识
-        self.menu_flag = 0    
         
-        # self.Container = QStackedWidget(self)
-        # self.Container.setGeometry(0,0,WINDOW_W, WINDOW_H)
-        # self.scene = QGraphicsScene()
-        # self.setScene(self.scene)
+        # 加载字体
+        font_db = QFontDatabase()
+        font_db.addApplicationFont(os.path.join(RESOURCE_ROOT, "fonts/PingFang_Regular.ttf"))
+        font_db.addApplicationFont(os.path.join(RESOURCE_ROOT, "fonts/PingFang_Bold.ttf"))
+        font_db.addApplicationFont(os.path.join(RESOURCE_ROOT, "fonts/PingFang_Light.ttf"))
+        font_db.addApplicationFont(os.path.join(RESOURCE_ROOT, "fonts/SourceHanSerifCN-Heavy-4.otf"))
+        font_db.addApplicationFont(os.path.join(RESOURCE_ROOT, "fonts/SourceHanSerifCN-Bold-2.otf"))
+        
+        # 菜单级数标识
+        self.menu_flag = 0
+        
         # 创建初始界面
         self.initBG = QLabel(self)
-        self.initBG.setPixmap(QPixmap("resources/images/zeroback_sun.jpg").scaled(self.size(), Qt.IgnoreAspectRatio))
+        self.initBG.setPixmap(QPixmap(os.path.join(RESOURCE_ROOT, "images/zeroback_sun.jpg")).scaled(self.size(), Qt.IgnoreAspectRatio))
         self.initBG.setGeometry(0, 0, self.width(), self.height())
-        # self.initRect = QGraphicsRectItem(self.initBG)
-        # self.initBG.hide()
-             
+        
         # 创建一级界面
         self.firstBG = QLabel(self)
         self.firstBG.setGeometry(0, 0, self.width(), self.height())
         self.firstBG.setScaledContents(True)
-        self.firstBGMovie = QMovie("resources/images/firstback_fire.gif")
+        self.firstBGMovie = QMovie(os.path.join(RESOURCE_ROOT, "images/firstback_fire.gif"))
         self.firstBG.setMovie(self.firstBGMovie)
         self.firstBGMovie.start()
-        self.firstBG.hide()         
+        self.firstBG.hide()
+        
         self.firstMenu = FirstWidget(self)
-        self.firstMenu.setGeometry(self.width(), 0, self.width(), self.height()) 
-        # self.firstMenu.hide() 
-
-        # 创建二级界面 
-        self.SecondMenuIndex = 0 #当前二级菜单页序数     
-        self.SecondMenuGrp = [] #二级菜单子项列表
+        self.firstMenu.setGeometry(self.width(), 0, self.width(), self.height())
+        
+        # 创建二级界面
+        self.SecondMenuIndex = 0
+        self.SecondMenuGrp = []
         for i in range(len(coacher)):
-            self.SecondMenuGrp.append(SecondWidget(i,self))
+            self.SecondMenuGrp.append(SecondWidget(i, self))
             if i == 0:
                 self.SecondMenuGrp[i].hide()
         self.curr_SecondMenu = self.SecondMenuGrp[self.SecondMenuIndex]
         self.next_SecondMenu = self.SecondMenuGrp[self.SecondMenuIndex+1]
         
-        # #创建三级场景界面
+        # 创建三级场景界面
         self.thirdBG = QLabel(self)
         self.thirdBG.setGeometry(0, 0, self.width(), self.height())
         self.thirdBG.setScaledContents(True)
-        # self.thirdBGMovie = QMovie("resources/images/third_starsky.gif")
-        # self.thirdBG.setMovie(self.thirdBGMovie)
-        # self.thirdBGMovie.start()
         self.thirdBG.hide()
         
         # 创建topBar
-        self.TopBar = TopBarDisplayWidget(self) 
-        # self.TopBar.hide()       
+        self.TopBar = TopBarDisplayWidget(self)
+        
         # 创建BottomBar
         self.BottomBar = BottomBarDisplayWidget(self)
+        
         # 创建左右按钮
-        self.leftBtn = ImageButton(GUIDE_BTN_W,GUIDE_BTN_H,"resources/images/leftSingleArrow.png",self)
+        self.leftBtn = ImageButton(GUIDE_BTN_W, GUIDE_BTN_H, os.path.join(RESOURCE_ROOT, "images/leftSingleArrow.png"), self)
         self.leftBtn.clicked.connect(self.leftArrowClicked)
         self.leftBtn.move(GUIDE_BTN_W//2, (WINDOW_H - GUIDE_BTN_H)//2)
         self.leftBtn.hide()
-        self.rightBtn = ImageButton(GUIDE_BTN_W,GUIDE_BTN_H,"resources/images/rightSingleArrow.png",self)
+        
+        self.rightBtn = ImageButton(GUIDE_BTN_W, GUIDE_BTN_H, os.path.join(RESOURCE_ROOT, "images/rightSingleArrow.png"), self)
         self.rightBtn.clicked.connect(self.rightArrowClicked)
-        self.rightBtn.move(WINDOW_W - GUIDE_BTN_W - GUIDE_BTN_W//2, (WINDOW_H - GUIDE_BTN_H)//2) 
+        self.rightBtn.move(WINDOW_W - GUIDE_BTN_W - GUIDE_BTN_W//2, (WINDOW_H - GUIDE_BTN_H)//2)
         self.rightBtn.hide()
-        # 创建语音交互图层       
-        self.voiceDetectingPage = VoiceDetectingWidget("resources/images/voiceDynamicImage", 100, self)
+        
+        # 创建语音交互图层
+        self.voiceDetectingPage = VoiceDetectingWidget(os.path.join(RESOURCE_ROOT, "images/voiceDynamicImage"), 100, self)
         self.voiceDetectingPage.hide()
         
-        #添加动画效果
+        # 添加动画效果
         self.AnimationFlash()
         
         # 添加引导系统
         self.guide_system = GuideSystem(self)
-        self.guide_system.setGeometry(0, 0, WINDOW_W, WINDOW_H)  # 设置引导系统的大小
-        self.show_guide()  # 主动显示引导系统
+        self.guide_system.setGeometry(0, 0, WINDOW_W, WINDOW_H)
+        self.show_guide()
         
+    def show_guide(self):
+        self.guide_system.show()
+        self.guide_system.raise_()
+        self.initBG.hide()
+        self.firstBG.hide()
+        self.firstMenu.hide()
+        self.TopBar.hide()
+        self.BottomBar.hide()
+        
+    def hide_guide(self):
+        self.guide_system.hide()
+        self.initBG.show()
+        self.animation_init.start()
+
     def messageHandler(self, text):
         if text == "voice appear":
             print(f"voice appear Received")
@@ -1179,20 +720,20 @@ class MainWindow(QMainWindow):
         self.curr_SecondMenu = self.SecondMenuGrp[self.SecondMenuIndex]
         if self.SecondMenuIndex == len(coacher) - 1:
             if self.SecondMenuIndex == 0:
-                self.leftBtn.image = QPixmap("resources/images/leftSingleArrow.png")
+                self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftSingleArrow.png")
             else:
-                self.leftBtn.image = QPixmap("resources/images/leftDoubleArrow.png")
+                self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftDoubleArrow.png")
             self.leftBtn.show()
             self.rightBtn.hide()
         elif self.SecondMenuIndex == 0:
-            self.leftBtn.image = QPixmap("resources/images/leftSingleArrow.png")
+            self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftSingleArrow.png")
             self.leftBtn.show()
-            self.rightBtn.image = QPixmap("resources/images/rightDoubleArrow.png")
+            self.rightBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/rightDoubleArrow.png")
             self.rightBtn.show()
         else:
-            self.leftBtn.image = QPixmap("resources/images/leftDoubleArrow.png")
+            self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftDoubleArrow.png")
             self.leftBtn.show()
-            self.rightBtn.image = QPixmap("resources/images/rightDoubleArrow.png")
+            self.rightBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/rightDoubleArrow.png")
             self.rightBtn.show()
         
     
@@ -1277,7 +818,7 @@ class MainWindow(QMainWindow):
             # print(self.firstMenu.pos().x())
             self.BottomBar.hide()
             self.TopBar.time_label.show()
-            self.leftBtn.image = QPixmap("resources/images/leftSingleArrow.png")
+            self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftSingleArrow.png")
             self.leftBtn.show()
         else:
             self.leftBtn.hide()
@@ -1290,9 +831,9 @@ class MainWindow(QMainWindow):
             self.BottomBar.time_label.hide()
             self.BottomBar.playbutton.show()
             self.BottomBar.show()
-            self.leftBtn.image = QPixmap("resources/images/leftSingleArrow.png")
+            self.leftBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/leftSingleArrow.png")
             self.leftBtn.show()
-            self.rightBtn.image = QPixmap("resources/images/rightDoubleArrow.png")
+            self.rightBtn.image = QPixmap("/home/dsg/test/seven_emb/resources/images/rightDoubleArrow.png")
             self.rightBtn.show()
             self.menu_flag = 2
             
@@ -1320,21 +861,6 @@ class MainWindow(QMainWindow):
         self.leftBtn.raise_()
         self.rightBtn.raise_()
             
-    def show_guide(self):
-        self.guide_system.show()
-        self.guide_system.raise_()
-        # 隐藏其他界面元素
-        self.initBG.hide()
-        self.firstBG.hide()
-        self.firstMenu.hide()
-        self.TopBar.hide()
-        self.BottomBar.hide()
-        
-    def hide_guide(self):
-        self.guide_system.hide()
-        # 显示主界面
-        self.initBG.show()
-        self.animation_init.start()
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
