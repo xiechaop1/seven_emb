@@ -14,8 +14,9 @@ from base.audio_player import AudioPlayer
 from config.config import Config
 from model.init_manager import InitManager
 
+from base.light import Light
+
 if not Config.IS_DEBUG:
-    from base.light import Light
     from base.spray import Spray
 else:
     from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QPushButton, 
@@ -176,6 +177,21 @@ if __name__ == "__main__":
     comm = Communicator()
     # comm = None
 
+    light_instance = Light()
+    light_thread = threading.Thread(target=light_instance.daemon)
+    light_thread.start()
+
+    ThreadingEvent.light_daemon_event.clear()
+    light_instance.turn_off()
+    # light_instance.start(Code.LIGHT_MODE_WAVE, {"fore_color": [0, 0, 255]})
+    # light_instance.start(Code.LIGHT_MODE_BREATHING, {"r":0, "g":0, "b":255, "steps": 200})
+    # light_instance.start(Code.LIGHT_MODE_CIRCLE, {"r1": 0, "g1": 0, "b1": 255, "r2": 0, "g2": 255, "b2": 0, "time_duration": 100, "times": -1})
+    light_instance.start(Code.LIGHT_MODE_SECTOR_FLOWING, {"mode": "colorful"})
+    # light_instance.start(Code.LIGHT_MODE_CIRCLE_RAINBOW, {"mode": "colorful"})
+    # light_instance.start(Code.LIGHT_MODE_RANDOM_POINT, {"fore_colors": [[0, 255, 0]], "back_colors": [[4, 0, 20]], "group_num": 1, "rand_num_per_groups": [1], "times": 100})
+    # light_instance.start(Code.LIGHT_MODE_RANDOM_POINT,{"mode": "fire"})
+    logging.info("light initialized")
+
     if not Config.IS_DEBUG:
         # 暂时去掉，等上板子再试
         # spray_instance = ""
@@ -190,20 +206,6 @@ if __name__ == "__main__":
         #
 
 
-        light_instance = Light()
-        light_thread = threading.Thread(target=light_instance.daemon)
-        light_thread.start()
-
-        ThreadingEvent.light_daemon_event.clear()
-        light_instance.turn_off()
-        # light_instance.start(Code.LIGHT_MODE_WAVE, {"fore_color": [0, 0, 255]})
-        # light_instance.start(Code.LIGHT_MODE_BREATHING, {"r":0, "g":0, "b":255, "steps": 200})
-        # light_instance.start(Code.LIGHT_MODE_CIRCLE, {"r1": 0, "g1": 0, "b1": 255, "r2": 0, "g2": 255, "b2": 0, "time_duration": 100, "times": -1})
-        light_instance.start(Code.LIGHT_MODE_SECTOR_FLOWING, {"mode": "colorful"})
-        # light_instance.start(Code.LIGHT_MODE_CIRCLE_RAINBOW, {"mode": "colorful"})
-        # light_instance.start(Code.LIGHT_MODE_RANDOM_POINT, {"fore_colors": [[0, 255, 0]], "back_colors": [[4, 0, 20]], "group_num": 1, "rand_num_per_groups": [1], "times": 100})
-        # light_instance.start(Code.LIGHT_MODE_RANDOM_POINT,{"mode": "fire"})
-        logging.info("light initialized")
     else:
         spray_instance = ""
         light_instance = ""
