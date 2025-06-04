@@ -9,9 +9,10 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QGraphicsBlurEf
                            QSlider, QCheckBox, QRadioButton, QButtonGroup, QVBoxLayout,
                            QHBoxLayout, QScrollArea)
 from GUI.buttons import CustomButton, ImageButton
+from .main import MainWindow  # 添加这行导入语句
 
-WINDOW_W = 1080
-WINDOW_H = 1080
+WINDOW_W = 1280
+WINDOW_H = 800
 
 class InitManager:
     def __init__(self):
