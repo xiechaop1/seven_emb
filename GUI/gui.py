@@ -443,10 +443,10 @@ class MainWindow(QMainWindow):
         # else:
         #     self.show_main_interface()
             
-    def show_guide(self):
-        """显示引导页面"""
-        self.guide_page = GuidePage(self)
-        self.setCentralWidget(self.guide_page)
+    # def show_guide(self):
+    #     """显示引导页面"""
+    #     self.guide_page = GuidePage(self)
+    #     self.setCentralWidget(self.guide_page)
         
     def show_main_interface(self):
         """显示主界面"""
@@ -553,8 +553,8 @@ class MainWindow(QMainWindow):
         super().mousePressEvent(event)
         
         # 如果引导页面正在显示，不处理其他点击事件
-        if self.guide_page.isVisible():
-            return
+        # if self.guide_page.isVisible():
+        #     return
             
         if event.button() == Qt.RightButton:
             self.initBG.show()
