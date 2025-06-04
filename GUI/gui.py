@@ -471,8 +471,10 @@ class MainWindow(QMainWindow):
         
         # 创建初始界面
         self.initBG = QLabel(self)
-        self.initBG.setPixmap(QPixmap("resources/images/zeroback_sun.jpg").scaled(self.size(), Qt.IgnoreAspectRatio))
         self.initBG.setGeometry(0, 0, self.width(), self.height())
+        self.initBG.setScaledContents(True)  # 添加这行，确保图片填充整个标签
+        self.initBG.setPixmap(QPixmap("resources/images/zeroback_sun.jpg"))
+        self.initBG.show()  # 确保标签可见
         
         # 创建一级界面
         self.firstBG = QLabel(self)
