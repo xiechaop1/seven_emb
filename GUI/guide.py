@@ -92,18 +92,18 @@ class BaseGuidePage(QWidget):
         
         # 创建按钮容器 - 移到顶部
         self.button_container = QWidget(self)
-        self.button_container.setGeometry(0, 20, WINDOW_W, 80)  # 移到顶部
+        self.button_container.setGeometry(0, 20, WINDOW_W, 80)
         self.button_container.setStyleSheet("background-color: transparent;")
         
         # 创建返回按钮
         self.back_btn = QPushButton(self.button_container)
         self.back_btn.setText("返回")
-        self.back_btn.setGeometry(20, 0, 200, 60)  # 靠左放置
+        self.back_btn.setGeometry(20, 0, 200, 60)
         self.back_btn.setStyleSheet("""
             QPushButton {
                 background-color: #4a4a4a;
                 color: #FFD700;
-                border: 3px solid #FFD700;
+                border: 1px solid #FFD700;
                 border-radius: 30px;
                 font-size: 24px;
                 font-weight: bold;
@@ -111,12 +111,12 @@ class BaseGuidePage(QWidget):
             }
             QPushButton:hover {
                 background-color: #5a5a5a;
-                border: 3px solid #FFA500;
+                border: 1px solid #FFA500;
                 color: #FFA500;
             }
             QPushButton:pressed {
                 background-color: #3a3a3a;
-                border: 3px solid #FF8C00;
+                border: 1px solid #FF8C00;
                 color: #FF8C00;
             }
         """)
@@ -125,12 +125,12 @@ class BaseGuidePage(QWidget):
         # 创建下一步按钮
         self.next_btn = QPushButton(self.button_container)
         self.next_btn.setText("下一步")
-        self.next_btn.setGeometry(WINDOW_W-220, 0, 200, 60)  # 靠右放置
+        self.next_btn.setGeometry(WINDOW_W-220, 0, 200, 60)
         self.next_btn.setStyleSheet("""
             QPushButton {
                 background-color: #4a4a4a;
                 color: #FFD700;
-                border: 3px solid #FFD700;
+                border: 1px solid #FFD700;
                 border-radius: 30px;
                 font-size: 24px;
                 font-weight: bold;
@@ -138,18 +138,18 @@ class BaseGuidePage(QWidget):
             }
             QPushButton:hover {
                 background-color: #5a5a5a;
-                border: 3px solid #FFA500;
+                border: 1px solid #FFA500;
                 color: #FFA500;
             }
             QPushButton:pressed {
                 background-color: #3a3a3a;
-                border: 3px solid #FF8C00;
+                border: 1px solid #FF8C00;
                 color: #FF8C00;
             }
         """)
         self.next_btn.clicked.connect(self.next_clicked.emit)
         
-        # 创建标题 - 移到按钮下方
+        # 创建标题
         self.title = QLabel(self)
         self.title.setGeometry(0, 120, WINDOW_W, 60)
         self.title.setAlignment(Qt.AlignCenter)
@@ -162,7 +162,7 @@ class BaseGuidePage(QWidget):
         self.content.setStyleSheet("color: white; font-size: 24px;")
         
         # 确保按钮容器和按钮都可见
-        self.button_container.raise_()  # 确保按钮在最上层
+        self.button_container.raise_()
         self.button_container.show()
         self.back_btn.show()
         self.next_btn.show()
@@ -439,6 +439,10 @@ class ReligionPage(BaseGuidePage):
             """)
             self.religion_group.addButton(radio, i)
             radio.show()
+        
+        # 确保滚动区域在最上层
+        self.scroll_area.raise_()
+        self.scroll_area.show()
 
 class StressPage(BaseGuidePage):
     def __init__(self, parent=None):
@@ -690,6 +694,10 @@ class ProblemsPage(BaseGuidePage):
         # 连接信号
         for checkbox in self.checkboxes:
             checkbox.stateChanged.connect(self.update_next_button)
+            
+        # 确保滚动区域在最上层
+        self.scroll_area.raise_()
+        self.scroll_area.show()
             
     def update_next_button(self):
         """更新下一步按钮状态"""
