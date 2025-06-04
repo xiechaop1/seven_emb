@@ -18,9 +18,9 @@ if not Config.IS_DEBUG:
     from base.light import Light
     from base.spray import Spray
 else:
-    from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, 
+    from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QPushButton, 
                            QVBoxLayout, QHBoxLayout, QStackedWidget, QComboBox,
-                           QSlider, QCheckBox, QRadioButton, QButtonGroup
+                           QSlider, QCheckBox, QRadioButton, QButtonGroup)
     # from model import ui
     # from base.screen import Screen
 if hasattr(Config, "OS"):
