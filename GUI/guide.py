@@ -386,6 +386,7 @@ class ReligionPage(BaseGuidePage):
         # 创建滚动区域
         self.scroll_area = QScrollArea(self)
         self.scroll_area.setGeometry((WINDOW_W-400)//2, 300, 400, 400)
+        self.scroll_area.setWidgetResizable(True)  # 允许widget调整大小
         self.scroll_area.setStyleSheet("""
             QScrollArea {
                 border: none;
@@ -412,15 +413,20 @@ class ReligionPage(BaseGuidePage):
         self.container.setStyleSheet("background-color: transparent;")
         self.scroll_area.setWidget(self.container)
         
+        # 创建垂直布局
+        layout = QVBoxLayout(self.container)
+        layout.setSpacing(10)
+        layout.setContentsMargins(0, 0, 0, 0)
+        
         # 创建单选按钮
-        for i, religion in enumerate(religions):
-            radio = QRadioButton(religion, self.container)
-            radio.setGeometry(0, i*60, 400, 50)
+        for religion in religions:
+            radio = QRadioButton(religion)
             radio.setStyleSheet("""
                 QRadioButton {
                     color: white;
                     font-size: 24px;
                     padding: 10px;
+                    min-height: 50px;
                 }
                 QRadioButton::indicator {
                     width: 20px;
@@ -437,8 +443,8 @@ class ReligionPage(BaseGuidePage):
                     background-color: #4a4a4a;
                 }
             """)
-            self.religion_group.addButton(radio, i)
-            radio.show()
+            self.religion_group.addButton(radio)
+            layout.addWidget(radio)
         
         # 确保滚动区域在最上层
         self.scroll_area.raise_()
@@ -620,6 +626,7 @@ class ProblemsPage(BaseGuidePage):
         # 创建问题选择区域
         self.scroll_area = QScrollArea(self)
         self.scroll_area.setGeometry((WINDOW_W-600)//2, 300, 600, 400)
+        self.scroll_area.setWidgetResizable(True)  # 允许widget调整大小
         self.scroll_area.setStyleSheet("""
             QScrollArea {
                 border: none;
@@ -646,6 +653,11 @@ class ProblemsPage(BaseGuidePage):
         self.container.setStyleSheet("background-color: transparent;")
         self.scroll_area.setWidget(self.container)
         
+        # 创建垂直布局
+        layout = QVBoxLayout(self.container)
+        layout.setSpacing(10)
+        layout.setContentsMargins(0, 0, 0, 0)
+        
         # 创建复选框
         problems = [
             "改善睡眠质量",
@@ -661,14 +673,14 @@ class ProblemsPage(BaseGuidePage):
         ]
         
         self.checkboxes = []
-        for i, problem in enumerate(problems):
-            checkbox = QCheckBox(problem, self.container)
-            checkbox.setGeometry(0, i*50, 600, 40)
+        for problem in problems:
+            checkbox = QCheckBox(problem)
             checkbox.setStyleSheet("""
                 QCheckBox {
                     color: white;
                     font-size: 20px;
                     padding: 5px;
+                    min-height: 40px;
                 }
                 QCheckBox::indicator {
                     width: 20px;
@@ -686,15 +698,12 @@ class ProblemsPage(BaseGuidePage):
                 }
             """)
             self.checkboxes.append(checkbox)
-            checkbox.show()
+            layout.addWidget(checkbox)
+            checkbox.stateChanged.connect(self.update_next_button)
             
         # 修改下一步按钮的启用状态
         self.next_btn.setEnabled(False)
         
-        # 连接信号
-        for checkbox in self.checkboxes:
-            checkbox.stateChanged.connect(self.update_next_button)
-            
         # 确保滚动区域在最上层
         self.scroll_area.raise_()
         self.scroll_area.show()
@@ -703,6 +712,7 @@ class ProblemsPage(BaseGuidePage):
         """更新下一步按钮状态"""
         checked = any(checkbox.isChecked() for checkbox in self.checkboxes)
         self.next_btn.setEnabled(checked)
+        print(f"Checkbox state changed. Next button enabled: {checked}")  # 添加调试信息
 
 class MentorPage(BaseGuidePage):
     def __init__(self, parent=None):
