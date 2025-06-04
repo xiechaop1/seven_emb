@@ -93,9 +93,11 @@ class GuidePage(QWidget):
         
         print("Initialization data:", init_data)  # 调试信息
         
-        # 创建并显示主界面
-        # self.main_window = MainWindow(init_data)
-        # self.main_window.show()
+        # 保存初始化数据
+        self.init_manager.save_init_data(init_data)
+        print("Initialization data saved")
+        
+        # 关闭引导窗口
         self.close()
 
 class BaseGuidePage(QWidget):
