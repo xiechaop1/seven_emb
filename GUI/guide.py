@@ -376,6 +376,13 @@ class DatePage(BaseGuidePage):
             self.day_combo.setCurrentText(str(current_day).zfill(2))
         else:
             self.day_combo.setCurrentText("01")
+            
+    def get_selected_date(self):
+        """获取选择的日期"""
+        year = self.year_combo.currentText()
+        month = self.month_combo.currentText()
+        day = self.day_combo.currentText()
+        return f"{year}-{month}-{day}"
 
 class TimePage(BaseGuidePage):
     def __init__(self, parent=None):
