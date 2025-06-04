@@ -443,10 +443,10 @@ class MainWindow(QMainWindow):
         # else:
         #     self.show_main_interface()
             
-    # def show_guide(self):
-    #     """显示引导页面"""
-    #     self.guide_page = GuidePage(self)
-    #     self.setCentralWidget(self.guide_page)
+    def show_guide(self):
+        """显示引导页面"""
+        self.guide_page = GuidePage(self)
+        self.setCentralWidget(self.guide_page)
         
     def show_main_interface(self):
         """显示主界面"""
