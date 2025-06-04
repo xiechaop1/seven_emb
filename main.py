@@ -137,6 +137,12 @@ if __name__ == "__main__":
     # 创建初始化管理器
     init_manager = InitManager()
     
+    # 创建应用程序实例
+    app = QApplication(sys.argv)
+    # 创建主窗口
+    window = gui.MainWindow()
+    window.show()
+    
     # 检查是否需要显示引导页面
     if not init_manager.load_init_data():
         # 如果没有初始化数据，显示引导页面
@@ -146,13 +152,7 @@ if __name__ == "__main__":
         # 如果有初始化数据，直接显示主界面
         window.show_main_interface()
         print("Showing main interface")
-    
-    
-    # 创建应用程序实例
-    app = QApplication(sys.argv)
-    window = gui.MainWindow()
-    window.show()
-
+        
     # 初始化 WebSocket 客户端
     websocket_url = "ws://114.55.90.104:9001/ws"
     client = WebSocketClient()
