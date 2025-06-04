@@ -104,27 +104,32 @@ class BaseGuidePage(QWidget):
         
         # 创建按钮容器
         self.button_container = QWidget(self)
-        self.button_container.setGeometry(0, WINDOW_H-200, WINDOW_W, 60)
+        self.button_container.setGeometry(0, WINDOW_H-200, WINDOW_W, 100)  # 增加高度
         self.button_container.setStyleSheet("background-color: transparent;")
         
         # 创建返回按钮
         self.back_btn = QPushButton(self.button_container)
         self.back_btn.setText("返回")
-        self.back_btn.setGeometry((WINDOW_W-600)//2, 0, 200, 60)
+        self.back_btn.setGeometry((WINDOW_W-600)//2, 0, 200, 80)  # 增加按钮高度
         self.back_btn.setStyleSheet("""
             QPushButton {
                 background-color: #4a4a4a;
                 color: #FFD700;
-                border: none;
-                border-radius: 30px;
-                font-size: 20px;
+                border: 3px solid #FFD700;
+                border-radius: 40px;
+                font-size: 24px;
                 font-weight: bold;
+                padding: 10px;
             }
             QPushButton:hover {
                 background-color: #5a5a5a;
+                border: 3px solid #FFA500;
+                color: #FFA500;
             }
             QPushButton:pressed {
                 background-color: #3a3a3a;
+                border: 3px solid #FF8C00;
+                color: #FF8C00;
             }
         """)
         self.back_btn.clicked.connect(self.back_clicked.emit)
@@ -132,21 +137,26 @@ class BaseGuidePage(QWidget):
         # 创建下一步按钮
         self.next_btn = QPushButton(self.button_container)
         self.next_btn.setText("下一步")
-        self.next_btn.setGeometry((WINDOW_W+200)//2, 0, 200, 60)
+        self.next_btn.setGeometry((WINDOW_W+200)//2, 0, 200, 80)  # 增加按钮高度
         self.next_btn.setStyleSheet("""
             QPushButton {
                 background-color: #4a4a4a;
                 color: #FFD700;
-                border: none;
-                border-radius: 30px;
-                font-size: 20px;
+                border: 3px solid #FFD700;
+                border-radius: 40px;
+                font-size: 24px;
                 font-weight: bold;
+                padding: 10px;
             }
             QPushButton:hover {
                 background-color: #5a5a5a;
+                border: 3px solid #FFA500;
+                color: #FFA500;
             }
             QPushButton:pressed {
                 background-color: #3a3a3a;
+                border: 3px solid #FF8C00;
+                color: #FF8C00;
             }
         """)
         self.next_btn.clicked.connect(self.next_clicked.emit)
@@ -161,8 +171,34 @@ class WelcomePage(BaseGuidePage):
         super().__init__(parent)
         self.title.setText("欢迎来到Mindora的世界")
         self.content.setText("在最开始的时候，请选择一些必要的信息，\n以便Mindora带给你关于冥想和助眠的更好体验")
+        
         # 在欢迎页面隐藏返回按钮
         self.back_btn.hide()
+        
+        # 修改下一步按钮样式，使其更加显眼
+        self.next_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #4a4a4a;
+                color: #FFD700;
+                border: 4px solid #FFD700;
+                border-radius: 40px;
+                font-size: 28px;
+                font-weight: bold;
+                padding: 15px;
+            }
+            QPushButton:hover {
+                background-color: #5a5a5a;
+                border: 4px solid #FFA500;
+                color: #FFA500;
+            }
+            QPushButton:pressed {
+                background-color: #3a3a3a;
+                border: 4px solid #FF8C00;
+                color: #FF8C00;
+            }
+        """)
+        self.next_btn.setText("开始体验")
+        self.next_btn.setGeometry((WINDOW_W-300)//2, 0, 300, 80)  # 调整欢迎页面的按钮位置和大小
 
 class LanguagePage(BaseGuidePage):
     def __init__(self, parent=None):
