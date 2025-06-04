@@ -720,9 +720,13 @@ class MentorPage(BaseGuidePage):
         self.title.setText("重要的一步：请选择您喜爱的流派和导师")
         self.content.setText("每个导师有独特的特长和独在的世界，您可以试听导师的自我介绍以便选择。\n当您希望更换导师时，您随时可以通过设置页面进行更换")
         
-        # 创建导师选择区域
+        # 调整标题和内容区域的位置
+        self.title.setGeometry(0, 80, WINDOW_W, 40)  # 减小标题高度
+        self.content.setGeometry(100, 130, WINDOW_W-200, 60)  # 减小内容区域高度
+        
+        # 创建导师选择区域 - 调整位置
         self.scroll_area = QScrollArea(self)
-        self.scroll_area.setGeometry((WINDOW_W-400)//2, 300, 400, 300)  # 缩小滚动区域
+        self.scroll_area.setGeometry((WINDOW_W-400)//2, 200, 400, 300)  # 上移滚动区域
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setStyleSheet("""
             QScrollArea {
