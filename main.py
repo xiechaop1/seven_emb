@@ -140,6 +140,7 @@ if __name__ == "__main__":
     # 创建应用程序实例
     app = QApplication(sys.argv)
     window = gui.MainWindow()
+    window.show()
     
     # 检查是否需要显示引导页面
     if not init_manager.load_init_data():

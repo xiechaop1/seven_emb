@@ -853,7 +853,7 @@ class MentorPage(BaseGuidePage):
                 QWidget {
                     background-color: #2a2a2a;
                     border-radius: 5px;
-                    min-height: 40px;  # 减小最小高度
+                    min-height: 40px;  /* 减小最小高度 */
                 }
             """)
             
