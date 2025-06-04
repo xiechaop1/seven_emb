@@ -425,13 +425,29 @@ class VoiceDetectingWidget(QWidget):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setFixedSize(WINDOW_W, WINDOW_H)
-        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
-        self.setCursor(Qt.BlankCursor)
+        self.setWindowTitle("Mindora")
+        self.setGeometry(0, 0, WINDOW_W, WINDOW_H)
         
-        self.ClickStartPos = None
-        self.DraggingFlag = False
+        # 创建初始化管理器
+        self.init_manager = InitManager()
         
+        # 检查是否需要显示引导页面
+        if not self.init_manager.load_init_data():
+            self.show_guide()
+        else:
+            self.show_main_interface()
+            
+    def show_guide(self):
+        """显示引导页面"""
+        self.guide_page = GuidePage(self)
+        self.setCentralWidget(self.guide_page)
+        
+    def show_main_interface(self):
+        """显示主界面"""
+        # TODO: 实现主界面
+        print("Showing main interface")
+        # 这里可以访问 self.init_manager.data 来获取初始化数据
+        print("Initialization data:", self.init_manager.data)
         # 加载字体
         font_db = QFontDatabase()
         font_db.addApplicationFont("resources/fonts/PingFang_Regular.ttf")
@@ -505,19 +521,8 @@ class MainWindow(QMainWindow):
         self.AnimationFlash()
         
         # 显示引导页面
-        self.show_guide()
-        
-    def show_guide(self):
-        """显示引导页面"""
-        self.guide_page.show()
-        self.guide_page.raise_()
-        
-    def show_main_interface(self):
-        """显示主界面"""
-        self.guide_page.hide()
-        self.initBG.show()
-        self.animation_init.start()
-        
+        # self.show_guide()
+
     def messageHandler(self, text):
         if text == "voice appear":
             print(f"voice appear Received")

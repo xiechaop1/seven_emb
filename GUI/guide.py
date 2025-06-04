@@ -1,4 +1,6 @@
 import sys
+import json
+import os
 from PyQt5.QtCore import Qt, QPropertyAnimation, pyqtProperty, QRectF, QRect, QEasingCurve, QPoint, QTimer, QTime, QDate, pyqtSignal
 from PyQt5.QtGui import QPainter, QColor, QImage, QPixmap, QFont, QFontDatabase, QPalette, QMouseEvent, QIcon, QMovie
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QGraphicsBlurEffect, QLabel, 
@@ -11,10 +13,38 @@ from GUI.buttons import CustomButton, ImageButton
 WINDOW_W = 1080
 WINDOW_H = 1080
 
+class InitManager:
+    def __init__(self):
+        self.init_file = "init.json"
+        self.data = None
+        
+    def load_init_data(self):
+        """加载初始化数据"""
+        if os.path.exists(self.init_file):
+            try:
+                with open(self.init_file, 'r', encoding='utf-8') as f:
+                    self.data = json.load(f)
+                return True
+            except Exception as e:
+                print(f"Error loading init data: {e}")
+                return False
+        return False
+        
+    def save_init_data(self, data):
+        """保存初始化数据"""
+        try:
+            with open(self.init_file, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            return True
+        except Exception as e:
+            print(f"Error saving init data: {e}")
+            return False
+
 class GuidePage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setGeometry(0, 0, WINDOW_W, WINDOW_H)
+        self.init_manager = InitManager()
         self.setup_ui()
         
     def setup_ui(self):
@@ -73,7 +103,33 @@ class GuidePage(QWidget):
         self.stack.setCurrentIndex(0)
         
     def finish_guide(self):
-        # 完成引导流程，返回主界面
+        """完成引导流程，保存数据并返回主界面"""
+        # 收集所有页面的数据
+        init_data = {
+            "language": self.language_page.get_selected_language(),
+            "date": {
+                "year": self.date_page.year_combo.currentText(),
+                "month": self.date_page.month_combo.currentText(),
+                "day": self.date_page.day_combo.currentText()
+            },
+            "time": {
+                "hour": self.time_page.hour_combo.currentText(),
+                "minute": self.time_page.minute_combo.currentText()
+            },
+            "religion": self.religion_page.get_selected_religion(),
+            "stress_level": self.stress_page.slider.value(),
+            "sleep_quality": self.sleep_page.slider.value(),
+            "problems": self.problems_page.get_selected_problems(),
+            "mentor": self.mentor_page.get_selected_mentor()
+        }
+        
+        # 保存数据
+        if self.init_manager.save_init_data(init_data):
+            print("Initialization data saved successfully")
+        else:
+            print("Failed to save initialization data")
+            
+        # 返回主界面
         self.parent().show_main_interface()
 
 class BaseGuidePage(QWidget):
@@ -209,14 +265,14 @@ class LanguagePage(BaseGuidePage):
         
         # 创建语言选择按钮组
         self.language_group = QButtonGroup(self)
-        languages = ["英语", "中文", "日语", "法语"]
+        self.languages = ["英语", "中文", "日语", "法语"]
         
         # 创建语言选择容器
         self.language_container = QWidget(self)
         self.language_container.setGeometry((WINDOW_W-400)//2, 300, 400, 300)
         
         # 创建单选按钮
-        for i, lang in enumerate(languages):
+        for i, lang in enumerate(self.languages):
             radio = QRadioButton(lang, self.language_container)
             radio.setGeometry(0, i*60, 400, 50)
             radio.setStyleSheet("""
@@ -249,6 +305,13 @@ class LanguagePage(BaseGuidePage):
     def on_language_selected(self):
         """当选择语言时直接进入下一个页面"""
         self.next_clicked.emit()
+
+    def get_selected_language(self):
+        """获取选中的语言"""
+        button = self.language_group.checkedButton()
+        if button:
+            return self.languages[self.language_group.id(button)]
+        return None
 
 class DatePage(BaseGuidePage):
     def __init__(self, parent=None):
@@ -381,7 +444,7 @@ class ReligionPage(BaseGuidePage):
         
         # 创建宗教选择按钮组
         self.religion_group = QButtonGroup(self)
-        religions = ["无宗教信仰", "佛教", "基督教", "伊斯兰教", "印度教", "道教", "其他"]
+        self.religions = ["无宗教信仰", "佛教", "基督教", "伊斯兰教", "印度教", "道教", "其他"]
         
         # 创建滚动区域
         self.scroll_area = QScrollArea(self)
@@ -419,7 +482,7 @@ class ReligionPage(BaseGuidePage):
         layout.setContentsMargins(0, 0, 0, 0)
         
         # 创建单选按钮
-        for religion in religions:
+        for religion in self.religions:
             radio = QRadioButton(religion)
             radio.setStyleSheet("""
                 QRadioButton {
@@ -449,6 +512,13 @@ class ReligionPage(BaseGuidePage):
         # 确保滚动区域在最上层
         self.scroll_area.raise_()
         self.scroll_area.show()
+
+    def get_selected_religion(self):
+        """获取选中的宗教"""
+        button = self.religion_group.checkedButton()
+        if button:
+            return self.religions[self.religion_group.id(button)]
+        return None
 
 class StressPage(BaseGuidePage):
     def __init__(self, parent=None):
@@ -714,6 +784,10 @@ class ProblemsPage(BaseGuidePage):
         self.next_btn.setEnabled(checked)
         print(f"Checkbox state changed. Next button enabled: {checked}")  # 添加调试信息
 
+    def get_selected_problems(self):
+        """获取选中的问题列表"""
+        return [checkbox.text() for checkbox in self.checkboxes if checkbox.isChecked()]
+
 class MentorPage(BaseGuidePage):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -905,6 +979,18 @@ class MentorPage(BaseGuidePage):
         """更新下一步按钮状态"""
         self.next_btn.setEnabled(True)
         print("Mentor selected. Next button enabled.")
+
+    def get_selected_mentor(self):
+        """获取选中的导师"""
+        button = self.mentor_group.checkedButton()
+        if button:
+            # 获取导师卡片
+            card = button.parent().parent()
+            # 获取导师名称
+            name_label = card.findChild(QLabel)
+            if name_label:
+                return name_label.text()
+        return None
 
 class FinalPage(BaseGuidePage):
     finish_clicked = pyqtSignal()
