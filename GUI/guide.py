@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QGraphicsBlurEf
                            QSlider, QCheckBox, QRadioButton, QButtonGroup, QVBoxLayout,
                            QHBoxLayout, QScrollArea)
 from GUI.buttons import CustomButton, ImageButton
-from .main import MainWindow  # 添加这行导入语句
+# from .main import MainWindow  # 添加这行导入语句
 
 WINDOW_W = 1280
 WINDOW_H = 800
