@@ -428,6 +428,12 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Mindora")
         self.setGeometry(0, 0, WINDOW_W, WINDOW_H)
         
+        # 初始化拖动相关属性
+        self.ClickStartPos = None
+        self.DraggingFlag = False
+        self.curr_start = None
+        self.zero_start = None
+        
         # 创建初始化管理器
         self.init_manager = InitManager()
         
