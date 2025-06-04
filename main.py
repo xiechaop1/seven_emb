@@ -6,6 +6,7 @@ import logging
 import sys
 import os
 import time
+from datetime import datetime, timedelta
 
 from base.ws import WebSocketClient
 from base.mic import Mic
@@ -17,7 +18,9 @@ if not Config.IS_DEBUG:
     from base.light import Light
     from base.spray import Spray
 else:
-    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, 
+                           QVBoxLayout, QHBoxLayout, QStackedWidget, QComboBox,
+                           QSlider, QCheckBox, QRadioButton, QButtonGroup
     # from model import ui
     # from base.screen import Screen
 if hasattr(Config, "OS"):
@@ -41,7 +44,6 @@ from GUI import gui
 #     from PyQt5.QtWidgets import QApplication
 #     from model import ui
 
-from datetime import time, datetime, timedelta
 from model.scheduler import TaskDaemon
 from model.task import Task, TaskType, TaskScheduleType, TaskStatus, TaskAction, SoundCommand
 import json
