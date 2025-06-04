@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt, QRectF, QTimer, QTime, QDate, QPropertyAnimation, Q
 from PyQt5.QtGui import QPainter, QColor, QImage, QPixmap, QFont, QFontDatabase, QPalette, QMouseEvent, QIcon, QMovie
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget,  QGraphicsBlurEffect, QLabel, QGraphicsOpacityEffect, QPushButton, QStackedWidget, QFrame, QGraphicsView, QGraphicsScene, QGraphicsRectItem
 from GUI.buttons import CustomButton , ImageButton
-from GUI.guide import GuidePage
+from GUI.guide import GuidePage, InitManager
 # from buttons import CustomButton , ImageButton
 # from GUI.animations import fadeAnimation
 
