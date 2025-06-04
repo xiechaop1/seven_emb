@@ -105,6 +105,7 @@ class BaseGuidePage(QWidget):
         # 创建按钮容器
         self.button_container = QWidget(self)
         self.button_container.setGeometry(0, WINDOW_H-200, WINDOW_W, 60)
+        self.button_container.setStyleSheet("background-color: transparent;")
         
         # 创建返回按钮
         self.back_btn = QPushButton(self.button_container)
@@ -149,6 +150,11 @@ class BaseGuidePage(QWidget):
             }
         """)
         self.next_btn.clicked.connect(self.next_clicked.emit)
+        
+        # 确保按钮容器和按钮都可见
+        self.button_container.show()
+        self.back_btn.show()
+        self.next_btn.show()
 
 class WelcomePage(BaseGuidePage):
     def __init__(self, parent=None):
