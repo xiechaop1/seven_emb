@@ -12,8 +12,8 @@ from model.init_manager import InitManager
 from GUI.buttons import CustomButton, ImageButton
 # from .main import MainWindow  # 添加这行导入语句
 
-WINDOW_W = 1280
-WINDOW_H = 800
+WINDOW_W = 1080
+WINDOW_H = 1080
 
 class GuidePage(QWidget):
     def __init__(self, parent=None):
