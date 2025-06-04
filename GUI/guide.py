@@ -722,7 +722,7 @@ class MentorPage(BaseGuidePage):
         
         # 创建导师选择区域
         self.scroll_area = QScrollArea(self)
-        self.scroll_area.setGeometry((WINDOW_W-800)//2, 300, 800, 500)
+        self.scroll_area.setGeometry((WINDOW_W-400)//2, 300, 400, 300)  # 缩小滚动区域
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setStyleSheet("""
             QScrollArea {
@@ -752,7 +752,7 @@ class MentorPage(BaseGuidePage):
         
         # 创建垂直布局
         layout = QVBoxLayout(self.container)
-        layout.setSpacing(20)
+        layout.setSpacing(10)  # 减小间距
         layout.setContentsMargins(0, 0, 0, 0)
         
         # 创建导师选择按钮组
@@ -783,51 +783,51 @@ class MentorPage(BaseGuidePage):
             card.setStyleSheet("""
                 QWidget {
                     background-color: #2a2a2a;
-                    border-radius: 10px;
-                    min-height: 200px;
+                    border-radius: 5px;
+                    min-height: 40px;  # 减小最小高度
                 }
             """)
             
             # 创建卡片布局
             card_layout = QHBoxLayout(card)
-            card_layout.setContentsMargins(20, 20, 20, 20)
-            card_layout.setSpacing(20)
+            card_layout.setContentsMargins(5, 5, 5, 5)  # 减小边距
+            card_layout.setSpacing(5)  # 减小间距
             
             # 创建左侧区域（头像）
             left_widget = QWidget()
-            left_widget.setFixedSize(160, 160)
+            left_widget.setFixedSize(32, 32)  # 缩小头像尺寸
             left_layout = QVBoxLayout(left_widget)
             left_layout.setContentsMargins(0, 0, 0, 0)
             
             # 创建头像
             avatar = QLabel()
-            avatar.setFixedSize(160, 160)
+            avatar.setFixedSize(32, 32)  # 缩小头像尺寸
             avatar_pixmap = QPixmap(mentor["avatar"])
-            avatar.setPixmap(avatar_pixmap.scaled(160, 160, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-            avatar.setStyleSheet("border-radius: 80px;")
+            avatar.setPixmap(avatar_pixmap.scaled(32, 32, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            avatar.setStyleSheet("border-radius: 16px;")  # 调整圆角
             left_layout.addWidget(avatar)
             
             # 创建右侧区域（信息）
             right_widget = QWidget()
             right_layout = QVBoxLayout(right_widget)
             right_layout.setContentsMargins(0, 0, 0, 0)
-            right_layout.setSpacing(10)
+            right_layout.setSpacing(2)  # 减小间距
             
             # 创建名称
             name = QLabel(mentor["name"])
-            name.setStyleSheet("color: white; font-size: 24px; font-weight: bold;")
+            name.setStyleSheet("color: white; font-size: 14px; font-weight: bold;")  # 减小字体
             right_layout.addWidget(name)
             
             # 创建描述
             desc = QLabel(mentor["description"])
-            desc.setStyleSheet("color: #cccccc; font-size: 18px;")
+            desc.setStyleSheet("color: #cccccc; font-size: 12px;")  # 减小字体
             right_layout.addWidget(desc)
             
             # 创建按钮区域
             button_widget = QWidget()
             button_layout = QHBoxLayout(button_widget)
             button_layout.setContentsMargins(0, 0, 0, 0)
-            button_layout.setSpacing(20)
+            button_layout.setSpacing(5)  # 减小间距
             
             # 创建试听按钮
             listen_btn = QPushButton("试听")
@@ -836,10 +836,11 @@ class MentorPage(BaseGuidePage):
                     background-color: #4a4a4a;
                     color: #FFD700;
                     border: 1px solid #FFD700;
-                    border-radius: 20px;
-                    font-size: 18px;
-                    padding: 5px 15px;
-                    min-width: 100px;
+                    border-radius: 10px;
+                    font-size: 12px;
+                    padding: 2px 8px;
+                    min-width: 50px;
+                    min-height: 20px;
                 }
                 QPushButton:hover {
                     background-color: #5a5a5a;
@@ -855,17 +856,17 @@ class MentorPage(BaseGuidePage):
                     color: white;
                 }
                 QRadioButton::indicator {
-                    width: 30px;
-                    height: 30px;
+                    width: 15px;
+                    height: 15px;
                 }
                 QRadioButton::indicator:unchecked {
-                    border: 2px solid #4a4a4a;
-                    border-radius: 15px;
+                    border: 1px solid #4a4a4a;
+                    border-radius: 7px;
                     background-color: #2a2a2a;
                 }
                 QRadioButton::indicator:checked {
-                    border: 2px solid #4a4a4a;
-                    border-radius: 15px;
+                    border: 1px solid #4a4a4a;
+                    border-radius: 7px;
                     background-color: #4a4a4a;
                 }
             """)
@@ -899,7 +900,7 @@ class MentorPage(BaseGuidePage):
     def update_next_button(self):
         """更新下一步按钮状态"""
         self.next_btn.setEnabled(True)
-        print("Mentor selected. Next button enabled.")  # 添加调试信息
+        print("Mentor selected. Next button enabled.")
 
 class FinalPage(BaseGuidePage):
     finish_clicked = pyqtSignal()
