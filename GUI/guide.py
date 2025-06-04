@@ -72,9 +72,6 @@ class GuidePage(QWidget):
         # 设置初始页面
         self.stack.setCurrentIndex(0)
         
-        # 在欢迎页面隐藏返回按钮
-        self.welcome_page.back_btn.hide()
-        
     def finish_guide(self):
         # 完成引导流程，返回主界面
         self.parent().show_main_interface()
@@ -110,7 +107,7 @@ class BaseGuidePage(QWidget):
         self.button_container.setGeometry(0, WINDOW_H-200, WINDOW_W, 60)
         
         # 创建返回按钮
-        self.back_btn = CustomButton(200, 60, self.button_container)
+        self.back_btn = QPushButton(self.button_container)
         self.back_btn.setText("返回")
         self.back_btn.setGeometry((WINDOW_W-600)//2, 0, 200, 60)
         self.back_btn.setStyleSheet("""
@@ -132,7 +129,7 @@ class BaseGuidePage(QWidget):
         self.back_btn.clicked.connect(self.back_clicked.emit)
         
         # 创建下一步按钮
-        self.next_btn = CustomButton(200, 60, self.button_container)
+        self.next_btn = QPushButton(self.button_container)
         self.next_btn.setText("下一步")
         self.next_btn.setGeometry((WINDOW_W+200)//2, 0, 200, 60)
         self.next_btn.setStyleSheet("""
