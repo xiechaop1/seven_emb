@@ -434,6 +434,12 @@ class TimePage(BaseGuidePage):
         for minute in range(60):
             self.minute_combo.addItem(str(minute).zfill(2))
         self.minute_combo.setCurrentText(str(QTime.currentTime().minute()).zfill(2))
+        
+    def get_selected_time(self):
+        """获取选择的时间"""
+        hour = self.hour_combo.currentText()
+        minute = self.minute_combo.currentText()
+        return f"{hour}:{minute}"
 
 class ReligionPage(BaseGuidePage):
     def __init__(self, parent=None):
