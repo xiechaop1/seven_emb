@@ -43,7 +43,7 @@ class InitManager:
 class GuidePage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setGeometry(0, 0, WINDOW_W, WINDOW_H)
+        self.parent = parent
         self.init_manager = InitManager()
         self.setup_ui()
         
@@ -103,34 +103,25 @@ class GuidePage(QWidget):
         self.stack.setCurrentIndex(0)
         
     def finish_guide(self):
-        """完成引导流程，保存数据并返回主界面"""
+        """完成引导，保存数据并进入主界面"""
         # 收集所有页面的数据
-        init_data = {
+        data = {
             "language": self.language_page.get_selected_language(),
-            "date": {
-                "year": self.date_page.year_combo.currentText(),
-                "month": self.date_page.month_combo.currentText(),
-                "day": self.date_page.day_combo.currentText()
-            },
-            "time": {
-                "hour": self.time_page.hour_combo.currentText(),
-                "minute": self.time_page.minute_combo.currentText()
-            },
+            "date": self.date_page.get_selected_date(),
+            "time": self.time_page.get_selected_time(),
             "religion": self.religion_page.get_selected_religion(),
-            "stress_level": self.stress_page.slider.value(),
-            "sleep_quality": self.sleep_page.slider.value(),
+            "stress_level": self.stress_page.get_stress_level(),
+            "sleep_quality": self.sleep_page.get_sleep_quality(),
             "problems": self.problems_page.get_selected_problems(),
             "mentor": self.mentor_page.get_selected_mentor()
         }
         
         # 保存数据
-        if self.init_manager.save_init_data(init_data):
-            print("Initialization data saved successfully")
-        else:
-            print("Failed to save initialization data")
-            
-        # 返回主界面
-        self.parent().show_main_interface()
+        self.init_manager.save_init_data(data)
+        
+        # 通知父窗口显示主界面
+        if self.parent:
+            self.parent.show_main_interface()
 
 class BaseGuidePage(QWidget):
     next_clicked = pyqtSignal()
