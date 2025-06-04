@@ -137,11 +137,6 @@ if __name__ == "__main__":
     # 创建初始化管理器
     init_manager = InitManager()
     
-    # 创建应用程序实例
-    app = QApplication(sys.argv)
-    window = gui.MainWindow()
-    window.show()
-    
     # 检查是否需要显示引导页面
     if not init_manager.load_init_data():
         # 如果没有初始化数据，显示引导页面
@@ -151,6 +146,68 @@ if __name__ == "__main__":
         # 如果有初始化数据，直接显示主界面
         window.show_main_interface()
         print("Showing main interface")
+    
+    
+    # 创建应用程序实例
+    app = QApplication(sys.argv)
+    window = gui.MainWindow()
+    window.show()
+
+    # 初始化 WebSocket 客户端
+    websocket_url = "ws://114.55.90.104:9001/ws"
+    client = WebSocketClient()
+    ws = asyncio.run(client.create_websocket_client(websocket_url))
+    
+    # 初始化香氛
+    if not Config.IS_DEBUG:
+        spray_instance = Spray()
+        spray_thread = threading.Thread(target=spray_instance.deal)
+        spray_thread.start()
+        spray_instance.turn_off()
+        logging.info("spray initialized and turn off")
+    else:
+        spray_instance = None
+
+    # 初始化灯光
+    if not Config.IS_DEBUG:
+        light_instance = Light()
+        light_thread = threading.Thread(target=light_instance.daemon)
+        light_thread.start()
+        ThreadingEvent.light_daemon_event.clear()
+        light_instance.turn_off()
+        light_instance.start(Code.LIGHT_MODE_SECTOR_FLOWING, {"mode": "colorful"})
+        logging.info("light initialized")
+    else:
+        light_instance = None
+
+    # 初始化音频播放器
+    audio_instance = AudioPlayer(spray_instance, light_instance)
+    audio_play_thread = threading.Thread(target=audio_instance.audio_play_event_daemon)
+    audio_play_thread.start()
+    logging.info("audio is ready")
+
+    # 初始化屏幕
+    if args.mode != "demo":
+        screen_instance = Screen()
+        screen_instance.add("resources/video/main.mp4", 100)
+        screen_thread = threading.Thread(target=screen_instance.daemon)
+        screen_thread.start()
+        screen_instance.play()
+    else:
+        screen_instance = None
+
+    # 初始化麦克风
+    mic_instance = Mic(client, audio_instance, light_instance, screen_instance)
+    kaldi_thread = threading.Thread(target=mic_instance.kaldi_listener)
+    kaldi_thread.start()
+    logging.info("Mic is ready")
+
+    # 初始化任务调度器
+    task_daemon = TaskDaemon()
+    task_thread = threading.Thread(target=task_daemon.start)
+    task_thread.start()
+    logging.info("Task scheduler initialized")
+    
     
     # 对接槽接口
     comm.message.connect(window.messageHandler)

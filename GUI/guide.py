@@ -120,8 +120,8 @@ class GuidePage(QWidget):
         print("Initialization data:", init_data)  # 调试信息
         
         # 创建并显示主界面
-        self.main_window = MainWindow(init_data)
-        self.main_window.show()
+        # self.main_window = MainWindow(init_data)
+        # self.main_window.show()
         self.close()
 
 class BaseGuidePage(QWidget):
