@@ -438,10 +438,10 @@ class MainWindow(QMainWindow):
         self.init_manager = InitManager()
         
         # 检查是否需要显示引导页面
-        if not self.init_manager.load_init_data():
-            self.show_guide()
-        else:
-            self.show_main_interface()
+        # if not self.init_manager.load_init_data():
+        #     self.show_guide()
+        # else:
+        #     self.show_main_interface()
             
     def show_guide(self):
         """显示引导页面"""

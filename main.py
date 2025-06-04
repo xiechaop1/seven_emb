@@ -8,6 +8,8 @@ from base.ws import WebSocketClient
 from base.mic import Mic
 from base.audio_player import AudioPlayer
 from config.config import Config
+from model.init_manager import InitManager
+
 if not Config.IS_DEBUG:
     from base.light import Light
     from base.spray import Spray
@@ -29,6 +31,7 @@ from model.recv import Recv
 from model.daemon import Daemon
 from common.code import Code
 from common.common import Common
+from model.init_manager import InitManager
 from GUI import gui
 # from model.ui import ScenePage, HomePage, OverlayWidget, MainWindow
 # if Config.OS != "lineage":
@@ -130,8 +133,30 @@ def on_release(key):
 if __name__ == "__main__":
     print(f"Starting with mode {args.mode}")
 
+    # 创建应用程序实例
+    app = QApplication(sys.argv)
+    
+    # 创建主窗口
+    window = gui.MainWindow()
+    window.show()
+    
+    # 检查初始化数据
+    init_manager = InitManager()
+    if not init_manager.load_init_data():
+        # 如果没有初始化数据，显示引导页面
+        print("No initialization data found, showing guide page")
+        window.show_guide()
+        # 等待引导完成
+        while not init_manager.load_init_data():
+            app.processEvents()  # 保持GUI响应
+            time.sleep(0.1)  # 避免CPU占用过高
+        print("Guide completed, initialization data loaded")
+    
+    # 显示主界面
+    window.show_main_interface()
+    print("Showing main interface")
+
     # websocket_url = "ws://114.55.90.104:9001/ws"
-    # if "WEBSOCKET_URL" in Config:
     if hasattr(Config, "WEBSOCKET_URL"):
         websocket_url = Config.WEBSOCKET_URL
     else:
@@ -304,13 +329,6 @@ if __name__ == "__main__":
 
 
     signal.signal(signal.SIGINT, signal_handler)
-
-    app = QApplication(sys.argv)
-    window = gui.MainWindow()
-    window.show()
-    print("window appear")
-    # 对接槽接口
-    comm.message.connect(window.messageHandler)
 
     sys.exit(app.exec_())
 
