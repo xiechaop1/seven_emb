@@ -607,6 +607,10 @@ class StressPage(BaseGuidePage):
             self.labels[2].setStyleSheet("color: white; font-size: 18px;")
             self.labels[3].setStyleSheet("color: white; font-size: 18px;")
             self.labels[4].setStyleSheet("color: #00ff00; font-size: 18px;")
+            
+    def get_stress_level(self):
+        """获取压力水平值"""
+        return self.slider.value()
 
 class SleepPage(BaseGuidePage):
     def __init__(self, parent=None):
@@ -691,6 +695,10 @@ class SleepPage(BaseGuidePage):
             self.labels[2].setStyleSheet("color: white; font-size: 18px;")
             self.labels[3].setStyleSheet("color: white; font-size: 18px;")
             self.labels[4].setStyleSheet("color: #00ff00; font-size: 18px;")
+            
+    def get_sleep_quality(self):
+        """获取睡眠质量值"""
+        return self.slider.value()
 
 class ProblemsPage(BaseGuidePage):
     def __init__(self, parent=None):
