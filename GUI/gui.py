@@ -466,8 +466,8 @@ class MainWindow(QMainWindow):
         self.menu_flag = 0
         
         # 创建引导页面
-        self.guide_page = GuidePage(self)
-        self.guide_page.hide()
+        # self.guide_page = GuidePage(self)
+        # self.guide_page.hide()
         
         # 创建初始界面
         self.initBG = QLabel(self)
