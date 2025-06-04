@@ -466,8 +466,8 @@ class MainWindow(QMainWindow):
         self.menu_flag = 0
         
         # 创建引导页面
-        # self.guide_page = GuidePage(self)
-        # self.guide_page.hide()
+        self.guide_page = GuidePage(self)
+        self.guide_page.hide()
         
         # 创建初始界面
         self.initBG = QLabel(self)
@@ -555,8 +555,8 @@ class MainWindow(QMainWindow):
         super().mousePressEvent(event)
         
         # 如果引导页面正在显示，不处理其他点击事件
-        # if self.guide_page.isVisible():
-        #     return
+        if self.guide_page.isVisible():
+            return
             
         if event.button() == Qt.RightButton:
             self.initBG.show()
