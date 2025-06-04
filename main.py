@@ -8,6 +8,7 @@ from base.ws import WebSocketClient
 from base.mic import Mic
 from base.audio_player import AudioPlayer
 from config.config import Config
+from GUI.guide import InitManager
 if not Config.IS_DEBUG:
     from base.light import Light
     from base.spray import Spray
