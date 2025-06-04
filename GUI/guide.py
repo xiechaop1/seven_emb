@@ -103,25 +103,25 @@ class GuidePage(QWidget):
         self.stack.setCurrentIndex(0)
         
     def finish_guide(self):
-        """完成引导，保存数据并进入主界面"""
-        # 收集所有页面的数据
-        data = {
-            "language": self.language_page.get_selected_language(),
-            "date": self.date_page.get_selected_date(),
-            "time": self.time_page.get_selected_time(),
-            "religion": self.religion_page.get_selected_religion(),
-            "stress_level": self.stress_page.get_stress_level(),
-            "sleep_quality": self.sleep_page.get_sleep_quality(),
-            "problems": self.problems_page.get_selected_problems(),
-            "mentor": self.mentor_page.get_selected_mentor()
+        """完成引导，收集所有数据并传递给主界面"""
+        # 收集所有数据
+        init_data = {
+            'language': self.language_page.get_selected_language(),
+            'date': self.date_page.get_selected_date(),
+            'time': self.time_page.get_selected_time(),
+            'religion': self.religion_page.get_selected_religion(),
+            'stress_level': self.stress_page.get_stress_level(),
+            'sleep_quality': self.sleep_page.get_sleep_quality(),
+            'problems': self.problems_page.get_selected_problems(),
+            'mentor': self.mentor_page.get_selected_mentor()
         }
         
-        # 保存数据
-        self.init_manager.save_init_data(data)
+        print("Initialization data:", init_data)  # 调试信息
         
-        # 通知父窗口显示主界面
-        if self.parent:
-            self.parent.show_main_interface()
+        # 创建并显示主界面
+        self.main_window = MainWindow(init_data)
+        self.main_window.show()
+        self.close()
 
 class BaseGuidePage(QWidget):
     next_clicked = pyqtSignal()
