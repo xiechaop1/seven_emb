@@ -90,33 +90,21 @@ class BaseGuidePage(QWidget):
         self.background.setGeometry(0, 0, WINDOW_W, WINDOW_H)
         self.background.setStyleSheet("background-color: #1a1a1a;")
         
-        # 创建标题
-        self.title = QLabel(self)
-        self.title.setGeometry(0, 100, WINDOW_W, 60)
-        self.title.setAlignment(Qt.AlignCenter)
-        self.title.setStyleSheet("color: white; font-size: 32px;")
-        
-        # 创建内容区域
-        self.content = QLabel(self)
-        self.content.setGeometry(100, 200, WINDOW_W-200, 400)
-        self.content.setAlignment(Qt.AlignCenter)
-        self.content.setStyleSheet("color: white; font-size: 24px;")
-        
-        # 创建按钮容器
+        # 创建按钮容器 - 移到顶部
         self.button_container = QWidget(self)
-        self.button_container.setGeometry(0, WINDOW_H-200, WINDOW_W, 100)  # 增加高度
+        self.button_container.setGeometry(0, 20, WINDOW_W, 80)  # 移到顶部
         self.button_container.setStyleSheet("background-color: transparent;")
         
         # 创建返回按钮
         self.back_btn = QPushButton(self.button_container)
         self.back_btn.setText("返回")
-        self.back_btn.setGeometry((WINDOW_W-600)//2, 0, 200, 80)  # 增加按钮高度
+        self.back_btn.setGeometry(20, 0, 200, 60)  # 靠左放置
         self.back_btn.setStyleSheet("""
             QPushButton {
                 background-color: #4a4a4a;
                 color: #FFD700;
                 border: 3px solid #FFD700;
-                border-radius: 40px;
+                border-radius: 30px;
                 font-size: 24px;
                 font-weight: bold;
                 padding: 10px;
@@ -137,13 +125,13 @@ class BaseGuidePage(QWidget):
         # 创建下一步按钮
         self.next_btn = QPushButton(self.button_container)
         self.next_btn.setText("下一步")
-        self.next_btn.setGeometry((WINDOW_W+200)//2, 0, 200, 80)  # 增加按钮高度
+        self.next_btn.setGeometry(WINDOW_W-220, 0, 200, 60)  # 靠右放置
         self.next_btn.setStyleSheet("""
             QPushButton {
                 background-color: #4a4a4a;
                 color: #FFD700;
                 border: 3px solid #FFD700;
-                border-radius: 40px;
+                border-radius: 30px;
                 font-size: 24px;
                 font-weight: bold;
                 padding: 10px;
@@ -161,7 +149,20 @@ class BaseGuidePage(QWidget):
         """)
         self.next_btn.clicked.connect(self.next_clicked.emit)
         
+        # 创建标题 - 移到按钮下方
+        self.title = QLabel(self)
+        self.title.setGeometry(0, 120, WINDOW_W, 60)
+        self.title.setAlignment(Qt.AlignCenter)
+        self.title.setStyleSheet("color: white; font-size: 32px;")
+        
+        # 创建内容区域
+        self.content = QLabel(self)
+        self.content.setGeometry(100, 200, WINDOW_W-200, 400)
+        self.content.setAlignment(Qt.AlignCenter)
+        self.content.setStyleSheet("color: white; font-size: 24px;")
+        
         # 确保按钮容器和按钮都可见
+        self.button_container.raise_()  # 确保按钮在最上层
         self.button_container.show()
         self.back_btn.show()
         self.next_btn.show()
@@ -181,7 +182,7 @@ class WelcomePage(BaseGuidePage):
                 background-color: #4a4a4a;
                 color: #FFD700;
                 border: 4px solid #FFD700;
-                border-radius: 40px;
+                border-radius: 30px;
                 font-size: 28px;
                 font-weight: bold;
                 padding: 15px;
@@ -198,7 +199,7 @@ class WelcomePage(BaseGuidePage):
             }
         """)
         self.next_btn.setText("开始体验")
-        self.next_btn.setGeometry((WINDOW_W-300)//2, 0, 300, 80)  # 调整欢迎页面的按钮位置和大小
+        self.next_btn.setGeometry((WINDOW_W-300)//2, 0, 300, 60)  # 欢迎页面按钮居中
 
 class LanguagePage(BaseGuidePage):
     def __init__(self, parent=None):
