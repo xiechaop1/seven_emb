@@ -151,6 +151,7 @@ if __name__ == "__main__":
     
     #创建信号槽
     comm = Communicator()
+    RecComm = Communicator()
     
     if not Config.IS_DEBUG:
         # 暂时去掉，等上板子再试
@@ -215,7 +216,7 @@ if __name__ == "__main__":
     # screen = Screen()
     # screen.display("resources/video/think.mp4")
 
-    mic_instance = Mic(client, audio_instance, light_instance, screen_instance, comm)
+    mic_instance = Mic(client, audio_instance, light_instance, screen_instance, comm, RecComm)
     kaldi_thread = threading.Thread(target=mic_instance.kaldi_listener)
     # kaldi_thread.start()
 
@@ -243,7 +244,7 @@ if __name__ == "__main__":
     #     listener.join()
     
     app = QApplication(sys.argv)
-    window = gui.MainWindow()
+    window = gui.MainWindow(RecComm)
     window.show()
     print("window appear")
     # 对接槽接口
