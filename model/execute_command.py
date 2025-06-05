@@ -22,7 +22,7 @@ class ExecuteCommand:
 
 	MAX_SCENE = 6	# 最大场景ID
 
-	def __init__(self, audioPlayerIns, ws, cv2):
+	def __init__(self, audioPlayerIns, ws, cv2, communicator):
 		self.audio_player = audioPlayerIns
 		self.latest_scene_seq = 0
 		self.req_scene_seq = 0
@@ -36,6 +36,8 @@ class ExecuteCommand:
 		self.commit_status = None
 
 		self.undertake_lock = threading.Lock()
+		self.comm = communicator
+		self.last_scene_seq = -1
 
 	def take_photo(self):
 		while True:
@@ -197,7 +199,9 @@ class ExecuteCommand:
 		resp_conv_id = resp['conversation_id']
 
 		scene_seq = resp["data"]["scene_seq"]
-
+		if self.last_scene_seq != scene_seq:
+			self.comm.message.emit(f"sleepAssisting {scene_seq}")  # 发信号到主线程
+			self.last_scene_seq = scene_seq
 		voice_msg_id = messageid.get_latest_message_id()
 		print("resp_msg_id:", resp_msg_id)
 		if voice_msg_id > resp_msg_id:

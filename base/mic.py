@@ -29,7 +29,6 @@ from vosk import Model, KaldiRecognizer, SpkModel
 from scipy import signal
 # from GUI.gui import Communicator
 
-
 class Mic:
     """麦克风控制类，负责录音和语音活动检测（VAD）"""
 
@@ -59,7 +58,7 @@ class Mic:
     # SPK_MODEL_PATH = "/home/li/vosk-api/python/example/vosk-model-spk-0.4"
     # model_path = "/home/li/vosk-model-small-cn-0.22"
 
-    def __init__(self, ws, audio_player, light, screen, communicator, threshold=800, timeout=30, sample_rate=16000, frame_duration=30):
+    def __init__(self, ws, audio_player, light, screen, communicator, communicator1, threshold=800, timeout=30, sample_rate=16000, frame_duration=30):
         """
         初始化麦克风参数
         :param threshold: 静音检测阈值（音频幅度超过该值视为非静音）
@@ -136,6 +135,8 @@ class Mic:
         
         self.comm = communicator
         self.framNo = 0
+        self.RecComm = communicator1
+        self.RecComm.message.connect(self.messageHandler)
 
     def kaldi_listener(self):
 
@@ -882,6 +883,15 @@ class Mic:
         if self.stream:
             self.stream.close()
         self.p.terminate()
+        
+    def messageHandler(self):
+        with wave.open("/home/dsg/test/seven_emb/resources/sound/GoToSleep.wav", 'rb') as wav_file:
+            # 2. 读取原始音频帧数据
+            audio_data = wav_file.readframes(wav_file.getnframes())
+            # print(type(audio_data))
+        # 3. 编码为 Base64 字符串
+        # audio_base64 = base64.b64encode(audio_data).decode('utf-8')
+        self.send_request(self.ws, audio_data)
 
 # # 使用示例
 # if __name__ == "__main__":

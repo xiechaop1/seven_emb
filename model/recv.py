@@ -39,7 +39,7 @@ class Recv:
 		vc_handler = VoiceChat(self.audio_player)
 
 		# self.wsClient.set_callback = ec_handler.undertake
-		ec_handler = ExecuteCommand(self.audio_player, self.wsClient, self.cv2)
+		ec_handler = ExecuteCommand(self.audio_player, self.wsClient, self.cv2, self.comm)
 		co_handler = Command(self.audio_player, self.light, self.spray, self.wsClient, self.cv2)
 
 		last_resp = None
