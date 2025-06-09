@@ -109,9 +109,9 @@ class Mic:
                          -0.233448, 0.757664, -0.375494, 0.666074, -0.123803, 1.518769, 0.873773, -0.218161, 1.566089,
                          -0.488127, 0.386693]
         self.keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
-        self.target_keywords = ["播放音乐", "七七", "停止", "抬头", "拍照", "休息", "Yuyu", "Mindora"]
+        self.target_keywords = ["播放音乐", "七七", "停止", "抬头", "拍照", "休息", "Yuyu", "Test"]
         # self.wakeup_keywords = '["七七", "七宝", "七夕", "休息", "嘻嘻"]'
-        self.wakeup_keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]", "Mindora"]'
+        self.wakeup_keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]", "Test"]'
         # self.command_keywords = '["关机"]'
 
         # self.device_name = "Yundea 1076"
@@ -249,8 +249,8 @@ class Mic:
             print(f"Transcription@@: {transcription}")
             
             # 检测关键词
-            if self.target_keywords[1] in str(transcription) or "Mindora" in str(transcription):
-                print(f"检测到唤醒词: {self.target_keywords[1] if self.target_keywords[1] in str(transcription) else 'Mindora'}")
+            if self.target_keywords[1] in str(transcription) or "Test" in str(transcription):
+                print(f"检测到唤醒词: {self.target_keywords[1] if self.target_keywords[1] in str(transcription) else 'Test'}")
                 self.voice_buffer = indata
                 ThreadingEvent.wakeup_event.set()
                 self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
@@ -261,8 +261,8 @@ class Mic:
             partial = json.loads(self.rec.PartialResult())
             partial_text = partial.get("partial", "")
             print(f"Partial Transcription: {partial_text}")
-            if self.target_keywords[1] in str(partial_text) or "Mindora" in str(partial_text):
-                print(f"检测到唤醒词: {self.target_keywords[1] if self.target_keywords[1] in str(partial_text) else 'Mindora'}")
+            if self.target_keywords[1] in str(partial_text) or "Test" in str(partial_text):
+                print(f"检测到唤醒词: {self.target_keywords[1] if self.target_keywords[1] in str(partial_text) else 'Test'}")
                 self.voice_buffer = indata
                 ThreadingEvent.wakeup_event.set()
                 self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
