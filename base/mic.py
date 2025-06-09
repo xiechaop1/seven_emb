@@ -109,9 +109,9 @@ class Mic:
                          -0.233448, 0.757664, -0.375494, 0.666074, -0.123803, 1.518769, 0.873773, -0.218161, 1.566089,
                          -0.488127, 0.386693]
         self.keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
-        self.target_keywords = ["播放音乐", "七七", "停止", "抬头", "拍照", "休息", "Yuyu"]
+        self.target_keywords = ["播放音乐", "七七", "停止", "抬头", "拍照", "休息", "Yuyu", "Mindora"]
         # self.wakeup_keywords = '["七七", "七宝", "七夕", "休息", "嘻嘻"]'
-        self.wakeup_keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
+        self.wakeup_keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]", "Mindora"]'
         # self.command_keywords = '["关机"]'
 
         # self.device_name = "Yundea 1076"
@@ -247,31 +247,13 @@ class Mic:
             print("LI_Result_dict_keyword:", result)
             transcription = result.get("text", "")
             print(f"Transcription@@: {transcription}")
-            # detect_keywords(transcription)
-            # print("keywords[1]:",target_keywords[1])
+            
             # 检测关键词
-            # for word, phonemes in qibao_phonemes.items():
-            #     if any(phoneme in recognized_phonemes for phoneme in phonemes):
-            # if "spk" in result:
-            #     spk_vector = result["spk"]
-            #     print("spk_vector:", spk_vector)
-            #     print("len(spk_vector):", len(spk_vector))
-            #     # print("len(spk_sig):", len(spk_sig))
-            #
-            #     distance1 = cosine_dist(spk_li_1, spk_vector)
-            #     print(f"Speaker distance1: {distance1}")
-            #     if distance1>0.5:
-            #         print("speaker distance larger than 0.5!!!!!!!!")
-            #         continue
-            #     # distance2 = cosine_dist(spk_li_2, spk_vector)
-            #     # print(f"Speaker distance2: {distance2}")
-            if self.target_keywords[1] in str(transcription):
-                print(f"检测到qibao关键词: {self.target_keywords[1]}")
+            if self.target_keywords[1] in str(transcription) or "Mindora" in str(transcription):
+                print(f"检测到唤醒词: {self.target_keywords[1] if self.target_keywords[1] in str(transcription) else 'Mindora'}")
                 self.voice_buffer = indata
                 ThreadingEvent.wakeup_event.set()
                 self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
-                # print(f"检测到qibao关键词: {phonemes}")
-                # continue
                 if Config.IS_DEBUG == False:
                     self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0}, Code.LIGHT_TYPE_TEMP)
                     logging.info("turn on the light for wakeup")
@@ -279,13 +261,11 @@ class Mic:
             partial = json.loads(self.rec.PartialResult())
             partial_text = partial.get("partial", "")
             print(f"Partial Transcription: {partial_text}")
-            if self.target_keywords[1] in str(partial_text):
-                print(f"检测到qibao关键词: {self.target_keywords[1]}")
+            if self.target_keywords[1] in str(partial_text) or "Mindora" in str(partial_text):
+                print(f"检测到唤醒词: {self.target_keywords[1] if self.target_keywords[1] in str(partial_text) else 'Mindora'}")
                 self.voice_buffer = indata
                 ThreadingEvent.wakeup_event.set()
                 self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
-                # print(f"检测到qibao关键词: {phonemes}")
-                # self.comm.message.emit("wake up")  # 发信号到主线程
                 if Config.IS_DEBUG == False:
                     self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0}, Code.LIGHT_TYPE_TEMP)
                     logging.info("turn on the light for wakeup")

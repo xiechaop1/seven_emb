@@ -61,6 +61,18 @@ class TaskAction:
             }
         )
 
+    @classmethod
+    def create_spray_action(cls, mode: str, duration: int = 5) -> 'TaskAction':
+        """创建香氛动作"""
+        return cls(
+            action_type=ActionType.SPRAY,
+            target="spray",
+            parameters={
+                "mode": mode,
+                "duration": duration
+            }
+        )
+
 class TaskScheduler:
     def __init__(self, storage_file, audioPlayerIns, lightIns, sprayIns):
         self.storage_file = storage_file
@@ -234,6 +246,8 @@ class TaskScheduler:
                         self._execute_sound_action(action)
                     elif action.action_type == ActionType.DISPLAY:
                         self._execute_display_action(action)
+                    elif action.action_type == ActionType.SPRAY:
+                        self._execute_spray_action(action)
                 
                 # 如果设置了持续时间，等待指定时间后停止
                 if task.duration is not None:
@@ -317,6 +331,8 @@ class TaskScheduler:
                 return self._execute_sound_action(action)
             elif action.action_type == ActionType.DISPLAY:
                 return self._execute_display_action(action)
+            elif action.action_type == ActionType.SPRAY:
+                return self._execute_spray_action(action)
             elif action.action_type == ActionType.COMBINED:
                 return self._execute_combined_action(action)
             else:
@@ -399,6 +415,29 @@ class TaskScheduler:
             return {
                 "success": True,
                 "message": f"显示模式已设置为: {mode}",
+                "parameters": params
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
+    def _execute_spray_action(self, action: TaskAction) -> dict:
+        """执行香氛动作"""
+        try:
+            params = action.parameters
+            mode = params.get("mode")
+            duration = params.get("duration", 5)
+            
+            if not mode:
+                raise ValueError("无效的香氛模式")
+            
+            self.spray.start(mode, duration)
+            
+            return {
+                "success": True,
+                "message": f"开始喷香: {mode}",
                 "parameters": params
             }
         except Exception as e:
@@ -514,6 +553,8 @@ class TaskScheduler:
                         elif action.action_type == ActionType.DISPLAY:
                             # 实现显示停止逻辑
                             pass
+                        elif action.action_type == ActionType.SPRAY:
+                            self.spray.stop()
                 
                 logging.info(f"已发送停止信号到任务: ID={task_id}")
                 return True
@@ -663,6 +704,59 @@ class TaskScheduler:
             
             logging.debug(f"获取所有任务状态信息，共 {len(status_list)} 个任务")
             return status_list
+
+    def create_combined_task_example(self) -> Task:
+        """创建一个5分钟后执行的组合任务示例
+        
+        这个示例将同时执行：
+        1. 灯光效果：呼吸模式
+        2. 声音播放：播放指定音频文件
+        3. 屏幕显示：显示动画效果
+        
+        Returns:
+            Task: 创建的任务对象
+        """
+        # 计算5分钟后的时间
+        now = datetime.now()
+        execution_time = (now + timedelta(minutes=5)).time()
+        
+        # 创建各种动作
+        light_action = TaskAction.create_light_action(
+            mode="breath",
+            params={
+                "color": "#FF0000",
+                "speed": 2
+            }
+        )
+        
+        sound_action = TaskAction.create_sound_action(
+            file_path="/path/to/your/music.mp3",
+            volume=80
+        )
+        
+        display_action = TaskAction.create_screen_action(
+            mode="animation",
+            params={
+                "animation_type": "welcome",
+                "duration": 30
+            }
+        )
+        
+        # 将所有动作组合在一起
+        actions = [light_action, sound_action, display_action]
+        
+        # 创建任务
+        task = Task.create(
+            name="5分钟后的组合任务",
+            task_type=TaskType.ALARM,
+            schedule_type=TaskScheduleType.ONCE,
+            execution_time=execution_time.isoformat(),
+            duration=30,  # 任务持续30秒
+            actions=json.dumps(actions)
+        )
+        
+        # 添加到调度器
+        return self.add_task(task)
 
 class TaskDaemon:
     def __init__(self, storage_file: str, audioPlayerIns, lightIns, sprayIns):
