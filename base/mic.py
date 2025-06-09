@@ -112,7 +112,7 @@ class Mic:
         self.keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
         self.target_keywords = ["播放音乐", "七七", "停止", "抬头", "拍照", "休息", "Yuyu", "Football"]
         # self.wakeup_keywords = '["七七", "七宝", "七夕", "休息", "嘻嘻"]'
-        self.wakeup_keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]", "Football"]'
+        self.wakeup_keywords = '["播放音乐", "Football", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
         # self.command_keywords = '["关机"]'
 
         # self.device_name = "Yundea 1076"
