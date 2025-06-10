@@ -18,6 +18,28 @@ class AlarmItem(QWidget):
         self.setup_ui()
         
     def setup_ui(self):
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #1a237e;
+                border-radius: 10px;
+            }
+            QLabel {
+                color: white;
+                font-family: 'PingFang SC';
+            }
+            QPushButton {
+                background-color: #303f9f;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                font-family: 'PingFang SC';
+                font-size: 16px;
+            }
+            QPushButton:hover {
+                background-color: #3949ab;
+            }
+        """)
+        
         layout = QHBoxLayout()
         layout.setContentsMargins(10, 5, 10, 5)
         
@@ -39,7 +61,12 @@ class AlarmItem(QWidget):
             'weekday': '工作日',
             'weekend': '周末'
         }
-        freq = json.loads(self.task.actions)['frequency']
+        try:
+            actions = json.loads(self.task.actions)
+            freq = actions.get('frequency', 'once')
+        except:
+            freq = 'once'
+            
         freq_label = QLabel(freq_map.get(freq, freq))
         freq_label.setStyleSheet("""
             QLabel {
@@ -351,15 +378,23 @@ class AddAlarmDialog(QDialog):
         self.time_display.setText(f"{hour}:{minute}")
         
     def get_alarm_data(self):
+        # 获取效果选项的映射
+        effect_map = {
+            'screen': ['none', 'sunrise', 'sunset', 'ocean'],
+            'sound': ['none', 'gentle', 'intense'],
+            'light': ['none', 'ocean', 'colorful'],
+            'scent': ['none', 'forest', 'ocean']
+        }
+        
         return {
             'time': f"{self.hour_combo.currentText()}:{self.minute_combo.currentText()}",
             'frequency': ['once', 'daily', 'weekday', 'weekend'][self.repeat_combo.currentIndex()],
             'enabled': True,
             'effects': {
-                'screen': ['sunrise', 'sunset', 'ocean'][self.screen_combo.currentIndex()],
-                'sound': ['gentle', 'intense'][self.sound_combo.currentIndex()],
-                'light': ['ocean', 'colorful'][self.light_combo.currentIndex()],
-                'scent': ['forest', 'ocean'][self.scent_combo.currentIndex()]
+                'screen': effect_map['screen'][self.screen_combo.currentIndex()],
+                'sound': effect_map['sound'][self.sound_combo.currentIndex()],
+                'light': effect_map['light'][self.light_combo.currentIndex()],
+                'scent': effect_map['scent'][self.scent_combo.currentIndex()]
             }
         }
 
@@ -371,6 +406,27 @@ class AlarmWidget(QWidget):
         self.refresh_alarms()
         
     def setup_ui(self):
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #1a237e;
+            }
+            QLabel {
+                color: white;
+                font-family: 'PingFang SC';
+            }
+            QPushButton {
+                background-color: #303f9f;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                font-family: 'PingFang SC';
+                font-size: 16px;
+            }
+            QPushButton:hover {
+                background-color: #3949ab;
+            }
+        """)
+        
         layout = QVBoxLayout()
         layout.setContentsMargins(20, 20, 20, 20)
         layout.setSpacing(15)
