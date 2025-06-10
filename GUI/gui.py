@@ -448,40 +448,6 @@ class MainWindow(QMainWindow):
         # 闹钟界面
         self.alarm_widget = None
         
-    def show_alarm_widget(self, alarm_widget):
-        """显示闹钟界面"""
-        if self.alarm_widget is None:
-            self.alarm_widget = alarm_widget
-            self.alarm_widget.setGeometry(0, 0, self.width(), self.height())
-            self.alarm_widget.hide()
-            self.alarm_widget.setParent(self)
-        
-        # 隐藏其他界面
-        self.firstBG.hide()
-        self.firstMenu.hide()
-        for menu in self.SecondMenuGrp:
-            menu.hide()
-        self.thirdBG.hide()
-        
-        # 显示闹钟界面
-        self.alarm_widget.show()
-        self.alarm_widget.raise_()
-        self.afterRaise()
-        
-        # 更新菜单状态
-        self.menu_flag = 4  # 使用新的菜单状态标识闹钟界面
-        
-    def show_guide(self):
-        """显示引导页面"""
-        self.guide_page = GuidePage(self)
-        self.setCentralWidget(self.guide_page)
-        
-    def show_main_interface(self):
-        """显示主界面"""
-        # TODO: 实现主界面
-        print("Showing main interface")
-        # 这里可以访问 self.init_manager.data 来获取初始化数据
-        print("Initialization data:", self.init_manager.data)
         # 加载字体
         font_db = QFontDatabase()
         font_db.addApplicationFont("resources/fonts/PingFang_Regular.ttf")
@@ -491,7 +457,7 @@ class MainWindow(QMainWindow):
         font_db.addApplicationFont("resources/fonts/SourceHanSerifCN-Bold-2.otf")
         
         # 菜单级数标识
-        self.menu_flag = 0
+        self.menu_flag = 4  # 直接设置为闹钟界面状态
         
         # 创建引导页面
         self.guide_page = GuidePage(self)
@@ -500,9 +466,9 @@ class MainWindow(QMainWindow):
         # 创建初始界面
         self.initBG = QLabel(self)
         self.initBG.setGeometry(0, 0, self.width(), self.height())
-        self.initBG.setScaledContents(True)  # 添加这行，确保图片填充整个标签
+        self.initBG.setScaledContents(True)
         self.initBG.setPixmap(QPixmap("resources/images/zeroback_sun.jpg"))
-        self.initBG.show()  # 确保标签可见
+        self.initBG.hide()
         
         # 创建一级界面
         self.firstBG = QLabel(self)
@@ -515,14 +481,14 @@ class MainWindow(QMainWindow):
         
         self.firstMenu = FirstWidget(self)
         self.firstMenu.setGeometry(self.width(), 0, self.width(), self.height())
+        self.firstMenu.hide()
         
         # 创建二级界面
         self.SecondMenuIndex = 0
         self.SecondMenuGrp = []
         for i in range(len(coacher)):
             self.SecondMenuGrp.append(SecondWidget(i,self))
-            if i == 0:
-                self.SecondMenuGrp[i].hide()
+            self.SecondMenuGrp[i].hide()
         self.curr_SecondMenu = self.SecondMenuGrp[self.SecondMenuIndex]
         self.next_SecondMenu = self.SecondMenuGrp[self.SecondMenuIndex+1]
         
@@ -534,9 +500,113 @@ class MainWindow(QMainWindow):
         
         # 创建topBar
         self.TopBar = TopBarDisplayWidget(self)
+        self.TopBar.time_label.show()
         
         # 创建BottomBar
         self.BottomBar = BottomBarDisplayWidget(self)
+        self.BottomBar.hide()
+        
+        # 创建左右按钮
+        self.leftBtn = ImageButton(GUIDE_BTN_W,GUIDE_BTN_H,"resources/images/leftSingleArrow.png",self)
+        self.leftBtn.clicked.connect(self.leftArrowClicked)
+        self.leftBtn.move(GUIDE_BTN_W//2, (WINDOW_H - GUIDE_BTN_H)//2)
+        self.leftBtn.hide()
+        
+        self.rightBtn = ImageButton(GUIDE_BTN_W,GUIDE_BTN_H,"resources/images/rightSingleArrow.png",self)
+        self.rightBtn.clicked.connect(self.rightArrowClicked)
+        self.rightBtn.move(WINDOW_W - GUIDE_BTN_W - GUIDE_BTN_W//2, (WINDOW_H - GUIDE_BTN_H)//2)
+        self.rightBtn.hide()
+        
+        # 创建语音交互图层
+        self.voiceDetectingPage = VoiceDetectingWidget("resources/images/voiceDynamicImage", 100, self)
+        self.voiceDetectingPage.hide()
+        
+        # 添加动画效果
+        self.AnimationFlash()
+
+    def show_alarm_widget(self, alarm_widget):
+        """显示闹钟界面"""
+        print("显示闹钟界面")
+        self.alarm_widget = alarm_widget
+        self.alarm_widget.setParent(self)
+        self.alarm_widget.setGeometry(0, 0, self.width(), self.height())
+        
+        # 隐藏其他界面元素
+        self.initBG.hide()
+        self.firstBG.hide()
+        self.firstMenu.hide()
+        for menu in self.SecondMenuGrp:
+            menu.hide()
+        self.thirdBG.hide()
+        self.BottomBar.hide()
+        self.leftBtn.hide()
+        self.rightBtn.hide()
+        self.voiceDetectingPage.hide()
+        
+        # 显示闹钟界面
+        self.alarm_widget.show()
+        self.menu_flag = 4  # 设置为闹钟界面状态
+
+    def show_guide(self):
+        """显示引导页面"""
+        self.guide_page = GuidePage(self)
+        self.setCentralWidget(self.guide_page)
+        
+    def show_main_interface(self):
+        """显示主界面"""
+        print("显示主界面")
+        print("初始化数据:", self.init_manager.init_data)
+        
+        # 加载字体
+        font_db = QFontDatabase()
+        font_db.addApplicationFont("resources/fonts/PingFang_Regular.ttf")
+        font_db.addApplicationFont("resources/fonts/PingFang_Bold.ttf")
+        font_db.addApplicationFont("resources/fonts/PingFang_Light.ttf")
+        font_db.addApplicationFont("resources/fonts/SourceHanSerifCN-Heavy-4.otf")
+        font_db.addApplicationFont("resources/fonts/SourceHanSerifCN-Bold-2.otf")
+        
+        # 创建初始界面
+        self.initBG = QLabel(self)
+        self.initBG.setGeometry(0, 0, self.width(), self.height())
+        self.initBG.setScaledContents(True)
+        self.initBG.setPixmap(QPixmap("resources/images/zeroback_sun.jpg"))
+        self.initBG.hide()
+        
+        # 创建一级界面
+        self.firstBG = QLabel(self)
+        self.firstBG.setGeometry(0, 0, self.width(), self.height())
+        self.firstBG.setScaledContents(True)
+        self.firstBGMovie = QMovie("resources/images/firstback_fire.gif")
+        self.firstBG.setMovie(self.firstBGMovie)
+        self.firstBGMovie.start()
+        self.firstBG.hide()
+        
+        self.firstMenu = FirstWidget(self)
+        self.firstMenu.setGeometry(self.width(), 0, self.width(), self.height())
+        self.firstMenu.hide()
+        
+        # 创建二级界面
+        self.SecondMenuIndex = 0
+        self.SecondMenuGrp = []
+        for i in range(len(coacher)):
+            self.SecondMenuGrp.append(SecondWidget(i,self))
+            self.SecondMenuGrp[i].hide()
+        self.curr_SecondMenu = self.SecondMenuGrp[self.SecondMenuIndex]
+        self.next_SecondMenu = self.SecondMenuGrp[self.SecondMenuIndex+1]
+        
+        # 创建三级场景界面
+        self.thirdBG = QLabel(self)
+        self.thirdBG.setGeometry(0, 0, self.width(), self.height())
+        self.thirdBG.setScaledContents(True)
+        self.thirdBG.hide()
+        
+        # 创建topBar
+        self.TopBar = TopBarDisplayWidget(self)
+        self.TopBar.time_label.show()
+        
+        # 创建BottomBar
+        self.BottomBar = BottomBarDisplayWidget(self)
+        self.BottomBar.hide()
         
         # 创建左右按钮
         self.leftBtn = ImageButton(GUIDE_BTN_W,GUIDE_BTN_H,"resources/images/leftSingleArrow.png",self)
@@ -556,11 +626,22 @@ class MainWindow(QMainWindow):
         # 添加动画效果
         self.AnimationFlash()
         
-        # 隐藏主界面，等待闹钟界面显示
+        # 隐藏所有界面元素
+        self.initBG.hide()
         self.firstBG.hide()
         self.firstMenu.hide()
-        self.TopBar.time_label.hide()
+        for menu in self.SecondMenuGrp:
+            menu.hide()
+        self.thirdBG.hide()
         self.BottomBar.hide()
+        self.leftBtn.hide()
+        self.rightBtn.hide()
+        self.voiceDetectingPage.hide()
+        
+        # 显示闹钟界面
+        if self.alarm_widget:
+            self.alarm_widget.show()
+            self.menu_flag = 4  # 设置为闹钟界面状态
 
     def messageHandler(self, text):
         if text == "voice appear":
