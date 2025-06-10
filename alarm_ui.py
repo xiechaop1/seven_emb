@@ -100,7 +100,7 @@ class AddAlarmDialog(QDialog):
         
     def setup_ui(self):
         self.setWindowTitle("添加闹钟")
-        self.setFixedSize(400, 500)
+        self.setFixedSize(400, 600)
         self.setStyleSheet("""
             QDialog {
                 background-color: #1a237e;
@@ -148,26 +148,6 @@ class AddAlarmDialog(QDialog):
                 selection-color: white;
                 border: none;
             }
-            QCheckBox {
-                color: white;
-                font-family: 'PingFang SC';
-                font-size: 16px;
-                spacing: 10px;
-            }
-            QCheckBox::indicator {
-                width: 20px;
-                height: 20px;
-            }
-            QCheckBox::indicator:unchecked {
-                background-color: #303f9f;
-                border: 2px solid #3949ab;
-                border-radius: 4px;
-            }
-            QCheckBox::indicator:checked {
-                background-color: #3949ab;
-                border: 2px solid #3949ab;
-                border-radius: 4px;
-            }
             QPushButton {
                 background-color: #303f9f;
                 color: white;
@@ -195,85 +175,113 @@ class AddAlarmDialog(QDialog):
                 left: 10px;
                 padding: 0 5px;
             }
+            QScrollArea {
+                border: none;
+                background-color: transparent;
+            }
+            QWidget#timePicker {
+                background-color: #303f9f;
+                border-radius: 5px;
+            }
+            QLabel#timeLabel {
+                font-size: 48px;
+                font-weight: bold;
+                color: white;
+                text-align: center;
+            }
         """)
         
         layout = QVBoxLayout()
         layout.setContentsMargins(20, 20, 20, 20)
         layout.setSpacing(15)
         
-        # 时间设置组
-        time_group = QGroupBox("时间设置")
+        # 时间选择器
+        time_group = QGroupBox("提醒时间")
         time_layout = QVBoxLayout()
         
-        time_label = QLabel("提醒时间:")
-        self.time_edit = QTimeEdit()
-        self.time_edit.setDisplayFormat("HH:mm")
-        self.time_edit.setTime(QTime.currentTime())
+        # 创建时间选择器
+        time_picker = QWidget()
+        time_picker.setObjectName("timePicker")
+        time_picker_layout = QVBoxLayout()
         
-        time_layout.addWidget(time_label)
-        time_layout.addWidget(self.time_edit)
+        # 小时选择
+        hour_label = QLabel("小时")
+        hour_label.setAlignment(Qt.AlignCenter)
+        self.hour_combo = QComboBox()
+        self.hour_combo.addItems([f"{i:02d}" for i in range(24)])
+        self.hour_combo.setCurrentText("08")
+        
+        # 分钟选择
+        minute_label = QLabel("分钟")
+        minute_label.setAlignment(Qt.AlignCenter)
+        self.minute_combo = QComboBox()
+        self.minute_combo.addItems([f"{i:02d}" for i in range(60)])
+        self.minute_combo.setCurrentText("00")
+        
+        # 时间显示
+        self.time_display = QLabel("08:00")
+        self.time_display.setObjectName("timeLabel")
+        self.time_display.setAlignment(Qt.AlignCenter)
+        
+        # 连接信号
+        self.hour_combo.currentTextChanged.connect(self.update_time_display)
+        self.minute_combo.currentTextChanged.connect(self.update_time_display)
+        
+        time_picker_layout.addWidget(self.time_display)
+        time_picker_layout.addWidget(hour_label)
+        time_picker_layout.addWidget(self.hour_combo)
+        time_picker_layout.addWidget(minute_label)
+        time_picker_layout.addWidget(self.minute_combo)
+        time_picker.setLayout(time_picker_layout)
+        
+        time_layout.addWidget(time_picker)
         time_group.setLayout(time_layout)
         layout.addWidget(time_group)
         
-        # 重复设置组
-        repeat_group = QGroupBox("重复设置")
+        # 重复方式
+        repeat_group = QGroupBox("重复方式")
         repeat_layout = QVBoxLayout()
-        
-        repeat_label = QLabel("重复方式:")
-        self.freq_combo = QComboBox()
-        self.freq_combo.addItems(["单次", "每天", "工作日", "周末"])
-        
-        repeat_layout.addWidget(repeat_label)
-        repeat_layout.addWidget(self.freq_combo)
+        self.repeat_combo = QComboBox()
+        self.repeat_combo.addItems(["单次", "每天", "工作日", "周末"])
+        repeat_layout.addWidget(self.repeat_combo)
         repeat_group.setLayout(repeat_layout)
         layout.addWidget(repeat_group)
         
-        # 提醒方式组
-        reminder_group = QGroupBox("提醒方式")
-        reminder_layout = QVBoxLayout()
+        # 屏幕效果
+        screen_group = QGroupBox("屏幕效果")
+        screen_layout = QVBoxLayout()
+        self.screen_combo = QComboBox()
+        self.screen_combo.addItems(["日出", "日落", "海洋"])
+        screen_layout.addWidget(self.screen_combo)
+        screen_group.setLayout(screen_layout)
+        layout.addWidget(screen_group)
         
-        # 屏幕提醒
-        screen_layout = QHBoxLayout()
-        self.screen_check = QCheckBox("屏幕模拟日出")
-        screen_desc = QLabel("模拟太阳升起效果")
-        screen_desc.setStyleSheet("color: #b0bec5; font-size: 14px;")
-        screen_layout.addWidget(self.screen_check)
-        screen_layout.addWidget(screen_desc)
-        screen_layout.addStretch()
-        reminder_layout.addLayout(screen_layout)
+        # 声音效果
+        sound_group = QGroupBox("声音效果")
+        sound_layout = QVBoxLayout()
+        self.sound_combo = QComboBox()
+        self.sound_combo.addItems(["温柔", "激烈"])
+        sound_layout.addWidget(self.sound_combo)
+        sound_group.setLayout(sound_layout)
+        layout.addWidget(sound_group)
         
-        # 灯光提醒
-        light_layout = QHBoxLayout()
-        self.light_check = QCheckBox("灯光渐亮")
-        light_desc = QLabel("灯光逐渐变亮")
-        light_desc.setStyleSheet("color: #b0bec5; font-size: 14px;")
-        light_layout.addWidget(self.light_check)
-        light_layout.addWidget(light_desc)
-        light_layout.addStretch()
-        reminder_layout.addLayout(light_layout)
+        # 灯光效果
+        light_group = QGroupBox("灯光效果")
+        light_layout = QVBoxLayout()
+        self.light_combo = QComboBox()
+        self.light_combo.addItems(["海洋", "炫彩"])
+        light_layout.addWidget(self.light_combo)
+        light_group.setLayout(light_layout)
+        layout.addWidget(light_group)
         
-        # 声音提醒
-        sound_layout = QHBoxLayout()
-        self.sound_check = QCheckBox("声音渐起")
-        sound_desc = QLabel("声音逐渐变大")
-        sound_desc.setStyleSheet("color: #b0bec5; font-size: 14px;")
-        sound_layout.addWidget(self.sound_check)
-        sound_layout.addWidget(sound_desc)
-        sound_layout.addStretch()
-        reminder_layout.addLayout(sound_layout)
-        
-        # 香氛提醒
-        scent_layout = QHBoxLayout()
-        self.scent_check = QCheckBox("香氛")
-        scent_desc = QLabel("释放香氛")
-        scent_desc.setStyleSheet("color: #b0bec5; font-size: 14px;")
-        scent_layout.addWidget(self.scent_check)
-        scent_layout.addWidget(scent_desc)
-        scent_layout.addStretch()
-        reminder_layout.addLayout(scent_layout)
-        
-        reminder_group.setLayout(reminder_layout)
-        layout.addWidget(reminder_group)
+        # 香氛效果
+        scent_group = QGroupBox("香氛效果")
+        scent_layout = QVBoxLayout()
+        self.scent_combo = QComboBox()
+        self.scent_combo.addItems(["树木", "海洋"])
+        scent_layout.addWidget(self.scent_combo)
+        scent_group.setLayout(scent_layout)
+        layout.addWidget(scent_group)
         
         # 按钮
         button_layout = QHBoxLayout()
@@ -287,16 +295,21 @@ class AddAlarmDialog(QDialog):
         
         self.setLayout(layout)
         
+    def update_time_display(self):
+        hour = self.hour_combo.currentText()
+        minute = self.minute_combo.currentText()
+        self.time_display.setText(f"{hour}:{minute}")
+        
     def get_alarm_data(self):
         return {
-            'time': self.time_edit.time().toString("HH:mm"),
-            'frequency': ['once', 'daily', 'weekday', 'weekend'][self.freq_combo.currentIndex()],
+            'time': f"{self.hour_combo.currentText()}:{self.minute_combo.currentText()}",
+            'frequency': ['once', 'daily', 'weekday', 'weekend'][self.repeat_combo.currentIndex()],
             'enabled': True,
-            'reminders': {
-                'screen': self.screen_check.isChecked(),
-                'light': self.light_check.isChecked(),
-                'sound': self.sound_check.isChecked(),
-                'scent': self.scent_check.isChecked()
+            'effects': {
+                'screen': ['sunrise', 'sunset', 'ocean'][self.screen_combo.currentIndex()],
+                'sound': ['gentle', 'intense'][self.sound_combo.currentIndex()],
+                'light': ['ocean', 'colorful'][self.light_combo.currentIndex()],
+                'scent': ['forest', 'ocean'][self.scent_combo.currentIndex()]
             }
         }
 
@@ -430,11 +443,11 @@ class AlarmWidget(QWidget):
             'time': time,
             'frequency': frequency,
             'enabled': True,
-            'reminders': {
-                'screen': True,
-                'light': True,
-                'sound': True,
-                'scent': False
+            'effects': {
+                'screen': 'sunrise',
+                'sound': 'gentle',
+                'light': 'ocean',
+                'scent': 'forest'
             }
         }
         self.alarms.append(alarm_data)
