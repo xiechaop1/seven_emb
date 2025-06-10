@@ -258,7 +258,7 @@ class Mic:
                     self.voice_buffer = indata
                     ThreadingEvent.wakeup_event.set()
                     self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
-                    if not Config.DEBUG:
+                    if not Config.IS_DEBUG:
                         self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0}, Code.LIGHT_TYPE_TEMP)
                         logging.info("turn on the light for wakeup")
                     break  # 找到一个关键词就退出循环
@@ -273,7 +273,7 @@ class Mic:
                     self.voice_buffer = indata
                     ThreadingEvent.wakeup_event.set()
                     self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
-                    if not Config.DEBUG:
+                    if not Config.IS_DEBUG:
                         self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0}, Code.LIGHT_TYPE_TEMP)
                         logging.info("turn on the light for wakeup")
                     break  # 找到一个关键词就退出循环
