@@ -145,27 +145,6 @@ if __name__ == "__main__":
     # 创建应用程序实例
     app = QApplication(sys.argv)
     
-    # 创建主窗口
-    window = gui.MainWindow()
-    window.show()
-    
-    
-    # 检查初始化数据
-    init_manager = InitManager()
-    if not init_manager.load_init_data():
-        # 如果没有初始化数据，显示引导页面
-        print("No initialization data found, showing guide page")
-        window.show_guide()
-        # 等待引导完成
-        while not init_manager.load_init_data():
-            app.processEvents()  # 保持GUI响应
-            time.sleep(0.1)  # 避免CPU占用过高
-        print("Guide completed, initialization data loaded")
-    
-    # 显示主界面
-    window.show_main_interface()
-    print("Showing main interface")
-
     # websocket_url = "ws://114.55.90.104:9001/ws"
     if hasattr(Config, "WEBSOCKET_URL"):
         websocket_url = Config.WEBSOCKET_URL
@@ -273,6 +252,26 @@ if __name__ == "__main__":
     recv_thread.start()
     daemon_thread.start()
 
+
+    # 创建主窗口
+    window = gui.MainWindow(audio_instance, light_instance, spray_instance)
+    window.show()
+
+    # 检查初始化数据
+    init_manager = InitManager()
+    if not init_manager.load_init_data():
+        # 如果没有初始化数据，显示引导页面
+        print("No initialization data found, showing guide page")
+        window.show_guide()
+        # 等待引导完成
+        while not init_manager.load_init_data():
+            app.processEvents()  # 保持GUI响应
+            time.sleep(0.1)  # 避免CPU占用过高
+        print("Guide completed, initialization data loaded")
+
+    # 显示主界面
+    window.show_main_interface()
+    print("Showing main interface")
     # 初始化闹钟界面
     task_daemon = TaskDaemon("tasks.json", audio_instance, light_instance, spray_instance)
     alarm_widget = AlarmWidget(task_daemon)
