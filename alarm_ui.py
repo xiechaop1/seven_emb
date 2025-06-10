@@ -398,40 +398,19 @@ class AddAlarmDialog(QDialog):
             # 获取闹钟数据
             alarm_data = self.get_alarm_data()
             
-            # 获取下一个可用的任务ID
-            next_id = self.task_daemon.scheduler.next_id
-            
-            # 创建新任务
-            task = Task(
-                id=next_id,
-                name=f"闹钟 {alarm_data['time']}",
-                task_type="alarm",
-                schedule_type=alarm_data['frequency'],
-                next_run_time=datetime.now().replace(
-                    hour=int(alarm_data['time'].split(':')[0]),
-                    minute=int(alarm_data['time'].split(':')[1]),
-                    second=0,
-                    microsecond=0
-                ),
-                content="",
-                created_at=datetime.now(),
-                updated_at=datetime.now(),
-                actions=json.dumps(alarm_data),
-                execution_time=alarm_data['time'],
-                weekdays=None,
-                parameters=None,
-                status="pending",
-                last_run_time=None,
-                last_run_result=None,
-                is_enabled=True,
-                duration=300
+            # 创建闹钟任务
+            execution_time = time(
+                hour=int(alarm_data['time'].split(':')[0]),
+                minute=int(alarm_data['time'].split(':')[1])
             )
             
-            # 添加到任务守护进程
-            self.task_daemon.add_task(task)
-            
-            # 保存到文件
-            self.task_daemon.save_tasks()
+            # 使用TaskDaemon的方法创建闹钟
+            self.task_daemon.create_alarm_task(
+                name=f"闹钟 {alarm_data['time']}",
+                execution_time=execution_time,
+                parameters=alarm_data,
+                duration=300
+            )
             
             # 关闭对话框
             self.accept()
