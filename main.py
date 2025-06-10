@@ -90,6 +90,9 @@ from model.execute_command import ExecuteCommand
 from PyQt5.QtCore import QObject, pyqtSignal
 from GUI import gui
 
+from alarm_ui import AlarmWindow
+    
+
 # async def main():
 #     websocket_url = "ws://114.55.90.104:9001/ws"
 #     client = WebSocketClient()
@@ -146,11 +149,6 @@ if __name__ == "__main__":
     window = gui.MainWindow()
     window.show()
     
-    # 初始化闹钟界面
-    from alarm_ui import AlarmWindow
-    task_daemon = TaskDaemon("tasks.json", audio_instance, light_instance, spray_instance)
-    alarm_window = AlarmWindow(task_daemon)
-    alarm_window.show()
     
     # 检查初始化数据
     init_manager = InitManager()
@@ -243,6 +241,11 @@ if __name__ == "__main__":
     # else:
     screen_instance = None
 
+    # 初始化闹钟界面
+    task_daemon = TaskDaemon("tasks.json", audio_instance, light_instance, spray_instance)
+    alarm_window = AlarmWindow(task_daemon)
+    alarm_window.show()
+    
 
     # screen = Screen()
     # screen.display("resources/video/think.mp4")
