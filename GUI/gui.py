@@ -445,9 +445,6 @@ class MainWindow(QMainWindow):
         # 创建初始化管理器
         self.init_manager = InitManager()
         
-        # 闹钟界面
-        self.alarm_widget = None
-        
         # 加载字体
         font_db = QFontDatabase()
         font_db.addApplicationFont("resources/fonts/PingFang_Regular.ttf")
@@ -523,6 +520,35 @@ class MainWindow(QMainWindow):
         
         # 添加动画效果
         self.AnimationFlash()
+        
+        # 创建闹钟界面
+        from alarm_ui import AlarmWidget
+        from model.scheduler import TaskDaemon
+        from model.audio import AudioPlayer
+        from model.light import Light
+        from model.spray import Spray
+        
+        # 初始化必要的组件
+        audio_instance = AudioPlayer()
+        light_instance = Light()
+        spray_instance = Spray()
+        
+        # 创建TaskDaemon实例
+        task_daemon = TaskDaemon(
+            "tasks.json",
+            audio_instance,
+            light_instance,
+            spray_instance
+        )
+        
+        # 创建闹钟界面
+        self.alarm_widget = AlarmWidget(task_daemon)
+        self.alarm_widget.setParent(self)
+        self.alarm_widget.setGeometry(0, 0, self.width(), self.height())
+        
+        # 显示闹钟界面
+        self.alarm_widget.show()
+        self.menu_flag = 4  # 设置为闹钟界面状态
 
     def show_alarm_widget(self, alarm_widget):
         """显示闹钟界面"""
