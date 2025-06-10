@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                            QHBoxLayout, QPushButton, QLabel, QListWidget, 
-                           QDialog, QTimeEdit, QComboBox, QMessageBox, QScrollArea, QFrame)
+                           QDialog, QTimeEdit, QComboBox, QMessageBox, QScrollArea, QFrame, QGroupBox, QCheckBox)
 from PyQt5.QtCore import Qt, QTime, QDateTime, QSize
 from PyQt5.QtGui import QIcon, QFont, QColor, QPainter, QImage, QPixmap, QPalette
 from model.scheduler import TaskDaemon, TaskType, TaskScheduleType
@@ -100,6 +100,7 @@ class AddAlarmDialog(QDialog):
         
     def setup_ui(self):
         self.setWindowTitle("添加闹钟")
+        self.setFixedSize(400, 500)
         self.setStyleSheet("""
             QDialog {
                 background-color: #1a237e;
@@ -107,76 +108,157 @@ class AddAlarmDialog(QDialog):
             QLabel {
                 color: white;
                 font-family: 'PingFang SC';
-                font-size: 14px;
+                font-size: 16px;
+                margin: 5px 0;
             }
             QTimeEdit {
                 background-color: #303f9f;
                 color: white;
                 border: none;
                 border-radius: 5px;
-                padding: 5px;
+                padding: 8px;
                 font-family: 'PingFang SC';
+                font-size: 16px;
+                min-height: 30px;
             }
             QComboBox {
                 background-color: #303f9f;
                 color: white;
                 border: none;
                 border-radius: 5px;
-                padding: 5px;
+                padding: 8px;
                 font-family: 'PingFang SC';
+                font-size: 16px;
+                min-height: 30px;
             }
             QCheckBox {
                 color: white;
                 font-family: 'PingFang SC';
+                font-size: 16px;
+                spacing: 10px;
+            }
+            QCheckBox::indicator {
+                width: 20px;
+                height: 20px;
+            }
+            QCheckBox::indicator:unchecked {
+                background-color: #303f9f;
+                border: 2px solid #3949ab;
+                border-radius: 4px;
+            }
+            QCheckBox::indicator:checked {
+                background-color: #3949ab;
+                border: 2px solid #3949ab;
+                border-radius: 4px;
             }
             QPushButton {
                 background-color: #303f9f;
                 color: white;
                 border: none;
                 border-radius: 5px;
-                padding: 5px 10px;
+                padding: 10px 20px;
                 font-family: 'PingFang SC';
+                font-size: 16px;
+                min-height: 40px;
             }
             QPushButton:hover {
                 background-color: #3949ab;
             }
+            QGroupBox {
+                color: white;
+                font-family: 'PingFang SC';
+                font-size: 16px;
+                border: 2px solid #303f9f;
+                border-radius: 5px;
+                margin-top: 20px;
+                padding-top: 10px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px;
+            }
         """)
         
         layout = QVBoxLayout()
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(15)
         
-        # 时间选择
-        time_layout = QHBoxLayout()
-        time_label = QLabel("时间:")
+        # 时间设置组
+        time_group = QGroupBox("时间设置")
+        time_layout = QVBoxLayout()
+        
+        time_label = QLabel("提醒时间:")
         self.time_edit = QTimeEdit()
         self.time_edit.setDisplayFormat("HH:mm")
         self.time_edit.setTime(QTime.currentTime())
+        self.time_edit.setAlignment(Qt.AlignCenter)
+        
         time_layout.addWidget(time_label)
         time_layout.addWidget(self.time_edit)
-        layout.addLayout(time_layout)
+        time_group.setLayout(time_layout)
+        layout.addWidget(time_group)
         
-        # 频率选择
-        freq_layout = QHBoxLayout()
-        freq_label = QLabel("重复:")
+        # 重复设置组
+        repeat_group = QGroupBox("重复设置")
+        repeat_layout = QVBoxLayout()
+        
+        repeat_label = QLabel("重复方式:")
         self.freq_combo = QComboBox()
         self.freq_combo.addItems(["单次", "每天", "工作日", "周末"])
-        freq_layout.addWidget(freq_label)
-        freq_layout.addWidget(self.freq_combo)
-        layout.addLayout(freq_layout)
+        self.freq_combo.setAlignment(Qt.AlignCenter)
         
-        # 提醒方式
+        repeat_layout.addWidget(repeat_label)
+        repeat_layout.addWidget(self.freq_combo)
+        repeat_group.setLayout(repeat_layout)
+        layout.addWidget(repeat_group)
+        
+        # 提醒方式组
+        reminder_group = QGroupBox("提醒方式")
         reminder_layout = QVBoxLayout()
-        reminder_label = QLabel("提醒方式:")
-        self.screen_check = QCheckBox("屏幕模拟日出")
-        self.light_check = QCheckBox("灯光渐亮")
-        self.sound_check = QCheckBox("声音渐起")
-        self.scent_check = QCheckBox("香氛")
         
-        reminder_layout.addWidget(reminder_label)
-        reminder_layout.addWidget(self.screen_check)
-        reminder_layout.addWidget(self.light_check)
-        reminder_layout.addWidget(self.sound_check)
-        reminder_layout.addWidget(self.scent_check)
-        layout.addLayout(reminder_layout)
+        # 屏幕提醒
+        screen_layout = QHBoxLayout()
+        self.screen_check = QCheckBox("屏幕模拟日出")
+        screen_desc = QLabel("模拟太阳升起效果")
+        screen_desc.setStyleSheet("color: #b0bec5; font-size: 14px;")
+        screen_layout.addWidget(self.screen_check)
+        screen_layout.addWidget(screen_desc)
+        screen_layout.addStretch()
+        reminder_layout.addLayout(screen_layout)
+        
+        # 灯光提醒
+        light_layout = QHBoxLayout()
+        self.light_check = QCheckBox("灯光渐亮")
+        light_desc = QLabel("灯光逐渐变亮")
+        light_desc.setStyleSheet("color: #b0bec5; font-size: 14px;")
+        light_layout.addWidget(self.light_check)
+        light_layout.addWidget(light_desc)
+        light_layout.addStretch()
+        reminder_layout.addLayout(light_layout)
+        
+        # 声音提醒
+        sound_layout = QHBoxLayout()
+        self.sound_check = QCheckBox("声音渐起")
+        sound_desc = QLabel("声音逐渐变大")
+        sound_desc.setStyleSheet("color: #b0bec5; font-size: 14px;")
+        sound_layout.addWidget(self.sound_check)
+        sound_layout.addWidget(sound_desc)
+        sound_layout.addStretch()
+        reminder_layout.addLayout(sound_layout)
+        
+        # 香氛提醒
+        scent_layout = QHBoxLayout()
+        self.scent_check = QCheckBox("香氛")
+        scent_desc = QLabel("释放香氛")
+        scent_desc.setStyleSheet("color: #b0bec5; font-size: 14px;")
+        scent_layout.addWidget(self.scent_check)
+        scent_layout.addWidget(scent_desc)
+        scent_layout.addStretch()
+        reminder_layout.addLayout(scent_layout)
+        
+        reminder_group.setLayout(reminder_layout)
+        layout.addWidget(reminder_group)
         
         # 按钮
         button_layout = QHBoxLayout()
