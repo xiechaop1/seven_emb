@@ -233,28 +233,45 @@ class AlarmWidget(QWidget):
                 background-color: #3949ab;
             }
             QPushButton#addButton {
-                background-color: #303f9f;
+                background-color: transparent;
                 color: white;
                 border: none;
-                border-radius: 30px;
                 font-size: 32px;
                 font-weight: bold;
                 padding: 0px;
-                width: 60px;
-                height: 60px;
+                width: 40px;
+                height: 40px;
+                text-align: center;
             }
             QPushButton#addButton:hover {
-                background-color: #3949ab;
+                color: #3949ab;
             }
         """)
         
         layout = QVBoxLayout()
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(20)
+        
+        # 顶部布局（标题和添加按钮）
+        top_layout = QHBoxLayout()
+        top_layout.setContentsMargins(0, 0, 0, 0)
+        top_layout.setSpacing(10)
         
         # 标题
         title = QLabel("闹钟")
         title.setFont(QFont('PingFang SC', 24))
-        title.setAlignment(Qt.AlignCenter)
-        layout.addWidget(title)
+        title.setStyleSheet("color: white;")
+        top_layout.addWidget(title)
+        
+        # 添加按钮
+        add_btn = QPushButton("+")
+        add_btn.setObjectName("addButton")
+        add_btn.setFixedSize(40, 40)
+        add_btn.clicked.connect(self.show_add_dialog)
+        top_layout.addWidget(add_btn)
+        top_layout.addStretch()
+        
+        layout.addLayout(top_layout)
         
         # 闹钟列表
         self.scroll_area = QScrollArea()
@@ -268,22 +285,10 @@ class AlarmWidget(QWidget):
         
         self.alarm_list = QWidget()
         self.alarm_layout = QVBoxLayout()
+        self.alarm_layout.setSpacing(10)
         self.alarm_list.setLayout(self.alarm_layout)
         self.scroll_area.setWidget(self.alarm_list)
         layout.addWidget(self.scroll_area)
-        
-        # 添加按钮
-        add_btn = QPushButton("+")
-        add_btn.setObjectName("addButton")
-        add_btn.setFixedSize(60, 60)
-        add_btn.clicked.connect(self.show_add_dialog)
-        
-        # 创建水平布局来居中放置添加按钮
-        button_layout = QHBoxLayout()
-        button_layout.addStretch()
-        button_layout.addWidget(add_btn)
-        button_layout.addStretch()
-        layout.addLayout(button_layout)
         
         self.setLayout(layout)
         
