@@ -88,6 +88,7 @@ class FirstWidget(QWidget):
                     CustomButton(FIRST_BTN_W, FIRST_BTN_H, self),
                     CustomButton(FIRST_BTN_W, FIRST_BTN_H, self)] 
         self.btn[0].clicked.connect(self.MeditationClicked)
+        self.btn[2].clicked.connect(self.ToolsClicked)
         self.layout()
         
     def layout(self):
@@ -158,6 +159,13 @@ class FirstWidget(QWidget):
            print('illegal click\n')
            return
         
+    def ToolsClicked(self):
+        if self.parent().menu_flag == 1:
+            # 触发Tools按钮点击事件
+            self.parent().firstMenu.btn[2].clicked.emit()
+        else:
+            print('illegal click\n')
+            return
 
         
 class SecondWidget(QWidget):
@@ -548,8 +556,11 @@ class MainWindow(QMainWindow):
         # 添加动画效果
         self.AnimationFlash()
         
-        # 显示引导页面
-        # self.show_guide()
+        # 隐藏主界面，等待闹钟界面显示
+        self.firstBG.hide()
+        self.firstMenu.hide()
+        self.TopBar.time_label.hide()
+        self.BottomBar.hide()
 
     def messageHandler(self, text):
         if text == "voice appear":
