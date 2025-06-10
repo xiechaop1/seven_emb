@@ -9,6 +9,7 @@ from datetime import time, datetime
 import json
 import os
 import logging
+from model.task import Task, TaskStatus, TaskScheduleType, TaskType, TaskAction, ActionType, LightCommand, SoundCommand, DisplayCommand
 
 class AlarmItem(QWidget):
     def __init__(self, task, task_daemon, parent=None):
@@ -372,7 +373,7 @@ class AddAlarmDialog(QDialog):
         if screen_effect:
             mode, params = screen_effect
             actions.append({
-                "action_type": "display",
+                "action_type": ActionType.DISPLAY,
                 "target": "screen",
                 "parameters": {
                     "mode": mode,
@@ -390,7 +391,7 @@ class AddAlarmDialog(QDialog):
         if sound_effect:
             file_path, volume = sound_effect
             actions.append({
-                "action_type": "sound",
+                "action_type": ActionType.SOUND,
                 "target": "sound",
                 "parameters": {
                     "file_path": file_path,
@@ -408,7 +409,7 @@ class AddAlarmDialog(QDialog):
         if light_effect:
             mode, params = light_effect
             actions.append({
-                "action_type": "light",
+                "action_type": ActionType.LIGHT,
                 "target": "light",
                 "parameters": {
                     "mode": mode,
@@ -426,7 +427,7 @@ class AddAlarmDialog(QDialog):
         if scent_effect:
             mode, duration = scent_effect
             actions.append({
-                "action_type": "spray",
+                "action_type": ActionType.SPRAY,
                 "target": "spray",
                 "parameters": {
                     "mode": mode,

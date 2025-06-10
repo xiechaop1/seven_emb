@@ -26,6 +26,7 @@ class ActionType(str, Enum):
     LIGHT = "light"  # 灯光控制
     SOUND = "sound"  # 声音播放
     DISPLAY = "display"  # 屏幕显示
+    SPRAY = "spray"
     COMBINED = "combined"  # 组合动作
 
 class LightCommand(str, Enum):
