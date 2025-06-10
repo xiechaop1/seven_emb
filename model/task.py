@@ -16,6 +16,7 @@ class TaskStatus(str, Enum):
     COMPLETED = "completed"  # 已完成
     FAILED = "failed"  # 执行失败
     CANCELLED = "cancelled"  # 已取消
+    DISABLED = "disabled"
 
 class TaskScheduleType(str, Enum):
     ONCE = "once"  # 一次性任务
