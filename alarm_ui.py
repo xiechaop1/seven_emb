@@ -18,6 +18,7 @@ class AlarmItem(QWidget):
         self.setup_ui()
         
     def setup_ui(self):
+        self.setFixedHeight(60)  # 设置固定高度
         self.setStyleSheet("""
             QWidget {
                 background-color: #1a237e;
@@ -434,14 +435,22 @@ class AlarmWidget(QWidget):
             QPushButton:hover {
                 background-color: #3949ab;
             }
+            QScrollArea {
+                border: none;
+                background-color: transparent;
+            }
+            QWidget#scrollContent {
+                background-color: #1a237e;
+            }
         """)
         
-        layout = QVBoxLayout()
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(15)
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(20, 20, 20, 20)
+        main_layout.setSpacing(15)
         
-        # 标题栏
+        # 标题栏 - 固定在顶部
         title_layout = QHBoxLayout()
+        title_layout.setContentsMargins(0, 0, 0, 0)
         title = QLabel("闹钟")
         title.setStyleSheet("""
             QLabel {
@@ -473,14 +482,26 @@ class AlarmWidget(QWidget):
         title_layout.addWidget(title)
         title_layout.addStretch()
         title_layout.addWidget(add_btn)
-        layout.addLayout(title_layout)
+        main_layout.addLayout(title_layout)
         
-        # 闹钟列表
+        # 闹钟列表 - 使用滚动区域
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        
+        # 创建滚动区域的内容容器
+        scroll_content = QWidget()
+        scroll_content.setObjectName("scrollContent")
         self.alarm_list = QVBoxLayout()
         self.alarm_list.setSpacing(10)
-        layout.addLayout(self.alarm_list)
+        self.alarm_list.setContentsMargins(0, 0, 0, 0)
+        scroll_content.setLayout(self.alarm_list)
         
-        self.setLayout(layout)
+        scroll_area.setWidget(scroll_content)
+        main_layout.addWidget(scroll_area)
+        
+        self.setLayout(main_layout)
         
     def refresh_alarms(self):
         # 清除现有闹钟
@@ -495,6 +516,8 @@ class AlarmWidget(QWidget):
             for task in tasks:
                 alarm_item = AlarmItem(task, self.task_daemon)
                 self.alarm_list.addWidget(alarm_item)
+            # 添加弹性空间
+            self.alarm_list.addStretch()
         except Exception as e:
             logging.error(f"刷新闹钟列表失败: {str(e)}")
             
