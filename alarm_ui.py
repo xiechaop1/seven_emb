@@ -20,33 +20,20 @@ class AlarmItem(QWidget):
         self.setup_ui()
         
     def setup_ui(self):
-        self.setFixedHeight(60)
+        self.setFixedHeight(80)
         self.setStyleSheet("""
             QWidget {
-                background-color: #1a237e;
-                border-radius: 10px;
-            }
-            QLabel {
-                color: white;
-                font-family: 'PingFang SC';
-            }
-            QPushButton {
-                background-color: #303f9f;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                font-family: 'PingFang SC';
-                font-size: 16px;
-            }
-            QPushButton:hover {
-                background-color: #3949ab;
+                background-color: #000000;
+                border-radius: 0px;
             }
         """)
-        
         layout = QHBoxLayout()
-        layout.setContentsMargins(10, 5, 10, 5)
-        
-        # 时间标签 - 只显示时:分
+        layout.setContentsMargins(20, 0, 20, 0)
+        layout.setSpacing(0)
+
+        # 左侧：时间和标签
+        time_layout = QVBoxLayout()
+        time_layout.setSpacing(0)
         time_str = self.task.execution_time.split()[1][:5] if ' ' in self.task.execution_time else self.task.execution_time[:5]
         time_label = QLabel(time_str)
         time_label.setStyleSheet("""
@@ -54,35 +41,27 @@ class AlarmItem(QWidget):
             font-size: 48px;
             font-family: 'SF Pro Display', 'PingFang SC', Arial, sans-serif;
             font-weight: 300;
+            padding-bottom: 0px;
         """)
-        
-        # 频率标签
-        freq_map = {
-            'once': '单次',
-            'daily': '每天',
-            'weekday': '工作日',
-            'weekend': '周末'
-        }
-        try:
-            actions = json.loads(self.task.actions)
-            freq = actions.get('frequency', 'once')
-        except:
-            freq = 'once'
-            
-        freq_label = QLabel(freq_map.get(freq, freq))
-        freq_label.setStyleSheet("""
-            QLabel {
-                color: #b0bec5;
-                font-family: 'PingFang SC';
-                font-size: 14px;
-            }
+        desc_label = QLabel(self.task.name or "闹钟")
+        desc_label.setStyleSheet("""
+            color: #8e8e93;
+            font-size: 16px;
+            font-family: 'SF Pro Display', 'PingFang SC', Arial, sans-serif;
+            font-weight: 400;
+            padding-top: 0px;
         """)
-        
-        # 开关按钮
+        time_layout.addWidget(time_label)
+        time_layout.addWidget(desc_label)
+        time_layout.addStretch()
+
+        # 中间：开关按钮
         self.toggle_btn = QCheckBox()
         self.toggle_btn.setChecked(self.task.is_enabled)
         self.toggle_btn.setStyleSheet("""
-            QCheckBox::indicator { width: 52px; height: 32px; }
+            QCheckBox::indicator {
+                width: 52px; height: 32px;
+            }
             QCheckBox::indicator:unchecked {
                 border-radius: 16px;
                 background: #393939;
@@ -106,31 +85,31 @@ class AlarmItem(QWidget):
                 left: 24px;
             }
         """)
-        
-        # 删除按钮
+        self.toggle_btn.clicked.connect(self.toggle_alarm)
+
+        # 右侧：删除按钮
         delete_btn = QPushButton("×")
         delete_btn.setFixedSize(30, 30)
         delete_btn.clicked.connect(self.delete_alarm)
         delete_btn.setStyleSheet("""
             QPushButton {
                 background-color: transparent;
-                color: #b0bec5;
-                font-family: 'PingFang SC';
-                font-size: 20px;
+                color: #ff3b30;
+                font-family: 'SF Pro Display', 'PingFang SC', Arial, sans-serif;
+                font-size: 28px;
                 border: none;
             }
             QPushButton:hover {
-                color: #ff5252;
+                color: #ff9500;
             }
         """)
-        
-        # 添加组件到布局
-        layout.addWidget(time_label)
-        layout.addWidget(freq_label)
-        layout.addStretch()
-        layout.addWidget(self.toggle_btn)
-        layout.addWidget(delete_btn)
-        
+
+        # 布局调整
+        layout.addLayout(time_layout, 2)
+        layout.addStretch(1)
+        layout.addWidget(self.toggle_btn, 0, Qt.AlignVCenter)
+        layout.addSpacing(20)
+        layout.addWidget(delete_btn, 0, Qt.AlignVCenter)
         self.setLayout(layout)
         
     def toggle_alarm(self):
