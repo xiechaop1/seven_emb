@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
 from PyQt5.QtCore import Qt, QTime, QDateTime, QSize
 from PyQt5.QtGui import QIcon, QFont, QColor, QPainter, QImage, QPixmap, QPalette
 from model.scheduler import TaskDaemon, TaskType, TaskScheduleType
-from datetime import time
+from datetime import time, datetime
 import json
 import os
 import logging
@@ -45,7 +45,7 @@ class AlarmItem(QWidget):
         layout.setContentsMargins(10, 5, 10, 5)
         
         # 时间标签 - 只显示时:分
-        time_str = self.task.execution_time.split()[1][:5]  # 只取 HH:MM 部分
+        time_str = self.task.execution_time.split()[1][:5] if ' ' in self.task.execution_time else self.task.execution_time[:5]
         time_label = QLabel(time_str)
         time_label.setStyleSheet("""
             QLabel {
@@ -392,6 +392,50 @@ class AddAlarmDialog(QDialog):
             }
         }
 
+    def save_alarm(self):
+        try:
+            # 获取闹钟数据
+            alarm_data = self.get_alarm_data()
+            
+            # 创建新任务
+            task = Task(
+                id=self.task_daemon.get_next_id(),
+                name=f"闹钟 {alarm_data['time']}",
+                task_type="alarm",
+                schedule_type=alarm_data['frequency'],
+                next_run_time=datetime.now().replace(
+                    hour=int(alarm_data['time'].split(':')[0]),
+                    minute=int(alarm_data['time'].split(':')[1]),
+                    second=0,
+                    microsecond=0
+                ),
+                content="",
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+                actions=json.dumps(alarm_data),
+                execution_time=alarm_data['time'],
+                weekdays=None,
+                parameters=None,
+                status="pending",
+                last_run_time=None,
+                last_run_result=None,
+                is_enabled=True,
+                duration=300
+            )
+            
+            # 添加到任务守护进程
+            self.task_daemon.add_task(task)
+            
+            # 保存到文件
+            self.task_daemon.save_tasks()
+            
+            # 关闭对话框
+            self.accept()
+            
+        except Exception as e:
+            logging.error(f"保存闹钟失败: {str(e)}")
+            QMessageBox.critical(self, "错误", f"保存闹钟失败: {str(e)}")
+
 class AlarmWidget(QWidget):
     def __init__(self, task_daemon, parent=None):
         super().__init__(parent)
@@ -507,34 +551,9 @@ class AlarmWidget(QWidget):
             logging.error(f"刷新闹钟列表失败: {str(e)}")
             
     def show_add_dialog(self):
-        dialog = AddAlarmDialog(self.task_daemon)
+        dialog = AddAlarmDialog(self.task_daemon, self)
         if dialog.exec_() == QDialog.Accepted:
-            try:
-                # 获取闹钟数据
-                alarm_data = dialog.get_alarm_data()
-                
-                # 创建闹钟任务
-                execution_time = time.fromisoformat(alarm_data['time'])
-                weekdays = None
-                if alarm_data['frequency'] == 'weekday':
-                    weekdays = [1, 2, 3, 4, 5]  # 周一到周五
-                elif alarm_data['frequency'] == 'weekend':
-                    weekdays = [6, 7]  # 周六和周日
-                    
-                task = self.task_daemon.create_alarm_task(
-                    name=f"闹钟 {alarm_data['time']}",
-                    execution_time=execution_time,
-                    parameters=alarm_data,
-                    duration=300,  # 默认持续5分钟
-                    weekdays=weekdays
-                )
-                
-                if task:
-                    logging.info(f"创建闹钟成功: ID={task.id}, 时间={task.execution_time}")
-                    self.refresh_alarms()
-                    
-            except Exception as e:
-                logging.error(f"创建闹钟失败: {str(e)}")
+            self.refresh_alarms()
 
 def main():
     app = QApplication(sys.argv)
