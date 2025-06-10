@@ -90,7 +90,7 @@ from model.execute_command import ExecuteCommand
 from PyQt5.QtCore import QObject, pyqtSignal
 from GUI import gui
 
-from alarm_ui import AlarmWindow, AlarmWidget
+from alarm_ui import AlarmWidget
     
 
 # async def main():
