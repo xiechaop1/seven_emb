@@ -1,257 +1,331 @@
 import sys
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                            QHBoxLayout, QPushButton, QLabel, QListWidget, 
-                           QDialog, QTimeEdit, QComboBox, QMessageBox)
-from PyQt5.QtCore import Qt, QTime, QDateTime
-from PyQt5.QtGui import QIcon, QFont, QColor, QPainter, QImage, QPixmap
+                           QDialog, QTimeEdit, QComboBox, QMessageBox, QScrollArea, QFrame)
+from PyQt5.QtCore import Qt, QTime, QDateTime, QSize
+from PyQt5.QtGui import QIcon, QFont, QColor, QPainter, QImage, QPixmap, QPalette
 from model.scheduler import TaskDaemon, TaskType, TaskScheduleType
 from datetime import time
+import json
+import os
 
-class AlarmItem(QWidget):
-    def __init__(self, task, parent=None):
+class AlarmItem(QFrame):
+    def __init__(self, alarm_data, parent=None):
         super().__init__(parent)
-        self.task = task
-        self.init_ui()
+        self.alarm_data = alarm_data
+        self.setup_ui()
         
-    def init_ui(self):
+    def setup_ui(self):
+        self.setStyleSheet("""
+            QFrame {
+                background-color: #1a237e;
+                border-radius: 10px;
+                padding: 10px;
+                margin: 5px;
+            }
+            QLabel {
+                color: white;
+                font-family: 'PingFang SC';
+                font-size: 16px;
+            }
+            QPushButton {
+                background-color: #303f9f;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 5px 10px;
+                font-family: 'PingFang SC';
+            }
+            QPushButton:hover {
+                background-color: #3949ab;
+            }
+            QPushButton:disabled {
+                background-color: #1a237e;
+            }
+        """)
+        
         layout = QHBoxLayout()
-        layout.setContentsMargins(20, 10, 20, 10)
         
         # 时间显示
-        time_str = time.fromisoformat(self.task.execution_time).strftime("%H:%M")
-        time_label = QLabel(time_str)
-        time_label.setFont(QFont("PingFang SC", 24))
-        time_label.setStyleSheet("color: white;")
+        time_label = QLabel(self.alarm_data['time'])
+        time_label.setFont(QFont('PingFang SC', 20))
         layout.addWidget(time_label)
         
-        # 频次显示
-        if self.task.schedule_type == TaskScheduleType.ONCE:
-            freq_text = "一次"
-        elif self.task.schedule_type == TaskScheduleType.DAILY:
-            freq_text = "每日"
-        else:
-            weekdays = [int(d) for d in self.task.weekdays.strip('[]').split(',')]
-            freq_text = f"每周 {','.join(map(str, weekdays))}"
+        # 频率显示
+        freq_text = self.get_frequency_text()
         freq_label = QLabel(freq_text)
-        freq_label.setFont(QFont("PingFang SC", 16))
-        freq_label.setStyleSheet("color: white;")
+        freq_label.setFont(QFont('PingFang SC', 12))
         layout.addWidget(freq_label)
         
         # 开关按钮
-        self.toggle_btn = QPushButton("开启" if self.task.is_enabled else "关闭")
-        self.toggle_btn.setCheckable(True)
-        self.toggle_btn.setChecked(self.task.is_enabled)
-        self.toggle_btn.setFont(QFont("PingFang SC", 14))
-        self.toggle_btn.setStyleSheet("""
-            QPushButton {
-                background-color: rgba(255, 255, 255, 0.2);
-                color: white;
-                border: none;
-                border-radius: 15px;
-                padding: 8px 15px;
-            }
-            QPushButton:checked {
-                background-color: rgba(0, 255, 0, 0.3);
-            }
-        """)
+        self.toggle_btn = QPushButton("开启" if self.alarm_data['enabled'] else "关闭")
         self.toggle_btn.clicked.connect(self.toggle_alarm)
         layout.addWidget(self.toggle_btn)
         
         # 删除按钮
         delete_btn = QPushButton("删除")
-        delete_btn.setFont(QFont("PingFang SC", 14))
-        delete_btn.setStyleSheet("""
-            QPushButton {
-                background-color: rgba(255, 0, 0, 0.2);
-                color: white;
-                border: none;
-                border-radius: 15px;
-                padding: 8px 15px;
-            }
-            QPushButton:hover {
-                background-color: rgba(255, 0, 0, 0.3);
-            }
-        """)
         delete_btn.clicked.connect(self.delete_alarm)
         layout.addWidget(delete_btn)
         
         self.setLayout(layout)
         
+    def get_frequency_text(self):
+        if self.alarm_data['frequency'] == 'once':
+            return "单次"
+        elif self.alarm_data['frequency'] == 'daily':
+            return "每天"
+        elif self.alarm_data['frequency'] == 'weekday':
+            return "工作日"
+        elif self.alarm_data['frequency'] == 'weekend':
+            return "周末"
+        return ""
+        
     def toggle_alarm(self):
-        enabled = self.toggle_btn.isChecked()
-        self.toggle_btn.setText("开启" if enabled else "关闭")
-        # TODO: 调用TaskDaemon的toggle_task方法
+        self.alarm_data['enabled'] = not self.alarm_data['enabled']
+        self.toggle_btn.setText("开启" if self.alarm_data['enabled'] else "关闭")
+        self.parent().parent().save_alarms()
         
     def delete_alarm(self):
-        # TODO: 调用TaskDaemon的remove_task方法
-        pass
+        reply = QMessageBox.question(self, '确认删除', 
+                                   '确定要删除这个闹钟吗？',
+                                   QMessageBox.Yes | QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.parent().parent().delete_alarm(self.alarm_data)
+            self.deleteLater()
 
 class AddAlarmDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.init_ui()
+        self.setup_ui()
         
-    def init_ui(self):
-        self.setWindowTitle("新增闹钟")
+    def setup_ui(self):
+        self.setWindowTitle("添加闹钟")
         self.setStyleSheet("""
             QDialog {
-                background-color: #2C2C2C;
+                background-color: #1a237e;
             }
             QLabel {
                 color: white;
-                font-size: 16px;
+                font-family: 'PingFang SC';
+                font-size: 14px;
+            }
+            QTimeEdit {
+                background-color: #303f9f;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 5px;
+                font-family: 'PingFang SC';
+            }
+            QComboBox {
+                background-color: #303f9f;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 5px;
+                font-family: 'PingFang SC';
+            }
+            QCheckBox {
+                color: white;
+                font-family: 'PingFang SC';
             }
             QPushButton {
-                background-color: rgba(255, 255, 255, 0.2);
+                background-color: #303f9f;
                 color: white;
                 border: none;
-                border-radius: 15px;
-                padding: 8px 15px;
-                font-size: 14px;
+                border-radius: 5px;
+                padding: 5px 10px;
+                font-family: 'PingFang SC';
             }
             QPushButton:hover {
-                background-color: rgba(255, 255, 255, 0.3);
-            }
-            QTimeEdit, QComboBox {
-                background-color: rgba(255, 255, 255, 0.1);
-                color: white;
-                border: none;
-                border-radius: 10px;
-                padding: 5px;
-                font-size: 14px;
+                background-color: #3949ab;
             }
         """)
         
         layout = QVBoxLayout()
-        layout.setSpacing(20)
-        layout.setContentsMargins(30, 30, 30, 30)
         
         # 时间选择
         time_layout = QHBoxLayout()
         time_label = QLabel("时间:")
-        time_label.setFont(QFont("PingFang SC", 16))
         self.time_edit = QTimeEdit()
         self.time_edit.setDisplayFormat("HH:mm")
         self.time_edit.setTime(QTime.currentTime())
-        self.time_edit.setFont(QFont("PingFang SC", 16))
         time_layout.addWidget(time_label)
         time_layout.addWidget(self.time_edit)
         layout.addLayout(time_layout)
         
-        # 频次选择
+        # 频率选择
         freq_layout = QHBoxLayout()
-        freq_label = QLabel("频次:")
-        freq_label.setFont(QFont("PingFang SC", 16))
+        freq_label = QLabel("重复:")
         self.freq_combo = QComboBox()
-        self.freq_combo.addItems(["一次", "每日", "每周"])
-        self.freq_combo.setFont(QFont("PingFang SC", 16))
-        self.freq_combo.currentIndexChanged.connect(self.on_freq_changed)
+        self.freq_combo.addItems(["单次", "每天", "工作日", "周末"])
         freq_layout.addWidget(freq_label)
         freq_layout.addWidget(self.freq_combo)
         layout.addLayout(freq_layout)
         
+        # 提醒方式
+        reminder_layout = QVBoxLayout()
+        reminder_label = QLabel("提醒方式:")
+        self.screen_check = QCheckBox("屏幕模拟日出")
+        self.light_check = QCheckBox("灯光渐亮")
+        self.sound_check = QCheckBox("声音渐起")
+        self.scent_check = QCheckBox("香氛")
+        
+        reminder_layout.addWidget(reminder_label)
+        reminder_layout.addWidget(self.screen_check)
+        reminder_layout.addWidget(self.light_check)
+        reminder_layout.addWidget(self.sound_check)
+        reminder_layout.addWidget(self.scent_check)
+        layout.addLayout(reminder_layout)
+        
         # 按钮
-        btn_layout = QHBoxLayout()
-        ok_btn = QPushButton("确定")
+        button_layout = QHBoxLayout()
+        save_btn = QPushButton("保存")
+        save_btn.clicked.connect(self.accept)
         cancel_btn = QPushButton("取消")
-        ok_btn.setFont(QFont("PingFang SC", 16))
-        cancel_btn.setFont(QFont("PingFang SC", 16))
-        ok_btn.clicked.connect(self.accept)
         cancel_btn.clicked.connect(self.reject)
-        btn_layout.addWidget(ok_btn)
-        btn_layout.addWidget(cancel_btn)
-        layout.addLayout(btn_layout)
+        button_layout.addWidget(save_btn)
+        button_layout.addWidget(cancel_btn)
+        layout.addLayout(button_layout)
         
         self.setLayout(layout)
         
-    def on_freq_changed(self, index):
-        # TODO: 如果选择每周，显示星期选择界面
-        pass
-        
     def get_alarm_data(self):
-        time = self.time_edit.time().toPyTime()
-        freq = self.freq_combo.currentText()
-        return time, freq
+        return {
+            'time': self.time_edit.time().toString("HH:mm"),
+            'frequency': ['once', 'daily', 'weekday', 'weekend'][self.freq_combo.currentIndex()],
+            'enabled': True,
+            'reminders': {
+                'screen': self.screen_check.isChecked(),
+                'light': self.light_check.isChecked(),
+                'sound': self.sound_check.isChecked(),
+                'scent': self.scent_check.isChecked()
+            }
+        }
 
 class AlarmWidget(QWidget):
     def __init__(self, task_daemon, parent=None):
         super().__init__(parent)
         self.task_daemon = task_daemon
-        self.init_ui()
+        self.alarms = []
+        self.setup_ui()
+        self.load_alarms()
         
-    def init_ui(self):
-        # 设置背景
-        self.setAutoFillBackground(False)
+    def setup_ui(self):
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #0d47a1;
+            }
+            QLabel {
+                color: white;
+                font-family: 'PingFang SC';
+            }
+            QPushButton {
+                background-color: #303f9f;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 10px 20px;
+                font-family: 'PingFang SC';
+                font-size: 16px;
+            }
+            QPushButton:hover {
+                background-color: #3949ab;
+            }
+        """)
         
-        # 主布局
         layout = QVBoxLayout()
-        layout.setSpacing(20)
-        layout.setContentsMargins(40, 40, 40, 40)
         
         # 标题
         title = QLabel("闹钟")
-        title.setFont(QFont("PingFang SC", 32))
-        title.setStyleSheet("color: white;")
+        title.setFont(QFont('PingFang SC', 24))
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
         
         # 闹钟列表
-        self.alarm_list = QListWidget()
-        self.alarm_list.setStyleSheet("""
-            QListWidget {
-                background-color: rgba(255, 255, 255, 0.1);
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setStyleSheet("""
+            QScrollArea {
                 border: none;
-                border-radius: 20px;
-                padding: 10px;
-            }
-            QListWidget::item {
-                background-color: rgba(255, 255, 255, 0.05);
-                border-radius: 15px;
-                margin: 5px;
-            }
-            QListWidget::item:selected {
-                background-color: rgba(255, 255, 255, 0.1);
+                background-color: transparent;
             }
         """)
-        layout.addWidget(self.alarm_list)
+        
+        self.alarm_list = QWidget()
+        self.alarm_layout = QVBoxLayout()
+        self.alarm_list.setLayout(self.alarm_layout)
+        self.scroll_area.setWidget(self.alarm_list)
+        layout.addWidget(self.scroll_area)
         
         # 添加按钮
-        add_btn = QPushButton("+")
-        add_btn.setFixedSize(60, 60)
-        add_btn.setFont(QFont("PingFang SC", 24))
-        add_btn.setStyleSheet("""
-            QPushButton {
-                background-color: rgba(255, 255, 255, 0.2);
-                color: white;
-                border: none;
-                border-radius: 30px;
-            }
-            QPushButton:hover {
-                background-color: rgba(255, 255, 255, 0.3);
-            }
-        """)
+        add_btn = QPushButton("添加闹钟")
         add_btn.clicked.connect(self.show_add_dialog)
-        layout.addWidget(add_btn, alignment=Qt.AlignCenter)
+        layout.addWidget(add_btn)
         
         self.setLayout(layout)
         
-        # 加载现有闹钟
-        self.load_alarms()
-        
     def load_alarms(self):
-        self.alarm_list.clear()
-        alarms = self.task_daemon.get_alarm_tasks()
-        for alarm in alarms:
-            item = AlarmItem(alarm)
-            self.alarm_list.addItem("")
-            self.alarm_list.setItemWidget(self.alarm_list.item(self.alarm_list.count()-1), item)
+        # 清空现有闹钟
+        while self.alarm_layout.count():
+            item = self.alarm_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+        
+        # 加载闹钟
+        if os.path.exists('alarms.json'):
+            with open('alarms.json', 'r', encoding='utf-8') as f:
+                self.alarms = json.load(f)
+                
+        for alarm in self.alarms:
+            self.add_alarm_item(alarm)
             
+    def add_alarm_item(self, alarm_data):
+        alarm_item = AlarmItem(alarm_data, self.alarm_list)
+        self.alarm_layout.addWidget(alarm_item)
+        
     def show_add_dialog(self):
         dialog = AddAlarmDialog(self)
-        if dialog.exec_() == QDialog.Accepted:
-            time, freq = dialog.get_alarm_data()
-            # TODO: 调用TaskDaemon的create_alarm_task方法创建新闹钟
-            self.load_alarms()
+        if dialog.exec_():
+            alarm_data = dialog.get_alarm_data()
+            self.alarms.append(alarm_data)
+            self.add_alarm_item(alarm_data)
+            self.save_alarms()
+            
+    def delete_alarm(self, alarm_data):
+        self.alarms.remove(alarm_data)
+        self.save_alarms()
+        
+    def save_alarms(self):
+        with open('alarms.json', 'w', encoding='utf-8') as f:
+            json.dump(self.alarms, f, ensure_ascii=False, indent=2)
+            
+    def add_alarm_by_voice(self, time, frequency='once'):
+        """通过语音添加闹钟"""
+        alarm_data = {
+            'time': time,
+            'frequency': frequency,
+            'enabled': True,
+            'reminders': {
+                'screen': True,
+                'light': True,
+                'sound': True,
+                'scent': False
+            }
+        }
+        self.alarms.append(alarm_data)
+        self.add_alarm_item(alarm_data)
+        self.save_alarms()
+        
+    def delete_alarm_by_voice(self, time):
+        """通过语音删除闹钟"""
+        for alarm in self.alarms[:]:
+            if alarm['time'] == time:
+                self.alarms.remove(alarm)
+                self.load_alarms()
+                self.save_alarms()
+                return True
+        return False
 
 def main():
     app = QApplication(sys.argv)

@@ -431,7 +431,7 @@ class VoiceDetectingWidget(QWidget):
         self.current_index = (self.current_index + 1) % self.total_images              
         
 class MainWindow(QMainWindow):
-    def __init__(self, audio_instance, light_instance, spray_instance):
+    def __init__(self):
         super().__init__()
         self.setWindowTitle("Mindora")
         self.setGeometry(0, 0, WINDOW_W, WINDOW_H)
@@ -533,13 +533,13 @@ class MainWindow(QMainWindow):
         # light_instance = Light()
         # spray_instance = Spray()
         
-        # 创建TaskDaemon实例
-        task_daemon = TaskDaemon(
-            "tasks.json",
-            audio_instance,
-            light_instance,
-            spray_instance
-        )
+        # # 创建TaskDaemon实例
+        # task_daemon = TaskDaemon(
+        #     "tasks.json",
+        #     audio_instance,
+        #     light_instance,
+        #     spray_instance
+        # )
         
         # 创建闹钟界面
         self.alarm_widget = AlarmWidget(task_daemon)
