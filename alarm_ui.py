@@ -397,9 +397,12 @@ class AddAlarmDialog(QDialog):
             # 获取闹钟数据
             alarm_data = self.get_alarm_data()
             
+            # 获取下一个可用的任务ID
+            next_id = self.task_daemon.scheduler.get_next_id()
+            
             # 创建新任务
             task = Task(
-                id=self.task_daemon.get_next_id(),
+                id=next_id,
                 name=f"闹钟 {alarm_data['time']}",
                 task_type="alarm",
                 schedule_type=alarm_data['frequency'],
