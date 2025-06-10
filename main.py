@@ -146,6 +146,12 @@ if __name__ == "__main__":
     window = gui.MainWindow()
     window.show()
     
+    # 初始化闹钟界面
+    from alarm_ui import AlarmWindow
+    task_daemon = TaskDaemon("tasks.json", audio_instance, light_instance, spray_instance)
+    alarm_window = AlarmWindow(task_daemon)
+    alarm_window.show()
+    
     # 检查初始化数据
     init_manager = InitManager()
     if not init_manager.load_init_data():
