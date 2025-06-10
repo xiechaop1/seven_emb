@@ -2,9 +2,9 @@ import sys
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                            QHBoxLayout, QPushButton, QLabel, QListWidget, 
                            QDialog, QTimeEdit, QComboBox, QMessageBox, QScrollArea, QFrame, QGroupBox, QCheckBox)
-from PyQt5.QtCore import Qt, QTime, QDateTime, QSize
+from PyQt5.QtCore import Qt, QTime, QDateTime, QSize, QTimer, pyqtSignal
 from PyQt5.QtGui import QIcon, QFont, QColor, QPainter, QImage, QPixmap, QPalette
-from model.scheduler import TaskDaemon, TaskType, TaskScheduleType
+from model.scheduler import TaskDaemon, TaskType, TaskScheduleType, Task
 from datetime import time, datetime
 import json
 import os
@@ -117,7 +117,7 @@ class AlarmItem(QWidget):
             # 更新任务状态
             self.task.is_enabled = self.toggle_btn.isChecked()
             # 保存到文件
-            self.task_daemon.save_tasks()
+            self.task_daemon.scheduler.save_tasks()
             # 更新按钮样式
             self.update_toggle_style()
             # 重新加载任务
@@ -162,7 +162,7 @@ class AlarmItem(QWidget):
             
     def delete_alarm(self):
         try:
-            self.task_daemon.remove_task(self.task)
+            self.task_daemon.scheduler.remove_task(self.task.id)
             self.deleteLater()
         except Exception as e:
             logging.error(f"删除闹钟失败: {str(e)}")
@@ -427,7 +427,7 @@ class AddAlarmDialog(QDialog):
             self.task_daemon.add_task(task)
             
             # 保存到文件
-            self.task_daemon.save_tasks()
+            self.task_daemon.scheduler.save_tasks()
             
             # 关闭对话框
             self.accept()
