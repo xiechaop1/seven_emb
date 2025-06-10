@@ -185,18 +185,18 @@ class AddAlarmDialog(QDialog):
             QLabel {
                 color: white;
                 font-family: 'PingFang SC';
-                font-size: 16px;
-                margin: 5px 0;
+                font-size: 8px;
+                margin: 2px 0;
             }
             QTimeEdit {
                 background-color: #303f9f;
                 color: white;
                 border: none;
                 border-radius: 5px;
-                padding: 8px;
+                padding: 4px;
                 font-family: 'PingFang SC';
-                font-size: 16px;
-                min-height: 30px;
+                font-size: 8px;
+                min-height: 15px;
                 text-align: center;
             }
             QComboBox {
@@ -204,15 +204,15 @@ class AddAlarmDialog(QDialog):
                 color: white;
                 border: none;
                 border-radius: 5px;
-                padding: 8px;
+                padding: 4px;
                 font-family: 'PingFang SC';
-                font-size: 16px;
-                min-height: 30px;
+                font-size: 8px;
+                min-height: 15px;
                 text-align: center;
             }
             QComboBox::drop-down {
                 border: none;
-                width: 20px;
+                width: 10px;
             }
             QComboBox::down-arrow {
                 image: none;
@@ -224,16 +224,17 @@ class AddAlarmDialog(QDialog):
                 selection-background-color: #3949ab;
                 selection-color: white;
                 border: none;
+                font-size: 8px;
             }
             QPushButton {
                 background-color: #303f9f;
                 color: white;
                 border: none;
                 border-radius: 5px;
-                padding: 10px 20px;
+                padding: 5px 10px;
                 font-family: 'PingFang SC';
-                font-size: 16px;
-                min-height: 40px;
+                font-size: 8px;
+                min-height: 20px;
             }
             QPushButton:hover {
                 background-color: #3949ab;
@@ -241,16 +242,16 @@ class AddAlarmDialog(QDialog):
             QGroupBox {
                 color: white;
                 font-family: 'PingFang SC';
-                font-size: 16px;
-                border: 2px solid #303f9f;
+                font-size: 8px;
+                border: 1px solid #303f9f;
                 border-radius: 5px;
-                margin-top: 20px;
-                padding-top: 10px;
+                margin-top: 10px;
+                padding-top: 5px;
             }
             QGroupBox::title {
                 subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 5px;
+                left: 5px;
+                padding: 0 2px;
             }
             QScrollArea {
                 border: none;
@@ -261,7 +262,7 @@ class AddAlarmDialog(QDialog):
                 border-radius: 5px;
             }
             QLabel#timeLabel {
-                font-size: 48px;
+                font-size: 24px;
                 font-weight: bold;
                 color: white;
                 text-align: center;
@@ -269,17 +270,19 @@ class AddAlarmDialog(QDialog):
         """)
         
         layout = QVBoxLayout()
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(15)
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(7)
         
         # 时间选择器
         time_group = QGroupBox("提醒时间")
         time_layout = QVBoxLayout()
+        time_layout.setSpacing(2)
         
         # 创建时间选择器
         time_picker = QWidget()
         time_picker.setObjectName("timePicker")
         time_picker_layout = QVBoxLayout()
+        time_picker_layout.setSpacing(2)
         
         # 小时选择
         hour_label = QLabel("小时")
@@ -318,6 +321,7 @@ class AddAlarmDialog(QDialog):
         # 重复方式
         repeat_group = QGroupBox("重复方式")
         repeat_layout = QVBoxLayout()
+        repeat_layout.setSpacing(2)
         self.repeat_combo = QComboBox()
         self.repeat_combo.addItems(["单次", "每天", "工作日", "周末"])
         repeat_layout.addWidget(self.repeat_combo)
@@ -327,6 +331,7 @@ class AddAlarmDialog(QDialog):
         # 屏幕效果
         screen_group = QGroupBox("屏幕效果")
         screen_layout = QVBoxLayout()
+        screen_layout.setSpacing(2)
         self.screen_combo = QComboBox()
         self.screen_combo.addItems(["无", "日出", "日落", "海洋"])
         screen_layout.addWidget(self.screen_combo)
@@ -336,6 +341,7 @@ class AddAlarmDialog(QDialog):
         # 声音效果
         sound_group = QGroupBox("声音效果")
         sound_layout = QVBoxLayout()
+        sound_layout.setSpacing(2)
         self.sound_combo = QComboBox()
         self.sound_combo.addItems(["无", "温柔", "激烈"])
         sound_layout.addWidget(self.sound_combo)
@@ -345,6 +351,7 @@ class AddAlarmDialog(QDialog):
         # 灯光效果
         light_group = QGroupBox("灯光效果")
         light_layout = QVBoxLayout()
+        light_layout.setSpacing(2)
         self.light_combo = QComboBox()
         self.light_combo.addItems(["无", "海洋", "炫彩"])
         light_layout.addWidget(self.light_combo)
@@ -354,6 +361,7 @@ class AddAlarmDialog(QDialog):
         # 香氛效果
         scent_group = QGroupBox("香氛效果")
         scent_layout = QVBoxLayout()
+        scent_layout.setSpacing(2)
         self.scent_combo = QComboBox()
         self.scent_combo.addItems(["无", "树木", "海洋"])
         scent_layout.addWidget(self.scent_combo)
@@ -362,6 +370,7 @@ class AddAlarmDialog(QDialog):
         
         # 按钮
         button_layout = QHBoxLayout()
+        button_layout.setSpacing(5)
         save_btn = QPushButton("保存")
         save_btn.clicked.connect(self.accept)
         cancel_btn = QPushButton("取消")
