@@ -55,7 +55,7 @@ class AlarmItem(QWidget):
         time_layout.addWidget(desc_label)
         time_layout.addStretch()
 
-        # 中间：开关按钮
+        # 中间：开关按钮（再往左移动）
         self.toggle_btn = QCheckBox()
         self.toggle_btn.setChecked(self.task.is_enabled)
         self.toggle_btn.setStyleSheet("""
@@ -106,9 +106,9 @@ class AlarmItem(QWidget):
 
         # 布局调整
         layout.addLayout(time_layout, 2)
-        layout.addStretch(1)
+        layout.addStretch(2)  # 增加弹性空间让开关更靠左
         layout.addWidget(self.toggle_btn, 0, Qt.AlignVCenter)
-        layout.addSpacing(20)
+        layout.addSpacing(40)  # 增大开关和删除按钮间距
         layout.addWidget(delete_btn, 0, Qt.AlignVCenter)
         self.setLayout(layout)
         
@@ -471,7 +471,7 @@ class AlarmWidget(QWidget):
     def setup_ui(self):
         self.setStyleSheet("""
             QWidget {
-                background-color: #1a237e;
+                background-color: #000000;
             }
             QLabel {
                 color: white;
@@ -493,7 +493,7 @@ class AlarmWidget(QWidget):
                 background-color: transparent;
             }
             QWidget#scrollContent {
-                background-color: #1a237e;
+                background-color: #000000;
             }
         """)
         
