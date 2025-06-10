@@ -276,6 +276,8 @@ if __name__ == "__main__":
     # 初始化闹钟界面
     task_daemon = TaskDaemon("tasks.json", audio_instance, light_instance, spray_instance)
     alarm_widget = AlarmWidget(task_daemon)
+    alarm_widget.show()
+    window.show_alarm_widget(alarm_widget)
     # 将闹钟界面添加到主界面的Tools菜单中
     window.firstMenu.btn[2].clicked.connect(lambda: window.show_alarm_widget(alarm_widget))
     

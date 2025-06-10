@@ -542,13 +542,13 @@ class MainWindow(QMainWindow):
         # )
         
         # 创建闹钟界面
-        self.alarm_widget = AlarmWidget(task_daemon)
-        self.alarm_widget.setParent(self)
-        self.alarm_widget.setGeometry(0, 0, self.width(), self.height())
+        # self.alarm_widget = AlarmWidget(task_daemon)
+        # self.alarm_widget.setParent(self)
+        # self.alarm_widget.setGeometry(0, 0, self.width(), self.height())
         
         # 显示闹钟界面
-        self.alarm_widget.show()
-        self.menu_flag = 4  # 设置为闹钟界面状态
+        # self.alarm_widget.show()
+        # self.menu_flag = 4  # 设置为闹钟界面状态
 
     def show_alarm_widget(self, alarm_widget):
         """显示闹钟界面"""
