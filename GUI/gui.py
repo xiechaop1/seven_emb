@@ -555,7 +555,7 @@ class MainWindow(QMainWindow):
     def show_main_interface(self):
         """显示主界面"""
         print("显示主界面")
-        print("初始化数据:", self.init_manager.init_data)
+        print("初始化数据:", self.init_manager.data)
         
         # 加载字体
         font_db = QFontDatabase()
