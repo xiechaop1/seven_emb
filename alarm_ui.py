@@ -18,7 +18,7 @@ class AlarmItem(QWidget):
         self.setup_ui()
         
     def setup_ui(self):
-        self.setFixedHeight(60)  # 设置固定高度
+        self.setFixedHeight(60)
         self.setStyleSheet("""
             QWidget {
                 background-color: #1a237e;
@@ -44,8 +44,9 @@ class AlarmItem(QWidget):
         layout = QHBoxLayout()
         layout.setContentsMargins(10, 5, 10, 5)
         
-        # 时间标签
-        time_label = QLabel(self.task.execution_time)
+        # 时间标签 - 只显示时:分
+        time_str = self.task.execution_time.split()[1][:5]  # 只取 HH:MM 部分
+        time_label = QLabel(time_str)
         time_label.setStyleSheet("""
             QLabel {
                 color: white;
@@ -111,6 +112,22 @@ class AlarmItem(QWidget):
         
         self.setLayout(layout)
         
+    def toggle_alarm(self):
+        try:
+            # 更新任务状态
+            self.task.is_enabled = self.toggle_btn.isChecked()
+            # 保存到文件
+            self.task_daemon.save_tasks()
+            # 更新按钮样式
+            self.update_toggle_style()
+            # 重新加载任务
+            self.task_daemon.load_tasks()
+        except Exception as e:
+            logging.error(f"切换闹钟状态失败: {str(e)}")
+            # 恢复按钮状态
+            self.toggle_btn.setChecked(not self.toggle_btn.isChecked())
+            self.update_toggle_style()
+            
     def update_toggle_style(self):
         if self.toggle_btn.isChecked():
             self.toggle_btn.setStyleSheet("""
@@ -122,12 +139,9 @@ class AlarmItem(QWidget):
                 QPushButton::indicator {
                     width: 26px;
                     height: 26px;
-                    background-color: white;
                     border-radius: 13px;
+                    background-color: white;
                     margin: 2px;
-                }
-                QPushButton::indicator:checked {
-                    margin-left: 22px;
                 }
             """)
         else:
@@ -140,34 +154,16 @@ class AlarmItem(QWidget):
                 QPushButton::indicator {
                     width: 26px;
                     height: 26px;
-                    background-color: white;
                     border-radius: 13px;
+                    background-color: white;
                     margin: 2px;
-                }
-                QPushButton::indicator:unchecked {
-                    margin-left: 2px;
                 }
             """)
             
-    def toggle_alarm(self):
-        try:
-            # 调用scheduler的toggle_task方法
-            updated_task = self.task_daemon.toggle_task(self.task.id)
-            if updated_task:
-                self.task = updated_task
-                self.update_toggle_style()
-                logging.info(f"闹钟状态已切换: ID={self.task.id}, 启用状态={self.task.is_enabled}")
-        except Exception as e:
-            logging.error(f"切换闹钟状态失败: {str(e)}")
-            
     def delete_alarm(self):
         try:
-            # 调用scheduler的remove_task方法
-            if self.task_daemon.scheduler.remove_task(self.task.id):
-                logging.info(f"闹钟已删除: ID={self.task.id}")
-                # 通知父窗口刷新列表
-                if self.parent():
-                    self.parent().refresh_alarms()
+            self.task_daemon.remove_task(self.task)
+            self.deleteLater()
         except Exception as e:
             logging.error(f"删除闹钟失败: {str(e)}")
 
