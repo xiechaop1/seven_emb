@@ -116,14 +116,18 @@ class AlarmItem(QWidget):
         
     def toggle_alarm(self):
         try:
-            # 更新任务状态
-            self.task.is_enabled = self.toggle_btn.isChecked()
-            # 保存到文件
-            self.task_daemon.save_tasks()
+            # 获取当前按钮状态
+            enable = self.toggle_btn.isChecked()
+            
+            # 调用toggle_task方法切换任务状态
+            self.task_daemon.toggle_task(
+                task_id=self.task.id,
+                enable=enable
+            )
+            
             # 更新按钮样式
             self.update_toggle_style()
-            # 重新加载任务
-            self.task_daemon.load_tasks()
+            
         except Exception as e:
             logging.error(f"切换闹钟状态失败: {str(e)}")
             # 恢复按钮状态
