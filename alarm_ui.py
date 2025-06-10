@@ -232,6 +232,20 @@ class AlarmWidget(QWidget):
             QPushButton:hover {
                 background-color: #3949ab;
             }
+            QPushButton#addButton {
+                background-color: #303f9f;
+                color: white;
+                border: none;
+                border-radius: 30px;
+                font-size: 32px;
+                font-weight: bold;
+                padding: 0px;
+                width: 60px;
+                height: 60px;
+            }
+            QPushButton#addButton:hover {
+                background-color: #3949ab;
+            }
         """)
         
         layout = QVBoxLayout()
@@ -259,9 +273,17 @@ class AlarmWidget(QWidget):
         layout.addWidget(self.scroll_area)
         
         # 添加按钮
-        add_btn = QPushButton("添加闹钟")
+        add_btn = QPushButton("+")
+        add_btn.setObjectName("addButton")
+        add_btn.setFixedSize(60, 60)
         add_btn.clicked.connect(self.show_add_dialog)
-        layout.addWidget(add_btn)
+        
+        # 创建水平布局来居中放置添加按钮
+        button_layout = QHBoxLayout()
+        button_layout.addStretch()
+        button_layout.addWidget(add_btn)
+        button_layout.addStretch()
+        layout.addLayout(button_layout)
         
         self.setLayout(layout)
         
