@@ -111,10 +111,10 @@ class Mic:
                          -0.488127, 0.386693]
         self.keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
         # self.target_keywords = ["播放音乐", "七七", "停止", "抬头", "拍照", "休息", "Yuyu", "Foot"]
-        self.target_keywords = ["Hi boy", "Hi boy"]
+        self.target_keywords = ["man", "min"]
         # self.wakeup_keywords = '["七七", "七宝", "七夕", "休息", "嘻嘻"]'
         # self.wakeup_keywords = '["播放音乐", "Foot", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
-        self.wakeup_keywords = '["Hi boy"]'
+        self.wakeup_keywords = '["mindora", "min", "man"]'
         # self.command_keywords = '["关机"]'
 
         # self.device_name = "Yundea 1076"
@@ -252,27 +252,31 @@ class Mic:
             print(f"Transcription@@: {transcription}")
             
             # 检测关键词
-            if self.target_keywords[1] in str(transcription) or "Football" in str(transcription):
-                print(f"检测到唤醒词: {self.target_keywords[1] if self.target_keywords[1] in str(transcription) else 'Football'}")
-                self.voice_buffer = indata
-                ThreadingEvent.wakeup_event.set()
-                self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
-                if Config.IS_DEBUG == False:
-                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0}, Code.LIGHT_TYPE_TEMP)
-                    logging.info("turn on the light for wakeup")
-        else:
+            for keyword in self.target_keywords:
+                if keyword in str(transcription):
+                    print(f"检测到唤醒词: {keyword}")
+                    self.voice_buffer = indata
+                    ThreadingEvent.wakeup_event.set()
+                    self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
+                    if not Config.DEBUG:
+                        self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0}, Code.LIGHT_TYPE_TEMP)
+                        logging.info("turn on the light for wakeup")
+                    break  # 找到一个关键词就退出循环
+
+            # 检查部分识别结果
             partial = json.loads(self.rec.PartialResult())
             partial_text = partial.get("partial", "")
             print(f"Partial Transcription: {partial_text}")
-            if self.target_keywords[1] in str(partial_text) or "Football" in str(partial_text):
-                print(f"检测到唤醒词: {self.target_keywords[1] if self.target_keywords[1] in str(partial_text) else 'Football'}")
-                self.voice_buffer = indata
-                ThreadingEvent.wakeup_event.set()
-                self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
-                if Config.IS_DEBUG == False:
-                    self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0}, Code.LIGHT_TYPE_TEMP)
-                    logging.info("turn on the light for wakeup")
-
+            for keyword in self.target_keywords:
+                if keyword in str(partial_text):
+                    print(f"检测到唤醒词: {keyword}")
+                    self.voice_buffer = indata
+                    ThreadingEvent.wakeup_event.set()
+                    self.rec = KaldiRecognizer(self.model, self.SAMPLERATE_ORIG, self.wakeup_keywords)
+                    if not Config.DEBUG:
+                        self.light.start(Code.LIGHT_MODE_BREATHING, {"r": 0, "g": 255, "b": 0}, Code.LIGHT_TYPE_TEMP)
+                        logging.info("turn on the light for wakeup")
+                    break  # 找到一个关键词就退出循环
 
         # print("final:", self.rec.FinalResult())
 
