@@ -8,90 +8,140 @@ from model.scheduler import TaskDaemon, TaskType, TaskScheduleType
 from datetime import time
 import json
 import os
+import logging
 
-class AlarmItem(QFrame):
-    def __init__(self, alarm_data, parent=None):
+class AlarmItem(QWidget):
+    def __init__(self, task, task_daemon, parent=None):
         super().__init__(parent)
-        self.alarm_data = alarm_data
+        self.task = task
+        self.task_daemon = task_daemon
         self.setup_ui()
         
     def setup_ui(self):
-        self.setStyleSheet("""
-            QFrame {
-                background-color: #1a237e;
-                border-radius: 10px;
-                padding: 10px;
-                margin: 5px;
-            }
+        layout = QHBoxLayout()
+        layout.setContentsMargins(10, 5, 10, 5)
+        
+        # 时间标签
+        time_label = QLabel(self.task.execution_time)
+        time_label.setStyleSheet("""
             QLabel {
                 color: white;
                 font-family: 'PingFang SC';
-                font-size: 16px;
-            }
-            QPushButton {
-                background-color: #303f9f;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                padding: 5px 10px;
-                font-family: 'PingFang SC';
-            }
-            QPushButton:hover {
-                background-color: #3949ab;
-            }
-            QPushButton:disabled {
-                background-color: #1a237e;
+                font-size: 24px;
+                font-weight: bold;
             }
         """)
         
-        layout = QHBoxLayout()
-        
-        # 时间显示
-        time_label = QLabel(self.alarm_data['time'])
-        time_label.setFont(QFont('PingFang SC', 20))
-        layout.addWidget(time_label)
-        
-        # 频率显示
-        freq_text = self.get_frequency_text()
-        freq_label = QLabel(freq_text)
-        freq_label.setFont(QFont('PingFang SC', 12))
-        layout.addWidget(freq_label)
+        # 频率标签
+        freq_map = {
+            'once': '单次',
+            'daily': '每天',
+            'weekday': '工作日',
+            'weekend': '周末'
+        }
+        freq = json.loads(self.task.actions)['frequency']
+        freq_label = QLabel(freq_map.get(freq, freq))
+        freq_label.setStyleSheet("""
+            QLabel {
+                color: #b0bec5;
+                font-family: 'PingFang SC';
+                font-size: 14px;
+            }
+        """)
         
         # 开关按钮
-        self.toggle_btn = QPushButton("开启" if self.alarm_data['enabled'] else "关闭")
+        self.toggle_btn = QPushButton()
+        self.toggle_btn.setFixedSize(50, 30)
+        self.toggle_btn.setCheckable(True)
+        self.toggle_btn.setChecked(self.task.is_enabled)
         self.toggle_btn.clicked.connect(self.toggle_alarm)
-        layout.addWidget(self.toggle_btn)
+        self.update_toggle_style()
         
         # 删除按钮
-        delete_btn = QPushButton("删除")
+        delete_btn = QPushButton("×")
+        delete_btn.setFixedSize(30, 30)
         delete_btn.clicked.connect(self.delete_alarm)
+        delete_btn.setStyleSheet("""
+            QPushButton {
+                background-color: transparent;
+                color: #b0bec5;
+                font-family: 'PingFang SC';
+                font-size: 20px;
+                border: none;
+            }
+            QPushButton:hover {
+                color: #ff5252;
+            }
+        """)
+        
+        # 添加组件到布局
+        layout.addWidget(time_label)
+        layout.addWidget(freq_label)
+        layout.addStretch()
+        layout.addWidget(self.toggle_btn)
         layout.addWidget(delete_btn)
         
         self.setLayout(layout)
         
-    def get_frequency_text(self):
-        if self.alarm_data['frequency'] == 'once':
-            return "单次"
-        elif self.alarm_data['frequency'] == 'daily':
-            return "每天"
-        elif self.alarm_data['frequency'] == 'weekday':
-            return "工作日"
-        elif self.alarm_data['frequency'] == 'weekend':
-            return "周末"
-        return ""
-        
+    def update_toggle_style(self):
+        if self.toggle_btn.isChecked():
+            self.toggle_btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #4caf50;
+                    border: none;
+                    border-radius: 15px;
+                }
+                QPushButton::indicator {
+                    width: 26px;
+                    height: 26px;
+                    background-color: white;
+                    border-radius: 13px;
+                    margin: 2px;
+                }
+                QPushButton::indicator:checked {
+                    margin-left: 22px;
+                }
+            """)
+        else:
+            self.toggle_btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #b0bec5;
+                    border: none;
+                    border-radius: 15px;
+                }
+                QPushButton::indicator {
+                    width: 26px;
+                    height: 26px;
+                    background-color: white;
+                    border-radius: 13px;
+                    margin: 2px;
+                }
+                QPushButton::indicator:unchecked {
+                    margin-left: 2px;
+                }
+            """)
+            
     def toggle_alarm(self):
-        self.alarm_data['enabled'] = not self.alarm_data['enabled']
-        self.toggle_btn.setText("开启" if self.alarm_data['enabled'] else "关闭")
-        self.parent().parent().save_alarms()
-        
+        try:
+            # 调用scheduler的toggle_task方法
+            updated_task = self.task_daemon.toggle_task(self.task.id)
+            if updated_task:
+                self.task = updated_task
+                self.update_toggle_style()
+                logging.info(f"闹钟状态已切换: ID={self.task.id}, 启用状态={self.task.is_enabled}")
+        except Exception as e:
+            logging.error(f"切换闹钟状态失败: {str(e)}")
+            
     def delete_alarm(self):
-        reply = QMessageBox.question(self, '确认删除', 
-                                   '确定要删除这个闹钟吗？',
-                                   QMessageBox.Yes | QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            self.parent().parent().delete_alarm(self.alarm_data)
-            self.deleteLater()
+        try:
+            # 调用scheduler的remove_task方法
+            if self.task_daemon.scheduler.remove_task(self.task.id):
+                logging.info(f"闹钟已删除: ID={self.task.id}")
+                # 通知父窗口刷新列表
+                if self.parent():
+                    self.parent().refresh_alarms()
+        except Exception as e:
+            logging.error(f"删除闹钟失败: {str(e)}")
 
 class AddAlarmDialog(QDialog):
     def __init__(self, parent=None):
@@ -317,152 +367,101 @@ class AlarmWidget(QWidget):
     def __init__(self, task_daemon, parent=None):
         super().__init__(parent)
         self.task_daemon = task_daemon
-        self.alarms = []
         self.setup_ui()
-        self.load_alarms()
+        self.refresh_alarms()
         
     def setup_ui(self):
-        self.setStyleSheet("""
-            QWidget {
-                background-color: #0d47a1;
-            }
+        layout = QVBoxLayout()
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(15)
+        
+        # 标题栏
+        title_layout = QHBoxLayout()
+        title = QLabel("闹钟")
+        title.setStyleSheet("""
             QLabel {
                 color: white;
                 font-family: 'PingFang SC';
+                font-size: 24px;
+                font-weight: bold;
             }
+        """)
+        
+        add_btn = QPushButton("+")
+        add_btn.setFixedSize(40, 40)
+        add_btn.setStyleSheet("""
             QPushButton {
                 background-color: #303f9f;
                 color: white;
                 border: none;
-                border-radius: 5px;
-                padding: 10px 20px;
+                border-radius: 20px;
                 font-family: 'PingFang SC';
-                font-size: 16px;
+                font-size: 24px;
+                font-weight: bold;
             }
             QPushButton:hover {
                 background-color: #3949ab;
             }
-            QPushButton#addButton {
-                background-color: transparent;
-                color: white;
-                border: none;
-                font-size: 32px;
-                font-weight: bold;
-                padding: 0px;
-                width: 40px;
-                height: 40px;
-                text-align: center;
-            }
-            QPushButton#addButton:hover {
-                color: #3949ab;
-            }
         """)
-        
-        layout = QVBoxLayout()
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(20)
-        
-        # 顶部布局（标题和添加按钮）
-        top_layout = QHBoxLayout()
-        top_layout.setContentsMargins(0, 0, 0, 0)
-        top_layout.setSpacing(10)
-        
-        # 标题
-        title = QLabel("闹钟")
-        title.setFont(QFont('PingFang SC', 24))
-        title.setStyleSheet("color: white;")
-        top_layout.addWidget(title)
-        
-        # 添加按钮
-        add_btn = QPushButton("+")
-        add_btn.setObjectName("addButton")
-        add_btn.setFixedSize(40, 40)
         add_btn.clicked.connect(self.show_add_dialog)
-        top_layout.addWidget(add_btn)
-        top_layout.addStretch()
         
-        layout.addLayout(top_layout)
+        title_layout.addWidget(title)
+        title_layout.addStretch()
+        title_layout.addWidget(add_btn)
+        layout.addLayout(title_layout)
         
         # 闹钟列表
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setStyleSheet("""
-            QScrollArea {
-                border: none;
-                background-color: transparent;
-            }
-        """)
-        
-        self.alarm_list = QWidget()
-        self.alarm_layout = QVBoxLayout()
-        self.alarm_layout.setSpacing(10)
-        self.alarm_list.setLayout(self.alarm_layout)
-        self.scroll_area.setWidget(self.alarm_list)
-        layout.addWidget(self.scroll_area)
+        self.alarm_list = QVBoxLayout()
+        self.alarm_list.setSpacing(10)
+        layout.addLayout(self.alarm_list)
         
         self.setLayout(layout)
         
-    def load_alarms(self):
-        # 清空现有闹钟
-        while self.alarm_layout.count():
-            item = self.alarm_layout.takeAt(0)
+    def refresh_alarms(self):
+        # 清除现有闹钟
+        while self.alarm_list.count():
+            item = self.alarm_list.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
-        
-        # 加载闹钟
-        if os.path.exists('alarms.json'):
-            with open('alarms.json', 'r', encoding='utf-8') as f:
-                self.alarms = json.load(f)
                 
-        for alarm in self.alarms:
-            self.add_alarm_item(alarm)
+        # 获取所有闹钟任务
+        try:
+            tasks = self.task_daemon.get_alarm_tasks()
+            for task in tasks:
+                alarm_item = AlarmItem(task, self.task_daemon)
+                self.alarm_list.addWidget(alarm_item)
+        except Exception as e:
+            logging.error(f"刷新闹钟列表失败: {str(e)}")
             
-    def add_alarm_item(self, alarm_data):
-        alarm_item = AlarmItem(alarm_data, self.alarm_list)
-        self.alarm_layout.addWidget(alarm_item)
-        
     def show_add_dialog(self):
         dialog = AddAlarmDialog(self)
-        if dialog.exec_():
-            alarm_data = dialog.get_alarm_data()
-            self.alarms.append(alarm_data)
-            self.add_alarm_item(alarm_data)
-            self.save_alarms()
-            
-    def delete_alarm(self, alarm_data):
-        self.alarms.remove(alarm_data)
-        self.save_alarms()
-        
-    def save_alarms(self):
-        with open('alarms.json', 'w', encoding='utf-8') as f:
-            json.dump(self.alarms, f, ensure_ascii=False, indent=2)
-            
-    def add_alarm_by_voice(self, time, frequency='once'):
-        """通过语音添加闹钟"""
-        alarm_data = {
-            'time': time,
-            'frequency': frequency,
-            'enabled': True,
-            'effects': {
-                'screen': 'sunrise',
-                'sound': 'gentle',
-                'light': 'ocean',
-                'scent': 'forest'
-            }
-        }
-        self.alarms.append(alarm_data)
-        self.add_alarm_item(alarm_data)
-        self.save_alarms()
-        
-    def delete_alarm_by_voice(self, time):
-        """通过语音删除闹钟"""
-        for alarm in self.alarms[:]:
-            if alarm['time'] == time:
-                self.alarms.remove(alarm)
-                self.load_alarms()
-                self.save_alarms()
-                return True
-        return False
+        if dialog.exec_() == QDialog.Accepted:
+            try:
+                # 获取闹钟数据
+                alarm_data = dialog.get_alarm_data()
+                
+                # 创建闹钟任务
+                execution_time = time.fromisoformat(alarm_data['time'])
+                weekdays = None
+                if alarm_data['frequency'] == 'weekday':
+                    weekdays = [1, 2, 3, 4, 5]  # 周一到周五
+                elif alarm_data['frequency'] == 'weekend':
+                    weekdays = [6, 7]  # 周六和周日
+                    
+                task = self.task_daemon.create_alarm_task(
+                    name=f"闹钟 {alarm_data['time']}",
+                    execution_time=execution_time,
+                    parameters=alarm_data,
+                    duration=300,  # 默认持续5分钟
+                    weekdays=weekdays
+                )
+                
+                if task:
+                    logging.info(f"创建闹钟成功: ID={task.id}, 时间={task.execution_time}")
+                    self.refresh_alarms()
+                    
+            except Exception as e:
+                logging.error(f"创建闹钟失败: {str(e)}")
 
 def main():
     app = QApplication(sys.argv)
