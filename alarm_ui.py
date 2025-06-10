@@ -50,12 +50,10 @@ class AlarmItem(QWidget):
         time_str = self.task.execution_time.split()[1][:5] if ' ' in self.task.execution_time else self.task.execution_time[:5]
         time_label = QLabel(time_str)
         time_label.setStyleSheet("""
-            QLabel {
-                color: white;
-                font-family: 'PingFang SC';
-                font-size: 24px;
-                font-weight: bold;
-            }
+            color: #d1d1d6;
+            font-size: 48px;
+            font-family: 'SF Pro Display', 'PingFang SC', Arial, sans-serif;
+            font-weight: 300;
         """)
         
         # 频率标签
@@ -81,12 +79,33 @@ class AlarmItem(QWidget):
         """)
         
         # 开关按钮
-        self.toggle_btn = QPushButton()
-        self.toggle_btn.setFixedSize(50, 30)
-        self.toggle_btn.setCheckable(True)
+        self.toggle_btn = QCheckBox()
         self.toggle_btn.setChecked(self.task.is_enabled)
-        self.toggle_btn.clicked.connect(self.toggle_alarm)
-        self.update_toggle_style()
+        self.toggle_btn.setStyleSheet("""
+            QCheckBox::indicator { width: 52px; height: 32px; }
+            QCheckBox::indicator:unchecked {
+                border-radius: 16px;
+                background: #393939;
+            }
+            QCheckBox::indicator:checked {
+                border-radius: 16px;
+                background: #ff9500;
+            }
+            QCheckBox::indicator:unchecked::before, QCheckBox::indicator:checked::before {
+                content: '';
+                position: absolute;
+                left: 4px;
+                top: 4px;
+                width: 24px;
+                height: 24px;
+                border-radius: 12px;
+                background: white;
+                transition: left 0.2s;
+            }
+            QCheckBox::indicator:checked::before {
+                left: 24px;
+            }
+        """)
         
         # 删除按钮
         delete_btn = QPushButton("×")
@@ -137,32 +156,22 @@ class AlarmItem(QWidget):
     def update_toggle_style(self):
         if self.toggle_btn.isChecked():
             self.toggle_btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #4caf50;
-                    border: none;
-                    border-radius: 15px;
+                QCheckBox::indicator:checked {
+                    border-radius: 16px;
+                    background: #ff9500;
                 }
-                QPushButton::indicator {
-                    width: 26px;
-                    height: 26px;
-                    border-radius: 13px;
-                    background-color: white;
-                    margin: 2px;
+                QCheckBox::indicator:checked::before {
+                    left: 24px;
                 }
             """)
         else:
             self.toggle_btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #b0bec5;
-                    border: none;
-                    border-radius: 15px;
+                QCheckBox::indicator:unchecked {
+                    border-radius: 16px;
+                    background: #393939;
                 }
-                QPushButton::indicator {
-                    width: 26px;
-                    height: 26px;
-                    border-radius: 13px;
-                    background-color: white;
-                    margin: 2px;
+                QCheckBox::indicator:unchecked::before {
+                    left: 4px;
                 }
             """)
             
