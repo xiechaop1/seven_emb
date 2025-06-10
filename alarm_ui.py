@@ -120,6 +120,7 @@ class AddAlarmDialog(QDialog):
                 font-family: 'PingFang SC';
                 font-size: 16px;
                 min-height: 30px;
+                text-align: center;
             }
             QComboBox {
                 background-color: #303f9f;
@@ -130,6 +131,22 @@ class AddAlarmDialog(QDialog):
                 font-family: 'PingFang SC';
                 font-size: 16px;
                 min-height: 30px;
+                text-align: center;
+            }
+            QComboBox::drop-down {
+                border: none;
+                width: 20px;
+            }
+            QComboBox::down-arrow {
+                image: none;
+                border: none;
+            }
+            QComboBox QAbstractItemView {
+                background-color: #303f9f;
+                color: white;
+                selection-background-color: #3949ab;
+                selection-color: white;
+                border: none;
             }
             QCheckBox {
                 color: white;
@@ -192,7 +209,6 @@ class AddAlarmDialog(QDialog):
         self.time_edit = QTimeEdit()
         self.time_edit.setDisplayFormat("HH:mm")
         self.time_edit.setTime(QTime.currentTime())
-        self.time_edit.setAlignment(Qt.AlignCenter)
         
         time_layout.addWidget(time_label)
         time_layout.addWidget(self.time_edit)
@@ -206,7 +222,6 @@ class AddAlarmDialog(QDialog):
         repeat_label = QLabel("重复方式:")
         self.freq_combo = QComboBox()
         self.freq_combo.addItems(["单次", "每天", "工作日", "周末"])
-        self.freq_combo.setAlignment(Qt.AlignCenter)
         
         repeat_layout.addWidget(repeat_label)
         repeat_layout.addWidget(self.freq_combo)
