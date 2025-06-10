@@ -117,7 +117,7 @@ class AlarmItem(QWidget):
             # 更新任务状态
             self.task.is_enabled = self.toggle_btn.isChecked()
             # 保存到文件
-            self.task_daemon.scheduler.save_tasks()
+            self.task_daemon.save_tasks()
             # 更新按钮样式
             self.update_toggle_style()
             # 重新加载任务
@@ -163,6 +163,7 @@ class AlarmItem(QWidget):
     def delete_alarm(self):
         try:
             self.task_daemon.scheduler.remove_task(self.task.id)
+            self.task_daemon.save_tasks()
             self.deleteLater()
         except Exception as e:
             logging.error(f"删除闹钟失败: {str(e)}")
@@ -398,7 +399,7 @@ class AddAlarmDialog(QDialog):
             alarm_data = self.get_alarm_data()
             
             # 获取下一个可用的任务ID
-            next_id = self.task_daemon.scheduler.get_next_id()
+            next_id = self.task_daemon.scheduler.next_id
             
             # 创建新任务
             task = Task(
@@ -430,7 +431,7 @@ class AddAlarmDialog(QDialog):
             self.task_daemon.add_task(task)
             
             # 保存到文件
-            self.task_daemon.scheduler.save_tasks()
+            self.task_daemon.save_tasks()
             
             # 关闭对话框
             self.accept()
