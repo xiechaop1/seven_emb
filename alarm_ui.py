@@ -478,15 +478,16 @@ class AlarmWidget(QWidget):
                 font-family: 'PingFang SC';
             }
             QPushButton {
-                background-color: #303f9f;
+                background-color: #000000;
                 color: white;
-                border: none;
-                border-radius: 5px;
+                border: 2px solid #ffffff;
+                border-radius: 20px;
                 font-family: 'PingFang SC';
-                font-size: 16px;
+                font-size: 24px;
+                font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #3949ab;
+                background-color: #222222;
             }
             QScrollArea {
                 border: none;
@@ -498,8 +499,8 @@ class AlarmWidget(QWidget):
         """)
         
         main_layout = QVBoxLayout()
-        main_layout.setContentsMargins(20, 20, 20, 20)
-        main_layout.setSpacing(15)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
         
         # 标题栏 - 固定在顶部
         title_layout = QHBoxLayout()
@@ -518,16 +519,16 @@ class AlarmWidget(QWidget):
         add_btn.setFixedSize(40, 40)
         add_btn.setStyleSheet("""
             QPushButton {
-                background-color: #303f9f;
+                background-color: #000000;
                 color: white;
-                border: none;
+                border: 2px solid #ffffff;
                 border-radius: 20px;
                 font-family: 'PingFang SC';
                 font-size: 24px;
                 font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #3949ab;
+                background-color: #222222;
             }
         """)
         add_btn.clicked.connect(self.show_add_dialog)
