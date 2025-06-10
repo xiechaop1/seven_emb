@@ -9,6 +9,7 @@ from datetime import time, datetime
 import json
 import os
 import logging
+from common.code import Code
 from model.task import Task, TaskStatus, TaskScheduleType, TaskType, TaskAction, ActionType, LightCommand, SoundCommand, DisplayCommand
 
 class AlarmItem(QWidget):
@@ -402,8 +403,8 @@ class AddAlarmDialog(QDialog):
         # 灯光效果
         light_map = {
             "None": None,
-            "Breathing": ("breathing", {"color": "#FF0000", "speed": 2}),
-            "Colorful": ("sectorflowing", {"speed": 3})
+            "Breathing": (Code.LIGHT_MODE_BREATHING, {"r": "128", "g": 128, "b": 0, "steps": 200}),
+            "Colorful": (Code.LIGHT_MODE_SECTOR_FLOWING, {"mode": "colorful"}),
         }
         light_effect = light_map.get(self.light_combo.currentText())
         if light_effect:
