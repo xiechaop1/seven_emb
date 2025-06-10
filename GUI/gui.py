@@ -665,9 +665,9 @@ class MainWindow(QMainWindow):
         self.voiceDetectingPage.hide()
         
         # 显示闹钟界面
-        if self.alarm_widget:
-            self.alarm_widget.show()
-            self.menu_flag = 4  # 设置为闹钟界面状态
+        # if self.alarm_widget:
+        #     self.alarm_widget.show()
+        #     self.menu_flag = 4  # 设置为闹钟界面状态
 
     def messageHandler(self, text):
         if text == "voice appear":
