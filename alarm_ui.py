@@ -358,39 +358,87 @@ class AddAlarmDialog(QDialog):
         }
         repeat = repeat_map.get(self.repeat_combo.currentText(), "once")
         
-        # 获取效果选项
+        # 创建动作列表
+        actions = []
+        
+        # 屏幕效果
         screen_map = {
-            "None": "none",
-            "Sunrise": "sunrise",
-            "Sunset": "sunset",
-            "Ocean": "ocean"
+            "None": None,
+            "Sunrise": ("animation", {"type": "sunrise", "duration": 300}),
+            "Sunset": ("animation", {"type": "sunset", "duration": 300}),
+            "Ocean": ("animation", {"type": "ocean", "duration": 300})
         }
+        screen_effect = screen_map.get(self.screen_combo.currentText())
+        if screen_effect:
+            mode, params = screen_effect
+            actions.append({
+                "action_type": "display",
+                "target": "screen",
+                "parameters": {
+                    "mode": mode,
+                    "params": params
+                }
+            })
+            
+        # 声音效果
         sound_map = {
-            "None": "none",
-            "Gentle": "gentle",
-            "Intense": "intense"
+            "None": None,
+            "Gentle": ("gentle.mp3", 80),
+            "Intense": ("intense.mp3", 100)
         }
+        sound_effect = sound_map.get(self.sound_combo.currentText())
+        if sound_effect:
+            file_path, volume = sound_effect
+            actions.append({
+                "action_type": "sound",
+                "target": "sound",
+                "parameters": {
+                    "file_path": file_path,
+                    "volume": volume
+                }
+            })
+            
+        # 灯光效果
         light_map = {
-            "None": "none",
-            "Breathing": "breathing",
-            "Colorful": "sectorflowing"
+            "None": None,
+            "Breathing": ("breathing", {"color": "#FF0000", "speed": 2}),
+            "Colorful": ("sectorflowing", {"speed": 3})
         }
+        light_effect = light_map.get(self.light_combo.currentText())
+        if light_effect:
+            mode, params = light_effect
+            actions.append({
+                "action_type": "light",
+                "target": "light",
+                "parameters": {
+                    "mode": mode,
+                    "params": params
+                }
+            })
+            
+        # 香薰效果
         scent_map = {
-            "None": "none",
-            "Forest": "forest",
-            "Ocean": "ocean"
+            "None": None,
+            "Forest": ("forest", 5),
+            "Ocean": ("ocean", 5)
         }
+        scent_effect = scent_map.get(self.scent_combo.currentText())
+        if scent_effect:
+            mode, duration = scent_effect
+            actions.append({
+                "action_type": "spray",
+                "target": "spray",
+                "parameters": {
+                    "mode": mode,
+                    "duration": duration
+                }
+            })
         
         return {
             "time": time_str,
             "frequency": repeat,
             "enabled": True,
-            "effects": {
-                "screen": screen_map.get(self.screen_combo.currentText(), "none"),
-                "sound": sound_map.get(self.sound_combo.currentText(), "none"),
-                "light": light_map.get(self.light_combo.currentText(), "none"),
-                "scent": scent_map.get(self.scent_combo.currentText(), "none")
-            }
+            "actions": actions
         }
 
     def save_alarm(self):
