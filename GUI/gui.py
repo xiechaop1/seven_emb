@@ -437,12 +437,32 @@ class MainWindow(QMainWindow):
         # 创建初始化管理器
         self.init_manager = InitManager()
         
-        # 检查是否需要显示引导页面
-        # if not self.init_manager.load_init_data():
-        #     self.show_guide()
-        # else:
-        #     self.show_main_interface()
-            
+        # 闹钟界面
+        self.alarm_widget = None
+        
+    def show_alarm_widget(self, alarm_widget):
+        """显示闹钟界面"""
+        if self.alarm_widget is None:
+            self.alarm_widget = alarm_widget
+            self.alarm_widget.setGeometry(0, 0, self.width(), self.height())
+            self.alarm_widget.hide()
+            self.alarm_widget.setParent(self)
+        
+        # 隐藏其他界面
+        self.firstBG.hide()
+        self.firstMenu.hide()
+        for menu in self.SecondMenuGrp:
+            menu.hide()
+        self.thirdBG.hide()
+        
+        # 显示闹钟界面
+        self.alarm_widget.show()
+        self.alarm_widget.raise_()
+        self.afterRaise()
+        
+        # 更新菜单状态
+        self.menu_flag = 4  # 使用新的菜单状态标识闹钟界面
+        
     def show_guide(self):
         """显示引导页面"""
         self.guide_page = GuidePage(self)

@@ -90,7 +90,7 @@ from model.execute_command import ExecuteCommand
 from PyQt5.QtCore import QObject, pyqtSignal
 from GUI import gui
 
-from alarm_ui import AlarmWindow
+from alarm_ui import AlarmWindow, AlarmWidget
     
 
 # async def main():
@@ -149,6 +149,11 @@ if __name__ == "__main__":
     window = gui.MainWindow()
     window.show()
     
+    # 初始化闹钟界面
+    task_daemon = TaskDaemon("tasks.json", audio_instance, light_instance, spray_instance)
+    alarm_widget = AlarmWidget(task_daemon)
+    # 将闹钟界面添加到主界面的Tools菜单中
+    window.firstMenu.btn[2].clicked.connect(lambda: window.show_alarm_widget(alarm_widget))
     
     # 检查初始化数据
     init_manager = InitManager()
@@ -240,15 +245,6 @@ if __name__ == "__main__":
     #             motor_instance.start()
     # else:
     screen_instance = None
-
-    # 初始化闹钟界面
-    task_daemon = TaskDaemon("tasks.json", audio_instance, light_instance, spray_instance)
-    alarm_window = AlarmWindow(task_daemon)
-    alarm_window.show()
-    
-
-    # screen = Screen()
-    # screen.display("resources/video/think.mp4")
 
     mic_instance = Mic(client, audio_instance, light_instance, screen_instance, comm)
     kaldi_thread = threading.Thread(target=mic_instance.kaldi_listener)
