@@ -111,7 +111,7 @@ class Mic:
                          -0.488127, 0.386693]
         self.keywords = '["播放音乐", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
         # self.target_keywords = ["播放音乐", "七七", "停止", "抬头", "拍照", "休息", "Yuyu", "Foot"]
-        self.target_keywords = ["Hi boy"]
+        self.target_keywords = ["Hi boy", "Hi boy"]
         # self.wakeup_keywords = '["七七", "七宝", "七夕", "休息", "嘻嘻"]'
         # self.wakeup_keywords = '["播放音乐", "Foot", "七七", "停止", "抬头", "拍照","休息","[unk]"]'
         self.wakeup_keywords = '["Hi boy"]'
