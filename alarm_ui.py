@@ -458,8 +458,8 @@ class AddAlarmDialog(QDialog):
             self.task_daemon.create_alarm_task(
                 name=f"闹钟 {alarm_data['time']}",
                 execution_time=execution_time,
-                parameters=alarm_data,
-                duration=300
+                parameters=alarm_data['actions'],
+                duration=60
             )
             
             # 关闭对话框
