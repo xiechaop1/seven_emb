@@ -558,25 +558,28 @@ class MainWindow(QMainWindow):
     def show_alarm_widget(self, alarm_widget):
         """显示闹钟界面"""
         print("显示闹钟界面")
-        self.alarm_widget = alarm_widget
-        self.alarm_widget.setParent(self)
-        self.alarm_widget.setGeometry(0, 0, self.width(), self.height())
+        # self.alarm_widget = alarm_widget
+        # self.alarm_widget.setParent(self)
+        # self.alarm_widget.setGeometry(0, 0, self.width(), self.height())
         
-        # 隐藏其他界面元素
-        self.initBG.hide()
-        self.firstBG.hide()
-        self.firstMenu.hide()
-        for menu in self.SecondMenuGrp:
-            menu.hide()
-        self.thirdBG.hide()
-        self.BottomBar.hide()
-        self.leftBtn.hide()
-        self.rightBtn.hide()
-        self.voiceDetectingPage.hide()
+        # # 隐藏其他界面元素
+        # self.initBG.hide()
+        # self.firstBG.hide()
+        # self.firstMenu.hide()
+        # for menu in self.SecondMenuGrp:
+        #     menu.hide()
+        # self.thirdBG.hide()
+        # self.BottomBar.hide()
+        # self.leftBtn.hide()
+        # self.rightBtn.hide()
+        # self.voiceDetectingPage.hide()
         
-        # 显示闹钟界面
-        self.alarm_widget.show()
-        self.menu_flag = 4  # 设置为闹钟界面状态
+        # # 显示闹钟界面
+        # self.alarm_widget.show()
+        # self.menu_flag = 4  # 设置为闹钟界面状态
+        # 推荐用 QStackedWidget 管理 alarm_widget
+        self.stackedWidget.setCurrentWidget(alarm_widget)
+        alarm_widget.show()
 
     def show_guide(self):
         """显示引导页面"""

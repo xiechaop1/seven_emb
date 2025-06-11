@@ -381,6 +381,7 @@ class AlarmWidget(QWidget):
             
     def show_add_dialog(self):
         dialog = AddAlarmDialog(self.task_daemon, self)
+        dialog.setModal(True)
         if dialog.exec_() == QDialog.Accepted:
             self.refresh_alarms()
 
