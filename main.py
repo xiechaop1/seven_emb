@@ -145,42 +145,6 @@ if __name__ == "__main__":
     # 创建应用程序实例
     app = QApplication(sys.argv)
     
-    # 创建主窗口
-    window = gui.MainWindow()
-    window.show()
-
-
-    # 检查初始化数据
-    init_manager = InitManager()
-    if not init_manager.load_init_data():
-        # 如果没有初始化数据，显示引导页面
-        print("No initialization data found, showing guide page")
-        window.show_guide()
-        # 等待引导完成
-        while not init_manager.load_init_data():
-            app.processEvents()  # 保持GUI响应
-            time.sleep(0.1)  # 避免CPU占用过高
-        print("Guide completed, initialization data loaded")
-
-    # 显示主界面
-    window.show_main_interface()
-    print("Showing main interface")
-
-    # websocket_url = "ws://114.55.90.104:9001/ws"
-    if hasattr(Config, "WEBSOCKET_URL"):
-        websocket_url = Config.WEBSOCKET_URL
-    else:
-        websocket_url = "ws://114.55.90.104:9001/ws"
-    client = WebSocketClient(websocket_url)
-    ws_cli = client.connect()
-    pygame.init()
-
-    cv2_instance = cv2.VideoCapture(0)
-    
-    #创建信号槽
-    comm = Communicator()
-    # comm = None
-
     light_instance = Light()
     light_thread = threading.Thread(target=light_instance.daemon)
     light_thread.start()
@@ -220,12 +184,56 @@ if __name__ == "__main__":
     # strip.begin()
 
     # audio_event = threading.Event()
-    audio_instance = AudioPlayer(spray_instance, light_instance)
-    # audio_stop_thread = threading.Thread(target=audio_instance.audio_stop_event_daemon)
-    # audio_stop_thread.start()
     audio_play_thread = threading.Thread(target=audio_instance.audio_play_event_daemon)
     # audio_play_thread.start()
     logging.info("audio is ready")
+
+    
+    # 初始化闹钟相关依赖
+    audio_instance = AudioPlayer(spray_instance, light_instance)
+    task_daemon = TaskDaemon("tasks.json", audio_instance, light_instance, spray_instance)
+    
+    # 创建主窗口并传入task_daemon
+    window = gui.MainWindow(task_daemon)
+    window.show()
+
+    # 初始化闹钟界面
+    alarm_widget = AlarmWidget(task_daemon, parent=window)
+    window.show_alarm_widget(alarm_widget)
+    window.firstMenu.btn[2].clicked.connect(lambda: window.show_alarm_widget(alarm_widget))
+
+    # 检查初始化数据
+    init_manager = InitManager()
+    if not init_manager.load_init_data():
+        # 如果没有初始化数据，显示引导页面
+        print("No initialization data found, showing guide page")
+        window.show_guide()
+        # 等待引导完成
+        while not init_manager.load_init_data():
+            app.processEvents()  # 保持GUI响应
+            time.sleep(0.1)  # 避免CPU占用过高
+        print("Guide completed, initialization data loaded")
+
+    # 显示主界面
+    window.show_main_interface()
+    print("Showing main interface")
+
+    # websocket_url = "ws://114.55.90.104:9001/ws"
+    if hasattr(Config, "WEBSOCKET_URL"):
+        websocket_url = Config.WEBSOCKET_URL
+    else:
+        websocket_url = "ws://114.55.90.104:9001/ws"
+    client = WebSocketClient(websocket_url)
+    ws_cli = client.connect()
+    pygame.init()
+
+    cv2_instance = cv2.VideoCapture(0)
+    
+    #创建信号槽
+    comm = Communicator()
+    # comm = None
+
+    
 
     # if args.mode != "demo" and args.mode != "show":
     #     screen_instance = Screen()
@@ -272,63 +280,6 @@ if __name__ == "__main__":
     kaldi_thread.start()
     recv_thread.start()
     daemon_thread.start()
-
-    # 初始化闹钟界面
-    task_daemon = TaskDaemon("tasks.json", audio_instance, light_instance, spray_instance)
-    alarm_widget = AlarmWidget(task_daemon, parent=window)
-    window.show_alarm_widget(alarm_widget)
-    window.firstMenu.btn[2].clicked.connect(lambda: window.show_alarm_widget(alarm_widget))
-    
-
-    # # 创建守护进程
-    # task_daemon = TaskDaemon("tasks.json", audio_instance, light_instance, spray_instance)
-    #
-    # # 计算当前时间1分钟后的时间
-    # now = datetime.now()
-    # execution_time = (now + timedelta(seconds=10)).time()
-    # # execution_time = one_minute_later.strftime("%H:%M:%S"),  # 使用计算出的时间
-    #
-    # # 创建任务，使用计算出的时间
-    # # task = Task.create(
-    # #     name="Sunrise Light",
-    # #     task_type=TaskType.SYSTEM,
-    # #     schedule_type=TaskScheduleType.ONCE,  # 改为单次执行
-    # #     execution_time=one_minute_later.strftime("%H:%M:%S"),  # 使用计算出的时间
-    # #     actions=json.dumps([
-    # #         {
-    # #             "action_type": "light",
-    # #             "target": "bedroom_light",
-    # #             "parameters": {
-    # #                 "mode": Code.LIGHT_MODE_BREATHING,
-    # #                 "params": {"r":0, "g":255, "b":255, "steps": 200}
-    # #             }
-    # #         }
-    # #     ])
-    # # )
-    # actions = [
-    #         {
-    #             "action_type": "sound",
-    #             "target": "bedroom_light",
-    #             "parameters": {
-    #                 "command": SoundCommand.PLAY,
-    #                 "file_path": "xyxh.mp3",
-    #                 # "mode": Code.LIGHT_MODE_BREATHING,
-    #                 # "params": {"r":0, "g":255, "b":255, "steps": 200}
-    #             }
-    #         }
-    #     ]
-    # task_daemon.create_alarm_task("Test_sound", execution_time, actions, 3)
-    # actions = [
-    #     {
-    #         "action_type": "light",
-    #         "target": "bedroom_light",
-    #         "parameters": {
-    #             "mode": Code.LIGHT_MODE_BREATHING,
-    #             "params": {"r":0, "g":255, "b":255, "steps": 200}
-    #         }
-    #     }
-    # ]
-    # task_daemon.create_alarm_task("Test_light", execution_time, actions, 3)
 
     def signal_handler(sig, frame):
         print("Now exiting...")
