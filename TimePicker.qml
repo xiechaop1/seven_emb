@@ -7,7 +7,7 @@ Rectangle {
         anchors.centerIn: parent
         spacing: 8
 
-        WheelView {
+        Wheel {
             id: hourWheel
             width: 80; height: 120
             model: 24
@@ -20,7 +20,7 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter
             }
         }
-        WheelView {
+        Wheel {
             id: minuteWheel
             width: 80; height: 120
             model: 60
