@@ -31,12 +31,35 @@ class AlarmItem(QWidget):
         time_layout = QVBoxLayout()
         time_layout.setSpacing(0)
         time_str = self.task.execution_time.split()[1][:5] if ' ' in self.task.execution_time else self.task.execution_time[:5]
+        # 判断开关状态，设置颜色
+        is_enabled = self.task.is_enabled
+        time_color = "white" if is_enabled else "#8e8e93"
+        desc_color = "#8e8e93" if is_enabled else "#444444"
         time_label = QLabel(time_str)
-        time_label.setStyleSheet("color: #d1d1d6; font-size: 48px; font-weight: 300; padding-left: 24px;")
+        time_label.setStyleSheet(f"color: {time_color}; font-size: 48px; font-weight: 300; padding-left: 24px;")
         desc_label = QLabel(self.task.name or "闹钟")
-        desc_label.setStyleSheet("color: #8e8e93; font-size: 16px; font-weight: 400; padding-left: 24px;")
+        desc_label.setStyleSheet(f"color: {desc_color}; font-size: 16px; font-weight: 400; padding-left: 24px;")
         time_layout.addWidget(time_label)
         time_layout.addWidget(desc_label)
+        # 新增：Sound, Light, Display, Spray 字段
+        actions = json.loads(self.task.actions) if hasattr(self.task, 'actions') and self.task.actions else []
+        sound_text = light_text = display_text = spray_text = "None"
+        for action in actions:
+            if action.get('action_type') == 'sound' or action.get('action_type') == 'SOUND':
+                params = action.get('parameters', {})
+                sound_text = params.get('file_path', 'On') if params else 'On'
+            if action.get('action_type') == 'light' or action.get('action_type') == 'LIGHT':
+                params = action.get('parameters', {})
+                light_text = params.get('mode', 'On') if params else 'On'
+            if action.get('action_type') == 'display' or action.get('action_type') == 'DISPLAY':
+                params = action.get('parameters', {})
+                display_text = params.get('mode', 'On') if params else 'On'
+            if action.get('action_type') == 'spray' or action.get('action_type') == 'SPRAY':
+                params = action.get('parameters', {})
+                spray_text = params.get('mode', 'On') if params else 'On'
+        detail_label = QLabel(f"Sound: {sound_text}   Light: {light_text}   Display: {display_text}   Spray: {spray_text}")
+        detail_label.setStyleSheet(f"color: #8e8e93; font-size: 14px; padding-left: 24px;")
+        time_layout.addWidget(detail_label)
         time_layout.addStretch()
         # 中间：iOS风格QML开关
         self.switch_widget = QQuickWidget()
@@ -50,6 +73,7 @@ class AlarmItem(QWidget):
         # 右侧：iOS风格删除按钮
         delete_btn = QPushButton("X")
         delete_btn.setFixedSize(36, 36)
+        
         delete_btn.setStyleSheet("""
             QPushButton {
                 background-color: #ff3b30;
@@ -89,6 +113,12 @@ class AlarmItem(QWidget):
                 task_id=self.task.id,
                 enable=checked
             )
+            # 同步左侧文字颜色
+            is_enabled = checked
+            time_color = "white" if is_enabled else "#8e8e93"
+            desc_color = "#8e8e93" if is_enabled else "#444444"
+            self.findChildren(QLabel)[0].setStyleSheet(f"color: {time_color}; font-size: 48px; font-weight: 300; padding-left: 24px;")
+            self.findChildren(QLabel)[1].setStyleSheet(f"color: {desc_color}; font-size: 16px; font-weight: 400; padding-left: 24px;")
         except Exception as e:
             logging.error(f"切换闹钟状态失败: {str(e)}")
             # 恢复按钮状态
