@@ -47,15 +47,33 @@ class AlarmItem(QWidget):
         if root is not None:
             root.setProperty("checked", self.task.is_enabled)
             root.toggled.connect(self.toggle_alarm)
-        # 右侧：删除按钮
-        delete_btn = QPushButton("×")
-        delete_btn.setFixedSize(30, 30)
+        # 右侧：iOS风格删除按钮
+        delete_btn = QPushButton("Delete")
+        delete_btn.setFixedSize(72, 32)
+        delete_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #ff3b30;
+                color: white;
+                border: none;
+                border-radius: 16px;
+                font-size: 18px;
+                font-family: 'PingFang SC', 'SF Pro Display', Arial, sans-serif;
+                font-weight: bold;
+                padding: 0 16px;
+            }
+            QPushButton:hover {
+                background-color: #ff6259;
+            }
+            QPushButton:pressed {
+                background-color: #d70015;
+            }
+        """)
         delete_btn.clicked.connect(self.delete_alarm)
-        delete_btn.setStyleSheet("background: transparent; color: #ff3b30; font-size: 28px; border: none; margin-right: 16px;")
         # 布局调整
         layout.addLayout(time_layout, 2)
         layout.addStretch(1)
         layout.addWidget(self.switch_widget, 0, Qt.AlignVCenter)
+        layout.addSpacing(16)  # 开关和删除按钮之间的距离
         layout.addWidget(delete_btn, 0, Qt.AlignVCenter)
         self.setLayout(layout)
         # 分割线
