@@ -1,6 +1,3 @@
-
-remote: Counting objects: 100% (7/7), done.
-remote: Compressing objects: 100% (1/1), done.
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
