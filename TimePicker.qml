@@ -1,41 +1,66 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtGraphicalEffects 1.15
 
 Rectangle {
-    width: 220; height: 120; color: "#232325"
+    id: root
+    width: 220
+    height: 120
+    color: "#232325"
+
+    property int hour: hourView.currentIndex
+    property int minute: minuteView.currentIndex
+
     Row {
         anchors.centerIn: parent
         spacing: 8
 
-        Wheel {
-            id: hourWheel
-            width: 80; height: 120
+        FlickableWheel {
+            id: hourView
+            width: 80
+            height: 120
             model: 24
-            currentIndex: 8
-            delegate: Text {
-                text: modelData < 10 ? "0" + modelData : modelData
-                font.pixelSize: 32
-                color: "#d1d1d6"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
         }
-        Wheel {
-            id: minuteWheel
-            width: 80; height: 120
+
+        FlickableWheel {
+            id: minuteView
+            width: 80
+            height: 120
             model: 60
-            currentIndex: 0
-            delegate: Text {
-                text: modelData < 10 ? "0" + modelData : modelData
-                font.pixelSize: 32
-                color: "#d1d1d6"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
         }
     }
 
-    // 用于Python获取时间
-    property int hour: hourWheel.currentIndex
-    property int minute: minuteWheel.currentIndex
+    // 中间高亮线
+    Rectangle {
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: (root.height - 40) / 2
+        width: root.width
+        height: 40
+        color: "transparent"
+        border.color: "#ffffff22"
+        border.width: 1
+    }
+
+    // 顶部和底部的渐隐遮罩
+    Rectangle {
+        anchors.top: parent.top
+        width: parent.width
+        height: 40
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: "#232325" }
+            GradientStop { position: 1.0; color: "#23232500" }
+        }
+        z: 10
+    }
+
+    Rectangle {
+        anchors.bottom: parent.bottom
+        width: parent.width
+        height: 40
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: "#23232500" }
+            GradientStop { position: 1.0; color: "#232325" }
+        }
+        z: 10
+    }
 }
