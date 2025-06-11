@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
     QListWidget, QDialog, QTimeEdit, QComboBox, QMessageBox, QScrollArea, QFrame, QGroupBox, QCheckBox
 )
-from PySide6.QtCore import Qt, QTime, QDateTime, QSize, QTimer, Signal, QUrl
+from PySide6.QtCore import Qt, QTime, QDateTime, QSize, QTimer, Signal, QUrl, Property
 from PySide6.QtGui import QIcon, QFont, QColor, QPainter, QImage, QPixmap, QPalette
 from PySide6.QtQuickWidgets import QQuickWidget
 from model.scheduler import TaskDaemon, TaskType, TaskScheduleType, Task
@@ -38,26 +38,15 @@ class AlarmItem(QWidget):
         time_layout.addWidget(time_label)
         time_layout.addWidget(desc_label)
         time_layout.addStretch()
-        # 中间：iOS风格开关按钮
-        self.toggle_btn = QCheckBox()
-        self.toggle_btn.setChecked(self.task.is_enabled)
-        self.toggle_btn.setStyleSheet("""
-            QCheckBox::indicator {
-                width: 52px;
-                height: 32px;
-                border-radius: 16px;
-                background: #393939;
-            }
-            QCheckBox::indicator:unchecked {
-                background: #393939;
-                border: 1px solid #393939;
-            }
-            QCheckBox::indicator:checked {
-                background: #393939;
-                border: 1px solid #393939;
-            }
-        """)
-        self.toggle_btn.clicked.connect(self.toggle_alarm)
+        # 中间：iOS风格QML开关
+        self.switch_widget = QQuickWidget()
+        self.switch_widget.setSource(QUrl.fromLocalFile(os.path.abspath("IosSwitch.qml")))
+        self.switch_widget.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.switch_widget.setFixedSize(52, 32)
+        root = self.switch_widget.rootObject()
+        if root is not None:
+            root.setProperty("checked", self.task.is_enabled)
+            root.toggled.connect(self.toggle_alarm)
         # 右侧：删除按钮
         delete_btn = QPushButton("×")
         delete_btn.setFixedSize(30, 30)
@@ -66,7 +55,7 @@ class AlarmItem(QWidget):
         # 布局调整
         layout.addLayout(time_layout, 2)
         layout.addStretch(1)
-        layout.addWidget(self.toggle_btn, 0, Qt.AlignVCenter)
+        layout.addWidget(self.switch_widget, 0, Qt.AlignVCenter)
         layout.addWidget(delete_btn, 0, Qt.AlignVCenter)
         self.setLayout(layout)
         # 分割线
@@ -75,47 +64,18 @@ class AlarmItem(QWidget):
         line.setStyleSheet("background: #222222;")
         line.show()
         
-    def toggle_alarm(self):
+    def toggle_alarm(self, checked):
         try:
-            # 获取当前按钮状态
-            enable = self.toggle_btn.isChecked()
-            
-            # 调用toggle_task方法切换任务状态
             self.task_daemon.toggle_task(
                 task_id=self.task.id,
-                enable=enable
+                enable=checked
             )
-            
-            # 更新按钮样式
-            self.update_toggle_style()
-            
         except Exception as e:
             logging.error(f"切换闹钟状态失败: {str(e)}")
             # 恢复按钮状态
-            self.toggle_btn.setChecked(not self.toggle_btn.isChecked())
-            self.update_toggle_style()
-            
-    def update_toggle_style(self):
-        if self.toggle_btn.isChecked():
-            self.toggle_btn.setStyleSheet("""
-                QCheckBox::indicator:checked {
-                    border-radius: 16px;
-                    background: #ff9500;
-                }
-                QCheckBox::indicator:checked::before {
-                    left: 24px;
-                }
-            """)
-        else:
-            self.toggle_btn.setStyleSheet("""
-                QCheckBox::indicator:unchecked {
-                    border-radius: 16px;
-                    background: #393939;
-                }
-                QCheckBox::indicator:unchecked::before {
-                    left: 4px;
-                }
-            """)
+            root = self.switch_widget.rootObject()
+            if root is not None:
+                root.setProperty("checked", not checked)
             
     def delete_alarm(self):
         try:
@@ -189,6 +149,7 @@ class AddAlarmDialog(QDialog):
             QComboBox {
                 color: #d1d1d6;
                 background: transparent;
+                width: 160px;
                 font-size: 18px;
                 border: none;
                 padding: 8px 0 8px 0;
