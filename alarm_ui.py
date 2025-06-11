@@ -204,7 +204,7 @@ class AddAlarmDialog(QDialog):
             row.setContentsMargins(24, 0, 24, 0)
             row.setSpacing(0)
             lab = QLabel(label)
-            lab.setStyleSheet("color: #d1d1d6; font-size: 18px; background: #18181a")
+            lab.setStyleSheet("color: #d1d1d6; font-size: 18px;")
             row.addWidget(lab)
             row.addStretch()
             row.addWidget(widget)
@@ -212,7 +212,7 @@ class AddAlarmDialog(QDialog):
             if divider:
                 line = QFrame()
                 line.setFrameShape(QFrame.HLine)
-                line.setStyleSheet("background: #222222; min-height: 1px; max-height: 1px; border: none;")
+                line.setStyleSheet("background: #18181a; min-height: 1px; max-height: 1px; border: none;")
                 option_layout.addWidget(line)
         add_option_row("Repeat", self.repeat_combo)
         add_option_row("Sound", self.sound_combo)
