@@ -60,6 +60,7 @@ class AlarmItem(QWidget):
                 font-family: 'PingFang SC', 'SF Pro Display', Arial, sans-serif;
                 font-weight: bold;
                 padding: 0;
+                margin-right: 20px;
             }
             QPushButton:hover {
                 background-color: #ff6259;
@@ -331,10 +332,14 @@ class AlarmWidget(QWidget):
         title_layout = QHBoxLayout()
         title_layout.setContentsMargins(16, 0, 16, 0)
         title_layout.setSpacing(0)
-        # edit_label = QLabel("编辑")
-        # edit_label.setStyleSheet("color: #ff9500; font-size: 20px; font-weight: 500;")
+        # title_layout.addWidget(edit_label)
+        # title_layout.addStretch()
         title = QLabel("闹钟")
         title.setStyleSheet("color: white; font-size: 20px; font-weight: bold;")
+        title.setAlignment(Qt.AlignCenter)
+        title_layout.addStretch()
+        title_layout.addWidget(title, 0, Qt.AlignCenter)
+        title_layout.addStretch()
         add_btn = QPushButton("")
         add_btn.setFixedSize(36, 36)
         add_btn.setStyleSheet("""
@@ -354,10 +359,6 @@ class AlarmWidget(QWidget):
         add_btn.setText("+")
         add_btn.setFont(QFont('PingFang SC', 28, QFont.Bold))
         add_btn.clicked.connect(self.show_add_dialog)
-        # title_layout.addWidget(edit_label)
-        # title_layout.addStretch()
-        title_layout.addWidget(title)
-        title_layout.addStretch()
         title_layout.addWidget(add_btn)
         title_bar.setLayout(title_layout)
         main_layout.addWidget(title_bar)
