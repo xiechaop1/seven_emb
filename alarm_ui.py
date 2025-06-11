@@ -11,7 +11,7 @@ import os
 import logging
 from common.code import Code
 from model.task import Task, TaskStatus, TaskScheduleType, TaskType, TaskAction, ActionType, LightCommand, SoundCommand, DisplayCommand
-from PyQt5.QtQuickWidgets import QQuickWidget
+from PySide6.QtQuickWidgets import QQuickWidget
 
 class AlarmItem(QWidget):
     def __init__(self, task, task_daemon, parent=None):
