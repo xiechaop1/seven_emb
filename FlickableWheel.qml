@@ -3,13 +3,15 @@ import QtQuick.Controls 2.15
 
 ListView {
     id: wheel
-    property alias currentIndex: wheel.currentIndex
-    property alias modelData: wheel.model   // 👈 注意这里是 alias，不是新定义
+
+    // ✅ 自定义属性
+    property int itemHeight: 40
+    property int currentIndex: wheel.currentIndex
 
     width: 80
     height: 120
-    itemHeight: 40
     clip: true
+    model: 10  // 默认模型，外部可以覆盖
 
     snapMode: ListView.SnapToItem
     boundsBehavior: Flickable.StopAtBounds
