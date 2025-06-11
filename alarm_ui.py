@@ -147,274 +147,154 @@ class AddAlarmDialog(QDialog):
     def __init__(self, task_daemon, parent=None):
         super().__init__(parent)
         self.task_daemon = task_daemon
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setFixedSize(360, 480)
+        self.setStyleSheet("background: #18181a;")
         self.setup_ui()
-        
+
     def setup_ui(self):
-        self.setWindowTitle("添加闹钟")
-        self.setFixedSize(400, 600)
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #1a237e;
-            }
-            QLabel {
-                color: white;
-                font-family: 'PingFang SC';
-                font-size: 12px;
-            }
-            QComboBox {
-                background-color: #303f9f;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                padding: 4px;
-                font-family: 'PingFang SC';
-                font-size: 12px;
-                min-height: 40px;
-            }
-            QComboBox::drop-down {
-                border: none;
-                width: 20px;
-            }
-            QComboBox::down-arrow {
-                image: none;
-                border: none;
-            }
-            QComboBox QAbstractItemView {
-                background-color: #303f9f;
-                color: white;
-                selection-background-color: #3949ab;
-                selection-color: white;
-                border: none;
-                outline: none;
-                font-size: 12px;
-            }
-            QPushButton {
-                background-color: #303f9f;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                padding: 4px;
-                font-family: 'PingFang SC';
-                font-size: 12px;
-                min-height: 40px;
-            }
-            QPushButton:hover {
-                background-color: #3949ab;
-            }
-            QTimeEdit {
-                background-color: #303f9f;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                padding: 4px;
-                font-family: 'PingFang SC';
-                font-size: 12px;
-                min-height: 40px;
-            }
-            QTimeEdit::up-button, QTimeEdit::down-button {
-                width: 20px;
-                border: none;
-                background: transparent;
-            }
-        """)
-        
-        layout = QVBoxLayout()
-        layout.setContentsMargins(20, 20, 20, 20)
-        layout.setSpacing(15)
-        
-        # 时间选择
-        time_layout = QVBoxLayout()
-        time_label = QLabel("提醒时间")
-        time_label.setStyleSheet("font-size: 12px;")
-        
-        # 使用下拉框选择时间
-        time_widget = QWidget()
-        time_h_layout = QHBoxLayout()
-        time_h_layout.setContentsMargins(0, 0, 0, 0)
-        
+        main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+
+        # 顶部栏
+        top_bar = QHBoxLayout()
+        top_bar.setContentsMargins(16, 16, 16, 0)
+        cancel_btn = QPushButton("取消")
+        cancel_btn.setStyleSheet("color: #ff9500; font-size: 18px; font-family: 'PingFang SC'; background: transparent; border: none;")
+        cancel_btn.clicked.connect(self.reject)
+        title = QLabel("添加闹钟")
+        title.setStyleSheet("color: white; font-size: 18px; font-family: 'PingFang SC'; font-weight: bold;")
+        title.setAlignment(Qt.AlignCenter)
+        save_btn = QPushButton("存储")
+        save_btn.setStyleSheet("color: #ff9500; font-size: 18px; font-family: 'PingFang SC'; background: transparent; border: none;")
+        save_btn.clicked.connect(self.save_alarm)
+        top_bar.addWidget(cancel_btn)
+        top_bar.addStretch()
+        top_bar.addWidget(title)
+        top_bar.addStretch()
+        top_bar.addWidget(save_btn)
+        main_layout.addLayout(top_bar)
+
+        # 时间选择（仿iOS滚轮）
+        time_layout = QHBoxLayout()
+        time_layout.setContentsMargins(0, 24, 0, 0)
+        time_layout.setSpacing(0)
         self.hour_combo = QComboBox()
         self.minute_combo = QComboBox()
-        
-        # 添加小时选项
         for i in range(24):
             self.hour_combo.addItem(f"{i:02d}")
-            
-        # 添加分钟选项
         for i in range(60):
             self.minute_combo.addItem(f"{i:02d}")
-            
-        # 设置默认时间为08:00
         self.hour_combo.setCurrentText("08")
         self.minute_combo.setCurrentText("00")
-        
-        time_h_layout.addWidget(self.hour_combo)
-        time_h_layout.addWidget(QLabel(":"))
-        time_h_layout.addWidget(self.minute_combo)
-        time_widget.setLayout(time_h_layout)
-        
-        time_layout.addWidget(time_label)
-        time_layout.addWidget(time_widget)
-        layout.addLayout(time_layout)
-        
-        # 重复选项
-        repeat_layout = QVBoxLayout()
-        repeat_label = QLabel("重复")
-        repeat_label.setStyleSheet("font-size: 12px;")
+        for c in [self.hour_combo, self.minute_combo]:
+            c.setStyleSheet("""
+                QComboBox {
+                    background: #232325;
+                    color: #d1d1d6;
+                    font-size: 32px;
+                    border: none;
+                    min-width: 80px;
+                    min-height: 48px;
+                    padding: 0 8px;
+                    qproperty-alignment: AlignCenter;
+                }
+                QComboBox QAbstractItemView {
+                    background: #232325;
+                    color: #d1d1d6;
+                    selection-background-color: #393939;
+                    selection-color: #ff9500;
+                    font-size: 32px;
+                }
+            """)
+        time_layout.addStretch(1)
+        time_layout.addWidget(self.hour_combo)
+        time_layout.addWidget(QLabel(":"))
+        time_layout.addWidget(self.minute_combo)
+        time_layout.addStretch(1)
+        main_layout.addLayout(time_layout)
+
+        # 选项区块
+        option_box = QFrame()
+        option_box.setStyleSheet("background: #232325; border-radius: 16px;")
+        option_layout = QVBoxLayout()
+        option_layout.setContentsMargins(0, 0, 0, 0)
+        option_layout.setSpacing(0)
+        # 选项内容
         self.repeat_combo = QComboBox()
-        self.repeat_combo.addItems(["单次", "每天", "工作日", "周末"])
-        repeat_layout.addWidget(repeat_label)
-        repeat_layout.addWidget(self.repeat_combo)
-        layout.addLayout(repeat_layout)
-        
-        # 屏幕效果
-        screen_layout = QVBoxLayout()
-        screen_label = QLabel("屏幕效果")
-        screen_label.setStyleSheet("font-size: 12px;")
-        self.screen_combo = QComboBox()
-        self.screen_combo.addItems(["None", "Sunrise", "Sunset", "Ocean"])
-        screen_layout.addWidget(screen_label)
-        screen_layout.addWidget(self.screen_combo)
-        layout.addLayout(screen_layout)
-        
-        # 声音效果
-        sound_layout = QVBoxLayout()
-        sound_label = QLabel("声音效果")
-        sound_label.setStyleSheet("font-size: 12px;")
+        self.repeat_combo.addItems(["一次", "每日", "每周"])
+        self.repeat_combo.setStyleSheet("color: #d1d1d6; background: transparent; font-size: 18px; border: none; padding: 8px 0 8px 0;")
         self.sound_combo = QComboBox()
-        self.sound_combo.addItems(["None", "Gentle", "Intense"])
-        sound_layout.addWidget(sound_label)
-        sound_layout.addWidget(self.sound_combo)
-        layout.addLayout(sound_layout)
-        
-        # 灯光效果
-        light_layout = QVBoxLayout()
-        light_label = QLabel("灯光效果")
-        light_label.setStyleSheet("font-size: 12px;")
+        self.sound_combo.addItems(["None", "Soft", "Active"])
+        self.sound_combo.setStyleSheet("color: #d1d1d6; background: transparent; font-size: 18px; border: none; padding: 8px 0 8px 0;")
         self.light_combo = QComboBox()
         self.light_combo.addItems(["None", "Breathing", "Colorful"])
-        light_layout.addWidget(light_label)
-        light_layout.addWidget(self.light_combo)
-        layout.addLayout(light_layout)
-        
-        # 香薰效果
-        scent_layout = QVBoxLayout()
-        scent_label = QLabel("香薰效果")
-        scent_label.setStyleSheet("font-size: 12px;")
+        self.light_combo.setStyleSheet("color: #d1d1d6; background: transparent; font-size: 18px; border: none; padding: 8px 0 8px 0;")
+        self.screen_combo = QComboBox()
+        self.screen_combo.addItems(["None", "Sunrise", "Sunset", "Moon"])
+        self.screen_combo.setStyleSheet("color: #d1d1d6; background: transparent; font-size: 18px; border: none; padding: 8px 0 8px 0;")
         self.scent_combo = QComboBox()
-        self.scent_combo.addItems(["None", "Forest", "Ocean"])
-        scent_layout.addWidget(scent_label)
-        scent_layout.addWidget(self.scent_combo)
-        layout.addLayout(scent_layout)
-        
-        # 按钮
-        button_layout = QHBoxLayout()
-        cancel_btn = QPushButton("取消")
-        cancel_btn.clicked.connect(self.reject)
-        save_btn = QPushButton("保存")
-        save_btn.clicked.connect(self.save_alarm)
-        button_layout.addWidget(cancel_btn)
-        button_layout.addWidget(save_btn)
-        layout.addLayout(button_layout)
-        
-        self.setLayout(layout)
-        
+        self.scent_combo.addItems(["Off", "On"])
+        self.scent_combo.setStyleSheet("color: #d1d1d6; background: transparent; font-size: 18px; border: none; padding: 8px 0 8px 0;")
+        # 行生成函数
+        def add_option_row(label, widget, divider=True):
+            row = QHBoxLayout()
+            row.setContentsMargins(24, 0, 24, 0)
+            row.setSpacing(0)
+            lab = QLabel(label)
+            lab.setStyleSheet("color: #d1d1d6; font-size: 18px;")
+            row.addWidget(lab)
+            row.addStretch()
+            row.addWidget(widget)
+            option_layout.addLayout(row)
+            if divider:
+                line = QFrame()
+                line.setFrameShape(QFrame.HLine)
+                line.setStyleSheet("background: #222222; min-height: 1px; max-height: 1px; border: none;")
+                option_layout.addWidget(line)
+        add_option_row("重复", self.repeat_combo)
+        add_option_row("铃声", self.sound_combo)
+        add_option_row("灯光", self.light_combo)
+        add_option_row("屏幕", self.screen_combo)
+        add_option_row("香氛", self.scent_combo, divider=False)
+        option_box.setLayout(option_layout)
+        main_layout.addSpacing(24)
+        main_layout.addWidget(option_box)
+        self.setLayout(main_layout)
+
     def get_alarm_data(self):
-        # 获取时间
         hour = self.hour_combo.currentText()
         minute = self.minute_combo.currentText()
         time_str = f"{hour}:{minute}"
-        
-        # 获取重复选项
-        repeat_map = {
-            "单次": "once",
-            "每天": "daily",
-            "工作日": "weekday",
-            "周末": "weekend"
-        }
+        repeat_map = {"一次": "once", "每日": "daily", "每周": "weekly"}
         repeat = repeat_map.get(self.repeat_combo.currentText(), "once")
-        
-        # 创建动作列表
         actions = []
-        
-        # 屏幕效果
-        screen_map = {
-            "None": None,
-            "Sunrise": ("animation", {"type": "sunrise", "duration": 300}),
-            "Sunset": ("animation", {"type": "sunset", "duration": 300}),
-            "Ocean": ("animation", {"type": "ocean", "duration": 300})
-        }
-        screen_effect = screen_map.get(self.screen_combo.currentText())
-        if screen_effect:
-            mode, params = screen_effect
-            actions.append({
-                "action_type": ActionType.DISPLAY,
-                "target": "screen",
-                "parameters": {
-                    "mode": mode,
-                    "params": params
-                }
-            })
-            
-        # 声音效果
-        sound_map = {
-            "None": None,
-            "Gentle": ("gentle.mp3", 80),
-            "Intense": ("intense.mp3", 100)
-        }
+        # 声音
+        sound_map = {"None": None, "Soft": ("gentle.mp3", 80), "Active": ("intense.mp3", 100)}
         sound_effect = sound_map.get(self.sound_combo.currentText())
         if sound_effect:
             file_path, volume = sound_effect
-            actions.append({
-                "action_type": ActionType.SOUND,
-                "target": "sound",
-                "parameters": {
-                    "file_path": file_path,
-                    "volume": volume
-                }
-            })
-            
-        # 灯光效果
-        light_map = {
-            "None": None,
-            "Breathing": (Code.LIGHT_MODE_BREATHING, {"r": "128", "g": 128, "b": 0, "steps": 200}),
-            "Colorful": (Code.LIGHT_MODE_SECTOR_FLOWING, {"mode": "colorful"}),
-        }
+            actions.append({"action_type": ActionType.SOUND, "target": "sound", "parameters": {"file_path": file_path, "volume": volume}})
+        # 灯光
+        light_map = {"None": None, "Breathing": (Code.LIGHT_MODE_BREATHING, {"r": "128", "g": 128, "b": 0, "steps": 200}), "Colorful": (Code.LIGHT_MODE_SECTOR_FLOWING, {"mode": "colorful"})}
         light_effect = light_map.get(self.light_combo.currentText())
         if light_effect:
             mode, params = light_effect
-            actions.append({
-                "action_type": ActionType.LIGHT,
-                "target": "light",
-                "parameters": {
-                    "mode": mode,
-                    "params": params
-                }
-            })
-            
-        # 香薰效果
-        scent_map = {
-            "None": None,
-            "Forest": ("forest", 5),
-            "Ocean": ("ocean", 5)
-        }
+            actions.append({"action_type": ActionType.LIGHT, "target": "light", "parameters": {"mode": mode, "params": params}})
+        # 屏幕
+        screen_map = {"None": None, "Sunrise": ("animation", {"type": "sunrise", "duration": 300}), "Sunset": ("animation", {"type": "sunset", "duration": 300}), "Moon": ("animation", {"type": "moon", "duration": 300})}
+        screen_effect = screen_map.get(self.screen_combo.currentText())
+        if screen_effect:
+            mode, params = screen_effect
+            actions.append({"action_type": ActionType.DISPLAY, "target": "screen", "parameters": {"mode": mode, "params": params}})
+        # 香氛
+        scent_map = {"Off": None, "On": ("forest", 5)}
         scent_effect = scent_map.get(self.scent_combo.currentText())
         if scent_effect:
             mode, duration = scent_effect
-            actions.append({
-                "action_type": ActionType.SPRAY,
-                "target": "spray",
-                "parameters": {
-                    "mode": mode,
-                    "duration": duration
-                }
-            })
-        
-        return {
-            "time": time_str,
-            "frequency": repeat,
-            "enabled": True,
-            "actions": actions
-        }
+            actions.append({"action_type": ActionType.SPRAY, "target": "spray", "parameters": {"mode": mode, "duration": duration}})
+        return {"time": time_str, "frequency": repeat, "enabled": True, "actions": actions}
 
     def save_alarm(self):
         try:
