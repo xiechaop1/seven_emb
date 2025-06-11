@@ -1,6 +1,5 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtGraphicalEffects 1.15
 
 Rectangle {
     id: root
@@ -46,21 +45,21 @@ Rectangle {
         anchors.top: parent.top
         width: parent.width
         height: 40
+        z: 10
         gradient: Gradient {
             GradientStop { position: 0.0; color: "#232325" }
             GradientStop { position: 1.0; color: "#23232500" }
         }
-        z: 10
     }
 
     Rectangle {
         anchors.bottom: parent.bottom
         width: parent.width
         height: 40
+        z: 10
         gradient: Gradient {
             GradientStop { position: 0.0; color: "#23232500" }
             GradientStop { position: 1.0; color: "#232325" }
         }
-        z: 10
     }
 }
