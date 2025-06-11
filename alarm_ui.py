@@ -213,7 +213,7 @@ class AddAlarmDialog(QDialog):
         option_layout.setSpacing(0)
         # 选项内容
         self.repeat_combo = QComboBox()
-        self.repeat_combo.addItems(["一次", "每日", "每周"])
+        self.repeat_combo.addItems(["Once", "Daily", "Workday", "Weekend", "Weekly"])
         self.repeat_combo.setStyleSheet("color: #d1d1d6; background: transparent; font-size: 18px; border: none; padding: 8px 0 8px 0;")
         self.sound_combo = QComboBox()
         self.sound_combo.addItems(["None", "Soft", "Active"])
@@ -255,7 +255,7 @@ class AddAlarmDialog(QDialog):
 
     def get_alarm_data(self):
         time_str = self.time_edit.time().toString("HH:mm")
-        repeat_map = {"Once": "once", "Daily": "daily", "Weekly": "weekly"}
+        repeat_map = {"Once": "once", "Daily": "daily", "Workday": "workday", "Weekend": "weekend", "Weekly": "weekly"}
         repeat = repeat_map.get(self.repeat_combo.currentText(), "once")
         actions = []
         # 声音
