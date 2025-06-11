@@ -436,7 +436,7 @@ class VoiceDetectingWidget(QWidget):
         self.current_index = (self.current_index + 1) % self.total_images              
         
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, task_daemon, parent=None):
         super().__init__()
         self.setWindowTitle("Mindora")
         self.setGeometry(0, 0, WINDOW_W, WINDOW_H)
@@ -555,8 +555,8 @@ class MainWindow(QMainWindow):
         # self.alarm_widget.show()
         # self.menu_flag = 4  # 设置为闹钟界面状态
 
-        # self.alarm_widget = AlarmWidget(task_daemon, parent=self)
-        # self.stackedWidget.addWidget(self.alarm_widget)
+        self.alarm_widget = AlarmWidget(task_daemon, parent=self)
+        self.stackedWidget.addWidget(self.alarm_widget)
 
         # 创建闹钟界面
         # self.alarm_widget = AlarmWidget(task_daemon, parent=self)
