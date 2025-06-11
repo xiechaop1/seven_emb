@@ -108,8 +108,9 @@ class AddAlarmDialog(QDialog):
     def __init__(self, task_daemon, parent=None):
         super().__init__(parent)
         self.task_daemon = task_daemon
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-        self.setFixedSize(360, 480)
+        # 全屏显示
+        self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
+        self.showFullScreen()
         self.setStyleSheet("background: #18181a;")
         self.setup_ui()
 
@@ -124,8 +125,8 @@ class AddAlarmDialog(QDialog):
         cancel_btn = QPushButton("取消")
         cancel_btn.setStyleSheet("color: #ff9500; font-size: 18px; font-family: 'PingFang SC'; background: transparent; border: none;")
         cancel_btn.clicked.connect(self.reject)
-        title = QLabel("添加闹钟")
-        title.setStyleSheet("color: white; font-size: 18px; font-family: 'PingFang SC'; font-weight: bold;")
+        title = QLabel("Add Alert")
+        title.setStyleSheet("color: white; font-size: 20px; font-family: 'PingFang SC'; font-weight: bold;")
         title.setAlignment(Qt.AlignCenter)
         save_btn = QPushButton("存储")
         save_btn.setStyleSheet("color: #ff9500; font-size: 18px; font-family: 'PingFang SC'; background: transparent; border: none;")
@@ -217,7 +218,7 @@ class AddAlarmDialog(QDialog):
             row.setContentsMargins(0, 0, 0, 0)
             row.setSpacing(0)
             lab = QLabel(label)
-            lab.setStyleSheet("color: #d1d1d6; font-size: 18px;")
+            lab.setStyleSheet("color: #d1d1d6; font-size: 18px; padding-left: 20px;")
             row.addWidget(lab)
             row.addStretch()
             row.addWidget(widget)
