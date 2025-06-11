@@ -47,17 +47,17 @@ class AlarmItem(QWidget):
         for action in actions:
             if action.get('action_type') == 'sound' or action.get('action_type') == 'SOUND':
                 params = action.get('parameters', {})
-                sound_text = params.get('file_path', 'On') if params else 'On'
+                sound_text = params.get('name', '') if params else 'None'
             if action.get('action_type') == 'light' or action.get('action_type') == 'LIGHT':
                 params = action.get('parameters', {})
-                light_text = params.get('mode', 'On') if params else 'On'
+                light_text = params.get('name', '') if params else 'None'
             if action.get('action_type') == 'display' or action.get('action_type') == 'DISPLAY':
                 params = action.get('parameters', {})
-                display_text = params.get('mode', 'On') if params else 'On'
+                display_text = params.get('name', '') if params else 'None'
             if action.get('action_type') == 'spray' or action.get('action_type') == 'SPRAY':
                 params = action.get('parameters', {})
-                spray_text = params.get('mode', 'On') if params else 'On'
-        detail_label = QLabel(f"{self.task.name} Sound: {sound_text}   Light: {light_text}   Display: {display_text}   Spray: {spray_text}")
+                spray_text = params.get('name', '') if params else 'Off'
+        detail_label = QLabel(f"{self.task.name} Sound: {sound_text} Light: {light_text} Display: {display_text} Spray: {spray_text}")
         detail_label.setStyleSheet(f"color: #8e8e93; font-size: 14px; padding-left: 24px;")
         time_layout.addWidget(detail_label)
         time_layout.addStretch()
@@ -282,25 +282,25 @@ class AddAlarmDialog(QDialog):
         sound_effect = sound_map.get(self.sound_combo.currentText())
         if sound_effect:
             file_path, volume = sound_effect
-            actions.append({"action_type": ActionType.SOUND, "target": "sound", "parameters": {"file_path": file_path, "volume": volume}})
+            actions.append({"name": self.sound_combo.currentText(), "action_type": ActionType.SOUND, "target": "sound", "parameters": {"file_path": file_path, "volume": volume}})
         # 灯光
         light_map = {"None": None, "Breathing": (Code.LIGHT_MODE_BREATHING, {"r": "128", "g": 128, "b": 0, "steps": 200}), "Colorful": (Code.LIGHT_MODE_SECTOR_FLOWING, {"mode": "colorful"})}
         light_effect = light_map.get(self.light_combo.currentText())
         if light_effect:
             mode, params = light_effect
-            actions.append({"action_type": ActionType.LIGHT, "target": "light", "parameters": {"mode": mode, "params": params}})
+            actions.append({"name": self.light_combo.currentText(), "action_type": ActionType.LIGHT, "target": "light", "parameters": {"mode": mode, "params": params}})
         # 屏幕
         screen_map = {"None": None, "Sunrise": ("animation", {"type": "sunrise", "duration": 300}), "Sunset": ("animation", {"type": "sunset", "duration": 300}), "Moon": ("animation", {"type": "moon", "duration": 300})}
         screen_effect = screen_map.get(self.screen_combo.currentText())
         if screen_effect:
             mode, params = screen_effect
-            actions.append({"action_type": ActionType.DISPLAY, "target": "screen", "parameters": {"mode": mode, "params": params}})
+            actions.append({"name": self.screen_combo.currentText(), "action_type": ActionType.DISPLAY, "target": "screen", "parameters": {"mode": mode, "params": params}})
         # 香氛
         scent_map = {"Off": None, "On": ("forest", 5)}
         scent_effect = scent_map.get(self.scent_combo.currentText())
         if scent_effect:
             mode, duration = scent_effect
-            actions.append({"action_type": ActionType.SPRAY, "target": "spray", "parameters": {"mode": mode, "duration": duration}})
+            actions.append({"name": self.scent_combo.currentText(), "action_type": ActionType.SPRAY, "target": "spray", "parameters": {"mode": mode, "duration": duration}})
         return {"time": time_str, "frequency": repeat, "enabled": True, "actions": actions}
 
     def save_alarm(self):
