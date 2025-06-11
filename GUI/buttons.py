@@ -1,7 +1,7 @@
-from PyQt5.QtCore import Qt, QPropertyAnimation, QEasingCurve
-from PyQt5.QtGui import QPainter, QColor, QPen, QBrush, QFont, QPixmap
-from PyQt5.QtWidgets import QApplication, QPushButton, QMainWindow, QWidget
-from PyQt5.QtCore import Qt, QRect
+from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve
+from PySide6.QtGui import QPainter, QColor, QPen, QBrush, QFont, QPixmap
+from PySide6.QtWidgets import QApplication, QPushButton, QMainWindow, QWidget
+from PySide6.QtCore import Qt, QRect
 import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
