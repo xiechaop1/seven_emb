@@ -164,8 +164,13 @@ class AddAlarmDialog(QDialog):
         time_layout.setSpacing(0)
         self.qml_widget = QQuickWidget()
         self.qml_widget.setSource(QUrl.fromLocalFile(os.path.abspath("TimePicker.qml")))
-        # self.qml_widget.setSource(QUrl.fromLocalFile(os.path.abspath("utils/qml/FlickableWheel.qml")))
         self.qml_widget.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        # 设置QML时间为当前时间
+        now = datetime.now()
+        root = self.qml_widget.rootObject()
+        if root is not None:
+            root.setProperty("hour", now.hour)
+            root.setProperty("minute", now.minute)
         time_layout.addStretch(1)
         time_layout.addWidget(self.qml_widget)
         time_layout.addStretch(1)

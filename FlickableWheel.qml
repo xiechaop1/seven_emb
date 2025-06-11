@@ -27,7 +27,7 @@ Item {
             height: root.itemHeight
             Rectangle {
                 anchors.fill: parent
-                color: ListView.isCurrentItem ? "#232325ee" : "transparent"
+                color: index === root.currentIndex ? "#232325ee" : "transparent"
                 radius: 8
             }
             Text {
@@ -35,7 +35,7 @@ Item {
                 text: modelData < 10 ? "0" + modelData : modelData
                 font.pixelSize: 32
                 font.weight: Font.DemiBold
-                color: ListView.isCurrentItem ? "white" : "#8e8e93"
+                color: index === root.currentIndex ? "white" : "#8e8e93"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
