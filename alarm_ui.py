@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                            QHBoxLayout, QPushButton, QLabel, QListWidget, 
                            QDialog, QTimeEdit, QComboBox, QMessageBox, QScrollArea, QFrame, QGroupBox, QCheckBox)
-from PyQt5.QtCore import Qt, QTime, QDateTime, QSize, QTimer, pyqtSignal
+from PyQt5.QtCore import Qt, QTime, QDateTime, QSize, QTimer, pyqtSignal, QUrl
 from PyQt5.QtGui import QIcon, QFont, QColor, QPainter, QImage, QPixmap, QPalette
 from model.scheduler import TaskDaemon, TaskType, TaskScheduleType, Task
 from datetime import time, datetime
@@ -11,6 +11,7 @@ import os
 import logging
 from common.code import Code
 from model.task import Task, TaskStatus, TaskScheduleType, TaskType, TaskAction, ActionType, LightCommand, SoundCommand, DisplayCommand
+from PyQt5.QtQuickWidgets import QQuickWidget
 
 class AlarmItem(QWidget):
     def __init__(self, task, task_daemon, parent=None):
@@ -45,34 +46,14 @@ class AlarmItem(QWidget):
                 height: 32px;
                 border-radius: 16px;
                 background: #393939;
-                margin-right: 32px;
-                margin-left: 32px;
             }
             QCheckBox::indicator:unchecked {
                 background: #393939;
-                border: none;
+                border: 1px solid #393939;
             }
             QCheckBox::indicator:checked {
                 background: #393939;
-                border: none;
-            }
-            QCheckBox::indicator:unchecked::before, QCheckBox::indicator:checked::before {
-                content: '';
-                position: absolute;
-                top: 4px;
-                width: 24px;
-                height: 24px;
-                border-radius: 12px;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-                transition: left 0.2s, background 0.2s;
-            }
-            QCheckBox::indicator:unchecked::before {
-                left: 4px;
-                background: white;
-            }
-            QCheckBox::indicator:checked::before {
-                left: 24px;
-                background: #4cd964;
+                border: 1px solid #393939;
             }
         """)
         self.toggle_btn.clicked.connect(self.toggle_alarm)
@@ -180,28 +161,11 @@ class AddAlarmDialog(QDialog):
         time_layout = QHBoxLayout()
         time_layout.setContentsMargins(0, 24, 0, 0)
         time_layout.setSpacing(0)
-        self.time_edit = QTimeEdit()
-        self.time_edit.setDisplayFormat("HH:mm")
-        self.time_edit.setTime(QTime(8, 0))
-        self.time_edit.setButtonSymbols(QTimeEdit.NoButtons)
-        self.time_edit.setAlignment(Qt.AlignCenter)
-        self.time_edit.setStyleSheet("""
-            QTimeEdit {
-                background: #232325;
-                color: #d1d1d6;
-                font-size: 40px;
-                border: none;
-                border-radius: 12px;
-                min-width: 200px;
-                min-height: 56px;
-                qproperty-alignment: AlignCenter;
-            }
-            QTimeEdit::up-button, QTimeEdit::down-button {
-                width: 0px; height: 0px;
-            }
-        """)
+        qml_widget = QQuickWidget()
+        qml_widget.setSource(QUrl('TimePicker.qml'))
+        qml_widget.setResizeMode(QQuickWidget.SizeRootObjectToView)
         time_layout.addStretch(1)
-        time_layout.addWidget(self.time_edit)
+        time_layout.addWidget(qml_widget)
         time_layout.addStretch(1)
         main_layout.addLayout(time_layout)
 
