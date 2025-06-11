@@ -25,13 +25,17 @@ Item {
         delegate: Item {
             width: root.width
             height: root.itemHeight
-
+            Rectangle {
+                anchors.fill: parent
+                color: ListView.isCurrentItem ? "#f4f4f799" : "transparent"
+                radius: 8
+            }
             Text {
                 anchors.centerIn: parent
                 text: modelData < 10 ? "0" + modelData : modelData
-                font.pixelSize: 24
+                font.pixelSize: 32
                 font.weight: Font.DemiBold
-                color: ListView.isCurrentItem ? "#000000" : "#999999"
+                color: ListView.isCurrentItem ? "white" : "#8e8e93"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
