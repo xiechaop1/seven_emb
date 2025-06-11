@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
-    QListWidget, QDialog, QTimeEdit, QComboBox, QMessageBox, QScrollArea, QFrame, QGroupBox, QCheckBox
+    QListWidget, QDialog, QTimeEdit, QComboBox, QMessageBox, QScrollArea, QFrame, QGroupBox, QCheckBox, QSpacerItem, QSizePolicy
 )
 from PySide6.QtCore import Qt, QTime, QDateTime, QSize, QTimer, Signal, QUrl, Property
 from PySide6.QtGui import QIcon, QFont, QColor, QPainter, QImage, QPixmap, QPalette
@@ -108,8 +108,10 @@ class AlarmItem(QWidget):
         # 分割线
         line = QFrame(self)
         line.setGeometry(24, 79, self.width()-48, 1)
-        line.setStyleSheet("background: #222222;")
-        line.show()
+        line.setStyleSheet("background-color: #222222;")
+        layout.addWidget(line)
+        spacer = QSpacerItem(20, 5, QSizePolicy.Minimum, QSizePolicy.Fixed)
+        layout.addItem(spacer)
         
     def toggle_alarm(self, checked):
         try:
