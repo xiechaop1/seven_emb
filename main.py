@@ -19,7 +19,7 @@ from base.light import Light
 if not Config.IS_DEBUG:
     from base.spray import Spray
 else:
-    from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QPushButton, 
+    from PySide6.QtWidgets import (QApplication, QWidget, QLabel, QPushButton, 
                            QVBoxLayout, QHBoxLayout, QStackedWidget, QComboBox,
                            QSlider, QCheckBox, QRadioButton, QButtonGroup)
     # from model import ui
@@ -42,7 +42,7 @@ from model.init_manager import InitManager
 from GUI import gui
 # from model.ui import ScenePage, HomePage, OverlayWidget, MainWindow
 # if Config.OS != "lineage":
-#     from PyQt5.QtWidgets import QApplication
+#     from PySide6.QtWidgets import QApplication
 #     from model import ui
 
 from model.scheduler import TaskDaemon
@@ -87,7 +87,7 @@ import traceback
 #from base.spary import Spray
 from model.execute_command import ExecuteCommand
 #from base.spary import Spray
-from PyQt5.QtCore import QObject, pyqtSignal
+from PySide6.QtCore import QObject, Signal
 from GUI import gui
 
 from alarm_ui import AlarmWidget
@@ -103,7 +103,7 @@ from alarm_ui import AlarmWidget
 
 # 信号器：定义一个跨线程信号
 class Communicator(QObject):
-    message = pyqtSignal(str)
+    message = Signal(str)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--mode', default="", type=str, help='demo mode without screen')

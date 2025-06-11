@@ -1,9 +1,11 @@
 import sys
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                           QHBoxLayout, QPushButton, QLabel, QListWidget, 
-                           QDialog, QTimeEdit, QComboBox, QMessageBox, QScrollArea, QFrame, QGroupBox, QCheckBox)
-from PyQt5.QtCore import Qt, QTime, QDateTime, QSize, QTimer, pyqtSignal, QUrl
-from PyQt5.QtGui import QIcon, QFont, QColor, QPainter, QImage, QPixmap, QPalette
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
+    QListWidget, QDialog, QTimeEdit, QComboBox, QMessageBox, QScrollArea, QFrame, QGroupBox, QCheckBox
+)
+from PySide6.QtCore import Qt, QTime, QDateTime, QSize, QTimer, Signal, QUrl
+from PySide6.QtGui import QIcon, QFont, QColor, QPainter, QImage, QPixmap, QPalette
+from PySide6.QtQuickWidgets import QQuickWidget
 from model.scheduler import TaskDaemon, TaskType, TaskScheduleType, Task
 from datetime import time, datetime
 import json
@@ -11,7 +13,6 @@ import os
 import logging
 from common.code import Code
 from model.task import Task, TaskStatus, TaskScheduleType, TaskType, TaskAction, ActionType, LightCommand, SoundCommand, DisplayCommand
-from PySide6.QtQuickWidgets import QQuickWidget
 
 class AlarmItem(QWidget):
     def __init__(self, task, task_daemon, parent=None):

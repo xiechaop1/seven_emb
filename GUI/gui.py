@@ -1,18 +1,21 @@
 import sys
-from turtle import isvisible
 import vlc
-from PyQt5.QtCore import Qt, QPropertyAnimation, pyqtProperty, QRectF, QRect, QEasingCurve, QPoint
-from PyQt5.QtCore import Qt, QRectF, QTimer, QTime, QDate, QPropertyAnimation, QObject, pyqtSignal
-from PyQt5.QtGui import QPainter, QColor, QImage, QPixmap, QFont, QFontDatabase, QPalette, QMouseEvent, QIcon, QMovie
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget,  QGraphicsBlurEffect, QLabel, QGraphicsOpacityEffect, QPushButton, QStackedWidget, QFrame, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QTimeEdit
-from GUI.buttons import CustomButton , ImageButton
+from PySide6.QtCore import (
+    Qt, QPropertyAnimation, Signal, QRectF, QRect, QEasingCurve, QPoint, QTimer, QTime, QDate, QObject
+)
+from PySide6.QtGui import (
+    QPainter, QColor, QImage, QPixmap, QFont, QFontDatabase, QPalette, QMouseEvent, QIcon, QMovie
+)
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QGraphicsBlurEffect, QLabel, QGraphicsOpacityEffect,
+    QPushButton, QStackedWidget, QFrame, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QTimeEdit
+)
+from PySide6.QtQuickWidgets import QQuickWidget
+from PySide6.QtCore import QUrl
+from GUI.buttons import CustomButton, ImageButton
 from GUI.guide import GuidePage, InitManager
-from PyQt5.QtQuickWidgets import QQuickWidget
-from PyQt5.QtCore import QUrl
-# from buttons import CustomButton , ImageButton
-# from GUI.animations import fadeAnimation
-
 import os
+
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 WINDOW_W = 1080
@@ -66,7 +69,7 @@ coacherMovie = [["resources/images/third_breath.gif", "resources/images/third_st
 
 # 这个类专门用来发信号（必须继承 QObject）
 class Communicator(QObject):
-    message = pyqtSignal(str)
+    message = Signal(str)
 
 class FirstWidget(QWidget):
     def __init__(self, parent=None):
