@@ -43,22 +43,26 @@ class AlarmItem(QWidget):
         # time_layout.addWidget(desc_label)
         # 新增：Sound, Light, Display, Spray 字段
         actions = json.loads(self.task.actions) if hasattr(self.task, 'actions') and self.task.actions else []
-        sound_text = light_text = display_text = spray_text = "None"
+        sound_text = light_text = display_text = spray_text = ""
         for action in actions:
             if action.get('action_type') == 'sound' or action.get('action_type') == 'SOUND':
                 params = action.get('parameters', {})
-                sound_text = params.get('name', '') if params else 'None'
+                if params:
+                    sound_text = f"Sound: {action.get('name', '')} "
             if action.get('action_type') == 'light' or action.get('action_type') == 'LIGHT':
                 params = action.get('parameters', {})
-                light_text = params.get('name', '') if params else 'None'
+                if params:
+                    light_text = f"Light: {action.get('name', '')} "
             if action.get('action_type') == 'display' or action.get('action_type') == 'DISPLAY':
                 params = action.get('parameters', {})
-                display_text = params.get('name', '') if params else 'None'
+                if params:
+                    display_text = f"Display: {action.get('name', '')} "
             if action.get('action_type') == 'spray' or action.get('action_type') == 'SPRAY':
                 params = action.get('parameters', {})
-                spray_text = params.get('name', '') if params else 'Off'
-        detail_label = QLabel(f"{self.task.name} Sound: {sound_text} Light: {light_text} Display: {display_text} Spray: {spray_text}")
-        detail_label.setStyleSheet(f"color: #8e8e93; font-size: 14px; padding-left: 24px;")
+                if params:
+                    spray_text = f"Spray: {action.get('name', '')} "
+        detail_label = QLabel(f"{self.task.name} {sound_text}{light_text}{display_text}{spray_text}")
+        detail_label.setStyleSheet(f"color: {time_color}; font-size: 14px; padding-left: 24px;")
         time_layout.addWidget(detail_label)
         time_layout.addStretch()
         # 中间：iOS风格QML开关
@@ -119,6 +123,7 @@ class AlarmItem(QWidget):
             desc_color = "#8e8e93" if is_enabled else "#444444"
             self.findChildren(QLabel)[0].setStyleSheet(f"color: {time_color}; font-size: 48px; font-weight: 300; padding-left: 24px;")
             self.findChildren(QLabel)[1].setStyleSheet(f"color: {desc_color}; font-size: 16px; font-weight: 400; padding-left: 24px;")
+            self.findChildren(QLabel)[2].setStyleSheet(f"color: {time_color}; font-size: 14px; padding-left: 24px;")
         except Exception as e:
             logging.error(f"切换闹钟状态失败: {str(e)}")
             # 恢复按钮状态
