@@ -9,43 +9,41 @@ Item {
     width: 52
     height: 32
 
-    // 新增：底层背景
+    // 背景轨道
     Rectangle {
+        id: track
         anchors.fill: parent
-        color: "#18181a"   // 或 color: "transparent"
-        radius: 16
-        z: -1
-    }
-
-    Rectangle {
-        id: bg
-        anchors.fill: parent
-        radius: 16
-        color: root.checked ? "#4cd964" : "#393939"
+        radius: height / 2
+        color: root.checked ? "#34C759" : "#D1D1D6"  // iOS风格绿色和灰色
         border.color: "transparent"
-        border.width: 0
-        background: "#18181a"  // iOS风格背景
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                root.checked = !root.checked
-                root.toggled(root.checked)
-            }
-        }
+        z: 0
     }
 
+    // 拖动圆钮（白色圆形）
     Rectangle {
         id: knob
         width: 28
         height: 28
         radius: 14
         y: 2
-        color: "white"
         x: root.checked ? 22 : 2
-        Behavior on x { NumberAnimation { duration: 120; easing.type: Easing.InOutQuad } }
+        color: "white"
+        border.color: "#CCCCCC"
+        border.width: 1
         z: 2
-        border.color: "#dddddd"
-        border.width: 0
+
+        Behavior on x {
+            NumberAnimation { duration: 160; easing.type: Easing.InOutQuad }
+        }
+        
+    }
+
+    // 点击区域
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            root.checked = !root.checked
+            root.toggled(root.checked)
+        }
     }
 }
