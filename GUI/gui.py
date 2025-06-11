@@ -136,7 +136,7 @@ class FirstWidget(QWidget):
                 "Hypnotise",
                 "Tools" ]
         palette = QPalette()
-        palette.setColor(QPalette.Foreground, QColor(255, 255, 255))  # 设置字体颜色为红色
+        palette.setColor(QPalette.WindowText, QColor(255, 255, 255))  # 设置字体颜色为红色
         current_font = QFont("Source Han Serif CN", 20)
         for i in range(3):
             x = (i * (FIRST_CONTAINER_W + spacing)) + spacing*2
@@ -229,7 +229,7 @@ class SecondWidget(QWidget):
         self.guideLabel.setPixmap(self.pixmap)
         
         palette = QPalette()
-        palette.setColor(QPalette.Foreground, QColor(255, 255, 255))
+        palette.setColor(QPalette.WindowText, QColor(255, 255, 255))
         self.headBTN.move((WINDOW_W-SECOND_HEAD_R)//2, SECOND_HEAD_TOPGAP)
         self.nameQLabel.setGeometry((WINDOW_W-SECOND_NAME_W)//2, SECOND_HEAD_TOPGAP+SECOND_HEAD_R+SECOND_NAME_TOPGAP, SECOND_NAME_W, SECOND_NAME_H)
         self.nameQLabel.setAlignment(Qt.AlignCenter)
@@ -241,7 +241,7 @@ class SecondWidget(QWidget):
         self.coacherGuideTxtQLabel.setAlignment(Qt.AlignCenter)
         self.coacherGuideTxtQLabel.setText(coacherGuideTxt[self.number])
         self.coacherGuideTxtQLabel.setFont(QFont("PingFang SC Light", 20))
-        palette.setColor(QPalette.Foreground, QColor(0, 0, 0))
+        palette.setColor(QPalette.WindowText, QColor(0, 0, 0))
         self.coacherGuideTxtQLabel.setPalette(palette)
         
         # 设置透明度动画
