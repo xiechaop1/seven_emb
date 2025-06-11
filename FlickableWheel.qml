@@ -1,3 +1,6 @@
+
+remote: Counting objects: 100% (7/7), done.
+remote: Compressing objects: 100% (1/1), done.
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
@@ -27,7 +30,7 @@ Item {
             height: root.itemHeight
             Rectangle {
                 anchors.fill: parent
-                color: ListView.isCurrentItem ? "#f4f4f799" : "transparent"
+                color: ListView.isCurrentItem ? "#232325ee" : "transparent"
                 radius: 8
             }
             Text {

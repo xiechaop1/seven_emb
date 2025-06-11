@@ -1,3 +1,6 @@
+
+~
+"TimePicker.qml" [noeol] 65L, 1550B                                                                                                                               48,8         全部
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
@@ -5,7 +8,7 @@ Rectangle {
     id: root
     width: 280  // 更宽
     height: 160 // 更高
-    color: "#f2f2f7"  // iOS风格背景
+    color: "#18181a"  // iOS风格背景
 
     property int hour: hourView.currentIndex
     property int minute: minuteView.currentIndex
@@ -16,7 +19,8 @@ Rectangle {
         y: (root.height - 40) / 2
         width: parent.width - 16   // 两边留8像素边距
         height: 40
-        color: "#f4f4f799"  // 半透明淡灰色
+        color: "#585861"  // 半透明淡灰色
+        opacity: 0.8
         radius: 8
         z: 2
     }
@@ -47,8 +51,8 @@ Rectangle {
         height: 32
         z: 10
         gradient: Gradient {
-            GradientStop { position: 0.0; color: "#f2f2f7" }
-            GradientStop { position: 1.0; color: "#f2f2f700" }
+            GradientStop { position: 0.0; color: "#18181a" }
+            GradientStop { position: 1.0; color: "#18181a00" }
         }
     }
     // 底部渐隐
@@ -58,8 +62,8 @@ Rectangle {
         height: 32
         z: 10
         gradient: Gradient {
-            GradientStop { position: 0.0; color: "#f2f2f700" }
-            GradientStop { position: 1.0; color: "#f2f2f7" }
+            GradientStop { position: 0.0; color: "#18181a00" }
+            GradientStop { position: 1.0; color: "#18181a" }
         }
     }
 }
