@@ -49,17 +49,17 @@ class AlarmItem(QWidget):
             root.toggled.connect(self.toggle_alarm)
         # 右侧：iOS风格删除按钮
         delete_btn = QPushButton("X")
-        delete_btn.setFixedSize(72, 32)
+        delete_btn.setFixedSize(36, 36)
         delete_btn.setStyleSheet("""
             QPushButton {
                 background-color: #ff3b30;
                 color: white;
                 border: none;
-                border-radius: 16px;
-                font-size: 18px;
+                border-radius: 18px;
+                font-size: 24px;
                 font-family: 'PingFang SC', 'SF Pro Display', Arial, sans-serif;
                 font-weight: bold;
-                padding: 0 16px;
+                padding: 0;
             }
             QPushButton:hover {
                 background-color: #ff6259;
@@ -73,7 +73,7 @@ class AlarmItem(QWidget):
         layout.addLayout(time_layout, 2)
         layout.addStretch(1)
         layout.addWidget(self.switch_widget, 0, Qt.AlignVCenter)
-        layout.addSpacing(16)  # 开关和删除按钮之间的距离
+        layout.addSpacing(16)
         layout.addWidget(delete_btn, 0, Qt.AlignVCenter)
         self.setLayout(layout)
         # 分割线
@@ -331,7 +331,7 @@ class AlarmWidget(QWidget):
         title_layout = QHBoxLayout()
         title_layout.setContentsMargins(16, 0, 16, 0)
         title_layout.setSpacing(0)
-        edit_label = QLabel("编辑")
+        # edit_label = QLabel("编辑")
         edit_label.setStyleSheet("color: #ff9500; font-size: 20px; font-weight: 500;")
         title = QLabel("闹钟")
         title.setStyleSheet("color: white; font-size: 20px; font-weight: bold;")
