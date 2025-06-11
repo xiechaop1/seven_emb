@@ -1,34 +1,40 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
-ListView {
-    id: wheel
-
-    // ✅ 自定义属性
-    property int itemHeight: 40
-    property int currentIndex: wheel.currentIndex
-
+Item {
+    id: root
     width: 80
     height: 120
-    clip: true
-    model: 10  // 默认模型，外部可以覆盖
 
-    snapMode: ListView.SnapToItem
-    boundsBehavior: Flickable.StopAtBounds
-    preferredHighlightBegin: (height - itemHeight) / 2
-    preferredHighlightEnd: (height + itemHeight) / 2
-    highlightRangeMode: ListView.StrictlyEnforceRange
-    highlightMoveDuration: 150
+    property int itemHeight: 40
+    property int currentIndex: listView.currentIndex
+    property alias model: listView.model
 
-    delegate: Item {
-        width: wheel.width
-        height: wheel.itemHeight
+    ListView {
+        id: listView
+        anchors.fill: parent
+        clip: true
 
-        Text {
-            anchors.centerIn: parent
-            text: modelData < 10 ? "0" + modelData : modelData
-            font.pixelSize: 32
-            color: "#d1d1d6"
+        snapMode: ListView.SnapToItem
+        boundsBehavior: Flickable.StopAtBounds
+        preferredHighlightBegin: (height - itemHeight) / 2
+        preferredHighlightEnd: (height + itemHeight) / 2
+        highlightRangeMode: ListView.StrictlyEnforceRange
+        highlightMoveDuration: 150
+
+        delegate: Item {
+            width: root.width
+            height: root.itemHeight
+
+            Text {
+                anchors.centerIn: parent
+                text: modelData < 10 ? "0" + modelData : modelData
+                font.pixelSize: 24
+                font.weight: Font.DemiBold
+                color: ListView.isCurrentItem ? "#000000" : "#999999"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
         }
     }
 }
