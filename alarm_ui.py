@@ -332,7 +332,7 @@ class AlarmWidget(QWidget):
         title_layout.setContentsMargins(16, 0, 16, 0)
         title_layout.setSpacing(0)
         # edit_label = QLabel("编辑")
-        edit_label.setStyleSheet("color: #ff9500; font-size: 20px; font-weight: 500;")
+        # edit_label.setStyleSheet("color: #ff9500; font-size: 20px; font-weight: 500;")
         title = QLabel("闹钟")
         title.setStyleSheet("color: white; font-size: 20px; font-weight: bold;")
         add_btn = QPushButton("")
