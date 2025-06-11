@@ -4,9 +4,11 @@ import vlc
 from PyQt5.QtCore import Qt, QPropertyAnimation, pyqtProperty, QRectF, QRect, QEasingCurve, QPoint
 from PyQt5.QtCore import Qt, QRectF, QTimer, QTime, QDate, QPropertyAnimation, QObject, pyqtSignal
 from PyQt5.QtGui import QPainter, QColor, QImage, QPixmap, QFont, QFontDatabase, QPalette, QMouseEvent, QIcon, QMovie
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget,  QGraphicsBlurEffect, QLabel, QGraphicsOpacityEffect, QPushButton, QStackedWidget, QFrame, QGraphicsView, QGraphicsScene, QGraphicsRectItem
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget,  QGraphicsBlurEffect, QLabel, QGraphicsOpacityEffect, QPushButton, QStackedWidget, QFrame, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QTimeEdit
 from GUI.buttons import CustomButton , ImageButton
 from GUI.guide import GuidePage, InitManager
+from PyQt5.QtQuickWidgets import QQuickWidget
+from PyQt5.QtCore import QUrl
 # from buttons import CustomButton , ImageButton
 # from GUI.animations import fadeAnimation
 
