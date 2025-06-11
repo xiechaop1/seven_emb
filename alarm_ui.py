@@ -234,7 +234,7 @@ class AddAlarmDialog(QDialog):
         # 行生成函数
         def add_option_row(label, widget, divider=True):
             row = QHBoxLayout()
-            row.setContentsMargins(24, 0, 24, 0)
+            row.setContentsMargins(0, 0, 0, 0)
             row.setSpacing(0)
             lab = QLabel(label)
             lab.setStyleSheet("color: #d1d1d6; font-size: 18px;")
