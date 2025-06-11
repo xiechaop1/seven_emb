@@ -27,7 +27,7 @@ Item {
             height: root.itemHeight
             Rectangle {
                 anchors.fill: parent
-                color: index === root.currentIndex ? "#232325ee" : "transparent"
+                color: index === root.currentIndex ? "transparent" : "transparent"
                 radius: 8
             }
             Text {

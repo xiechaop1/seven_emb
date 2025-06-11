@@ -17,7 +17,7 @@ Rectangle {
         width: parent.width - 16   // 两边留8像素边距
         height: 40
         color: "#585861"  // 半透明淡灰色
-        opacity: 0.8
+        opacity: 0.2
         radius: 8
         z: 2
     }
