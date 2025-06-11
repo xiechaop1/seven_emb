@@ -121,9 +121,13 @@ class AlarmItem(QWidget):
             is_enabled = checked
             time_color = "white" if is_enabled else "#8e8e93"
             desc_color = "#8e8e93" if is_enabled else "#444444"
-            self.findChildren(QLabel)[0].setStyleSheet(f"color: {time_color}; font-size: 48px; font-weight: 300; padding-left: 24px;")
-            self.findChildren(QLabel)[1].setStyleSheet(f"color: {desc_color}; font-size: 16px; font-weight: 400; padding-left: 24px;")
-            self.findChildren(QLabel)[2].setStyleSheet(f"color: {time_color}; font-size: 14px; padding-left: 24px;")
+            labels = self.findChildren(QLabel)
+            if len(labels) > 0:
+                labels[0].setStyleSheet(f"color: {time_color}; font-size: 48px; font-weight: 300; padding-left: 24px;")
+            if len(labels) > 1:
+                labels[1].setStyleSheet(f"color: {desc_color}; font-size: 16px; font-weight: 400; padding-left: 24px;")
+            if len(labels) > 2:
+                labels[2].setStyleSheet(f"color: {time_color}; font-size: 14px; padding-left: 24px;")
         except Exception as e:
             logging.error(f"切换闹钟状态失败: {str(e)}")
             # 恢复按钮状态
