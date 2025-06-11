@@ -185,19 +185,79 @@ class AddAlarmDialog(QDialog):
         # 选项内容
         self.repeat_combo = QComboBox()
         self.repeat_combo.addItems(["Once", "Daily", "Workday", "Weekend", "Weekly"])
-        self.repeat_combo.setStyleSheet("color: #d1d1d6; background: transparent; width: 160px; font-size: 18px; border: none; padding: 8px 0 8px 0;")
+        self.repeat_combo.setStyleSheet("""
+            QComboBox {
+                color: #d1d1d6;
+                background: transparent;
+                font-size: 18px;
+                border: none;
+                padding: 8px 0 8px 0;
+            }
+            QComboBox QAbstractItemView {
+                background: #232325;
+                color: white;
+            }
+        """)
         self.sound_combo = QComboBox()
         self.sound_combo.addItems(["None", "Soft", "Active"])
-        self.sound_combo.setStyleSheet("color: #d1d1d6; background: transparent; width: 160px; font-size: 18px; border: none; padding: 8px 0 8px 0;")
+        self.sound_combo.setStyleSheet("""
+            QComboBox {
+                color: #d1d1d6;
+                background: transparent;
+                font-size: 18px;
+                border: none;
+                padding: 8px 0 8px 0;
+            }
+            QComboBox QAbstractItemView {
+                background: #232325;
+                color: white;
+            }
+        """)
         self.light_combo = QComboBox()
         self.light_combo.addItems(["None", "Breathing", "Colorful"])
-        self.light_combo.setStyleSheet("color: #d1d1d6; background: transparent; width: 160px; font-size: 18px; border: none; padding: 8px 0 8px 0;")
+        self.light_combo.setStyleSheet("""
+            QComboBox {
+                color: #d1d1d6;
+                background: transparent;
+                font-size: 18px;
+                border: none;
+                padding: 8px 0 8px 0;
+            }
+            QComboBox QAbstractItemView {
+                background: #232325;
+                color: white;
+            }
+        """)
         self.screen_combo = QComboBox()
         self.screen_combo.addItems(["None", "Sunrise", "Sunset", "Moon"])
-        self.screen_combo.setStyleSheet("color: #d1d1d6; background: transparent; width: 160px; font-size: 18px; border: none; padding: 8px 0 8px 0;")
+        self.screen_combo.setStyleSheet("""
+            QComboBox {
+                color: #d1d1d6;
+                background: transparent;
+                font-size: 18px;
+                border: none;
+                padding: 8px 0 8px 0;
+            }
+            QComboBox QAbstractItemView {
+                background: #232325;
+                color: white;
+            }
+        """)
         self.scent_combo = QComboBox()
         self.scent_combo.addItems(["Off", "On"])
-        self.scent_combo.setStyleSheet("color: #d1d1d6; background: transparent; font-size: 18px; border: none; padding: 8px 0 8px 0;")
+        self.scent_combo.setStyleSheet("""
+            QComboBox {
+                color: #d1d1d6;
+                background: transparent;
+                font-size: 18px;
+                border: none;
+                padding: 8px 0 8px 0;
+            }
+            QComboBox QAbstractItemView {
+                background: #232325;
+                color: white;
+            }
+        """)
         # 行生成函数
         def add_option_row(label, widget, divider=True):
             row = QHBoxLayout()
