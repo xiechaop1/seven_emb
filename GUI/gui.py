@@ -555,14 +555,12 @@ class MainWindow(QMainWindow):
         # self.alarm_widget.show()
         # self.menu_flag = 4  # 设置为闹钟界面状态
 
+        self.stackedWidget = QStackedWidget(self)
+
         self.alarm_widget = AlarmWidget(task_daemon, parent=self)
         self.stackedWidget.addWidget(self.alarm_widget)
 
-        # 创建闹钟界面
-        # self.alarm_widget = AlarmWidget(task_daemon, parent=self)
-        # self.stackedWidget.addWidget(self.alarm_widget)
-        
-        self.stackedWidget = QStackedWidget(self)
+
         self.setCentralWidget(self.stackedWidget)
         # 初始化主界面
         self.main_page = QWidget()  # 你的主界面widget
