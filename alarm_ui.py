@@ -37,10 +37,10 @@ class AlarmItem(QWidget):
         desc_color = "#8e8e93" if is_enabled else "#444444"
         time_label = QLabel(time_str)
         time_label.setStyleSheet(f"color: {time_color}; font-size: 48px; font-weight: 300; padding-left: 24px;")
-        desc_label = QLabel(self.task.name or "闹钟")
-        desc_label.setStyleSheet(f"color: {desc_color}; font-size: 16px; font-weight: 400; padding-left: 24px;")
+        # desc_label = QLabel(self.task.name or "闹钟")
+        # desc_label.setStyleSheet(f"color: {desc_color}; font-size: 16px; font-weight: 400; padding-left: 24px;")
         time_layout.addWidget(time_label)
-        time_layout.addWidget(desc_label)
+        # time_layout.addWidget(desc_label)
         # 新增：Sound, Light, Display, Spray 字段
         actions = json.loads(self.task.actions) if hasattr(self.task, 'actions') and self.task.actions else []
         sound_text = light_text = display_text = spray_text = "None"
@@ -57,7 +57,7 @@ class AlarmItem(QWidget):
             if action.get('action_type') == 'spray' or action.get('action_type') == 'SPRAY':
                 params = action.get('parameters', {})
                 spray_text = params.get('mode', 'On') if params else 'On'
-        detail_label = QLabel(f"Sound: {sound_text}   Light: {light_text}   Display: {display_text}   Spray: {spray_text}")
+        detail_label = QLabel(f"{self.task.name} Sound: {sound_text}   Light: {light_text}   Display: {display_text}   Spray: {spray_text}")
         detail_label.setStyleSheet(f"color: #8e8e93; font-size: 14px; padding-left: 24px;")
         time_layout.addWidget(detail_label)
         time_layout.addStretch()
