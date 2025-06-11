@@ -48,7 +48,7 @@ class AlarmItem(QWidget):
             root.setProperty("checked", self.task.is_enabled)
             root.toggled.connect(self.toggle_alarm)
         # 右侧：iOS风格删除按钮
-        delete_btn = QPushButton("Delete")
+        delete_btn = QPushButton("X")
         delete_btn.setFixedSize(72, 32)
         delete_btn.setStyleSheet("""
             QPushButton {
