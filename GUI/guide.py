@@ -1,9 +1,6 @@
-import sys
-import json
-import os
-from PyQt5.QtCore import Qt, QPropertyAnimation, pyqtProperty, QRectF, QRect, QEasingCurve, QPoint, QTimer, QTime, QDate, pyqtSignal
-from PyQt5.QtGui import QPainter, QColor, QImage, QPixmap, QFont, QFontDatabase, QPalette, QMouseEvent, QIcon, QMovie
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QGraphicsBlurEffect, QLabel, 
+from PySide6.QtCore import Qt, QPropertyAnimation, Signal, QRectF, QRect, QEasingCurve, QPoint, QTimer, QTime, QDate
+from PySide6.QtGui import QPainter, QColor, QImage, QPixmap, QFont, QFontDatabase, QPalette, QMouseEvent, QIcon, QMovie
+from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QGraphicsBlurEffect, QLabel, 
                            QGraphicsOpacityEffect, QPushButton, QStackedWidget, QFrame, 
                            QGraphicsView, QGraphicsScene, QGraphicsRectItem, QComboBox,
                            QSlider, QCheckBox, QRadioButton, QButtonGroup, QVBoxLayout,
@@ -101,8 +98,8 @@ class GuidePage(QWidget):
         self.close()
 
 class BaseGuidePage(QWidget):
-    next_clicked = pyqtSignal()
-    back_clicked = pyqtSignal()
+    next_clicked = Signal()
+    back_clicked = Signal()
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -982,7 +979,7 @@ class MentorPage(BaseGuidePage):
         return None
 
 class FinalPage(BaseGuidePage):
-    finish_clicked = pyqtSignal()
+    finish_clicked = Signal()
     
     def __init__(self, parent=None):
         super().__init__(parent)
