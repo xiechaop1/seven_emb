@@ -19,6 +19,19 @@ Rectangle {
             width: 80
             height: 120
             model: 24
+            delegate: Item {
+                width: 80; height: 40
+                Rectangle {
+                    anchors.fill: parent
+                    color: hourView.currentIndex === index ? "#f4f4f7" : "transparent"
+                }
+                Text {
+                    anchors.centerIn: parent
+                    text: modelData < 10 ? "0" + modelData : modelData
+                    font.pixelSize: 32
+                    color: hourView.currentIndex === index ? "white" : "#d1d1d6"
+                }
+            }
         }
 
         FlickableWheel {
@@ -26,6 +39,19 @@ Rectangle {
             width: 80
             height: 120
             model: 60
+            delegate: Item {
+                width: 80; height: 40
+                Rectangle {
+                    anchors.fill: parent
+                    color: minuteView.currentIndex === index ? "#f4f4f7" : "transparent"
+                }
+                Text {
+                    anchors.centerIn: parent
+                    text: modelData < 10 ? "0" + modelData : modelData
+                    font.pixelSize: 32
+                    color: minuteView.currentIndex === index ? "white" : "#d1d1d6"
+                }
+            }
         }
     }
 
