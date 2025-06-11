@@ -180,38 +180,28 @@ class AddAlarmDialog(QDialog):
         time_layout = QHBoxLayout()
         time_layout.setContentsMargins(0, 24, 0, 0)
         time_layout.setSpacing(0)
-        self.hour_combo = QComboBox()
-        self.minute_combo = QComboBox()
-        for i in range(24):
-            self.hour_combo.addItem(f"{i:02d}")
-        for i in range(60):
-            self.minute_combo.addItem(f"{i:02d}")
-        self.hour_combo.setCurrentText("08")
-        self.minute_combo.setCurrentText("00")
-        for c in [self.hour_combo, self.minute_combo]:
-            c.setStyleSheet("""
-                QComboBox {
-                    background: #232325;
-                    color: #d1d1d6;
-                    font-size: 32px;
-                    border: none;
-                    min-width: 80px;
-                    min-height: 48px;
-                    padding: 0 8px;
-                    qproperty-alignment: AlignCenter;
-                }
-                QComboBox QAbstractItemView {
-                    background: #232325;
-                    color: #d1d1d6;
-                    selection-background-color: #393939;
-                    selection-color: #ff9500;
-                    font-size: 32px;
-                }
-            """)
+        self.time_edit = QTimeEdit()
+        self.time_edit.setDisplayFormat("HH:mm")
+        self.time_edit.setTime(QTime(8, 0))
+        self.time_edit.setButtonSymbols(QTimeEdit.NoButtons)
+        self.time_edit.setAlignment(Qt.AlignCenter)
+        self.time_edit.setStyleSheet("""
+            QTimeEdit {
+                background: #232325;
+                color: #d1d1d6;
+                font-size: 40px;
+                border: none;
+                border-radius: 12px;
+                min-width: 200px;
+                min-height: 56px;
+                qproperty-alignment: AlignCenter;
+            }
+            QTimeEdit::up-button, QTimeEdit::down-button {
+                width: 0px; height: 0px;
+            }
+        """)
         time_layout.addStretch(1)
-        time_layout.addWidget(self.hour_combo)
-        time_layout.addWidget(QLabel(":"))
-        time_layout.addWidget(self.minute_combo)
+        time_layout.addWidget(self.time_edit)
         time_layout.addStretch(1)
         main_layout.addLayout(time_layout)
 
@@ -253,21 +243,19 @@ class AddAlarmDialog(QDialog):
                 line.setFrameShape(QFrame.HLine)
                 line.setStyleSheet("background: #222222; min-height: 1px; max-height: 1px; border: none;")
                 option_layout.addWidget(line)
-        add_option_row("重复", self.repeat_combo)
-        add_option_row("铃声", self.sound_combo)
-        add_option_row("灯光", self.light_combo)
-        add_option_row("屏幕", self.screen_combo)
-        add_option_row("香氛", self.scent_combo, divider=False)
+        add_option_row("Repeat", self.repeat_combo)
+        add_option_row("Sound", self.sound_combo)
+        add_option_row("Light", self.light_combo)
+        add_option_row("Display", self.screen_combo)
+        add_option_row("Spray", self.scent_combo, divider=False)
         option_box.setLayout(option_layout)
         main_layout.addSpacing(24)
         main_layout.addWidget(option_box)
         self.setLayout(main_layout)
 
     def get_alarm_data(self):
-        hour = self.hour_combo.currentText()
-        minute = self.minute_combo.currentText()
-        time_str = f"{hour}:{minute}"
-        repeat_map = {"一次": "once", "每日": "daily", "每周": "weekly"}
+        time_str = self.time_edit.time().toString("HH:mm")
+        repeat_map = {"Once": "once", "Daily": "daily", "Weekly": "weekly"}
         repeat = repeat_map.get(self.repeat_combo.currentText(), "once")
         actions = []
         # 声音
