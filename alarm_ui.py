@@ -194,7 +194,7 @@ class AddAlarmDialog(QDialog):
                 padding: 8px 0 8px 0;
             }
             QComboBox QAbstractItemView {
-                background: #232325;
+                background: #18181a;
                 color: white;
             }
         """)
@@ -209,7 +209,7 @@ class AddAlarmDialog(QDialog):
                 padding: 8px 0 8px 0;
             }
             QComboBox QAbstractItemView {
-                background: #232325;
+                background: #18181a;
                 color: white;
             }
         """)
@@ -224,7 +224,7 @@ class AddAlarmDialog(QDialog):
                 padding: 8px 0 8px 0;
             }
             QComboBox QAbstractItemView {
-                background: #232325;
+                background: #18181a;
                 color: white;
             }
         """)
@@ -239,7 +239,7 @@ class AddAlarmDialog(QDialog):
                 padding: 8px 0 8px 0;
             }
             QComboBox QAbstractItemView {
-                background: #232325;
+                background: #18181a;
                 color: white;
             }
         """)
@@ -254,7 +254,7 @@ class AddAlarmDialog(QDialog):
                 padding: 8px 0 8px 0;
             }
             QComboBox QAbstractItemView {
-                background: #232325;
+                background: #18181a;
                 color: white;
             }
         """)
