@@ -157,15 +157,15 @@ class AddAlarmDialog(QDialog):
         top_bar.addWidget(save_btn)
         main_layout.addLayout(top_bar)
 
-        # 时间选择（仿iOS滚轮）
+        # 时间选择（QML滚轮）
         time_layout = QHBoxLayout()
         time_layout.setContentsMargins(0, 24, 0, 0)
         time_layout.setSpacing(0)
-        qml_widget = QQuickWidget()
-        qml_widget.setSource(QUrl('TimePicker.qml'))
-        qml_widget.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.qml_widget = QQuickWidget()
+        self.qml_widget.setSource(QUrl.fromLocalFile(os.path.abspath("TimePicker.qml")))
+        self.qml_widget.setResizeMode(QQuickWidget.SizeRootObjectToView)
         time_layout.addStretch(1)
-        time_layout.addWidget(qml_widget)
+        time_layout.addWidget(self.qml_widget)
         time_layout.addStretch(1)
         main_layout.addLayout(time_layout)
 
@@ -218,7 +218,11 @@ class AddAlarmDialog(QDialog):
         self.setLayout(main_layout)
 
     def get_alarm_data(self):
-        time_str = self.time_edit.time().toString("HH:mm")
+        # 从QML获取时间
+        root = self.qml_widget.rootObject()
+        hour = int(root.property("hour"))
+        minute = int(root.property("minute"))
+        time_str = f"{hour:02d}:{minute:02d}"
         repeat_map = {"Once": "once", "Daily": "daily", "Workday": "workday", "Weekend": "weekend", "Weekly": "weekly"}
         repeat = repeat_map.get(self.repeat_combo.currentText(), "once")
         actions = []
