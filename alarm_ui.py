@@ -21,96 +21,77 @@ class AlarmItem(QWidget):
         
     def setup_ui(self):
         self.setFixedHeight(80)
-        self.setStyleSheet("""
-            QWidget {
-                background-color: #000000;
-                border-radius: 0px;
-            }
-        """)
+        self.setStyleSheet("background: #000000;")
         layout = QHBoxLayout()
-        layout.setContentsMargins(20, 0, 20, 0)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-
         # 左侧：时间和标签
         time_layout = QVBoxLayout()
         time_layout.setSpacing(0)
         time_str = self.task.execution_time.split()[1][:5] if ' ' in self.task.execution_time else self.task.execution_time[:5]
         time_label = QLabel(time_str)
-        time_label.setStyleSheet("""
-            color: #d1d1d6;
-            font-size: 48px;
-            font-family: 'SF Pro Display', 'PingFang SC', Arial, sans-serif;
-            font-weight: 300;
-            padding-bottom: 0px;
-        """)
+        time_label.setStyleSheet("color: #d1d1d6; font-size: 48px; font-weight: 300; padding-left: 24px;")
         desc_label = QLabel(self.task.name or "闹钟")
-        desc_label.setStyleSheet("""
-            color: #8e8e93;
-            font-size: 16px;
-            font-family: 'SF Pro Display', 'PingFang SC', Arial, sans-serif;
-            font-weight: 400;
-            padding-top: 0px;
-        """)
+        desc_label.setStyleSheet("color: #8e8e93; font-size: 16px; font-weight: 400; padding-left: 24px;")
         time_layout.addWidget(time_label)
         time_layout.addWidget(desc_label)
         time_layout.addStretch()
-
-        # 中间：开关按钮（再往左移动）
+        # 中间：iOS风格开关按钮
         self.toggle_btn = QCheckBox()
         self.toggle_btn.setChecked(self.task.is_enabled)
         self.toggle_btn.setStyleSheet("""
             QCheckBox::indicator {
-                width: 52px; height: 32px;
-            }
-            QCheckBox::indicator:unchecked {
+                width: 52px;
+                height: 32px;
                 border-radius: 16px;
                 background: #393939;
+                margin-right: 32px;
+                margin-left: 32px;
+            }
+            QCheckBox::indicator:unchecked {
+                background: #393939;
+                border: none;
             }
             QCheckBox::indicator:checked {
-                border-radius: 16px;
-                background: #ff9500;
+                background: #393939;
+                border: none;
             }
             QCheckBox::indicator:unchecked::before, QCheckBox::indicator:checked::before {
                 content: '';
                 position: absolute;
-                left: 4px;
                 top: 4px;
                 width: 24px;
                 height: 24px;
                 border-radius: 12px;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+                transition: left 0.2s, background 0.2s;
+            }
+            QCheckBox::indicator:unchecked::before {
+                left: 4px;
                 background: white;
-                transition: left 0.2s;
             }
             QCheckBox::indicator:checked::before {
                 left: 24px;
+                background: #4cd964;
             }
         """)
         self.toggle_btn.clicked.connect(self.toggle_alarm)
-
         # 右侧：删除按钮
         delete_btn = QPushButton("×")
         delete_btn.setFixedSize(30, 30)
         delete_btn.clicked.connect(self.delete_alarm)
-        delete_btn.setStyleSheet("""
-            QPushButton {
-                background-color: transparent;
-                color: #ff3b30;
-                font-family: 'SF Pro Display', 'PingFang SC', Arial, sans-serif;
-                font-size: 28px;
-                border: none;
-            }
-            QPushButton:hover {
-                color: #ff9500;
-            }
-        """)
-
+        delete_btn.setStyleSheet("background: transparent; color: #ff3b30; font-size: 28px; border: none; margin-right: 16px;")
         # 布局调整
         layout.addLayout(time_layout, 2)
-        layout.addStretch(2)  # 增加弹性空间让开关更靠左
+        layout.addStretch(1)
         layout.addWidget(self.toggle_btn, 0, Qt.AlignVCenter)
-        layout.addSpacing(40)  # 增大开关和删除按钮间距
         layout.addWidget(delete_btn, 0, Qt.AlignVCenter)
         self.setLayout(layout)
+        # 分割线
+        line = QFrame(self)
+        line.setGeometry(24, 79, self.width()-48, 1)
+        line.setStyleSheet("background: #222222;")
+        line.show()
         
     def toggle_alarm(self):
         try:
@@ -473,21 +454,8 @@ class AlarmWidget(QWidget):
             QWidget {
                 background-color: #000000;
             }
-            QLabel {
-                color: white;
-                font-family: 'PingFang SC';
-            }
-            QPushButton {
-                background-color: #000000;
-                color: white;
-                border: 2px solid #ffffff;
-                border-radius: 20px;
-                font-family: 'PingFang SC';
-                font-size: 24px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #222222;
+            QLabel, QCheckBox, QPushButton {
+                font-family: 'PingFang SC', 'SF Pro Display', Arial, sans-serif;
             }
             QScrollArea {
                 border: none;
@@ -497,64 +465,61 @@ class AlarmWidget(QWidget):
                 background-color: #000000;
             }
         """)
-        
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
-        
-        # 标题栏 - 固定在顶部
+
+        # 顶部栏
+        title_bar = QWidget()
+        title_bar.setFixedHeight(60)
+        title_bar.setStyleSheet("background: #000000;")
         title_layout = QHBoxLayout()
-        title_layout.setContentsMargins(0, 0, 0, 0)
+        title_layout.setContentsMargins(16, 0, 16, 0)
+        title_layout.setSpacing(0)
+        edit_label = QLabel("编辑")
+        edit_label.setStyleSheet("color: #ff9500; font-size: 20px; font-weight: 500;")
         title = QLabel("闹钟")
-        title.setStyleSheet("""
-            QLabel {
-                color: white;
-                font-family: 'PingFang SC';
-                font-size: 24px;
-                font-weight: bold;
-            }
-        """)
-        
-        add_btn = QPushButton("+")
-        add_btn.setFixedSize(40, 40)
+        title.setStyleSheet("color: white; font-size: 20px; font-weight: bold;")
+        add_btn = QPushButton("")
+        add_btn.setFixedSize(36, 36)
         add_btn.setStyleSheet("""
             QPushButton {
-                background-color: #000000;
+                background-color: #ff9500;
                 color: white;
-                border: 2px solid #ffffff;
-                border-radius: 20px;
-                font-family: 'PingFang SC';
-                font-size: 24px;
+                border: none;
+                border-radius: 18px;
+            }
+            QPushButton::before {
+                content: '+';
+                color: white;
+                font-size: 28px;
                 font-weight: bold;
             }
-            QPushButton:hover {
-                background-color: #222222;
-            }
         """)
+        add_btn.setText("+")
+        add_btn.setFont(QFont('PingFang SC', 28, QFont.Bold))
         add_btn.clicked.connect(self.show_add_dialog)
-        
+        title_layout.addWidget(edit_label)
+        title_layout.addStretch()
         title_layout.addWidget(title)
         title_layout.addStretch()
         title_layout.addWidget(add_btn)
-        main_layout.addLayout(title_layout)
-        
+        title_bar.setLayout(title_layout)
+        main_layout.addWidget(title_bar)
+
         # 闹钟列表 - 使用滚动区域
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        
-        # 创建滚动区域的内容容器
         scroll_content = QWidget()
         scroll_content.setObjectName("scrollContent")
         self.alarm_list = QVBoxLayout()
-        self.alarm_list.setSpacing(10)
+        self.alarm_list.setSpacing(0)
         self.alarm_list.setContentsMargins(0, 0, 0, 0)
         scroll_content.setLayout(self.alarm_list)
-        
         scroll_area.setWidget(scroll_content)
         main_layout.addWidget(scroll_area)
-        
         self.setLayout(main_layout)
         
     def refresh_alarms(self):
