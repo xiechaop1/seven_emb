@@ -288,6 +288,14 @@ class DatePage(BaseGuidePage):
         super().__init__(parent)
         self.title.setText("请选择您当前所在地的日期")
         
+        # 计算当前年月日和范围
+        now = QDate.currentDate()
+        current_year = now.year()
+        current_month = now.month()
+        current_day = now.day()
+        start_year = current_year - 10
+        end_year = current_year + 10
+        
         # 创建日期选择器
         self.date_widget = QWidget(self)
         self.date_widget.setGeometry((WINDOW_W-400)//2, 300, 400, 200)
@@ -298,13 +306,14 @@ class DatePage(BaseGuidePage):
         self.qml_widget.setResizeMode(QQuickWidget.SizeRootObjectToView)
         self.qml_widget.setGeometry(0, 0, 400, 200)
         
-        # 设置QML日期为当前日期
-        now = QDate.currentDate()
+        # 设置QML属性
         root = self.qml_widget.rootObject()
         if root is not None:
-            root.setProperty("year", now.year())
-            root.setProperty("month", now.month())
-            root.setProperty("day", now.day())
+            root.setProperty("startYear", start_year)
+            root.setProperty("endYear", end_year)
+            root.setProperty("year", current_year)
+            root.setProperty("month", current_month)
+            root.setProperty("day", current_day)
         
     def get_selected_date(self):
         """获取选择的日期"""

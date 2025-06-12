@@ -7,15 +7,14 @@ Rectangle {
     height: 200
     color: "#18181a"
 
-    property int currentYear: (new Date()).getFullYear()
-    property int currentMonth: (new Date()).getMonth() + 1
-    property int currentDay: (new Date()).getDate()
-    property int startYear: currentYear - 10
-    property int endYear: currentYear + 10
-
-    property int year: yearWheel.currentIndex + startYear
-    property int month: monthWheel.currentIndex + 1
-    property int day: dayWheel.currentIndex + 1
+    property int startYear: 2010
+    property int endYear: 2030
+    property int year: startYear
+    property int month: 1
+    property int day: 1
+    property int currentYear: year
+    property int currentMonth: month
+    property int currentDay: day
 
     // 高亮区域
     Rectangle {
@@ -67,9 +66,9 @@ Rectangle {
 
     // 默认选中当前日期
     Component.onCompleted: {
-        yearWheel.currentIndex = currentYear - startYear
-        monthWheel.currentIndex = currentMonth - 1
-        dayWheel.currentIndex = currentDay - 1
+        yearWheel.currentIndex = year - startYear
+        monthWheel.currentIndex = month - 1
+        dayWheel.currentIndex = day - 1
     }
 
     // 顶部渐隐
