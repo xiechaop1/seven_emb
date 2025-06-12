@@ -67,9 +67,10 @@ class AlarmItem(QWidget):
         time_layout.addStretch()
         # 中间：iOS风格QML开关
         self.switch_widget = QQuickWidget()
+        self.switch_widget.setStyleSheet("background: transparent;")
         self.switch_widget.setSource(QUrl.fromLocalFile(os.path.abspath("IosSwitch.qml")))
-        # self.switch_widget.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        # self.switch_widget.setFixedSize(52, 32)
+        self.switch_widget.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.switch_widget.setFixedSize(52, 32)
         root = self.switch_widget.rootObject()
         if root is not None:
             root.setProperty("checked", self.task.is_enabled)
