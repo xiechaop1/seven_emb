@@ -3,12 +3,14 @@ import QtQuick.Controls 2.15
 
 Rectangle {
     id: root
-    width: 280  // 更宽
-    height: 160 // 更高
-    color: "#18181a"  // iOS风格背景
+    width: 400
+    height: 200
+    color: "#18181a"
 
-    property int hour: 0
-    property int minute: 0
+    property int religionIndex: religionWheel.currentIndex
+    property var religions: [
+        "无宗教信仰", "佛教", "基督教", "伊斯兰教", "印度教", "道教", "其他"
+    ]
 
     // 高亮区域
     Rectangle {
@@ -23,21 +25,14 @@ Rectangle {
     }
 
     Row {
-        anchors.fill: parent
-        anchors.margins: 8  // 留边距
-        spacing: 8
+        anchors.centerIn: parent
+        spacing: 16
 
         FlickableWheel {
-            id: hourView
-            width: 120
-            height: parent.height
-            model: 24
-        }
-        FlickableWheel {
-            id: minuteView
-            width: 120
-            height: parent.height
-            model: 60
+            id: religionWheel
+            width: 300
+            height: 160
+            model: religions
         }
     }
 
@@ -62,17 +57,5 @@ Rectangle {
             GradientStop { position: 0.0; color: "#18181a00" }
             GradientStop { position: 1.0; color: "#18181a" }
         }
-    }
-
-    Component.onCompleted: {
-        var now = new Date()
-        if (hour === 0 && minute === 0) {
-            hour = now.getHours()
-            minute = now.getMinutes()
-        }
-        hourView.currentIndex = hour
-        minuteView.currentIndex = minute
-        if (hourView.listView) hourView.listView.positionViewAtIndex(hour, ListView.Center)
-        if (minuteView.listView) minuteView.listView.positionViewAtIndex(minute, ListView.Center)
     }
 }
