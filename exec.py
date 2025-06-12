@@ -6,7 +6,7 @@ import shutil
 import subprocess
 
 # 配置
-SERVER_URL = 'http://your-server-address/api/version'  # 替换为实际接口
+SERVER_URL = 'http://114.55.90.104:8000/api/version'  # 替换为实际接口
 VER_FILE = 'ver.json'
 TMP_DIR = './tmp'
 
