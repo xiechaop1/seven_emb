@@ -88,7 +88,6 @@ class AlarmItem(QWidget):
                 font-family: 'PingFang SC', 'SF Pro Display', Arial, sans-serif;
                 font-weight: bold;
                 padding: 0;
-                margin-right: 20px;
             }
             QPushButton:hover {
                 background-color: #ff6259;
@@ -104,6 +103,7 @@ class AlarmItem(QWidget):
         layout.addWidget(self.switch_widget, 0, Qt.AlignVCenter)
         layout.addSpacing(16)
         layout.addWidget(delete_btn, 0, Qt.AlignVCenter)
+        layout.addSpacing(16)
         self.setLayout(layout)
         # 分割线
         line = QFrame(self)
