@@ -7,7 +7,8 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QGraphicsBlur
                            QGraphicsOpacityEffect, QPushButton, QStackedWidget, QFrame, 
                            QGraphicsView, QGraphicsScene, QGraphicsRectItem, QComboBox,
                            QSlider, QCheckBox, QRadioButton, QButtonGroup, QVBoxLayout,
-                           QHBoxLayout, QScrollArea, QQuickWidget)
+                           QHBoxLayout, QScrollArea)
+from PySide6.QtQuickWidgets import QQuickWidget
 from model.init_manager import InitManager
 from GUI.buttons import CustomButton, ImageButton
 # from .main import MainWindow  # 添加这行导入语句
