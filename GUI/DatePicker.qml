@@ -23,26 +23,14 @@ Rectangle {
             width: 100
             height: 160
             model: endYear - startYear + 1
-            delegate: Text {
-                text: (index + startYear).toString()
-                font.pixelSize: 32
-                color: yearWheel.currentIndex === index ? "white" : "#8e8e93"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
+            model: religions
         }
         FlickableWheel {
             id: monthWheel
             width: 80
             height: 160
             model: 12
-            delegate: Text {
-                text: (index + 1).toString().padStart(2, '0')
-                font.pixelSize: 32
-                color: monthWheel.currentIndex === index ? "white" : "#8e8e93"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
+            model: religions
         }
         FlickableWheel {
             id: dayWheel
@@ -61,13 +49,7 @@ Rectangle {
                     return 31
                 return 30
             }
-            delegate: Text {
-                text: (index + 1).toString().padStart(2, '0')
-                font.pixelSize: 32
-                color: dayWheel.currentIndex === index ? "white" : "#8e8e93"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-            }
+            model: religions
         }
     }
 }

@@ -16,13 +16,6 @@ Rectangle {
         id: religionWheel
         width: 300
         height: 160
-        model: religions.length
-        delegate: Text {
-            text: religions[index]
-            font.pixelSize: 32
-            color: religionWheel.currentIndex === index ? "white" : "#8e8e93"
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
+        model: religions
     }
 }
