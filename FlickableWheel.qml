@@ -9,6 +9,7 @@ Item {
     property int itemHeight: 40
     property int currentIndex: listView.currentIndex
     property alias model: listView.model
+    property alias listView: listView
 
     ListView {
         id: listView
