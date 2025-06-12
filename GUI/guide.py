@@ -1,7 +1,7 @@
 import sys
 import json
 import os
-from PySide6.QtCore import Qt, QPropertyAnimation, Signal, QRectF, QRect, QEasingCurve, QPoint, QTimer, QTime, QDate
+from PySide6.QtCore import Qt, QPropertyAnimation, Signal, QRectF, QRect, QEasingCurve, QPoint, QTimer, QTime, QDate, QUrl, Property
 from PySide6.QtGui import QPainter, QColor, QImage, QPixmap, QFont, QFontDatabase, QPalette, QMouseEvent, QIcon, QMovie
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QGraphicsBlurEffect, QLabel, 
                            QGraphicsOpacityEffect, QPushButton, QStackedWidget, QFrame, 
