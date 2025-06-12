@@ -568,7 +568,7 @@ class MainWindow(QMainWindow):
         # 其它页面后续 addWidget
 
         # 直接进入引导页
-        self.show_guide()
+        # self.show_guide()
 
     def show_alarm_widget(self, alarm_widget):
         """显示闹钟界面"""
