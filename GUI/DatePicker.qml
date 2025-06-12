@@ -92,11 +92,14 @@ Rectangle {
         }
         yearWheel.model = years
         yearWheel.currentIndex = year - startYear
+        yearWheel.listView.positionViewAtIndex(yearWheel.currentIndex, ListView.Center)
 
         monthWheel.currentIndex = month - 1
+        monthWheel.listView.positionViewAtIndex(monthWheel.currentIndex, ListView.Center)
 
         updateDays()
         dayWheel.currentIndex = day - 1
+        dayWheel.listView.positionViewAtIndex(dayWheel.currentIndex, ListView.Center)
     }
 
     function updateDays() {
@@ -107,7 +110,14 @@ Rectangle {
         for (let d = 1; d <= daysInMonth; d++) {
             days.push(d)
         }
+        let oldIndex = dayWheel.currentIndex
         dayWheel.model = days
+        if (oldIndex > days.length - 1) {
+            dayWheel.currentIndex = days.length - 1
+        } else {
+            dayWheel.currentIndex = oldIndex
+        }
+        dayWheel.listView.positionViewAtIndex(dayWheel.currentIndex, ListView.Center)
     }
 
     Connections {
