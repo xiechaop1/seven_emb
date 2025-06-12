@@ -7,10 +7,11 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QGraphicsBlur
                            QGraphicsOpacityEffect, QPushButton, QStackedWidget, QFrame, 
                            QGraphicsView, QGraphicsScene, QGraphicsRectItem, QComboBox,
                            QSlider, QCheckBox, QRadioButton, QButtonGroup, QVBoxLayout,
-                           QHBoxLayout, QScrollArea)
+                           QHBoxLayout, QScrollArea, QQuickWidget)
 from model.init_manager import InitManager
 from GUI.buttons import CustomButton, ImageButton
 # from .main import MainWindow  # 添加这行导入语句
+from datetime import datetime
 
 WINDOW_W = 1080
 WINDOW_H = 1080
@@ -370,53 +371,25 @@ class TimePage(BaseGuidePage):
         self.time_widget = QWidget(self)
         self.time_widget.setGeometry((WINDOW_W-400)//2, 300, 400, 200)
         
-        # 创建时分选择器
-        self.hour_combo = QComboBox(self.time_widget)
-        self.hour_combo.setGeometry(0, 0, 120, 50)
-        self.hour_combo.setStyleSheet("""
-            QComboBox {
-                background-color: #2a2a2a;
-                color: white;
-                border: 1px solid #3a3a3a;
-                border-radius: 5px;
-                padding: 5px;
-                font-size: 20px;
-            }
-            QComboBox::drop-down {
-                border: none;
-            }
-            QComboBox::down-arrow {
-                image: url(resources/images/down_arrow.png);
-                width: 20px;
-                height: 20px;
-            }
-        """)
+        # 使用QQuickWidget加载TimePicker.qml
+        self.qml_widget = QQuickWidget(self.time_widget)
+        self.qml_widget.setSource(QUrl.fromLocalFile(os.path.abspath("TimePicker.qml")))
+        self.qml_widget.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.qml_widget.setGeometry(0, 0, 400, 200)
         
-        self.minute_combo = QComboBox(self.time_widget)
-        self.minute_combo.setGeometry(140, 0, 120, 50)
-        self.minute_combo.setStyleSheet(self.hour_combo.styleSheet())
-        
-        # 创建分隔符标签
-        self.separator = QLabel(":", self.time_widget)
-        self.separator.setGeometry(120, 0, 20, 50)
-        self.separator.setStyleSheet("color: white; font-size: 30px;")
-        self.separator.setAlignment(Qt.AlignCenter)
-        
-        # 填充小时选项
-        for hour in range(24):
-            self.hour_combo.addItem(str(hour).zfill(2))
-        self.hour_combo.setCurrentText(str(QTime.currentTime().hour()).zfill(2))
-        
-        # 填充分钟选项
-        for minute in range(60):
-            self.minute_combo.addItem(str(minute).zfill(2))
-        self.minute_combo.setCurrentText(str(QTime.currentTime().minute()).zfill(2))
+        # 设置QML时间为当前时间
+        now = datetime.now()
+        root = self.qml_widget.rootObject()
+        if root is not None:
+            root.setProperty("hour", now.hour)
+            root.setProperty("minute", now.minute)
         
     def get_selected_time(self):
         """获取选择的时间"""
-        hour = self.hour_combo.currentText()
-        minute = self.minute_combo.currentText()
-        return f"{hour}:{minute}"
+        root = self.qml_widget.rootObject()
+        hour = int(root.property("hour"))
+        minute = int(root.property("minute"))
+        return f"{hour:02d}:{minute:02d}"
 
 class ReligionPage(BaseGuidePage):
     def __init__(self, parent=None):
