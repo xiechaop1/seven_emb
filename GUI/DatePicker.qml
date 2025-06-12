@@ -1,3 +1,4 @@
+// DatePicker.qml
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
@@ -7,22 +8,19 @@ Rectangle {
     height: 200
     color: "#18181a"
 
-    property int startYear: 2010
-    property int endYear: 2030
-    property int year: startYear
-    property int month: 1
-    property int day: 1
-    property int currentYear: year
-    property int currentMonth: month
-    property int currentDay: day
+    property int startYear
+    property int endYear
+    property int year
+    property int month
+    property int day
 
     // 高亮区域
     Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         y: (root.height - 40) / 2
-        width: parent.width - 16   // 两边留8像素边距
+        width: parent.width - 16
         height: 40
-        color: "#585861"  // 半透明淡灰色
+        color: "#585861"
         opacity: 0.2
         radius: 8
         z: 2
@@ -36,42 +34,26 @@ Rectangle {
             id: yearWheel
             width: 100
             height: 160
-            model: endYear - startYear + 1
+            model: []
         }
+
         FlickableWheel {
             id: monthWheel
             width: 80
             height: 160
-            model: [1,2,3,4,5,6,7,8,9,10,11,12]
+            model: ["1", "2", "3", "4", "5", "6",
+                    "7", "8", "9", "10", "11", "12"]
         }
+
         FlickableWheel {
             id: dayWheel
             width: 80
             height: 160
-            model: {
-                var m = monthWheel.currentIndex + 1
-                var y = yearWheel.currentIndex + startYear
-                if (m === 2) {
-                    if ((y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0))
-                        return 29
-                    else
-                        return 28
-                }
-                if ([1,3,5,7,8,10,12].indexOf(m) !== -1)
-                    return 31
-                return 30
-            }
+            model: []
         }
     }
 
-    // 默认选中当前日期
-    Component.onCompleted: {
-        yearWheel.currentIndex = year - startYear
-        monthWheel.currentIndex = month - 1
-        dayWheel.currentIndex = day - 1
-    }
-
-    // 顶部渐隐
+    // 顶部和底部渐隐
     Rectangle {
         anchors.top: parent.top
         width: parent.width
@@ -82,7 +64,7 @@ Rectangle {
             GradientStop { position: 1.0; color: "#18181a00" }
         }
     }
-    // 底部渐隐
+
     Rectangle {
         anchors.bottom: parent.bottom
         width: parent.width
@@ -91,6 +73,53 @@ Rectangle {
         gradient: Gradient {
             GradientStop { position: 0.0; color: "#18181a00" }
             GradientStop { position: 1.0; color: "#18181a" }
+        }
+    }
+
+    // 初始化当前日期与模型
+    Component.onCompleted: {
+        let now = new Date()
+        year = now.getFullYear()
+        month = now.getMonth() + 1
+        day = now.getDate()
+
+        startYear = year - 10
+        endYear = year + 10
+
+        let years = []
+        for (let y = startYear; y <= endYear; y++) {
+            years.push(y.toString())
+        }
+        yearWheel.model = years
+        yearWheel.currentIndex = year - startYear
+
+        monthWheel.currentIndex = month - 1
+
+        updateDays()
+        dayWheel.currentIndex = day - 1
+    }
+
+    function updateDays() {
+        let y = startYear + yearWheel.currentIndex
+        let m = monthWheel.currentIndex + 1
+        let daysInMonth = new Date(y, m, 0).getDate()
+        let days = []
+        for (let d = 1; d <= daysInMonth; d++) {
+            days.push(d)
+        }
+        dayWheel.model = days
+    }
+
+    Connections {
+        target: yearWheel
+        function onCurrentIndexChanged() {
+            updateDays()
+        }
+    }
+    Connections {
+        target: monthWheel
+        function onCurrentIndexChanged() {
+            updateDays()
         }
     }
 
