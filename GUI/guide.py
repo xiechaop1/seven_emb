@@ -292,76 +292,27 @@ class DatePage(BaseGuidePage):
         self.date_widget = QWidget(self)
         self.date_widget.setGeometry((WINDOW_W-400)//2, 300, 400, 200)
         
-        # 创建年月日选择器
-        self.year_combo = QComboBox(self.date_widget)
-        self.year_combo.setGeometry(0, 0, 120, 50)
-        self.year_combo.setStyleSheet("""
-            QComboBox {
-                background-color: #2a2a2a;
-                color: white;
-                border: 1px solid #3a3a3a;
-                border-radius: 5px;
-                padding: 5px;
-                font-size: 20px;
-            }
-            QComboBox::drop-down {
-                border: none;
-            }
-            QComboBox::down-arrow {
-                image: url(resources/images/down_arrow.png);
-                width: 20px;
-                height: 20px;
-            }
-        """)
+        # 使用QQuickWidget加载DatePicker.qml
+        self.qml_widget = QQuickWidget(self.date_widget)
+        self.qml_widget.setSource(QUrl.fromLocalFile(os.path.abspath("DatePicker.qml")))
+        self.qml_widget.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.qml_widget.setGeometry(0, 0, 400, 200)
         
-        self.month_combo = QComboBox(self.date_widget)
-        self.month_combo.setGeometry(140, 0, 120, 50)
-        self.month_combo.setStyleSheet(self.year_combo.styleSheet())
+        # 设置QML日期为当前日期
+        now = QDate.currentDate()
+        root = self.qml_widget.rootObject()
+        if root is not None:
+            root.setProperty("year", now.year())
+            root.setProperty("month", now.month())
+            root.setProperty("day", now.day())
         
-        self.day_combo = QComboBox(self.date_widget)
-        self.day_combo.setGeometry(280, 0, 120, 50)
-        self.day_combo.setStyleSheet(self.year_combo.styleSheet())
-        
-        # 填充年份选项（当前年份前后10年）
-        current_year = QDate.currentDate().year()
-        for year in range(current_year-10, current_year+11):
-            self.year_combo.addItem(str(year))
-        self.year_combo.setCurrentText(str(current_year))
-        
-        # 填充月份选项
-        for month in range(1, 13):
-            self.month_combo.addItem(str(month).zfill(2))
-        self.month_combo.setCurrentText(str(QDate.currentDate().month()).zfill(2))
-        
-        # 更新日期选项
-        self.update_days()
-        
-        # 连接信号
-        self.year_combo.currentTextChanged.connect(self.update_days)
-        self.month_combo.currentTextChanged.connect(self.update_days)
-        
-    def update_days(self):
-        """更新日期选项"""
-        year = int(self.year_combo.currentText())
-        month = int(self.month_combo.currentText())
-        days_in_month = QDate(year, month, 1).daysInMonth()
-        
-        self.day_combo.clear()
-        for day in range(1, days_in_month + 1):
-            self.day_combo.addItem(str(day).zfill(2))
-        
-        current_day = QDate.currentDate().day()
-        if current_day <= days_in_month:
-            self.day_combo.setCurrentText(str(current_day).zfill(2))
-        else:
-            self.day_combo.setCurrentText("01")
-            
     def get_selected_date(self):
         """获取选择的日期"""
-        year = self.year_combo.currentText()
-        month = self.month_combo.currentText()
-        day = self.day_combo.currentText()
-        return f"{year}-{month}-{day}"
+        root = self.qml_widget.rootObject()
+        year = int(root.property("year"))
+        month = int(root.property("month"))
+        day = int(root.property("day"))
+        return f"{year}-{month:02d}-{day:02d}"
 
 class TimePage(BaseGuidePage):
     def __init__(self, parent=None):
@@ -397,83 +348,28 @@ class ReligionPage(BaseGuidePage):
         super().__init__(parent)
         self.title.setText("请选择您所在的宗教")
         
-        # 创建宗教选择按钮组
-        self.religion_group = QButtonGroup(self)
+        # 创建宗教选择器
+        self.religion_widget = QWidget(self)
+        self.religion_widget.setGeometry((WINDOW_W-400)//2, 300, 400, 200)
+        
+        # 使用QQuickWidget加载ReligionPicker.qml
+        self.qml_widget = QQuickWidget(self.religion_widget)
+        self.qml_widget.setSource(QUrl.fromLocalFile(os.path.abspath("ReligionPicker.qml")))
+        self.qml_widget.setResizeMode(QQuickWidget.SizeRootObjectToView)
+        self.qml_widget.setGeometry(0, 0, 400, 200)
+        
+        # 设置QML宗教选项（如有需要可通过contextProperty传递列表）
+        # 这里假设QML端有religionIndex属性
         self.religions = ["无宗教信仰", "佛教", "基督教", "伊斯兰教", "印度教", "道教", "其他"]
+        root = self.qml_widget.rootObject()
+        if root is not None:
+            root.setProperty("religionIndex", 0)
         
-        # 创建滚动区域
-        self.scroll_area = QScrollArea(self)
-        self.scroll_area.setGeometry((WINDOW_W-400)//2, 300, 400, 400)
-        self.scroll_area.setWidgetResizable(True)  # 允许widget调整大小
-        self.scroll_area.setStyleSheet("""
-            QScrollArea {
-                border: none;
-                background-color: transparent;
-            }
-            QScrollBar:vertical {
-                border: none;
-                background: #2a2a2a;
-                width: 10px;
-                margin: 0px;
-            }
-            QScrollBar::handle:vertical {
-                background: #4a4a4a;
-                min-height: 20px;
-                border-radius: 5px;
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                height: 0px;
-            }
-        """)
-        
-        # 创建容器widget
-        self.container = QWidget()
-        self.container.setStyleSheet("background-color: transparent;")
-        self.scroll_area.setWidget(self.container)
-        
-        # 创建垂直布局
-        layout = QVBoxLayout(self.container)
-        layout.setSpacing(10)
-        layout.setContentsMargins(0, 0, 0, 0)
-        
-        # 创建单选按钮
-        for religion in self.religions:
-            radio = QRadioButton(religion)
-            radio.setStyleSheet("""
-                QRadioButton {
-                    color: white;
-                    font-size: 24px;
-                    padding: 10px;
-                    min-height: 50px;
-                }
-                QRadioButton::indicator {
-                    width: 20px;
-                    height: 20px;
-                }
-                QRadioButton::indicator:unchecked {
-                    border: 2px solid #4a4a4a;
-                    border-radius: 10px;
-                    background-color: #2a2a2a;
-                }
-                QRadioButton::indicator:checked {
-                    border: 2px solid #4a4a4a;
-                    border-radius: 10px;
-                    background-color: #4a4a4a;
-                }
-            """)
-            self.religion_group.addButton(radio)
-            layout.addWidget(radio)
-        
-        # 确保滚动区域在最上层
-        self.scroll_area.raise_()
-        self.scroll_area.show()
-
     def get_selected_religion(self):
         """获取选中的宗教"""
-        button = self.religion_group.checkedButton()
-        if button:
-            return self.religions[self.religion_group.id(button)]
-        return None
+        root = self.qml_widget.rootObject()
+        idx = int(root.property("religionIndex"))
+        return self.religions[idx] if 0 <= idx < len(self.religions) else None
 
 class StressPage(BaseGuidePage):
     def __init__(self, parent=None):
