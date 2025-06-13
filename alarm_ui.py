@@ -152,9 +152,10 @@ class AddAlarmDialog(QDialog):
     def __init__(self, task_daemon, parent=None):
         super().__init__(parent)
         self.task_daemon = task_daemon
-        # 全屏显示
-        self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
-        self.showFullScreen()
+        # 设置为和主屏幕一样大，不全屏
+        self.setWindowFlags(self.windowFlags() & ~Qt.FramelessWindowHint)
+        screen = QApplication.primaryScreen().geometry()
+        self.setGeometry(screen)
         self.setStyleSheet("background: #18181a;")
         self.setup_ui()
 
