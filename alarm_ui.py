@@ -99,7 +99,7 @@ class AlarmItem(QWidget):
                 background-color: #d70015;
             }
         """)
-        delete_btn.clicked.connect(self.delete_alarm, self.task.id)
+        delete_btn.clicked.connect(self.delete_alarm)
         # 布局调整
         layout.addLayout(time_layout, 2)
         layout.addStretch(1)
@@ -140,9 +140,9 @@ class AlarmItem(QWidget):
             if root is not None:
                 root.setProperty("checked", not checked)
             
-def delete_alarm(self, task_id):
+    def delete_alarm(self):
         try:
-            self.task_daemon.scheduler.remove_task(task_id)
+            self.task_daemon.scheduler.remove_task(self.task.id)
             self.task_daemon.save_tasks()
             self.deleteLater()
         except Exception as e:
