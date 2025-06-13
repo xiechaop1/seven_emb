@@ -29,6 +29,9 @@ class ActionType(str, Enum):
     DISPLAY = "display"  # 屏幕显示
     SPRAY = "spray"
     COMBINED = "combined"  # 组合动作
+    MODULE = "module"
+    PYTHON = "python"
+    SHELL = "shell"
 
 class LightCommand(str, Enum):
     TURN_ON = "turn_on"

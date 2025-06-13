@@ -6,11 +6,18 @@ import threading
 import time as time_module
 import os
 
+from numpy.f2py.auxfuncs import throw_error
+
 from common.threading_event import ThreadingEvent
 from .task import Task, TaskStatus, TaskScheduleType, TaskType, TaskAction, ActionType, LightCommand, SoundCommand, DisplayCommand
 import signal
 import sys
 from common.code import Code
+
+import threading
+import subprocess
+import importlib
+
 
 # 配置日志格式
 logging.basicConfig(
@@ -309,11 +316,8 @@ class TaskScheduler:
 
             # 新增：系统任务类型处理
             if task.task_type == TaskType.SYSTEM:
-                import threading
-                import subprocess
-                import importlib
                 for action in actions:
-                    result = self._execute_action(action)
+                    result = self._execute_system_action(action)
                     results.append(result)
                 #     params = action.parameters
                 #     if action.action_type == 'module' or action.action_type == ActionType.MODULE:
@@ -349,7 +353,7 @@ class TaskScheduler:
                 #     "message": "System task executed",
                 #     "results": results
                 # }
-            elif task.task_type == TaskType.ALERT:
+            elif task.task_type == TaskType.ALARM:
                 for action in actions:
                     result = self._execute_action(action)
                     results.append(result)
@@ -364,8 +368,9 @@ class TaskScheduler:
                 "success": False,
                 "error": str(e)
             }
-    def _execute_system_action(self, action: TaskAction) -> dict:
+    def _execute_system_action(self, action: TaskAction):
         """执行系统任务动作，支持模块、python、shell三种类型"""
+        results = []
         try:
             params = action.parameters
             sys_type = params.get("sys_type")  # "module"/"python"/"shell"
@@ -376,7 +381,7 @@ class TaskScheduler:
                 target = params.get("target")
                 if not target:
                     results.append({"success": False, "error": "系统任务缺少模块名"})
-                    continue
+                    return results
                 def run_module():
                     mod = importlib.import_module(target)
                     if hasattr(mod, 'main'):
@@ -388,29 +393,34 @@ class TaskScheduler:
                 target = params.get("target")
                 if not target:
                     results.append({"success": False, "error": "系统任务缺少python文件路径"})
-                    continue
+                    return results
                 subprocess.Popen(['python3', target])
                 results.append({"success": True, "message": f"python文件 {target} 已启动执行"})
             elif action.action_type == 'shell' or action.action_type == ActionType.SHELL:
                 target = params.get("target")
                 if not target:
                     results.append({"success": False, "error": "系统任务缺少shell脚本路径"})
-                    continue
+                    return results
                 subprocess.Popen(['sh', target])
                 results.append({"success": True, "message": f"shell脚本 {target} 已启动执行"})
             else:
                 results.append({"success": False, "error": f"未知的系统任务类型: {action.action_type}"})
+                return results
         except Exception as e:
-            return {
-                "success": False,
-                "error": str(e)
-            }
-        
-        return {
-            "success": all(r.get("success", False) for r in results),
-            "message": "System task executed",
-            "results": results
-        }
+            results.append({"success": False, "error": str(e)})
+            return results
+        return results
+        # except Exception as e:
+        #     return {
+        #         "success": False,
+        #         "error": str(e)
+        #     }
+        #
+        # return {
+        #     "success": all(r.get("success", False) for r in results),
+        #     "message": "System task executed",
+        #     "results": results
+        # }
     def _execute_action(self, action: TaskAction) -> dict:
         """执行具体动作"""
         try:
