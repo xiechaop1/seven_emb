@@ -21,12 +21,13 @@ class Command:
 
 	MAX_SCENE = 6	# 最大场景ID
 
-	def __init__(self, audioPlayerIns, light, spray, ws, cv2):
+	def __init__(self, audioPlayerIns, light, spray, ws, cv2, comm):
 		self.audio_player = audioPlayerIns
 		self.light = light
 		self.spray = spray
 		self.ws = ws
 		self.cv2 = cv2
+		self.comm = comm
 
 	def deal(self, device, operation, value):
 
@@ -84,6 +85,16 @@ class Command:
 					self.spray.turn_on()
 				else:
 					self.spray.turn_off()
+			elif device == Code.REC_ACTION_PARAMS_DEVICE_ALARM:
+				if value == Code.REC_ACTION_PARAMS_VALUE_ON:
+					self.comm.message.emit("alarm enter")
+				elif value == Code.REC_ACTION_PARAMS_VALUE_OFF:
+					self.comm.message.emit("alarm exit")
+				elif value == Code.REC_ACTION_PARAMS_VALUE_SET:
+					self.comm.message.emit("alarm enter")
+				else:
+					self.comm.message.emit("alarm enter")
+
 			elif device == Code.REC_ACTION_PARAMS_DEVICE_SYSTEM:
 				if value == Code.REC_ACTION_PARAMS_VALUE_SLEEP:
 					Common.sleep(self.audio_player, self.light, self.spray)

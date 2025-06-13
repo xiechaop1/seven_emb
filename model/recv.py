@@ -40,7 +40,7 @@ class Recv:
 
 		# self.wsClient.set_callback = ec_handler.undertake
 		ec_handler = ExecuteCommand(self.audio_player, self.wsClient, self.cv2)
-		co_handler = Command(self.audio_player, self.light, self.spray, self.wsClient, self.cv2)
+		co_handler = Command(self.audio_player, self.light, self.spray, self.wsClient, self.cv2, self.comm)
 
 		last_resp = None
 		msg_id_2_type = {}
@@ -142,10 +142,10 @@ class Recv:
 							self.audio_player.play_voice_with_file(output_file_name)
 							last_resp = resp
 						elif act == Code.REC_ACTION_COMMAND:
-							resp_msg_id = resp["message_id"]
-							resp_conv_id = resp['conversation_id']
-
-							action = resp["data"]["action"]
+							# resp_msg_id = resp["message_id"]
+							# resp_conv_id = resp['conversation_id']
+							#
+							# action = resp["data"]["action"]
 
 							params = resp["data"]["action_params"]
 							device = None

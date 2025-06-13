@@ -503,13 +503,35 @@ class TaskScheduler:
             # 根据模式执行不同的显示效果
             if mode == "animation":
                 # 播放动画
-                pass
+                file_path = params.get("file_path")
+                alarmBg = QLabel(self)
+                alarmBg.setGeometry(0, 0, self.width(), self.height())
+                alarmBg.setScaledContents(True)
+                alarmBgMoive = QMovie(f"resources/images/{file_path}")
+                alarmBg.setMovie(alarmBgMoive)
+                alarmBgMoive.start()
+                alarmBg.hide()
             elif mode == "text":
                 # 显示文本
-                pass
+                file_path = params.get("file_path")
+                alarmBg = QLabel(self)
+                alarmBg.setGeometry(0, 0, self.width(), self.height())
+                alarmBg.setScaledContents(True)
+                alarmBgMovie = QMovie(f"resources/video/{file_path}")
+                alarmBg.setMovie(alarmBgMovie)
+                alarmBgMoive.start()
+                alarmBg.hide()
+                
             elif mode == "image":
                 # 显示图片
-                pass
+                file_path = params.get("file_path")
+                alarmBg = QLabel(self)
+                alarmBg.setGeometry(0, 0, self.width(), self.height())
+                alarmBg.setScaledContents(True)
+                alarmBgMovie = QMovie(f"resources/images/{file_path}")
+                alarmBg.setMovie(alarmBgMovie)
+                alarmBgMoive.start()
+                alarmBg.hide()
             
             return {
                 "success": True,
