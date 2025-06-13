@@ -306,11 +306,54 @@ class TaskScheduler:
         try:
             actions = task.get_actions()
             results = []
-            
-            for action in actions:
-                result = self._execute_action(action)
-                results.append(result)
-                
+
+            # 新增：系统任务类型处理
+            if task.task_type == TaskType.SYSTEM:
+                import threading
+                import subprocess
+                import importlib
+                for action in actions:
+                    result = self._execute_action(action)
+                    results.append(result)
+                #     params = action.parameters
+                #     if action.action_type == 'module' or action.action_type == ActionType.MODULE:
+                #         target = params.get("target")
+                #         if not target:
+                #             results.append({"success": False, "error": "系统任务缺少模块名"})
+                #             continue
+                #         def run_module():
+                #             mod = importlib.import_module(target)
+                #             if hasattr(mod, 'main'):
+                #                 mod.main()
+                #         t = threading.Thread(target=run_module)
+                #         t.start()
+                #         results.append({"success": True, "message": f"模块 {target} 已启动线程执行"})
+                #     elif action.action_type == 'python' or action.action_type == ActionType.PYTHON:
+                #         target = params.get("target")
+                #         if not target:
+                #             results.append({"success": False, "error": "系统任务缺少python文件路径"})
+                #             continue
+                #         subprocess.Popen(['python3', target])
+                #         results.append({"success": True, "message": f"python文件 {target} 已启动执行"})
+                #     elif action.action_type == 'shell' or action.action_type == ActionType.SHELL:
+                #         target = params.get("target")
+                #         if not target:
+                #             results.append({"success": False, "error": "系统任务缺少shell脚本路径"})
+                #             continue
+                #         subprocess.Popen(['sh', target])
+                #         results.append({"success": True, "message": f"shell脚本 {target} 已启动执行"})
+                #     else:
+                #         results.append({"success": False, "error": f"未知的系统任务类型: {action.action_type}"})
+                # return {
+                #     "success": all(r.get("success", False) for r in results),
+                #     "message": "System task executed",
+                #     "results": results
+                # }
+            elif task.task_type == TaskType.ALERT:
+                for action in actions:
+                    result = self._execute_action(action)
+                    results.append(result)
+                    
             return {
                 "success": all(r.get("success", False) for r in results),
                 "message": "Task executed successfully",
@@ -321,7 +364,53 @@ class TaskScheduler:
                 "success": False,
                 "error": str(e)
             }
-
+    def _execute_system_action(self, action: TaskAction) -> dict:
+        """执行系统任务动作，支持模块、python、shell三种类型"""
+        try:
+            params = action.parameters
+            sys_type = params.get("sys_type")  # "module"/"python"/"shell"
+            target = params.get("target")      # 模块名或文件路径
+            if not sys_type or not target:
+                raise ValueError("系统任务缺少类型或目标")
+            if action.action_type == 'module' or action.action_type == ActionType.MODULE:
+                target = params.get("target")
+                if not target:
+                    results.append({"success": False, "error": "系统任务缺少模块名"})
+                    continue
+                def run_module():
+                    mod = importlib.import_module(target)
+                    if hasattr(mod, 'main'):
+                        mod.main()
+                t = threading.Thread(target=run_module)
+                t.start()
+                results.append({"success": True, "message": f"模块 {target} 已启动线程执行"})
+            elif action.action_type == 'python' or action.action_type == ActionType.PYTHON:
+                target = params.get("target")
+                if not target:
+                    results.append({"success": False, "error": "系统任务缺少python文件路径"})
+                    continue
+                subprocess.Popen(['python3', target])
+                results.append({"success": True, "message": f"python文件 {target} 已启动执行"})
+            elif action.action_type == 'shell' or action.action_type == ActionType.SHELL:
+                target = params.get("target")
+                if not target:
+                    results.append({"success": False, "error": "系统任务缺少shell脚本路径"})
+                    continue
+                subprocess.Popen(['sh', target])
+                results.append({"success": True, "message": f"shell脚本 {target} 已启动执行"})
+            else:
+                results.append({"success": False, "error": f"未知的系统任务类型: {action.action_type}"})
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }
+        
+        return {
+            "success": all(r.get("success", False) for r in results),
+            "message": "System task executed",
+            "results": results
+        }
     def _execute_action(self, action: TaskAction) -> dict:
         """执行具体动作"""
         try:
@@ -704,59 +793,6 @@ class TaskScheduler:
             
             logging.debug(f"获取所有任务状态信息，共 {len(status_list)} 个任务")
             return status_list
-
-    def create_combined_task_example(self) -> Task:
-        """创建一个5分钟后执行的组合任务示例
-        
-        这个示例将同时执行：
-        1. 灯光效果：呼吸模式
-        2. 声音播放：播放指定音频文件
-        3. 屏幕显示：显示动画效果
-        
-        Returns:
-            Task: 创建的任务对象
-        """
-        # 计算5分钟后的时间
-        now = datetime.now()
-        execution_time = (now + timedelta(minutes=5)).time()
-        
-        # 创建各种动作
-        light_action = TaskAction.create_light_action(
-            mode="breath",
-            params={
-                "color": "#FF0000",
-                "speed": 2
-            }
-        )
-        
-        sound_action = TaskAction.create_sound_action(
-            file_path="/path/to/your/music.mp3",
-            volume=80
-        )
-        
-        display_action = TaskAction.create_screen_action(
-            mode="animation",
-            params={
-                "animation_type": "welcome",
-                "duration": 30
-            }
-        )
-        
-        # 将所有动作组合在一起
-        actions = [light_action, sound_action, display_action]
-        
-        # 创建任务
-        task = Task.create(
-            name="5分钟后的组合任务",
-            task_type=TaskType.ALARM,
-            schedule_type=TaskScheduleType.ONCE,
-            execution_time=execution_time.isoformat(),
-            duration=30,  # 任务持续30秒
-            actions=json.dumps(actions)
-        )
-        
-        # 添加到调度器
-        return self.add_task(task)
 
 class TaskDaemon:
     def __init__(self, storage_file: str, audioPlayerIns, lightIns, sprayIns):

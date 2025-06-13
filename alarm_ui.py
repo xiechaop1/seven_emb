@@ -67,6 +67,8 @@ class AlarmItem(QWidget):
         time_layout.addStretch()
         # 中间：iOS风格QML开关
         self.switch_widget = QQuickWidget()
+        self.switch_widget.setAttribute(Qt.WA_TranslucentBackground)
+        self.switch_widget.setClearColor(Qt.transparent)
         self.switch_widget.setStyleSheet("background: transparent;")
         self.switch_widget.setSource(QUrl.fromLocalFile(os.path.abspath("IosSwitch.qml")))
         self.switch_widget.setResizeMode(QQuickWidget.SizeRootObjectToView)
